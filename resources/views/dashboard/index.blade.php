@@ -14,7 +14,7 @@
 <section class="section dashboard" id="dashboard-container">
     <div class="row">
         <div class="card-nominal">
-            <span class="badge-toggle toggle-button" onclick="toggleNominal()">Show/Hide Nominal</span>
+            <span class="badge-toggle toggle-button" onclick="toggleNominal()">Tampilkan / Sembunyikan Nominal</span>
             <ul class="box-info">
                 <li>
                     <i class='bx bxs-dollar-circle'></i>
@@ -49,7 +49,7 @@
 
         <!-- Cash Flow -->
         <div class="card-penyiar mb-4">
-            <h3>Cash Flow</h3>
+            <h3>Arus Kas</h3>
             <div class="card-goal">
                 <div class="card-body-goal">
                     <div class="chart-container">
@@ -61,13 +61,13 @@
 
         <!-- Expense Chart -->
         <div class="card-grafik" id="barChartCard">
-            <h3>Expense Chart</h3>
+            <h3>Grafik Pendapatan dan Pengeluaran</h3>
             <div id="barChart"></div>
         </div>
 
         <!-- Transaksi Hari ini -->
         <div class="card-today">
-            <h3>Recent Transaction</h3>
+            <h3>Transaksi Hari Ini</h3>
             <div class="card-body">
                 <table id="todayTransactionsTable" class="display">
                     <thead>
@@ -88,7 +88,7 @@
 
         <!-- Kompas -->
         <div class="card-today">
-            <h3>Compass</h3>
+            <h3>Kompas</h3>
             <div>
                 <div id="chart"></div>
             </div>
