@@ -30,16 +30,13 @@
 
     <!-- CSS File -->
     <link href="/css/style.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 </head>
 
 <body>
     <!-- Header -->
     @include('layouts.header')
-
-    <!-- Sidebar -->
-    @include('layouts.sidebar')
 
     <!-- Main -->
     <main id="main" class="main">
@@ -57,6 +54,9 @@
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
     <script src="/vendor/php-email-form/validate.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
 
     <!-- DataTables  & Plugins -->
     <script src="/js/jquery-3.7.0.min.js"></script>

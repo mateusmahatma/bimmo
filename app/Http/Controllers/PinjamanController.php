@@ -6,7 +6,7 @@ use App\Models\Pinjaman;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Validator;
 
 class PinjamanController extends Controller
 {
@@ -28,7 +28,7 @@ class PinjamanController extends Controller
                     return $pinjaman->status;
                 })
                 ->addColumn('aksi', function ($pinjaman) {
-                    return view('pinjaman.tombol', ['pinjaman' => $pinjaman]);
+                    return view('pinjaman.tombol', ['pinjaman' => $pinjaman])->with('request', $pinjaman);
                 })
 
                 ->with('totalPinjaman', 'Rp ' . number_format($totalPinjaman, 0, ',', '.'))
@@ -49,11 +49,11 @@ class PinjamanController extends Controller
     {
         $validatedData = $request->validate([
             'nama_pinjaman' => 'required',
-            'jumlah_pinjaman' => 'required|numeric',
-            'jangka_waktu' => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'status' => 'required|in:lunas,belum_lunas',
+            'jumlah_pinjaman' => 'numeric',
+            'jangka_waktu' => 'integer',
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => 'in:lunas,belum_lunas',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -69,32 +69,52 @@ class PinjamanController extends Controller
         return view('pinjaman.show', compact('pinjaman'));
     }
 
+    public function edit($id)
+    {
+        $data = Pinjaman::where('id', $id)->first();
+        return response()->json(['result' => $data]);
+    }
+
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validasi = Validator::make($request->all(), [
             'nama_pinjaman' => 'required',
-            'jumlah_pinjaman' => 'required|numeric',
+            'jumlah_pinjaman' => 'numeric',
+            'jangka_waktu' => 'integer',
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => 'in:lunas,belum_lunas',
+        ], [
+            'nama_pinjaman.required' => 'Nama wajib diisi',
         ]);
 
-        $pinjaman = Pinjaman::findOrFail($id);
+        if ($validasi->fails()) {
+            return response()->json(['errors' => $validasi->errors()]);
+        }
 
-        $pinjaman->nama_pinjaman = $validatedData['nama_pinjaman'];
-        $pinjaman->jumlah_pinjaman = $validatedData['jumlah_pinjaman'];
+        $data = [
+            'nama_pinjaman' => $request->nama_pinjaman,
+            'jumlah_pinjaman' => $request->jumlah_pinjaman,
+            'jangka_waktu' => $request->jangka_waktu,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+        ];
 
-        $pinjaman->save();
-
-        return redirect()->route('pinjaman.index')->with('success', 'Pinjaman berhasil diperbarui.');
+        Pinjaman::where('id', $id)->update($data);
+        return response()->json(['success' => "Berhasil melakukan update data"]);
     }
+
+
 
     public function destroy($id)
     {
-        $pinjaman = Pinjaman::find($id);
+        $pinjaman = Pinjaman::findOrFail($id);
+        $pinjaman->delete(); // Ini akan otomatis menghapus semua pembayaran terkait
 
-        if (!$pinjaman) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        }
-
-        $pinjaman->delete();
-        return response()->json(['message' => 'Data berhasil dihapus'], 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'Pinjaman dan semua pembayaran terkait telah dihapus.'
+        ]);
     }
 }

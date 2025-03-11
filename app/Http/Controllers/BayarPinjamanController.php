@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pinjaman;
 use App\Models\BayarPinjaman;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class BayarPinjamanController extends Controller
 {
@@ -24,25 +25,42 @@ class BayarPinjamanController extends Controller
             return redirect()->back()->with('error', 'Nominal pembayaran melebihi jumlah pinjaman');
         }
 
-        BayarPinjaman::create([
-            'id_user' => auth()->id(),
-            'id_pinjaman' => $id_pinjaman,
-            'jumlah_bayar' => $jumlah_bayar,
-            'tgl_bayar' => $tgl_bayar,
-            'status' => 'sukses',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $pinjaman->jumlah_pinjaman -= $jumlah_bayar;
+            // Simpan pembayaran
+            $bayar = BayarPinjaman::create([
+                'id_user' => Auth::id(),
+                'id_pinjaman' => $id_pinjaman,
+                'jumlah_bayar' => $jumlah_bayar,
+                'tgl_bayar' => $tgl_bayar,
+                'status' => 'sukses',
+            ]);
 
-        if ($pinjaman->jumlah_pinjaman <= 0) {
-            $pinjaman->jumlah_pinjaman = 0;
-            $pinjaman->status = 'Lunas';
+            if (!$bayar) {
+                throw new \Exception('Gagal menyimpan pembayaran');
+            }
+
+            // Update jumlah pinjaman
+            $pinjaman->jumlah_pinjaman -= $jumlah_bayar;
+
+            // Jika sudah lunas, ubah status menjadi "Lunas"
+            if ($pinjaman->jumlah_pinjaman <= 0) {
+                $pinjaman->jumlah_pinjaman = 0;
+                $pinjaman->status = 'Lunas';
+            }
+
+            $pinjaman->save();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Pembayaran berhasil');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $pinjaman->save();
-
-        return redirect()->back()->with('success', 'Pembayaran berhasil');
     }
+
 
     public function destroy($id)
     {

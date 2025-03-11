@@ -49,8 +49,8 @@ $(document).ready(function () {
 
             $("#daterange span").html(
                 chosen_start_date.format("YYYY-MM-DD") +
-                    " - " +
-                    chosen_end_date.format("YYYY-MM-DD")
+                " - " +
+                chosen_end_date.format("YYYY-MM-DD")
             );
             transaksiTable.draw();
         }
@@ -115,7 +115,7 @@ $(document).ready(function () {
             },
             {
                 data: "pemasukan",
-                className: "text-center",
+                className: "text-left",
                 render: function (data, type, row) {
                     return data ? data : "-";
                 },
@@ -140,7 +140,7 @@ $(document).ready(function () {
             },
             {
                 data: "pengeluaran",
-                className: "text-center",
+                className: "text-left",
                 render: function (data, type, row) {
                     return data ? data : "-";
                 },
@@ -173,12 +173,23 @@ $(document).ready(function () {
                     if (type === "display") {
                         if (data && typeof data === "string") {
                             var lines = data.split("\n");
-                            var renderedText = "";
+                            var table = `
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <colgroup>
+                            <col style="width: 30px;">
+                            <col>
+                        </colgroup>`;
+
                             lines.forEach(function (line, index) {
-                                renderedText +=
-                                    index + 1 + ". " + line + "<br>";
+                                table += `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${index + 1}</td>
+                            <td style="border: 1px solid #ddd; padding: 4px;">${line}</td>
+                        </tr>`;
                             });
-                            return renderedText;
+
+                            table += "</table>";
+                            return table;
                         } else {
                             return "-";
                         }
@@ -186,6 +197,8 @@ $(document).ready(function () {
                     return data ? data : "-";
                 },
             },
+
+
 
             {
                 data: "created_at",
@@ -707,204 +720,6 @@ $(document).ready(function () {
 });
 
 // Handle Import Excel
-// function importData(form) {
-//     const formData = new FormData(form);
-//     const importBtn = document.getElementById("importBtn");
-//     const uploadStatus = document.getElementById("uploadStatus");
-
-//     importBtn.disabled = true;
-//     importBtn.innerHTML =
-//         '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses Import...';
-
-//     const xhr = new XMLHttpRequest();
-//     xhr.open("POST", form.action, true);
-//     xhr.setRequestHeader(
-//         "X-CSRF-TOKEN",
-//         document
-//             .querySelector('meta[name="csrf-token"]')
-//             .getAttribute("content")
-//     );
-
-//     xhr.onload = function () {
-//         handleResponse(xhr, uploadStatus, form, importBtn);
-//     };
-
-//     xhr.onerror = function () {
-//         handleError(uploadStatus, importBtn);
-//     };
-
-//     xhr.onloadend = function () {
-//         importBtn.disabled = false;
-//         importBtn.innerHTML = '<i class="fa fa-upload"></i> Import';
-//     };
-
-//     xhr.send(formData);
-// }
-
-// document.getElementById("importForm").addEventListener("submit", function (e) {
-//     e.preventDefault();
-
-//     Swal.fire({
-//         title: "Yakin ingin mengimpor file?",
-//         html: `Pastikan data sudah sesuai sebelum melakukan import.`,
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#3085d6",
-//         cancelButtonColor: "#d33",
-//         confirmButtonText: "Ya, import!",
-//         cancelButtonText: "Batal",
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             importData(e.target);
-//         }
-//     });
-// });
-
-// function handleResponse(xhr, uploadStatus, form, importBtn) {
-//     const data = JSON.parse(xhr.responseText);
-//     if (xhr.status >= 200 && xhr.status < 300) {
-//         if (data.success) {
-//             form.reset();
-//             $("#importExcelModal").modal("hide");
-
-//             Swal.fire({
-//                 icon: "success",
-//                 title: "Data berhasil diimport",
-//                 timer: 3000,
-//                 showConfirmButton: false,
-//                 toast: true,
-//                 position: "top",
-//                 customClass: {
-//                     title: "swal2-title-create",
-//                     popup: "swal2-popup-create",
-//                 },
-//                 iconColor: "#ffffff",
-//             });
-
-//             $("#transaksiTable").DataTable().ajax.reload();
-
-//             uploadStatus.innerHTML = `<div class="alert alert-success">Data berhasil diimpor!</div>`;
-//         } else {
-//             Swal.fire({
-//                 title: "Error!",
-//                 text: data.message || "Terjadi kesalahan saat mengimport file.",
-//                 icon: "error",
-//                 confirmButtonColor: "#d33",
-//             });
-//             uploadStatus.innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
-//         }
-//     } else {
-//         Swal.fire({
-//             title: "Error!",
-//             text: "Terjadi kesalahan pada server.",
-//             icon: "error",
-//             confirmButtonColor: "#d33",
-//         });
-//         uploadStatus.innerHTML = `<div class="alert alert-danger">Error uploading file!</div>`;
-//     }
-// }
-
-// function handleError(uploadStatus, importBtn) {
-//     Swal.fire({
-//         title: "Error!",
-//         text: "Terjadi kesalahan pada server.",
-//         icon: "error",
-//         confirmButtonColor: "#d33",
-//     });
-//     uploadStatus.innerHTML = `<div class="alert alert-danger">Error uploading file!</div>`;
-//     importBtn.disabled = false;
-//     importBtn.innerHTML = '<i class="fa fa-upload"></i> Import';
-// }
-
-// document.getElementById("importForm").addEventListener("submit", function (e) {
-//     e.preventDefault();
-
-//     Swal.fire({
-//         title: "Yakin ingin mengimpor file?",
-//         html: `Pastikan data sudah sesuai sebelum melakukan import.`,
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#3085d6",
-//         cancelButtonColor: "#d33",
-//         confirmButtonText: "Ya, import!",
-//         cancelButtonText: "Batal",
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             const form = e.target;
-//             const formData = new FormData(form);
-//             const importBtn = document.getElementById("importBtn");
-//             const uploadStatus = document.getElementById("uploadStatus");
-
-//             // Update UI to show loading state
-//             importBtn.disabled = true;
-//             importBtn.innerHTML =
-//                 '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses Import...';
-
-//             const xhr = new XMLHttpRequest();
-//             xhr.open("POST", form.action, true);
-//             xhr.setRequestHeader(
-//                 "X-CSRF-TOKEN",
-//                 document
-//                     .querySelector('meta[name="csrf-token"]')
-//                     .getAttribute("content")
-//             );
-
-//             xhr.onload = function () {
-//                 const data = JSON.parse(xhr.responseText);
-//                 if (xhr.status >= 200 && xhr.status < 300 && data.success) {
-//                     form.reset();
-//                     $("#importExcelModal").modal("hide");
-
-//                     Swal.fire({
-//                         icon: "success",
-//                         title: "Data berhasil diimport",
-//                         timer: 3000,
-//                         showConfirmButton: false,
-//                         toast: true,
-//                         position: "top",
-//                         customClass: {
-//                             title: "swal2-title-create",
-//                             popup: "swal2-popup-create",
-//                         },
-//                         iconColor: "#ffffff",
-//                     });
-
-//                     $("#transaksiTable").DataTable().ajax.reload();
-//                     uploadStatus.innerHTML = `<div class="alert alert-success">Data berhasil diimpor!</div>`;
-//                 } else {
-//                     const message =
-//                         data.message ||
-//                         "Terjadi kesalahan saat mengimport file.";
-//                     Swal.fire({
-//                         title: "Error!",
-//                         text: message,
-//                         icon: "error",
-//                         confirmButtonColor: "#d33",
-//                     });
-//                     uploadStatus.innerHTML = `<div class="alert alert-danger">Error: ${message}</div>`;
-//                 }
-//             };
-
-//             xhr.onerror = xhr.onloadend = function () {
-//                 if (xhr.status < 200 || xhr.status >= 300) {
-//                     Swal.fire({
-//                         title: "Error!",
-//                         text: "Terjadi kesalahan pada server.",
-//                         icon: "error",
-//                         confirmButtonColor: "#d33",
-//                     });
-//                     uploadStatus.innerHTML = `<div class="alert alert-danger">Error uploading file!</div>`;
-//                 }
-//                 importBtn.disabled = false;
-//                 importBtn.innerHTML = '<i class="fa fa-upload"></i> Import';
-//             };
-
-//             xhr.send(formData);
-//         }
-//     });
-// });
-
-// Revisi Handle Import Excel
 document.getElementById("importForm").addEventListener("submit", function (e) {
     e.preventDefault();
 

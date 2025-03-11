@@ -13,7 +13,7 @@
     --bs-white: #fff;
     --bs-gray: #6c757d;
     --bs-gray-dark: #343a40;
-    --bs-primary: #1d226c;
+    --bs-primary: black;
     --bs-secondary: #f9f9fb;
     --bs-success: #82d616;
     --bs-info: #17c1e8;
@@ -63,6 +63,12 @@ body {
     background-color: var(--bs-main);
     margin: 0;
     text-align: left;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+html {
+    height: 100%;
 }
 
 /* Layout */
@@ -73,7 +79,6 @@ body {
     padding: 0 20px;
     display: flex;
     align-items: center;
-    /* border-bottom: 1px solid gray; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -82,6 +87,8 @@ body {
     padding: 20px 30px;
     margin: 60px auto 0;
     background-color: var(--bs-main);
+    min-height: calc(100vh - 60px);
+    box-sizing: border-box;
 }
 
 /* Tipografi */
@@ -91,7 +98,7 @@ h3,
 h4,
 h5,
 h6 {
-    color: #444;
+    color: black;
     margin-top: 0;
 }
 
@@ -260,13 +267,6 @@ body.dark-mode .daterangepicker {
     background: var(--bs-dark-main);
     color: var(--bs-white);
     border: 1px solid #1a1c23;
-}
-
-body.dark-mode .daterangepicker .ranges li:hover,
-body.dark-mode .daterangepicker .ranges li:focus {
-    background: #40A2E3;
-    color: #ffffff;
-    border: 1px solid #40A2E3;
 }
 
 body.dark-mode .card {
@@ -477,15 +477,11 @@ a.disabled span {
     background-color: #f2f2f2;
 }
 
-.table-data .order tr:hover {
-    background-color: #e9ecef;
-}
 
 .badge-success {
     display: inline-block;
     padding: 0.25em 0.4em;
     font-size: 75%;
-    /* font-weight: bold; */
     line-height: 1;
     color: #fff;
     text-align: center;
@@ -499,7 +495,6 @@ a.disabled span {
     display: inline-block;
     padding: 0.25em 0.4em;
     font-size: 75%;
-    /* font-weight: bold; */
     line-height: 1;
     color: #fff;
     text-align: center;
@@ -513,7 +508,6 @@ a.disabled span {
     display: inline-block;
     padding: 0.25em 0.4em;
     font-size: 75%;
-    /* font-weight: bold; */
     line-height: 1;
     color: #fff;
     text-align: center;
@@ -547,19 +541,19 @@ a.disabled span {
 }
 
 .box-info li:nth-child(1) .bx {
-    color: var(--red);
+    color: green;
 }
 
 .box-info li:nth-child(2) .bx {
-    color: var(--orange);
+    color: red;
 }
 
 .box-info li:nth-child(3) .bx {
-    color: var(--green);
+    color: var(--red);
 }
 
 .box-info li:nth-child(4) .bx {
-    color: var(--green);
+    color: greenyellow;
 }
 
 .box-info li .text h3 {
@@ -617,12 +611,50 @@ a.disabled span {
 }
 
 .btn-color {
-    background-color: var(--bs-primary);
-    color: #fff;
-    border-color: var(--bs-primary);
+    background-color: var(--bs-main);
+    color: #012970;
+    border-color: #012970;
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
-    border-radius: 0.25rem;
+    border-radius: 2px;
+}
+
+/* Gaya modern yang disesuaikan */
+.cssbuttons-io-button {
+    display: flex;
+    align-items: center;
+    font-family: inherit;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0.6em 1.2em 0.6em 1em;
+    color: #012970;
+    background: var(--light);
+    letter-spacing: 0.03em;
+    border-radius: 8px;
+    border: 2px solid #012970;
+    transition: all 0.3s ease-in-out;
+}
+
+.cssbuttons-io-button svg {
+    margin-right: 8px;
+    fill: white;
+}
+
+.cssbuttons-io-button_2 {
+    display: flex;
+    align-items: center;
+    font-family: inherit;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0.6em 1.2em 0.6em 1em;
+    color: red;
+    background: var(--light);
+    letter-spacing: 0.03em;
+    border-radius: 8px;
+    border: 2px solid red;
+    transition: all 0.3s ease-in-out;
 }
 
 .btn-color2 {
@@ -648,10 +680,6 @@ a.disabled span {
     color: #6c757d;
     transition: color 0.3s ease-in-out;
     margin-bottom: 10px;
-}
-
-.password-toggle-icon i:hover {
-    color: #6c757d;
 }
 
 /* Chart */
@@ -732,7 +760,6 @@ body {
 .number-list {
     list-style-type: decimal;
     border-collapse: collapse;
-    /* Numbering angka desimal */
 }
 
 .bullet-list {
@@ -1001,9 +1028,6 @@ td {
     margin-bottom: 0;
 }
 
-/*--------------------------------------------------------------
-# Page Title
---------------------------------------------------------------*/
 .pagetitle {
     margin-bottom: 10px;
 }
@@ -1012,7 +1036,7 @@ td {
     font-size: 24px;
     margin-bottom: 0;
     font-weight: 600;
-    color: #012970;
+    color: black;
 }
 
 .link {
@@ -1021,7 +1045,8 @@ td {
 
 .icon-pointech {
     position: relative;
-    margin: 10px 15px 15px 10px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Tombol Back top */
@@ -1032,7 +1057,7 @@ td {
     right: 15px;
     bottom: 15px;
     z-index: 99999;
-    background: #0056b3;
+    background: black;
     width: 40px;
     height: 40px;
     border-radius: 4px;
@@ -1045,10 +1070,6 @@ td {
     line-height: 0;
 }
 
-.back-to-top:hover {
-    background: #0056b3;
-    color: #fff;
-}
 
 .back-to-top.active {
     visibility: visible;
@@ -1057,7 +1078,7 @@ td {
 
 /* Tombol Login */
 .bg-gradient-info {
-    background-color: var(--bs-primary);
+    background-color: var(--bs-white);
     padding: 2px;
     border-radius: 8px;
     width: 100%;
@@ -1068,9 +1089,9 @@ td {
     align-items: center;
     text-decoration: none;
     font-size: 1rem;
-    color: var(--bs-white);
+    color: black;
     padding: 8px;
-    border: 1px solid var(--primary-light);
+    border: 1px solid black;
     font-weight: 700;
 }
 
@@ -1344,7 +1365,7 @@ p {
     margin-bottom: 0.5rem;
     font-size: 1.2em;
     font-weight: 500;
-    color: #012970;
+    color: black;
 }
 
 .card-title span {
@@ -1488,7 +1509,7 @@ p {
 }
 
 .breadcrumb a:hover {
-    color: #51678f;
+    color: grey;
 }
 
 .breadcrumb .breadcrumb-item::before {
@@ -1513,13 +1534,13 @@ p {
 
 .nav-tabs-bordered .nav-link:hover,
 .nav-tabs-bordered .nav-link:focus {
-    color: #4154f1;
+    color: grey;
 }
 
 .nav-tabs-bordered .nav-link.active {
-    background-color: #fff;
-    color: #4154f1;
-    border-bottom: 2px solid #4154f1;
+    background-color: black;
+    color: grey;
+    border-bottom: 2px solid grey;
 }
 
 /*--------------------------------------------------------------
@@ -1537,7 +1558,7 @@ p {
 
 .logo img {
     max-height: 26px;
-    margin-right: 6px;
+    /* margin-right: 6px; */
 }
 
 .logo span {
@@ -1764,7 +1785,7 @@ p {
     background-color: #aab7cf;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1500px) {
 
     #main,
     #footer {
@@ -1819,7 +1840,7 @@ p {
     align-items: center;
     font-size: 15px;
     font-weight: 600;
-    color: #4154f1;
+    color: #012970;
     transition: 0.3;
     background: #f6f9ff;
     padding: 10px 15px;
@@ -1829,25 +1850,16 @@ p {
 .sidebar-nav .nav-link i {
     font-size: 16px;
     margin-right: 10px;
-    color: #4154f1;
+    color: #012970;
 }
 
 .sidebar-nav .nav-link.collapsed {
-    color: #012970;
+    color: black;
     background: #fff;
 }
 
 .sidebar-nav .nav-link.collapsed i {
     color: #899bbd;
-}
-
-.sidebar-nav .nav-link:hover {
-    color: #4154f1;
-    background: #f6f9ff;
-}
-
-.sidebar-nav .nav-link:hover i {
-    color: #4154f1;
 }
 
 .sidebar-nav .nav-link .bi-chevron-down {
@@ -1882,15 +1894,6 @@ p {
     border-radius: 50%;
 }
 
-.sidebar-nav .nav-content a:hover,
-.sidebar-nav .nav-content a.active {
-    color: #4154f1;
-}
-
-.sidebar-nav .nav-content a.active i {
-    background-color: #4154f1;
-}
-
 /* Search Bar */
 .mx-auto {
     align-items: center
@@ -1909,12 +1912,6 @@ p {
 }
 
 .text-gray-700 {
-    --text-opacity: 1;
-    color: #24262d;
-    color: rgba(36, 38, 45, var(--text-opacity))
-}
-
-.hover\:text-gray-700:hover {
     --text-opacity: 1;
     color: #24262d;
     color: rgba(36, 38, 45, var(--text-opacity))
@@ -1945,12 +1942,6 @@ p {
 }
 
 .bg-gray-100 {
-    --bg-opacity: 1;
-    background-color: #f4f5f7;
-    background-color: rgba(244, 245, 247, var(--bg-opacity))
-}
-
-.hover\:bg-gray-100:hover {
     --bg-opacity: 1;
     background-color: #f4f5f7;
     background-color: rgba(244, 245, 247, var(--bg-opacity))
@@ -2351,10 +2342,6 @@ p {
     font-size: 16px;
 }
 
-.dashboard .filter .icon:hover,
-.dashboard .filter .icon:focus {
-    color: #4154f1;
-}
 
 .dashboard .filter .dropdown-header {
     padding: 8px 15px;
@@ -2481,10 +2468,6 @@ p {
     transition: 0.3s;
 }
 
-.dashboard .news h4 a:hover {
-    color: #4154f1;
-}
-
 .dashboard .news p {
     font-size: 14px;
     color: #777777;
@@ -2594,10 +2577,6 @@ p {
     transition: 0.3s;
 }
 
-.profile .profile-card .social-links a:hover {
-    color: #012970;
-}
-
 .profile .profile-overview .row {
     margin-bottom: 20px;
     font-size: 15px;
@@ -2692,8 +2671,6 @@ p {
     margin: 0 10px -6px 0;
     border: 3px solid #18d26e;
     border-top-color: #eee;
-    /* -webkit-animation: animate-loading 1s linear infinite;
-    animation: animate-loading 1s linear infinite; */
 }
 
 .contact .php-email-form input,
@@ -2726,11 +2703,6 @@ p {
     border-radius: 4px;
 }
 
-.contact .php-email-form button[type="submit"]:hover {
-    background: #5969f3;
-}
-
-
 /*--------------------------------------------------------------
 # Error 404
 --------------------------------------------------------------*/
@@ -2759,9 +2731,9 @@ p {
     padding: 8px 30px;
 }
 
-.error-404 .btn:hover {
+/* .error-404 .btn:hover {
     background: #3e4f6f;
-}
+} */
 
 @media (min-width: 992px) {
     .error-404 img {
@@ -2806,22 +2778,22 @@ footer {
     font-weight: bold;
 }
 
-.footer-links a:hover {
+/* .footer-links a:hover {
     text-decoration: underline;
-}
+} */
 
 
 /* Toast Mixin */
 .swal2-title-create {
-    color: #ffffff !important;
+    color: #012970 !important;
 }
 
 .swal2-popup-create {
-    background-color: #012970 !important;
-    color: #ffffff !important;
+    background-color: #fff !important;
+    color: #012970 !important;
     width: 280px !important;
     height: 60px !important;
-    border-radius: 10px !important;
+    border-radius: 2px !important;
 }
 
 .swal2-popup-danger {
@@ -2829,7 +2801,7 @@ footer {
     color: #ffffff !important;
     width: 280px !important;
     height: 60px !important;
-    border-radius: 10px !important;
+    border-radius: 2px !important;
 }
 
 /* Dropdown */
@@ -2975,7 +2947,7 @@ footer {
 }
 
 .th {
-    background-color: #007bff;
+    background-color: #012970;
     color: white;
     font-weight: bold;
     text-transform: uppercase;
@@ -2997,19 +2969,13 @@ footer {
     outline: none;
 }
 
-.icon-elipsis:hover {
-    color: var(--bs-primary);
-}
-
 .nav-link {
     color: var(--bs-gray);
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 .nav-link.active {
     color: var(--bs-primary);
-    text-decoration: underline;
-    font-weight: bold;
 }
 
 .nav+form {
@@ -3018,7 +2984,6 @@ footer {
 
 .filter {
     color: black;
-    font-weight: bold;
 }
 
 .alert-info {
@@ -3105,7 +3070,7 @@ footer {
 }
 
 .daterangepicker .ranges li.active {
-    background-color: #007bff;
+    background-color: #012970;
     color: #fff;
 }
 
@@ -3116,7 +3081,7 @@ footer {
 }
 
 .daterangepicker .calendar-table .available.active {
-    background-color: #007bff;
+    background-color: #012970;
     color: #fff;
 }
 
@@ -3142,10 +3107,6 @@ footer {
     }
 }
 
-.toggle-button {
-    cursor: pointer;
-}
-
 /* Dashboard */
 /* Card Nominal */
 .card-nominal {
@@ -3156,19 +3117,37 @@ footer {
     margin-bottom: 0px;
 }
 
-.toggle-button {
-    display: inline-block;
+/* Container toggle switch */
+.toggle-switch {
+    width: 50px;
+    height: 25px;
+    background-color: #ccc;
+    border-radius: 25px;
+    position: relative;
     cursor: pointer;
-    background-color: var(--bs-primary);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 12px 24px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: auto;
+    transition: background-color 0.3s;
+}
+
+/* Tombol toggle */
+.toggle-button {
+    width: 23px;
+    height: 23px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    transition: left 0.3s;
+}
+
+/* Aktifkan mode toggle */
+.toggle-switch.active {
+    background-color: #4caf50;
+}
+
+.toggle-switch.active .toggle-button {
+    left: 26px;
+    /* Geser tombol ke kanan */
 }
 
 .box-info {
@@ -3183,11 +3162,13 @@ footer {
 
 .box-info li {
     flex: 1 1 calc(25% - 10px);
-    background-color: #f5f7fa;
+    background-color: var(--bs-main);
+    color: black;
+    /* border: 1px solid black; */
     padding: 20px;
     margin: 5px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* border-radius: 8px; */
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
     display: flex;
     align-items: center;
 }
@@ -3234,18 +3215,30 @@ footer {
 
 /* Dashboard */
 .card-penyiar,
+.card-today,
+.card-nominal,
 .card-pie,
-.card-grafik,
-.card-today {
+.card-grafik {
+    margin: 0px 0;
     padding: 20px;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 0px;
+}
+
+.mb-4 {
+    margin-bottom: 20px !important;
+}
+
+.filters-container,
+.chart-container,
+.card-body {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .chart-container {
-    height: 300px;
+    height: 350px;
     width: 100%;
 }
 
@@ -3265,7 +3258,6 @@ footer {
 }
 
 .toggle-password {
-    /* transform: translateY(-50%); */
     cursor: pointer;
     color: var(--bs-primary);
     font-size: 11px;
@@ -3273,9 +3265,58 @@ footer {
     background-color: transparent;
 }
 
-.toggle-password:hover {
-    color: #000000;
-    text-decoration: underline;
+/* Dropdown Arus Kas */
+.filters-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+}
+
+.filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff;
+    padding: 8px 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.filter-dropdown {
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filter-dropdown:hover {
+    border-color: #012970;
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
+}
+
+.filter-dropdown:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 6px 12px rgba(0, 86, 179, 0.3);
+}
+
+@media (max-width: 600px) {
+    .filters-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .dark-mode-dropdown-container {
@@ -3300,65 +3341,116 @@ footer {
     width: fit-content;
 }
 
-.section.dashboard .row > div {
-    margin-bottom: 24px; /* Beri jarak antar elemen vertikal */
+.section.dashboard .row>div {
+    margin-bottom: 24px;
+    /* Beri jarak antar elemen vertikal */
 }
 
 .card-body {
-    padding: 16px; /* Memberikan ruang di dalam tabel */
+    padding: 16px;
+    /* Memberikan ruang di dalam tabel */
 }
 
 table.display {
-    width: 100%; /* Pastikan tabel memenuhi lebar kontainer */
-    border-spacing: 0; /* Hilangkan spasi antara sel tabel */
+    width: 100%;
+    border-spacing: 0;
 }
 
 table.display th,
 table.display td {
-    text-align: center;
-    padding: 8px; /* Berikan ruang dalam sel */
+    text-align: left;
+    padding: 8px;
+    /* Berikan ruang dalam sel */
 }
 
 .card-penyiar {
-    margin-bottom: 24px; /* Berikan jarak di bawah Line Chart */
+    margin-bottom: 24px;
+    /* Berikan jarak di bawah Line Chart */
 }
 
 .card-grafik {
-    margin-top: 24px; /* Berikan jarak di atas Bar Chart */
+    margin-top: 24px;
 }
 
 /* Custom Table */
 table.customTable {
     width: 100%;
-    background-color: #FFFFFF;
-    border-collapse: collapse;
-    color: #000000;
+    border-spacing: 0;
+    background-color: #fff;
+    color: #333;
 }
 
-table.customTable td {
-    color: #000000;
-}
-
-table.customTable th {
-    color: var(--bs-primary);
-}
-
+/* Header dengan sudut membulat */
 table.customTable thead {
-    background-color: #ffffff;
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: bold;
+}
+
+table.customTable thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+table.customTable thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+/* Body dengan border di bawah */
+table.customTable tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+table.customTable tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+/* Sel dan border */
+table.customTable th,
+table.customTable td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Efek hover */
+table.customTable tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: background 0.3s ease-in-out;
 }
 
 /* Modal */
-/* Pastikan modal body dapat di-scroll */
-    .modal-dialog-scrollable .modal-body {
-        max-height: calc(100vh - 200px); /* Sesuaikan tinggi */
-        overflow-y: auto;
-    }
+.modal-dialog-scrollable .modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
 
-    /* Pastikan modal-footer tetap terlihat */
-    .modal-footer {
-        position: sticky;
-        bottom: 0;
-        background: #fff;
-        z-index: 10;
-        border-top: 1px solid #dee2e6;
-    }
+.modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    z-index: 10;
+    border-top: 1px solid #dee2e6;
+}
+
+/* dashboard */
+.lock-icon {
+    cursor: pointer;
+    font-size: 19px;
+    color: #333;
+}
+
+.apexcharts-bar-series path {
+    cursor: pointer;
+}
+
+.filter-dropdown {
+    cursor: pointer;
+}
+
+
+#barJenisPengeluaran {
+    max-height: 600px;
+    /* Batasi tinggi agar tidak terlalu panjang */
+    overflow-y: auto;
+    /* Scroll muncul jika grafik terlalu panjang */
+}

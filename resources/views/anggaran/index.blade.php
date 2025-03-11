@@ -39,12 +39,12 @@
         <table id="anggaranTable" class="customTable">
             <thead>
                 <tr>
-                    <th class="text-center">No</th>
+                    <th style="width: 5px;">No</th>
                     <th class="text-center">Nama Anggaran</th>
                     <th class="text-center">Persentase</th>
-                    <th class="text-center">Dibuat Tanggal</th>
-                    <th class="text-center">Diupdate Tanggal</th>
-                    <th class="text-center"></th>
+                    <th style="width: 90px;">Dibuat Tanggal</th>
+                    <th style="width: 90px;">Diupdate Tanggal</th>
+                    <th style="width: 5px;">Aksi</th>
                 </tr>
             </thead>
         </table>

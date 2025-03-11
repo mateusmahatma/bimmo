@@ -13,9 +13,8 @@
                 <div class="mb-3">
                     <label for="status" class="col-form-label">Status</label>
                     <select class="form-select" id="status">
-                        <!-- name="status" delete filter berjalan -->
-                        <option value="belum terbeli">Belum Terbeli</option>
-                        <option value="terbeli">Terbeli</option>
+                        <option value="1" {{ old('status', $aset->status ?? '') == 1 ? 'selected' : '' }}>Aset Dimiliki</option>
+                        <option value="0" {{ old('status', $aset->status ?? '') == 0 ? 'selected' : '' }}>Aset Digadaikan</option>
                     </select>
                 </div>
                 <div class="mb-3">

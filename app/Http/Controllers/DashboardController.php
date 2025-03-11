@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Transaksi;
+use App\Models\Pinjaman;
+use App\Models\Barang;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -14,21 +17,107 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
 
-        if ($request->ajax()) {
+        // Ambil transaksi
+        $transaksi = Transaksi::where('id_user', $userId)->get();
 
-            $data = Transaksi::where('id_user', $userId)
-                ->select('id, tgl_transaksi, pemasukan, nominal_pemasukan, pengeluaran, nominal, keterangan, id_user')
-                ->get();
+        // Hitung total pinjaman dan total barang
+        $totalPinjaman = Pinjaman::where('id_user', $userId)->sum('jumlah_pinjaman');
+        $totalBarang = Barang::where('id_user', $userId)
+            ->where('status', '1')
+            ->sum('harga');
+        $rasio = $totalBarang > 0 ? ($totalPinjaman / $totalBarang) * 100 : 0;
 
-            if ($request->filled('from_date') && $request->filled('to_date')) {
-                $data = $data->whereBetween('tgl_transaksi', [$request->from_date, $request->to_date]);
-            }
-        }
-        return view('dashboard.index', [
-            'transaksi' => Transaksi::where('id_user', Auth::id())->get(),
-        ]);
+        // rasio inflasi gaya hidup
+        $now = Carbon::now();
+        $lastMonth = $now->copy()->subMonth();
+
+        // Total nominal bulan ini
+        $totalThisMonth = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $now->year)
+            ->whereMonth('tgl_transaksi', $now->month)
+            ->sum('nominal');
+
+        // Total nominal bulan lalu
+        $totalLastMonth = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->sum('nominal');
+
+        // Total nominal pemasukan bulan ini
+        $totalPemasukanThisMonth = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $now->year)
+            ->whereMonth('tgl_transaksi', $now->month)
+            ->sum('nominal_pemasukan');
+
+        // Total nominal pemasukan bulan lalu
+        $totalPemasukanLastMonth = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->sum('nominal_pemasukan');
+
+        // Hitung rasio inflasi gaya hidup
+        $rasio_inflasi = (($totalThisMonth - $totalLastMonth) / $totalLastMonth) * 100;
+
+        // Rasio Dana Darurat
+        // $averageNominal = Transaksi::select(
+        //     DB::raw('YEAR(tgl_transaksi) as year'),
+        //     DB::raw('MONTH(tgl_transaksi) as month'),
+        //     DB::raw('SUM(nominal) as total_per_bulan')
+        // )
+        //     ->where('id_user', $userId)
+        //     ->groupBy(DB::raw('YEAR(tgl_transaksi)'), DB::raw('MONTH(tgl_transaksi)'))
+        //     ->get()
+        //     ->avg('total_per_bulan');
+        // $totalBarang = Barang::where('id_user', $userId)->sum('harga');
+        // $rasio_dana_darurat = $averageNominal != 0 ? $totalBarang / $averageNominal : 0;
+
+        // Rasio Pengeluaran Terhadap Pendapatan Bulan Sebelumnya
+        $lastMonth = $now->copy()->subMonth();
+        $totalPemasukan = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->sum('nominal_pemasukan');
+        $totalPengeluaran = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->sum('nominal');
+        $rasio_pengeluaran_pendapatan = $totalPemasukan > 0 ? ($totalPengeluaran / $totalPemasukan) * 100 : 0;
+
+        // Total Nominal Harian
+        $today = Carbon::today();
+        $totalNominal = Transaksi::where('id_user', $userId)
+            ->whereDate('tgl_transaksi', $today)
+            ->sum('nominal');
+
+        // Total Nominal Bulanan
+        $now = Carbon::now();
+        $totalNominalBulan = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $now->year)
+            ->whereMonth('tgl_transaksi', $now->month)
+            ->sum('nominal');
+
+        $totalNominalBulanPemasukan = Transaksi::where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $now->year)
+            ->whereMonth('tgl_transaksi', $now->month)
+            ->sum('nominal_pemasukan');
+
+        $totalNominalSisa = $totalNominalBulanPemasukan - $totalNominalBulan;
+
+        // Kirim semua data ke view
+        return view('dashboard.index', compact(
+            'transaksi',
+            'totalPinjaman',
+            'totalBarang',
+            'rasio',
+            'rasio_inflasi',
+            // 'rasio_dana_darurat',
+            'rasio_pengeluaran_pendapatan',
+            'totalNominal',
+            'totalNominalBulan',
+            'totalNominalBulanPemasukan',
+            'totalNominalSisa',
+        ));
     }
-
 
     // Cash Flow
     public function lineData()
@@ -59,7 +148,6 @@ class DashboardController extends Controller
 
         return response()->json($formattedData);
     }
-
 
     // Expense Chart
     public function getChartData()
@@ -137,32 +225,43 @@ class DashboardController extends Controller
         return response()->json($todayTransactions);
     }
 
-    public function showTotalNominal()
+    public function getJenisPengeluaran(Request $request)
     {
         $userId = Auth::id();
-        $now = Carbon::now();
-        $monthStart = $now->startOfMonth();
-        $monthEnd = $now->endOfMonth();
-        $today = Carbon::today();
+        $selectedMonth = $request->input('month', Carbon::now()->month);
+        $selectedYear = $request->input('year', Carbon::now()->year);
 
-        $totalNominal = Transaksi::where('id_user', $userId)
-            ->whereDate('tgl_transaksi', $today)
-            ->sum('nominal');
+        $jenisPengeluaran = Transaksi::select('pengeluaran', DB::raw('SUM(nominal) as total'))
+            ->where('id_user', $userId)
+            ->whereYear('tgl_transaksi', $selectedYear)
+            ->whereMonth('tgl_transaksi', $selectedMonth)
+            ->groupBy('pengeluaran')
+            ->orderByDesc('total')
+            ->get();
 
-        $totalNominalBulan = Transaksi::where('id_user', $userId)
-            ->whereYear('tgl_transaksi', $now->year)
-            ->whereMonth('tgl_transaksi', $now->month)
-            ->sum('nominal');
-
-        $totalNominalBulanPemasukan = Transaksi::where('id_user', $userId)
-            ->whereYear('tgl_transaksi', $now->year)
-            ->whereMonth('tgl_transaksi', $now->month)
-            ->sum('nominal_pemasukan');
-
-        $totalNominalSisa = $totalNominalBulanPemasukan - $totalNominalBulan;
-
-        return view('dashboard.index', compact('totalNominal', 'totalNominalBulan', 'totalNominalBulanPemasukan', 'totalNominalSisa'));
+        return response()->json($jenisPengeluaran);
     }
+
+    public function getTransaksiByPengeluaran(Request $request)
+    {
+        $pengeluaran = $request->query('pengeluaran');
+        $month = $request->query('month');
+        $year = $request->query('year');
+
+        if (!$pengeluaran || !$month || !$year) {
+            return response()->json(['error' => 'Parameter tidak lengkap'], 400);
+        }
+
+        $data = DB::table('transaksi')
+            ->select('keterangan', 'nominal')
+            ->where('pengeluaran', $pengeluaran)
+            ->whereMonth('tgl_transaksi', $month)
+            ->whereYear('tgl_transaksi', $year)
+            ->get();
+
+        return response()->json($data);
+    }
+
 
     function logout()
     {

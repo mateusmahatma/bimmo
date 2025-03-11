@@ -35,7 +35,7 @@ $(document).ready(function () {
                 icon: 'success',
                 title: 'General Title',
                 animation: false,
-                position: 'top-end',
+                position: 'top',
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: false,
@@ -74,7 +74,11 @@ $(document).ready(function () {
                         toastMixin.fire({
                             animation: true,
                             title: 'Data Berhasil disimpan',
-                            iconColor: '#ffffff'
+                            iconColor: '#012970',
+                            customClass: {
+                                title: 'swal2-title-create',
+                                icon: 'swal2-icon-success',
+                            }
                         });
                         $('#pemasukanModal').modal('hide');
                         $('#pemasukanTable').DataTable().ajax.reload();
@@ -100,14 +104,14 @@ $(document).ready(function () {
 
     let isRequesting = false;
 
-    // Handle Add Pemasukan
+    // Handle Add
     $('body').on('click', '.tombol-tambah-pemasukan', function (e) {
         e.preventDefault();
         $('#pemasukanModal').modal('show');
         simpanPemasukan();
     });
 
-    // Handle Edit Pemasukan
+    // Handle Edit
     $('body').on('click', '.tombol-edit-pemasukan', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
@@ -123,7 +127,7 @@ $(document).ready(function () {
         });
     });
 
-    // Handle Delete Pemasukan
+    // Handle Delete
     $('body').on('click', '.tombol-del-pemasukan', function (e) {
         e.preventDefault();
         var toastMixin = Swal.mixin({
@@ -131,7 +135,7 @@ $(document).ready(function () {
             icon: 'success',
             title: 'General Title',
             animation: false,
-            position: 'top-end',
+            position: 'top',
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: false,
@@ -164,11 +168,11 @@ $(document).ready(function () {
                         toastMixin.fire({
                             animation: true,
                             title: 'Data Berhasil dihapus',
+                            iconColor: '#012970',
                             customClass: {
                                 title: 'swal2-title-create',
-                                popup: 'swal2-popup-create',
-                            },
-                            iconColor: '#ffffff'
+                                icon: 'swal2-icon-success',
+                            }
                         });
                         $('#pemasukanTable').DataTable().ajax.reload();
                     },

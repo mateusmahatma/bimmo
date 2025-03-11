@@ -26,6 +26,7 @@
     </ol>
 </nav>
 
+@include('modal.pinjaman.index')
 
 @if (session('success'))
 <div class="alert alert-success">
@@ -44,7 +45,7 @@
                     <th class="text-center">Nama Pinjaman</th>
                     <th class="text-center">Jumlah</th>
                     <th class="text-center">Status</th>
-                    <th></th>
+                    <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>

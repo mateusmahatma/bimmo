@@ -1,255 +1,278 @@
-// Cash Flow
+// Arus Kas
 document.addEventListener("DOMContentLoaded", function () {
-    // Ambil data dari endpoint /dashboard/line-data
-    fetch("/dashboard/line-data")
-        .then((response) => response.json())
-        .then((data) => {
-            // Hitung selisih pemasukan dan pengeluaran untuk setiap label
-            var selisih = data.pemasukan.map(
-                (value, index) => value - data.pengeluaran[index]
-            );
+    let charts = {}; // Menyimpan semua instance chart
+    let chartData = {}; // Menyimpan data mentah chart
 
-            // Siapkan opsi untuk chart
-            var options = {
-                chart: {
-                    type: "bar", // Tipe grafik yang digunakan
-                    height: 350, // Tinggi chart
-                    toolbar: {
-                        show: true, // Menampilkan toolbar
-                        tools: {
-                            download: true, // Opsi untuk download
-                        },
-                    },
-                },
-                plotOptions: {
-                    bar: {
-                        columnWidth: "45%", // Lebar kolom
-                        borderRadius: 10, // Sudut rounded pada seluruh bar
-                    },
-                },
-                series: [
-                    {
-                        name: "Pemasukan",
-                        data: data.pemasukan,
-                    },
-                    {
-                        name: "Pengeluaran",
-                        data: data.pengeluaran,
-                    },
-                    {
-                        name: "Selisih (Pemasukan - Pengeluaran)",
-                        data: selisih,
-                    },
-                ],
-                xaxis: {
-                    categories: data.labels, // Menampilkan bulan
-                    // title: {
-                    //     text: "Bulan", // Label X-axis
-                    // },
-                    // labels: {
-                    //     style: {
-                    //         colors: "#333", // Warna label sumbu X
-                    //         fontSize: "12px", // Ukuran font label
-                    //         fontWeight: "bold", // Berat font label
-                    //     },
-                    // },
-                },
-                yaxis: {
-                    title: {
-                        text: "Nominal", // Label Y-axis
-                    },
-                    labels: {
-                        style: {
-                            colors: "#333", // Warna label sumbu Y
-                            fontSize: "12px", // Ukuran font label
-                        },
-                    },
-                },
-                tooltip: {
-                    theme: "light", // Tema tooltip gelap
-                    y: {
-                        formatter: function (val) {
-                            return "Rp " + val.toLocaleString(); // Format mata uang
-                        },
-                    },
-                },
-                fill: {
-                    opacity: 0.9, // Opacity yang sedikit lebih tebal
-                },
-                dataLabels: {
-                    enabled: false, // Menampilkan data labels di atas kolom
-                    style: {
-                        colors: ["#fff"], // Warna data labels
-                        fontSize: "10px",
-                    },
-                },
-                legend: {
-                    position: "top", // Posisi legend di atas
-                    horizontalAlign: "center", // Menyusun legend secara horizontal
-                    fontSize: "14px",
-                },
-            };
+    // Fungsi untuk memfilter data berdasarkan bulan yang dipilih
+    function filterData(data, months) {
+        if (months === "all") return data;
+        const startIndex = Math.max(data.labels.length - months, 0);
+        const filtered = { labels: data.labels.slice(startIndex) };
 
-            // Inisialisasi chart
-            var chart = new ApexCharts(
-                document.querySelector("#columnChart"),
-                options
-            );
-            chart.render();
-        })
-        .catch((error) => {
-            console.error("Error fetching chart data:", error);
+        Object.keys(data).forEach((key) => {
+            if (Array.isArray(data[key])) {
+                filtered[key] = data[key].slice(startIndex);
+            }
         });
+
+        return filtered;
+    }
+
+    // Fungsi umum untuk merender chart
+    function renderChart(type, selector, data, options) {
+        const defaultOptions = {
+            chart: {
+                type: type,
+                height: 350,
+                toolbar: { show: true, tools: { download: true } },
+            },
+            xaxis: { categories: data.labels },
+            series: [],
+        };
+
+        const finalOptions = { ...defaultOptions, ...options };
+
+        if (charts[selector]) {
+            charts[selector].updateOptions(finalOptions);
+        } else {
+            charts[selector] = new ApexCharts(document.querySelector(selector), finalOptions);
+            charts[selector].render();
+        }
+    }
+
+    // Ambil data dan render chart awal
+    Promise.all([
+        fetch("/dashboard/line-data").then((res) => res.json()),
+        fetch("/dashboard/chart-data").then((res) => res.json()),
+    ]).then(([cashFlowData, incomeExpenseData]) => {
+        chartData["cashFlow"] = cashFlowData;
+        chartData["incomeExpense"] = incomeExpenseData;
+
+        renderCashFlowChart(cashFlowData, 6);
+        renderIncomeExpenseChart(incomeExpenseData, 6);
+
+        // Event listener untuk filter periode
+        document.getElementById("filterPeriod").addEventListener("change", handleFilterChange);
+        document.getElementById("filterPeriodLine").addEventListener("change", handleFilterChange);
+    });
+
+    // Fungsi render chart arus kas
+    function renderCashFlowChart(data, months = "all") {
+        const filteredData = filterData(data, months);
+        renderChart("bar", "#columnChart", filteredData, {
+            plotOptions: {
+                bar: { columnWidth: "45%", borderRadius: 10 },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            series: [
+                { name: "Pemasukan", data: filteredData.pemasukan },
+                { name: "Pengeluaran", data: filteredData.pengeluaran },
+            ],
+            tooltip: {
+                theme: "light",
+                y: {
+                    formatter: (val) => "Rp " + val.toLocaleString(),
+                },
+            },
+        });
+    }
+
+    // Fungsi render chart pendapatan dan pengeluaran
+    function renderIncomeExpenseChart(data, months = "all") {
+        const filteredData = filterData(data, months);
+        renderChart("line", "#barChart", filteredData, {
+            series: [
+                { name: "Pengeluaran", data: filteredData.data_pengeluaran },
+                { name: "Pemasukan", data: filteredData.data_pemasukan },
+            ],
+            yaxis: [
+                { title: { text: "Pengeluaran (IDR)" } },
+                { opposite: true, title: { text: "Pemasukan (IDR)" } },
+            ],
+        });
+    }
+
+    // Fungsi untuk menangani perubahan filter
+    function handleFilterChange(e) {
+        const months = e.target.value === "all" ? "all" : parseInt(e.target.value);
+        renderCashFlowChart(chartData["cashFlow"], months);
+        renderIncomeExpenseChart(chartData["incomeExpense"], months);
+    }
+
+    // Toggle antara chart dengan animasi
+    document.getElementById("chartType").addEventListener("change", toggleChart);
+
+    function toggleChart() {
+        const chartType = document.getElementById("chartType").value;
+        const columnChart = document.getElementById("columnChart");
+        const barChart = document.getElementById("barChart");
+
+        columnChart.classList.remove("show");
+        barChart.classList.remove("show");
+
+        setTimeout(() => {
+            columnChart.style.display = "none";
+            barChart.style.display = "none";
+
+            if (chartType === "cashFlow") {
+                columnChart.style.display = "block";
+                setTimeout(() => columnChart.classList.add("show"), 50);
+                refreshChart(columnChart);
+            } else {
+                barChart.style.display = "block";
+                setTimeout(() => barChart.classList.add("show"), 50);
+                refreshChart(barChart);
+            }
+        }, 300);
+    }
+
+    // Refresh chart untuk memaksa resize
+    function refreshChart(chartElement) {
+        setTimeout(() => {
+            chartElement.style.display = "block";
+            window.dispatchEvent(new Event("resize"));
+        }, 0);
+    }
+
+    // Tampilan default saat load
+    window.onload = () => {
+        const columnChart = document.getElementById("columnChart");
+        const barChart = document.getElementById("barChart");
+        columnChart.style.display = "block";
+        columnChart.classList.add("show");
+        barChart.style.display = "none";
+    };
 });
 
-// Pie Chart
-// document.addEventListener("DOMContentLoaded", function () {
-//     fetch("/dashboard/pie-data")
-//         .then((response) => response.json())
-//         .then((data) => {
-//             if (data.labels.length === 0 || data.data.length === 0) {
-//                 document.getElementById("noDataMessagePie").style.display =
-//                     "block";
-//                 return;
-//             }
+function toggleNominal() {
+    // Ambil elemen-elemen <h3> yang ada dalam .box-info
+    const h3Elements = document.querySelectorAll(".box-info h3");
 
-//             var ctx = document.getElementById("pieChart").getContext("2d");
-//             var backgroundColors = generateRandomColors(data.labels.length);
+    // Periksa apakah data saat ini sedang disembunyikan
+    const isHidden = localStorage.getItem("nominalHidden") === "true";
 
-//             var polarAreaChart = new Chart(ctx, {
-//                 type: "pie",
-//                 data: {
-//                     labels: data.labels,
-//                     datasets: [
-//                         {
-//                             data: data.data,
-//                             backgroundColor: backgroundColors,
-//                             borderWidth: 0,
-//                         },
-//                     ],
-//                 },
-//                 options: {
-//                     plugins: {
-//                         legend: {
-//                             display: false,
-//                         },
-//                         tooltip: {
-//                             enabled: true,
-//                             callbacks: {
-//                                 label: function (tooltipItem) {
-//                                     var label =
-//                                         data.labels[tooltipItem.dataIndex] ||
-//                                         "";
-//                                     var value =
-//                                         data.data[tooltipItem.dataIndex] || "";
-//                                     return `${label}: ${value}`;
-//                                 },
-//                             },
-//                         },
-//                         datalabels: {
-//                             color: "#fff", // Text color
-//                             anchor: "end",
-//                             align: "start",
-//                             offset: -10,
-//                             borderWidth: 2,
-//                             borderColor: "#fff",
-//                             borderRadius: 25,
-//                             backgroundColor: (context) =>
-//                                 context.dataset.backgroundColor,
-//                             font: {
-//                                 weight: "bold",
-//                                 size: "12",
-//                             },
-//                             formatter: function (value, context) {
-//                                 var label =
-//                                     context.chart.data.labels[
-//                                         context.dataIndex
-//                                     ];
-//                                 return label + "\n" + value + "%";
-//                             },
-//                         },
-//                     },
-//                     hover: {
-//                         mode: "index", // Ensures the tooltip shows on hover
-//                         intersect: false,
-//                         onHover: function (event, activeElements) {
-//                             if (activeElements.length > 0) {
-//                                 const element = activeElements[0];
-//                                 const dataset =
-//                                     polarAreaChart.data.datasets[
-//                                         element.datasetIndex
-//                                     ];
-//                                 dataset.borderWidth = 2; // Set border width on hover
-//                                 polarAreaChart.update();
-//                             } else {
-//                                 polarAreaChart.data.datasets.forEach(
-//                                     (dataset) => (dataset.borderWidth = 0)
-//                                 ); // Reset border width
-//                                 polarAreaChart.update();
-//                             }
-//                         },
-//                     },
-//                     animation: {
-//                         animateScale: true,
-//                         animateRotate: true,
-//                     },
-//                     responsive: true,
-//                     maintainAspectRatio: false,
-//                 },
-//             });
-//         })
-//         .catch((error) => {
-//             console.error("Error fetching polar area chart data:", error);
-//         });
-// });
+    // Lakukan perubahan pada setiap elemen <h3>
+    h3Elements.forEach((h3) => {
+        if (isHidden) {
+            // Tampilkan nilai asli dari data-value
+            h3.textContent = h3.getAttribute("data-value");
+        } else {
+            // Sembunyikan nilai dengan asterisk
+            h3.textContent = "****";
+        }
+    });
 
-// Expense Chart
+    // Perbarui status di localStorage
+    localStorage.setItem("nominalHidden", !isHidden);
+}
+
+// bar jenis pengeluaran
 document.addEventListener("DOMContentLoaded", function () {
-    fetch("/dashboard/chart-data")
-        .then((response) => response.json())
-        .then((data) => {
-            var options = {
-                chart: {
-                    type: "line",
-                    height: 350,
-                },
-                series: [
-                    {
-                        name: "Pengeluaran",
-                        data: data.data_pengeluaran, // Menggunakan data pengeluaran
-                    },
-                    {
-                        name: "Pemasukan",
-                        data: data.data_pemasukan, // Menggunakan data pemasukan
-                    },
-                ],
-                xaxis: {
-                    categories: data.labels, // Menampilkan label bulan dan tahun
-                },
-                yaxis: [
-                    {
-                        title: {
-                            text: "Pengeluaran (IDR)",
-                        },
-                    },
-                    {
-                        opposite: true,
-                        title: {
-                            text: "Pemasukan (IDR)",
-                        },
-                    },
-                ],
-            };
+    let barChart = null;
 
-            var chart = new ApexCharts(
-                document.querySelector("#barChart"),
-                options
-            );
-            chart.render();
-        })
-        .catch((error) => {
-            console.error("Error fetching chart data:", error);
-        });
+    function fetchDataAndRenderChart(month, year) {
+        fetch(`/dashboard/jenis-pengeluaran?month=${month}&year=${year}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    data = [{ pengeluaran: "Data Tidak Ada", total: 0 }];
+                }
+
+                const labels = data.map(item => item.pengeluaran ?? "Tanpa Kategori");
+                const values = data.map(item => parseFloat(item.total) || 0);
+
+                const chartElement = document.querySelector("#barJenisPengeluaran");
+                if (!chartElement) return;
+
+                chartElement.innerHTML = "";
+                if (barChart) barChart.destroy();
+
+                var chartHeight = Math.min(800, Math.max(400, data.length * 30));
+                var maxXValue = Math.max(...values) * 1.2;
+
+                var options = {
+                    series: [{ data: values }],
+                    chart: {
+                        type: 'bar',
+                        height: chartHeight,
+                        events: {
+                            dataPointSelection: function (event, chartContext, config) {
+                                const selectedCategory = labels[config.dataPointIndex];
+                                fetchTransactionDetails(selectedCategory, month, year);
+                            }
+                        }
+                    },
+                    plotOptions: {
+                        bar: { borderRadius: 4, horizontal: true, barHeight: "80%" }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function (value) {
+                            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+                        }
+                    },
+                    xaxis: {
+                        categories: labels,
+                        max: maxXValue,
+                        labels: { style: { fontSize: '12px' } }
+                    }
+                };
+
+                barChart = new ApexCharts(chartElement, options);
+                barChart.render();
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    }
+
+    function fetchTransactionDetails(pengeluaran, month, year) {
+        fetch(`/dashboard/transaksi?pengeluaran=${pengeluaran}&month=${month}&year=${year}`)
+            .then(response => response.json())
+            .then(data => {
+                const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+                modalBody.innerHTML = ""; // Kosongkan isi tabel sebelum diisi ulang
+
+                if (data.length === 0) {
+                    modalBody.innerHTML = `
+                    <tr>
+                        <td colspan="2" class="text-center">Tidak ada transaksi</td>
+                    </tr>`;
+                } else {
+                    data.forEach(item => {
+                        let numberedKeterangan = item.keterangan
+                            .split("\n") // Pisahkan berdasarkan baris (jika ada newline)
+                            .map((line, index) => `${index + 1}. ${line.trim()}`) // Tambahkan numbering
+                            .join("<br>"); // Gabungkan kembali dengan line break
+
+                        modalBody.innerHTML += `
+                        <tr>
+                            <td>${numberedKeterangan}</td>
+                            <td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal)}</td>
+                        </tr>`;
+                    });
+                }
+
+                // Tampilkan modal
+                const modal = new bootstrap.Modal(document.getElementById('detailModalBarPengeluaran'));
+                modal.show();
+            })
+            .catch(error => console.error("Error fetching transactions:", error));
+    }
+
+
+    const filterMonth = document.getElementById("filterMonth");
+    const filterYear = document.getElementById("filterYear");
+
+    fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+
+    filterMonth.addEventListener("change", () => {
+        fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+    });
+
+    filterYear.addEventListener("change", () => {
+        fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+    });
 });
 
 // Transaksi Hari ini
@@ -310,11 +333,11 @@ $(document).ready(function () {
                     '<td class="text-center">' +
                     (transaction.nominal_pemasukan
                         ? formatNumberWithSeparator(
-                              transaction.nominal_pemasukan
-                          )
+                            transaction.nominal_pemasukan
+                        )
                         : "0") +
                     "</td>" +
-                    '<td class="text-center">' +
+                    '<td class="text-left">' +
                     (transaction.pengeluaran ? transaction.pengeluaran : "-") +
                     "</td>" +
                     '<td class="text-center">' +
@@ -375,24 +398,36 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeNominalDisplay();
 });
 
-// Show Hide Nominal
-function toggleNominal() {
+// Cek status toggle saat halaman dimuat
+window.addEventListener('load', () => {
+    const isHidden = localStorage.getItem("nominalHidden") === "true";
     const h3Elements = document.querySelectorAll(".box-info h3");
-    let isHidden = false;
 
     h3Elements.forEach((h3) => {
-        if (h3.textContent.includes("*")) {
-            h3.textContent = h3.getAttribute("data-value");
-            isHidden = false;
-        } else {
+        if (isHidden) {
             h3.textContent = "****";
-            isHidden = true;
+        } else {
+            h3.textContent = h3.getAttribute("data-value");
         }
     });
 
-    localStorage.setItem("nominalHidden", isHidden ? "true" : "false");
-}
+    // Jika nominal disembunyikan, beri kelas 'active' pada toggle switch
+    toggleSwitch.classList.toggle('active', isHidden);
+});
 
+// Inisialisasi saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+    // Ambil status terakhir dari localStorage
+    const isHidden = localStorage.getItem("nominalHidden") === "true";
+
+    // Sinkronkan tampilan sesuai status
+    const h3Elements = document.querySelectorAll(".box-info h3");
+    h3Elements.forEach((h3) => {
+        h3.textContent = isHidden ? "****" : h3.getAttribute("data-value");
+    });
+});
+
+// Hidden nominal
 function initializeNominalDisplay() {
     const isHidden = localStorage.getItem("nominalHidden") === "true";
     const h3Elements = document.querySelectorAll(".box-info h3");
@@ -407,127 +442,220 @@ function initializeNominalDisplay() {
 }
 
 // Kompas
-var options = {
-    series: [
-        {
-            name: "Actual",
-            data: [
-                {
-                    x: "Net Worth",
-                    y: 12,
-                    goals: [
-                        {
-                            name: "Target",
-                            value: 30,
-                            strokeWidth: 2,
-                            strokeDashArray: 2,
-                            strokeColor: "#775DD0",
-                        },
-                    ],
-                },
-                {
-                    x: "Saving Rate",
-                    y: 44,
-                    goals: [
-                        {
-                            name: "Target",
-                            value: 30,
-                            strokeWidth: 5,
-                            strokeHeight: 10,
-                            strokeColor: "#775DD0",
-                        },
-                    ],
-                },
-                {
-                    x: "FIRE Number",
-                    y: 54,
-                    goals: [
-                        {
-                            name: "Target",
-                            value: 50,
-                            strokeWidth: 10,
-                            strokeHeight: 0,
-                            strokeLineCap: "round",
-                            strokeColor: "#775DD0",
-                        },
-                    ],
-                },
-                {
-                    x: "Debt-to-Income Ratio",
-                    y: 66,
-                    goals: [
-                        {
-                            name: "Target",
-                            value: 35,
-                            strokeWidth: 10,
-                            strokeHeight: 0,
-                            strokeLineCap: "round",
-                            strokeColor: "#775DD0",
-                        },
-                    ],
-                },
-                {
-                    x: "Emergency Fund",
-                    y: 81,
-                    goals: [
-                        {
-                            name: "Target",
-                            value: 66,
-                            strokeWidth: 10,
-                            strokeHeight: 0,
-                            strokeLineCap: "round",
-                            strokeColor: "#775DD0",
-                        },
-                    ],
-                },
-                {
-                    x: "Investment Growth",
-                    y: 67,
-                    goals: [
-                        {
-                            name: "Target",
-                            value: 8,
-                            strokeWidth: 5,
-                            strokeHeight: 10,
-                            strokeColor: "#775DD0",
-                        },
-                    ],
-                },
-            ],
-        },
-    ],
-    chart: {
-        height: 350,
-        type: "bar",
-    },
-    plotOptions: {
-        bar: {
-            horizontal: true,
-            borderRadius: 10, // Menambahkan border radius untuk sudut tumpul
-        },
-    },
-    colors: ["#00E396"],
-    dataLabels: {
-        formatter: function (val, opt) {
-            const goals =
-                opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex]
-                    .goals;
+document.addEventListener("DOMContentLoaded", function () {
+    const chartElement = document.getElementById("chartKompas");
 
-            if (goals && goals.length) {
-                return `${val} / ${goals[0].value}`;
+    // Ambil data dari atribut HTML
+    const totalPinjaman = parseFloat(chartElement.dataset.totalPinjaman);
+    const totalBarang = parseFloat(chartElement.dataset.totalBarang);
+    const rasio = parseFloat(chartElement.dataset.rasio);
+    const rasio_inflasi = parseFloat(chartElement.dataset.rasioInflasi);
+    const rasio_dana_darurat = parseFloat(chartElement.dataset.rasioDanaDarurat);
+    const rasio_pengeluaran_pendapatan = parseFloat(chartElement.dataset.rasioPengeluaranPendapatan);
+
+    // Fungsi untuk menentukan warna berdasarkan target
+    const getColorByTarget = (value, target) => {
+        if (value < 0) return "#800080";
+        if (value < target) return "#00E396";
+        if (value > target) return "#FF4560";
+        return "#FFA500";
+    };
+
+    const getColorDanaDarurat = (value, target) => {
+        if (value < target) return "#FF4560"; // Merah jika belum mencapai target
+        if (value === target) return "#FFA500"; // Oranye jika sama dengan target
+        return "#00E396"; // Hijau jika melebihi target
+    };
+
+    const getColorInflasiGayaHidup = (value, target) => {
+        if (value > target) return "#FF4560"; // Merah jika belum mencapai target
+        if (value === target) return "#00E396"; // Oranye jika sama dengan target
+        if (value < target) return "#00E396"; // Oranye jika sama dengan target
+        return "#00E396"; // Hijau jika melebihi target
+    };
+
+    function AnalisisRasio(rasio) {
+        if (rasio < 20) {
+            return "Sangat Sehat : Kamu memiliki sedikit utang dibandingkan aset. Ini menunjukkan stabilitas keuangan yang tinggi dan ruang yang luas untuk investasi atau pengembangan aset.";
+        } else if (rasio >= 20 && rasio <= 40) {
+            return "Cukup Sehat : Masih berada dalam batas aman, tetapi sebaiknya kamu mulai mengendalikan utang baru dan fokus membangun aset.";
+        }
+        return "Waspadai : Rasio utang terhadap aset sudah mulai tinggi. Segera kurangi utang atau tingkatkan aset.";
+    }
+
+    function AnalisisRasioInflasi(rasio_inflasi) {
+        if (rasio_inflasi < 0) {
+            return "Sangat Ideal : Pengeluaran naik jauh lebih lambat dibanding kenaikan pendapatan. Artinya, kamu memiliki ruang lebih untuk menabung, berinvestasi, atau mempercepat pencapaian tujuan keuangan.";
+        } else if (rasio_inflasi >= 50 && rasio_inflasi <= 80) {
+            return "Masih Aman : Pengeluaran tetap terkendali, tetapi kenaikan sudah mulai signifikan. Sebaiknya mulai dievaluasi, apalagi jika pengeluaran ini bersifat konsumtif.";
+        } else if (rasio_inflasi > 80 && rasio_inflasi <= 100) {
+            return "Perlu Waspada : Hampir seluruh kenaikan pendapatan terpakai untuk pengeluaran. Kurangi pengeluaran yang tidak perlu agar bisa meningkatkan tabungan atau investasi.";
+        } else {
+            return "Warning : Pengeluaran naik lebih cepat dari pendapatan. Ini bisa menjadi pertanda kamu mulai terjebak dalam inflasi gaya hidup.";
+        }
+    }
+
+    function AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan) {
+        if (rasio_pengeluaran_pendapatan <= 50) {
+            return "Sangat Sehat : Pengeluaran terkendali, kamu memiliki cukup ruang untuk menabung, berinvestasi, dan mengatur dana darurat. Ideal untuk mencapai kebebasan finansial.";
+        } else if (rasio_pengeluaran_pendapatan >= 50 && rasio_pengeluaran_pendapatan <= 70) {
+            return "Cukup Sehat : Masih dalam batas aman, tapi sebaiknya mulai mengevaluasi pengeluaran yang bisa dikurangi, terutama yang bersifat konsumtif.";
+        } else {
+            return "Perlu Waspada : Pengeluaran sudah mulai melebihi pendapatan. Segera kurangi pengeluaran yang tidak perlu atau tingkatkan pendapatan.";
+        }
+    }
+
+    var options = {
+        chart: {
+            type: "bar",
+            height: 250,
+            events: {
+                dataPointSelection: function (event, chartContext, config) {
+                    const selectedIndex = config.dataPointIndex;
+                    let title = "";
+                    let rumus = "";
+                    let nominal = "";
+                    let target = 0;
+
+                    if (selectedIndex === 0) {
+                        title = "Rasio Utang terhadap Aset";
+                        rumus = "Total Pinjaman / Total Aset";
+                        target = '<20.00';
+                        nominal = rasio.toFixed(2) + '%';
+                        Analisis = AnalisisRasio(null);
+                    } else if (selectedIndex === 1) {
+                        title = "Rasio Inflasi Gaya Hidup";
+                        rumus = "(Pengeluaran Bulan Ini - Pengeluaran Bulan Sebelumnya)/(Pemasukan Bulan Ini - Pemasukan Bulan Sebelumnya) x 100%";
+                        target = '0';
+                        nominal = rasio_inflasi.toFixed(2) + '%';
+                        Analisis = AnalisisRasioInflasi(rasio_inflasi);
+                    } else if (selectedIndex === 2) {
+                        title = "Rasio Dana Darurat";
+                        rumus = "Total Dana Darurat / Total Pengeluaran Bulanan";
+                        target = '≥3';
+                        nominal = rasio_dana_darurat.toFixed(2) + '%';
+                        Analisis = AnalisisRasio(null);
+                    } else if (selectedIndex === 3) {
+                        title = "Rasio Pengeluaran Terhadap Pendapatan";
+                        rumus = "Total Pengeluaran Bulanan / Total Pendapatan Bulanan";
+                        target = '50';
+                        nominal = rasio_pengeluaran_pendapatan.toFixed(2) + '%';
+                        Analisis = AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan);
+                    }
+
+                    showModal(title, rumus, nominal, `${target}%`);
+                }
             }
-            return val;
         },
-    },
-    legend: {
-        show: true,
-        showForSingleSeries: true,
-        customLegendItems: ["Actual", "Target"],
-        markers: {
-            fillColors: ["#00E396", "#775DD0"],
+        states: {
+            hover: {
+                filter: {
+                    type: "darken",
+                    value: 0.15
+                }
+            }
         },
-    },
-};
+        series: [
+            {
+                name: "Rasio",
+                data: [
+                    {
+                        x: "Rasio Utang Terhadap Aset",
+                        y: rasio,
+                        fillColor: getColorByTarget(rasio, 20),
+                        goals: [
+                            {
+                                name: "Target Rasio Utang terhadap Aset",
+                                value: 20,
+                                strokeWidth: 4,
+                                strokeColor: "#9B59B6"
+                            }
+                        ]
+                    },
+                    {
+                        x: "Rasio Inflasi Gaya Hidup",
+                        y: rasio_inflasi > 0 ? rasio_inflasi : 0.5, // Minimal bar tetap terlihat
+                        fillColor: getColorInflasiGayaHidup(rasio_inflasi, 0),
+                        goals: [
+                            {
+                                name: "Target Rasio Inflasi Gaya Hidup",
+                                value: 0,
+                                strokeWidth: 4,
+                                strokeColor: "#9B59B6"
+                            }
+                        ]
+                    },
+                    {
+                        x: "Rasio Dana Darurat",
+                        y: rasio_dana_darurat,
+                        fillColor: getColorDanaDarurat(rasio_dana_darurat, 3),
+                        goals: [
+                            {
+                                name: "Target Rasio Dana Darurat",
+                                value: 3,
+                                strokeWidth: 4,
+                                strokeColor: "#9B59B6"
+                            }
+                        ]
+                    },
+                    {
+                        x: "Rasio Pengeluaran Terhadap Pendapatan",
+                        y: rasio_pengeluaran_pendapatan,
+                        fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 70),
+                        goals: [
+                            {
+                                name: "Target Rasio Dana Darurat",
+                                value: 49,
+                                strokeWidth: 4,
+                                strokeColor: "#9B59B6"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        plotOptions: {
+            bar: {
+                horizontal: true,
+                borderRadius: 8
+            }
+        },
+        colors: ["#FF4560", "#008FFB", "#00E396"],
+        dataLabels: {
+            enabled: true,
+            formatter: function (val) {
+                return `${val.toFixed(2)}%`;
+            }
+        },
+        tooltip: {
+            enabled: false
+        },
+        xaxis: {
+            title: {
+                text: "Nilai"
+            },
+            min: -100, // Atur nilai minimum sumbu X sesuai dengan rentang data Anda
+        },
+        yaxis: {
+            min: -100, // Atur nilai minimum sumbu Y jika diperlukan
+        }
+    };
 
-var chart = new ApexCharts(document.querySelector("#chart"), options);
-chart.render();
+    var chart = new ApexCharts(chartElement, options);
+    chart.render();
+
+    // Fungsi untuk menampilkan modal detail
+    function showModal(title, rumus, nominal, target, capaian) {
+        const modal = document.getElementById("detailModal");
+        document.getElementById("modalTitle").innerText = title;
+        document.getElementById("modalRumus").innerText = rumus;
+        document.getElementById("modalNominal").innerText = nominal;
+        document.getElementById("modalTarget").innerText = target;
+        document.getElementById("modalAnalisis").innerText = Analisis;
+
+
+        // Tampilkan modal (asumsi menggunakan Bootstrap)
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    }
+});

@@ -1,9 +1,8 @@
 $(document).ready(function () {
-    var barangTable = $('#barangTable').DataTable({
+    $('#barangTable').DataTable({
         paging: true,
         responsive: true,
         lengthChange: true,
-        scrollX: true,
         autoWidth: false,
         serverSide: true,
         processing: true,
@@ -15,19 +14,62 @@ $(document).ready(function () {
             type: 'GET',
             data: function (d) {
                 d.status = $('select[name="status"]').val();
+            },
+            dataSrc: function (json) {
+                console.log("Response dari server:", json); // Debugging
+
+                if (!json.totalBarang) {
+                    console.warn("totalBarang tidak ditemukan dalam response server!");
+                    $("#totalAset").text("Rp 0");
+                    return json.data;
+                }
+
+                console.log("Total harga aset dimiliki dari server:", json.totalBarang);
+
+                let totalHargaAsetDimiliki = parseInt(json.totalBarang.replace(/[^\d]/g, '')) || 0; // Ambil hanya angka
+
+                let formattedTotalHarga = totalHargaAsetDimiliki.toLocaleString("id-ID", {
+
+                });
+
+                $("#totalAset").text(formattedTotalHarga); // Update tampilan
+
+                return json.data;
             }
         },
+
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama_barang', className: 'text-center' },
             { data: 'nama_toko', className: 'text-center' },
-            { data: 'harga', className: 'text-center' },
+            {
+                data: 'harga',
+                className: 'text-center',
+                render: function (data, type, row) {
+                    var numericValue = parseFloat(data);
+
+                    if (!isNaN(numericValue)) {
+                        var formattedNominal = numericValue.toLocaleString("id-ID");
+                        var color = (row.status === 'aset dimiliki') ? 'green' : 'red';
+                        return (
+                            '<span style="color: ' + color + ';">' +
+                            formattedNominal +
+                            "</span>"
+                        );
+                    } else {
+                        return '<span style="color: red;">0</span>';
+                    }
+                }
+            },
             { data: 'jumlah', className: 'text-center' },
             {
-                data: 'status', className: 'text-center', render: function (data) {
-                    var badgeClass = (data === 'terbeli') ? 'badge-success' : 'badge-danger';
-                    var badgeText = (data === 'terbeli') ? 'Terbeli' : 'Belum Terbeli';
-                    return '<span class=" ' + badgeClass + '">' + badgeText + '</span>';
+                data: 'status',
+                className: 'text-center',
+                render: function (data) {
+                    var statusValue = data.toString().trim(); // Pastikan data dalam bentuk string
+                    var badgeClass = (statusValue === '1') ? 'badge-success' : 'badge-danger';
+                    var badgeText = (statusValue === '1') ? 'Aset Dimiliki' : 'Aset Digadaikan';
+                    return '<span class="badge ' + badgeClass + '">' + badgeText + '</span>';
                 }
             },
             { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },

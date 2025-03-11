@@ -10,42 +10,6 @@
 
 <div class="pagetitle d-flex justify-content-between align-items-center mb-3">
     <h1>Data Transaksi</h1>
-    <div class="btn-group">
-        <button class="btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Action
-        </button>
-        <ul class="dropdown-menu">
-            <li>
-                <button class="dropdown-item tombol-tambah-transaksi" data-bs-toggle="modal" data-bs-target="#transaksiModal">
-                    Tambah Data
-                </button>
-            </li>
-            <li>
-                <hr class="dropdown-divider" />
-            </li>
-            <li>
-                <button class="dropdown-item tombol-import_excel-transaksi" data-bs-toggle="modal" data-bs-target="#importExcelModal">
-                    Import Data
-                </button>
-            </li>
-            <li>
-                <hr class="dropdown-divider" />
-            </li>
-            <li>
-                <button class="dropdown-item" onclick="downloadPDFTransaksi()">
-                    Download PDF
-                </button>
-            </li>
-            <li>
-                <hr class="dropdown-divider" />
-            </li>
-            <li>
-                <button class="dropdown-item" onclick="downloadExcel()">
-                    Download Excel
-                </button>
-            </li>
-        </ul>
-    </div>
 </div>
 <nav>
     <ol class="breadcrumb">
@@ -64,23 +28,24 @@
         <div class="filter mt-3 ml-auto">
             <ul class="nav nav-underline">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/transaksi">Transaksi</a>
+                    <a class="nav-link active" href="/transaksi">Transaksi</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Tambah Data</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#importExcelModal">Import Data</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="downloadPDFTransaksi()">Download PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="downloadExcel()">Download Excel</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/compare">Compare Pengeluaran</a>
                 </li>
             </ul>
-            @if(session('success'))
-            <div style="color: green;">
-                {{ session('success') }}
-            </div>
-            @endif
-
-            @if(session('error'))
-            <div style="color: red;">
-                {{ session('error') }}
-            </div>
-            @endif
 
             <form>
                 <div class="form-row align-items-center d-flex">
@@ -117,16 +82,16 @@
         <table id="transaksiTable" class="customTable">
             <thead>
                 <tr>
-                    <th class="text-center">No</th>
+                    <th style="width: 5px;">No</th>
                     <th class="text-center">Tanggal Transaksi</th>
                     <th class="text-center">Pemasukan</th>
                     <th class="text-center">Nominal Pemasukan</th>
                     <th class="text-center">Pengeluaran</th>
                     <th class="text-center">Nominal Pengeluaran</th>
-                    <th class="text-center" style="width: 350px;">Keterangan</th>
-                    <th class="text-center">Dibuat Tanggal</th>
-                    <th class="text-center">Diupdate Tanggal</th>
-                    <th class="text-center">Aksi</th>
+                    <th style="width: 350px;" class="text-center">Keterangan</th>
+                    <th style="width: 90px;">Dibuat Tanggal</th>
+                    <th style="width: 90px;">Diupdate Tanggal</th>
+                    <th style="width: 5px;">Aksi</th>
                 </tr>
             </thead>
             <tbody>

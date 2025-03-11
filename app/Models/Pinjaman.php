@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Pinjaman extends Model
 {
     use HasFactory;
+
     protected $table = 'pinjaman';
     protected $guarded = ['id'];
+
     protected $fillable = [
         'id_user',
         'nama_pinjaman',
@@ -30,5 +32,15 @@ class Pinjaman extends Model
     public function bayar_pinjaman()
     {
         return $this->hasMany(BayarPinjaman::class, 'id_pinjaman');
+    }
+
+    // Tambahkan boot method untuk menghapus bayar_pinjaman terkait
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($pinjaman) {
+            $pinjaman->bayar_pinjaman()->delete(); // Hapus semua pembayaran terkait sebelum menghapus pinjaman
+        });
     }
 }

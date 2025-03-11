@@ -46,14 +46,12 @@
     <div class="card-header mb-3">
         <div class="filter mt-3 ml-auto">
             <form>
-                <div class="form-row align-items-center">
-                    <div class="col-md-3">
-                        <select class="form-control select-2" name="status">
-                            <option value="">Tampilkan Semua</option>
-                            <option value="terbeli">Terbeli</option>
-                            <option value="belum terbeli">Belum Terbeli</option>
-                        </select>
-                    </div>
+                <div class="col-md-3">
+                    <select class="form-control select-2" name="status">
+                        <option value="">Tampilkan Semua</option>
+                        <option value="terbeli">Terbeli</option>
+                        <option value="belum terbeli">Belum Terbeli</option>
+                    </select>
                 </div>
             </form>
         </div>
@@ -70,10 +68,13 @@
                     <th class="text-center">Status</th>
                     <th class="text-center">Dibuat Tanggal</th>
                     <th class="text-center">Diupdate Tanggal</th>
-                    <th></th>
+                    <th class="text-center">Aksi</th>
                 </tr>
             </thead>
         </table>
+        <div class="badge-success" style="font-size: medium">
+            Total Harga Barang: <span id="totalAset">Rp 0</span>
+        </div>
     </div>
 </div>
 @endsection

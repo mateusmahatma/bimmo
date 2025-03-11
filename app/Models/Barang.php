@@ -9,4 +9,9 @@ class Barang extends Model
 {
     protected $table = 'barang';
     protected $fillable = ['nama_barang', 'status', 'nama_toko', 'harga', 'jumlah', 'id_user'];
+
+    public function getStatusTextAttribute()
+    {
+        return $this->status ? 'Aset Dimiliki' : 'Aset Digadaikan';
+    }
 }

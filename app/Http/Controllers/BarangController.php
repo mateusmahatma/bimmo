@@ -20,10 +20,14 @@ class BarangController extends Controller
 
             $status = $request->status;
 
-            if ($status === 'terbeli') {
-                $query = $query->where('status', 'terbeli');
-            } elseif ($status === 'belum terbeli') {
-                $query = $query->where('status', '!=', 'terbeli');
+            $totalBarang = $query->where('status', '1')->sum('harga');
+
+            $query = Barang::where('id_user', $userId);
+
+            if ($status === '1') {
+                $query = $query->where('status', '1');
+            } elseif ($status === '0') {
+                $query = $query->where('status', '!=', '1');
             }
 
             return DataTables::of($query)
@@ -31,6 +35,7 @@ class BarangController extends Controller
                 ->addColumn('aksi', function ($barang) {
                     return view('barang.tombol')->with('request', $barang);
                 })
+                ->with('totalBarang', 'Rp ' . number_format($totalBarang, 0, ',', '.'))
                 ->toJson();
         } else {
             return view('barang.index');
@@ -42,7 +47,7 @@ class BarangController extends Controller
     {
         $validatedData = $request->validate([
             'nama_barang' => 'string',
-            'status' => 'in:terbeli,belum terbeli',
+            'status' => 'required|in:0,1',
             'nama_toko' => 'string',
             'harga' => 'numeric',
             'jumlah' => 'integer',

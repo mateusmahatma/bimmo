@@ -71,7 +71,7 @@
             <strong>Informasi :</strong>
             <br>GAP = Nominal Pengeluaran Periode 1 - Nominal Pengeluaran Periode 2.</br>
         </div>
-        <table id="comparisonTable" class="customTable">
+        <table class="customTable" id="comparisonTable">
             <thead>
                 <tr>
                     <th class="text-center">Nominal Pengeluaran Periode 1</th>
@@ -80,6 +80,9 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td colspan="3" class="text-center">Belum ada data</td>
+                </tr>
             </tbody>
         </table>
     </div>

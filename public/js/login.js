@@ -33,12 +33,12 @@ $('body').on('click', '.tombol-login', function (e) {
         },
         success: function (response) {
             $('.tombol-login').prop('disabled', false);
-            $('.tombol-login').html('Login');
+            $('.tombol-login').html('Masuk');
             if (response.success) {
                 var toastMixin = Swal.mixin({
                     toast: true,
                     icon: 'success',
-                    title: 'Berhasil Login',
+                    title: 'Berhasil Masuk',
                     animation: false,
                     position: 'top',
                     showConfirmButton: false,
@@ -56,17 +56,17 @@ $('body').on('click', '.tombol-login', function (e) {
                 });
                 toastMixin.fire({
                     animation: true,
-                    title: 'Berhasil Login'
+                    title: 'Berhasil Masuk'
                 });
                 window.location.href = '/dashboard';
             } else {
                 $('.tombol-login').prop('disabled', false);
-                $('.tombol-login').html('Login');
+                $('.tombol-login').html('Masuk');
                 $('.tombol-login .spinner-border').remove();
                 var toastFailedLogin = Swal.mixin({
                     toast: true,
                     icon: 'error',
-                    title: 'Gagal Login',
+                    title: 'Gagal Masuk',
                     animation: false,
                     position: 'top',
                     showConfirmButton: false,

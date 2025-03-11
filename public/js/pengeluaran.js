@@ -15,7 +15,6 @@ $(document).ready(function () {
         },
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
-            // { data: 'kode_pengeluaran', className: 'text-center' },
             { data: 'nama', className: 'text-center' },
             { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
             { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
@@ -102,7 +101,7 @@ $(document).ready(function () {
     let isRequesting = false;
 
     // Handle Add Pemasukan
-    $('body').on('click', '.tombol-tambah-pemasukan', function (e) {
+    $('body').on('click', '.tombol-tambah-pengeluaran', function (e) {
         e.preventDefault();
         $('#pengeluaranModal').modal('show');
         simpanPemasukan();
