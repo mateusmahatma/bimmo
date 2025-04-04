@@ -61,7 +61,7 @@
                                             <button class="bg-gradient-info tombol-login" type="submit">Masuk</button>
                                         </div>
                                         <div class="socials-row">
-                                            <a href="{{ url('/login/google') }}"><img src="/img/google.png" alt="Google">Masuk dengan Google</a>
+                                            <a href="#"><img src="/img/google.png" alt="Google">Masuk dengan Google</a>
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">Tidak memiliki akun? <a href="/daftar">Buat Akun</a></p>
@@ -79,12 +79,6 @@
     <footer>
         <div class="footer-container">
             <p class="footer-text">Copyright © 2024 <strong>@mateusbimahatma</strong>. All rights reserved.</p>
-            <p class="footer-text">Made with ❤️ by Mateus Bimahatma</p>
-            <ul class="footer-links">
-                <li><a href="https://github.com/mateusbimahatma" target="_blank">GitHub</a></li>
-                <li><a href="https://www.linkedin.com/in/mateusbimahatma" target="_blank">LinkedIn</a></li>
-                <li><a href="mailto:mateusbimahatma@example.com">Email</a></li>
-            </ul>
         </div>
     </footer>
 

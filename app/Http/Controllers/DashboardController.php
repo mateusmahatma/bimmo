@@ -56,7 +56,12 @@ class DashboardController extends Controller
             ->sum('nominal_pemasukan');
 
         // Hitung rasio inflasi gaya hidup
-        $rasio_inflasi = (($totalThisMonth - $totalLastMonth) / $totalLastMonth) * 100;
+        if ($totalLastMonth != 0) {
+            $rasio_inflasi = (($totalThisMonth - $totalLastMonth) / $totalLastMonth) * 100;
+        } else {
+            // Tangani kasus jika totalLastMonth adalah 0
+            $rasio_inflasi = 0; // Atau nilai default lainnya sesuai kebutuhan
+        }
 
         // Rasio Dana Darurat
         // $averageNominal = Transaksi::select(
@@ -72,16 +77,31 @@ class DashboardController extends Controller
         // $rasio_dana_darurat = $averageNominal != 0 ? $totalBarang / $averageNominal : 0;
 
         // Rasio Pengeluaran Terhadap Pendapatan Bulan Sebelumnya
-        $lastMonth = $now->copy()->subMonth();
+        // $lastMonth = $now->copy()->subMonth();
+        // $totalPemasukan = Transaksi::where('id_user', $userId)
+        //     ->whereYear('tgl_transaksi', $lastMonth->year)
+        //     ->whereMonth('tgl_transaksi', $lastMonth->month)
+        //     ->sum('nominal_pemasukan');
+        // $totalPengeluaran = Transaksi::where('id_user', $userId)
+        //     ->whereYear('tgl_transaksi', $lastMonth->year)
+        //     ->whereMonth('tgl_transaksi', $lastMonth->month)
+        //     ->sum('nominal');
+        // $rasio_pengeluaran_pendapatan = $totalPemasukan > 0 ? ($totalPengeluaran / $totalPemasukan) * 100 : 0;
+
+        // Rasio Pengeluaran Terhadap Pendapatan Bulan Ini
         $totalPemasukan = Transaksi::where('id_user', $userId)
-            ->whereYear('tgl_transaksi', $lastMonth->year)
-            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->whereYear('tgl_transaksi', $now->year)
+            ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal_pemasukan');
+
         $totalPengeluaran = Transaksi::where('id_user', $userId)
-            ->whereYear('tgl_transaksi', $lastMonth->year)
-            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->whereYear('tgl_transaksi', $now->year)
+            ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal');
+
         $rasio_pengeluaran_pendapatan = $totalPemasukan > 0 ? ($totalPengeluaran / $totalPemasukan) * 100 : 0;
+
+
 
         // Total Nominal Harian
         $today = Carbon::today();
@@ -261,7 +281,6 @@ class DashboardController extends Controller
 
         return response()->json($data);
     }
-
 
     function logout()
     {

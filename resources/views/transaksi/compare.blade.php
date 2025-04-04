@@ -13,8 +13,7 @@
 </div>
 <nav>
     <ol class="breadcrumb">
-        <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item">Manajemen Keuangan</li>
+        <li class="breadcrumb-item">Transaksi</li>
         <li class="breadcrumb-item active">Data Transaksi</li>
     </ol>
 </nav>
@@ -62,7 +61,7 @@
                 </div>
             </div>
             <div class="col mx-3">
-                <button type="submit" class="btn-sm btn-color tombol-compare">Compare</button>
+                <button type="submit" class="cssbuttons-io-button tombol-compare">Compare</button>
             </div>
         </form>
     </div>

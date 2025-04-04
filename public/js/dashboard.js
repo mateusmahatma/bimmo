@@ -146,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 });
 
+// Handle Show Hide Nominal
 function toggleNominal() {
     // Ambil elemen-elemen <h3> yang ada dalam .box-info
     const h3Elements = document.querySelectorAll(".box-info h3");
@@ -168,7 +169,7 @@ function toggleNominal() {
     localStorage.setItem("nominalHidden", !isHidden);
 }
 
-// bar jenis pengeluaran
+// Bar Jenis Pengeluaran
 document.addEventListener("DOMContentLoaded", function () {
     let barChart = null;
 
@@ -180,8 +181,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     data = [{ pengeluaran: "Data Tidak Ada", total: 0 }];
                 }
 
-                const labels = data.map(item => item.pengeluaran ?? "Tanpa Kategori");
-                const values = data.map(item => parseFloat(item.total) || 0);
+                // Filter data terlebih dahulu untuk menghilangkan item dengan pengeluaran null
+                const filteredData = data.filter(item => item.pengeluaran !== null);
+
+                // Kemudian gunakan data yang sudah difilter untuk membuat labels
+                const labels = filteredData.map(item => item.pengeluaran);
+                const values = filteredData.map(item => parseFloat(item.total) || 0);
 
                 const chartElement = document.querySelector("#barJenisPengeluaran");
                 if (!chartElement) return;
@@ -259,7 +264,6 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.error("Error fetching transactions:", error));
     }
-
 
     const filterMonth = document.getElementById("filterMonth");
     const filterYear = document.getElementById("filterYear");
@@ -359,7 +363,7 @@ $(document).ready(function () {
     getTodayTransactions();
 });
 
-// Dark Mode
+// Handle Dark Mode
 document.addEventListener("DOMContentLoaded", function () {
     const darkModeDropdown = document.getElementById("darkModeDropdown");
 
@@ -415,7 +419,7 @@ window.addEventListener('load', () => {
     toggleSwitch.classList.toggle('active', isHidden);
 });
 
-// Inisialisasi saat halaman dimuat
+// Inisialisasi saat halaman dimuat show hide nominal
 document.addEventListener("DOMContentLoaded", () => {
     // Ambil status terakhir dari localStorage
     const isHidden = localStorage.getItem("nominalHidden") === "true";
@@ -560,8 +564,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 name: "Rasio",
                 data: [
                     {
-                        x: "Rasio Utang Terhadap Aset",
-                        y: rasio,
+                        x: ["Rasio Utang", "terhadap Aset"],
+                        y: rasio > 0 ? rasio : 0.5,
                         fillColor: getColorByTarget(rasio, 20),
                         goals: [
                             {
@@ -574,7 +578,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     {
                         x: "Rasio Inflasi Gaya Hidup",
-                        y: rasio_inflasi > 0 ? rasio_inflasi : 0.5, // Minimal bar tetap terlihat
+                        y: rasio_inflasi > 0 ? rasio_inflasi : 0.5,
                         fillColor: getColorInflasiGayaHidup(rasio_inflasi, 0),
                         goals: [
                             {
@@ -586,8 +590,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         ]
                     },
                     {
-                        x: "Rasio Dana Darurat",
-                        y: rasio_dana_darurat,
+                        x: ["Rasio Dana", "Darurat"],
+                        y: rasio_dana_darurat > 0 ? rasio_dana_darurat : 0.5,
                         fillColor: getColorDanaDarurat(rasio_dana_darurat, 3),
                         goals: [
                             {
@@ -599,8 +603,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         ]
                     },
                     {
-                        x: "Rasio Pengeluaran Terhadap Pendapatan",
-                        y: rasio_pengeluaran_pendapatan,
+                        x: ["Rasio Pengeluaran", "Terhadap Pendapatan"],
+                        y: rasio_pengeluaran_pendapatan > 0 ? rasio_pengeluaran_pendapatan : 0.5,
                         fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 70),
                         goals: [
                             {
@@ -633,12 +637,8 @@ document.addEventListener("DOMContentLoaded", function () {
         xaxis: {
             title: {
                 text: "Nilai"
-            },
-            min: -100, // Atur nilai minimum sumbu X sesuai dengan rentang data Anda
+            }
         },
-        yaxis: {
-            min: -100, // Atur nilai minimum sumbu Y jika diperlukan
-        }
     };
 
     var chart = new ApexCharts(chartElement, options);

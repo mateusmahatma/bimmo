@@ -4,8 +4,9 @@
         <li class="nav-item">
             <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dashboard</a>
         </li>
+        <!-- Transaksi -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare', 'pinjaman') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+            <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                 <span>Transaksi</span>
             </a>
             <ul class="dropdown-menu">
@@ -24,14 +25,24 @@
                         <span>Data Transaksi</span>
                     </a>
                 </li>
+            </ul>
+        </li>
+
+        <!-- Pinjaman -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {{ Request::is('pinjaman') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <span>Pinjaman</span>
+            </a>
+            <ul class="dropdown-menu">
                 <li>
                     <a class="dropdown-item {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
-                        <span>Data Pinjaman</span>
+                        <span>Daftar Pinjaman</span>
                     </a>
                 </li>
             </ul>
         </li>
 
+        <!-- Anggaran -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                 <span>Anggaran</span>
@@ -39,7 +50,7 @@
             <ul class="dropdown-menu">
                 <li>
                     <a class="dropdown-item {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
-                        <span>Anggaran</span>
+                        <span>Daftar Anggaran</span>
                     </a>
                 </li>
                 <li>
@@ -50,6 +61,7 @@
             </ul>
         </li>
 
+        <!-- Aset -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('barang') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                 <span>Aset</span>
@@ -57,17 +69,18 @@
             <ul class="dropdown-menu">
                 <li>
                     <a class="dropdown-item {{ Request::is('barang') ? 'active' : '' }}" href="/barang">
-                        <span>Barang</span>
+                        <span>Daftar Aset</span>
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="">
+                    <a class="dropdown-item {{ Request::is('dana-darurat') ? 'active' : '' }}" href="/dana-darurat">
                         <span>Dana Darurat</span>
                     </a>
                 </li>
             </ul>
         </li>
 
+        <!-- Pengaturan -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('ubah-password') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                 <span>Pengaturan</span>

@@ -20,9 +20,8 @@
 </div>
 <nav>
     <ol class="breadcrumb">
-        <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item">Manajemen Keuangan</li>
-        <li class="breadcrumb-item active">Data Pinjaman</li>
+        <li class="breadcrumb-item">Pinjaman</li>
+        <li class="breadcrumb-item active">Daftar Pinjaman</li>
     </ol>
 </nav>
 

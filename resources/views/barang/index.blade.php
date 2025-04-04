@@ -1,5 +1,5 @@
 <head>
-    <title>Barang</title>
+    <title>Daftar Aset</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,7 +8,7 @@
 @extends('layouts.main')
 @section('container')
 <div class="pagetitle d-flex justify-content-between align-items-center mb-3">
-    <h1>Barang</h1>
+    <h1>Daftar Aset</h1>
     <div class="btn-group">
         <button class="btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             Action
@@ -34,9 +34,8 @@
 </div>
 <nav>
     <ol class="breadcrumb">
-        <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item">Manajemen Stok Barang</li>
-        <li class="breadcrumb-item active">Barang</li>
+        <li class="breadcrumb-item">Aset</li>
+        <li class="breadcrumb-item active">Daftar Aset</li>
     </ol>
 </nav>
 
@@ -49,8 +48,8 @@
                 <div class="col-md-3">
                     <select class="form-control select-2" name="status">
                         <option value="">Tampilkan Semua</option>
-                        <option value="terbeli">Terbeli</option>
-                        <option value="belum terbeli">Belum Terbeli</option>
+                        <option value="1">Aset Dimiliki</option>
+                        <option value="0">Aset Digadaikan</option>
                     </select>
                 </div>
             </form>
@@ -61,7 +60,7 @@
             <thead>
                 <tr>
                     <th class="text-center">No</th>
-                    <th class="text-center">Nama Barang</th>
+                    <th class="text-center">Nama Aset</th>
                     <th class="text-center">Nama Toko</th>
                     <th class="text-center">Harga</th>
                     <th class="text-center">Jumlah Barang</th>
@@ -73,7 +72,7 @@
             </thead>
         </table>
         <div class="badge-success" style="font-size: medium">
-            Total Harga Barang: <span id="totalAset">Rp 0</span>
+            Total Aset yang dimiliki: <span id="totalAset">Rp 0</span>
         </div>
     </div>
 </div>

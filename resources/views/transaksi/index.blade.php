@@ -13,8 +13,7 @@
 </div>
 <nav>
     <ol class="breadcrumb">
-        <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item">Manajemen Keuangan</li>
+        <li class="breadcrumb-item">Transaksi</li>
         <li class="breadcrumb-item active">Data Transaksi</li>
     </ol>
 </nav>
@@ -82,16 +81,16 @@
         <table id="transaksiTable" class="customTable">
             <thead>
                 <tr>
-                    <th style="width: 5px;">No</th>
+                    <th style="width: 3px;">No</th>
                     <th class="text-center">Tanggal Transaksi</th>
                     <th class="text-center">Pemasukan</th>
                     <th class="text-center">Nominal Pemasukan</th>
                     <th class="text-center">Pengeluaran</th>
                     <th class="text-center">Nominal Pengeluaran</th>
-                    <th style="width: 350px;" class="text-center">Keterangan</th>
-                    <th style="width: 90px;">Dibuat Tanggal</th>
-                    <th style="width: 90px;">Diupdate Tanggal</th>
-                    <th style="width: 5px;">Aksi</th>
+                    <th style="width: 200px;" class="text-center">Keterangan</th>
+                    <th style="width: 60px;">Dibuat Tanggal</th>
+                    <th style="width: 60px;">Diupdate Tanggal</th>
+                    <th style="width: 3px;">Aksi</th>
                 </tr>
             </thead>
             <tbody>

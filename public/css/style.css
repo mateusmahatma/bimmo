@@ -1,9 +1,6 @@
 :root {
     scroll-behavior: smooth;
-    --bs-blue: #63B3ED;
-    --bs-indigo: #596CFF;
     --bs-purple: #6f42c1;
-    --bs-pink: #d63384;
     --bs-red: #F56565;
     --bs-orange: #fd7e14;
     --bs-yellow: #FBD38D;
@@ -1093,6 +1090,14 @@ td {
     padding: 8px;
     border: 1px solid black;
     font-weight: 700;
+}
+
+/* Tombol Log in */
+.login {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 200%;
 }
 
 /* Tombol Login dengan Google */
@@ -2731,10 +2736,6 @@ p {
     padding: 8px 30px;
 }
 
-/* .error-404 .btn:hover {
-    background: #3e4f6f;
-} */
-
 @media (min-width: 992px) {
     .error-404 img {
         max-width: 50%;
@@ -2777,11 +2778,6 @@ footer {
     text-decoration: none;
     font-weight: bold;
 }
-
-/* .footer-links a:hover {
-    text-decoration: underline;
-} */
-
 
 /* Toast Mixin */
 .swal2-title-create {
@@ -3302,7 +3298,7 @@ footer {
 }
 
 .filter-dropdown:hover {
-    border-color: #012970;
+    border-color: #2a4e80;
     box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
 }
 
@@ -3454,3 +3450,8 @@ table.customTable tbody tr:hover {
     overflow-y: auto;
     /* Scroll muncul jika grafik terlalu panjang */
 }
+
+/* .dropdown-menu {
+    position: fixed !important;
+    z-index: 1051 !important;
+} */

@@ -50,9 +50,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-sm btn-color2" data-bs-dismiss="modal">
+                    <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">
                         <i class="fa fa-times"></i> Tutup</button>
-                    <button type="button" id="btnSimpan" class="btn-sm btn-color">
+                    <button type="button" id="btnSimpan" class="cssbuttons-io-button">
                         <span class="spinner-border spinner-border-sm d-none" id="btnSpinner" role="status" aria-hidden="true"></span>
                         <span id="btnText"><i class="fa fa-paper-plane"></i> Simpan</span>
                     </button>

@@ -18,7 +18,8 @@ use App\Http\Controllers\BayarPinjamanController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\LupaPasswordController;
 use App\Http\Controllers\UbahPasswordController;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Http\Controllers\DanaDaruratController;
+// use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 // Log in
 Route::get('/', function () {
@@ -49,25 +50,28 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
 Route::get('/logout', [DashboardController::class, 'logout']);
 
 // Pemasukan
-Route::resource('/pemasukan', PemasukanController::class)->middleware('auth');
-Route::post('/pemasukan', [PemasukanController::class, 'store']);
-Route::delete('/pemasukan', [PemasukanController::class, 'destroy']);
+Route::middleware(['auth'])->group(function () {
+    Route::resource('pemasukan', PemasukanController::class);
+});
 
 // Pengeluaran
-Route::resource('/pengeluaran', PengeluaranController::class)->middleware('auth');
-Route::post('/pengeluaran', [PengeluaranController::class, 'store']);
-Route::delete('/pengeluaran', [PengeluaranController::class, 'destroy']);
+Route::middleware(['auth'])->group(function () {
+    Route::resource('pengeluaran', PengeluaranController::class);
+});
 
 // Transaksi
-Route::get('/transaksi/cetak_pdf', [TransaksiController::class, 'cetak_pdf']);
-Route::get('/transaksi/download-excel', [TransaksiController::class, 'downloadExcel']);
-Route::post('/import-transaksi', [TransaksiController::class, 'import'])->name('import-transaksi');
-Route::get('/download-template', [TransaksiController::class, 'downloadTemplate'])->name('download-template');
-Route::post('/transaksi/importExcel', [TransaksiController::class, 'importExcel'])->name('transaksi.importExcel');
-Route::post('/upload', [TransaksiController::class, 'upload'])->name('upload');
-Route::resource('/transaksi', TransaksiController::class)->middleware('auth');
-Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
-Route::delete('/transaksi', [TransaksiController::class, 'destroy']);
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('transaksi')->group(function () {
+        Route::get('/cetak_pdf', [TransaksiController::class, 'cetak_pdf']);
+        Route::get('/download-excel', [TransaksiController::class, 'downloadExcel']);
+        Route::post('/importExcel', [TransaksiController::class, 'importExcel'])->name('transaksi.importExcel');
+        Route::post('/import', [TransaksiController::class, 'import'])->name('import-transaksi');
+        Route::get('/download-template', [TransaksiController::class, 'downloadTemplate'])->name('download-template');
+        Route::post('/upload', [TransaksiController::class, 'upload'])->name('upload');
+    });
+
+    Route::resource('transaksi', TransaksiController::class);
+});
 
 // Compare
 Route::get('/compare', [CompareController::class, 'index'])->middleware('auth');
@@ -102,3 +106,6 @@ Route::post('/ubah-password', [UbahPasswordController::class, 'store'])->middlew
 
 // Lupa Password
 Route::resource('/lupa-password', LupaPasswordController::class);
+
+// Dana Darurat
+Route::get('/dana-darurat', [DanaDaruratController::class, 'index'])->middleware('auth');

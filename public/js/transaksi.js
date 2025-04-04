@@ -58,7 +58,6 @@ $(document).ready(function () {
 
     var transaksiTable = $("#transaksiTable").DataTable({
         paging: true,
-        scrollX: true,
         responsive: true,
         lengthChange: true,
         autoWidth: true,
@@ -115,7 +114,7 @@ $(document).ready(function () {
             },
             {
                 data: "pemasukan",
-                className: "text-left",
+                className: "text-center",
                 render: function (data, type, row) {
                     return data ? data : "-";
                 },
@@ -140,7 +139,7 @@ $(document).ready(function () {
             },
             {
                 data: "pengeluaran",
-                className: "text-left",
+                className: "text-center",
                 render: function (data, type, row) {
                     return data ? data : "-";
                 },
@@ -197,9 +196,6 @@ $(document).ready(function () {
                     return data ? data : "-";
                 },
             },
-
-
-
             {
                 data: "created_at",
                 render: function (data) {
@@ -212,7 +208,6 @@ $(document).ready(function () {
                 },
                 className: "text-center",
             },
-
             {
                 data: "updated_at",
                 render: function (data) {
@@ -244,90 +239,293 @@ $(document).ready(function () {
 });
 
 // Create
-document.addEventListener("DOMContentLoaded", function () {
-    const btnSimpan = document.getElementById("btnSimpan");
-    const form = document.getElementById("formTransaksi");
-    const btnSpinner = document.getElementById("btnSpinner");
-    const btnText = document.getElementById("btnText");
-    const modalElement = document.getElementById("transaksiModal");
+document.addEventListener('DOMContentLoaded', function () {
+    // Mengambil elemen form dan button
+    const formTransaksi = document.getElementById('formTransaksi');
+    const btnSimpan = document.getElementById('btnSimpan');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnText = document.getElementById('btnText');
+    const transaksiModal = document.getElementById('transaksiModal');
 
-    if (!btnSimpan || !form || !btnSpinner || !btnText || !modalElement) {
-        console.error("Elemen yang diperlukan tidak ditemukan");
-        return;
+    // Fungsi untuk validasi form
+    function validateForm() {
+        const tglTransaksi = document.getElementById('tgl_transaksi').value;
+        let pemasukan = document.getElementById('pemasukan').value;
+        let pengeluaran = document.getElementById('pengeluaran').value;
+        let nominalPemasukan = document.getElementById('nominal_pemasukan').value;
+        let nominal = document.getElementById('nominal').value;
+
+        // Validasi tanggal transaksi
+        if (!tglTransaksi) {
+            showToast('Tanggal transaksi harus diisi!', 'danger');
+            return false;
+        }
+
+        // Validasi setidaknya satu dari pemasukan atau pengeluaran harus diisi
+        if (!pemasukan && !pengeluaran) {
+            showToast('Anda harus mengisi minimal satu dari pemasukan atau pengeluaran!', 'danger');
+            return false;
+        }
+
+        // Jika pemasukan dipilih, nominal pemasukan harus diisi
+        if (pemasukan && !nominalPemasukan) {
+            showToast('Nominal pemasukan harus diisi!', 'danger');
+            return false;
+        }
+
+        // Jika pengeluaran dipilih, nominal pengeluaran harus diisi
+        if (pengeluaran && !nominal) {
+            showToast('Nominal pengeluaran harus diisi!', 'danger');
+            return false;
+        }
+
+        return true;
     }
 
-    const modal =
-        bootstrap.Modal.getInstance(modalElement) ||
-        new bootstrap.Modal(modalElement);
+    // Fungsi untuk menampilkan toast notification
+    function showToast(message, type) {
+        // Buat container toast jika belum ada
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
 
-    btnSimpan.addEventListener("click", async function () {
-        let formData = new FormData(form);
-        btnSpinner.classList.remove("d-none");
-        btnText.innerHTML = "Proses...";
+        // Buat ID unik untuk toast
+        const toastId = 'toast-' + Date.now();
+
+        // Buat elemen toast
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        // Tambahkan toast ke container
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+        // Inisialisasi dan tampilkan toast
+        const toastElement = document.getElementById(toastId);
+
+        // Cek apakah Bootstrap 5 tersedia
+        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: true,
+                delay: 5000
+            });
+            toast.show();
+        } else {
+            // Fallback jika Bootstrap Toast tidak tersedia
+            toastElement.classList.add('show');
+            setTimeout(() => {
+                toastElement.classList.remove('show');
+                setTimeout(() => {
+                    toastElement.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Hapus toast dari DOM setelah dihide
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
+
+    // Fungsi untuk me-refresh tabel data
+    function refreshTable() {
+        // Tambahkan loading spinner ke tabel
+        const tableContainer = document.querySelector('.table-responsive');
+        if (tableContainer) {
+            // Tambahkan overlay loading jika belum ada
+            let loadingOverlay = tableContainer.querySelector('.loading-overlay');
+            if (!loadingOverlay) {
+                loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `;
+                tableContainer.style.position = 'relative';
+                loadingOverlay.style.position = 'absolute';
+                loadingOverlay.style.top = '0';
+                loadingOverlay.style.left = '0';
+                loadingOverlay.style.width = '100%';
+                loadingOverlay.style.height = '100%';
+                loadingOverlay.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.style.alignItems = 'center';
+                loadingOverlay.style.zIndex = '10';
+                tableContainer.appendChild(loadingOverlay);
+            } else {
+                loadingOverlay.style.display = 'flex';
+            }
+
+            // Fetch data terbaru dan update tabel
+            fetch(window.location.href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    // Extract tabel dari response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTable = doc.querySelector('.table-responsive table');
+
+                    // Update tabel dengan data baru
+                    if (newTable) {
+                        const currentTable = tableContainer.querySelector('table');
+                        if (currentTable) {
+                            currentTable.innerHTML = newTable.innerHTML;
+                        }
+                    }
+
+                    // Sembunyikan loading overlay
+                    loadingOverlay.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error refreshing table:', error);
+                    loadingOverlay.style.display = 'none';
+                    showToast('Gagal memperbarui tabel: ' + error.message, 'danger');
+                });
+        }
+    }
+
+    // Event listener untuk button simpan
+    btnSimpan.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // Validasi form
+        if (!validateForm()) {
+            return;
+        }
+
+        // Menampilkan spinner dan menonaktifkan button
+        btnSpinner.classList.remove('d-none');
+        btnText.textContent = ' Menyimpan...';
         btnSimpan.disabled = true;
 
-        try {
-            const response = await fetch(form.action, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]'
-                    ).content,
-                },
-            });
+        // Mengambil data form
+        const formData = new FormData(formTransaksi);
 
-            if (!response.ok) throw new Error("Network response was not ok");
-
-            const data = await response.json();
-
-            if (data.success) {
-                form.reset();
-                modal.hide();
-                $("#transaksiTable").DataTable().ajax.reload();
-
-                Swal.fire({
-                    icon: "success",
-                    title: "Data berhasil disimpan",
-                    timer: 3000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: "top",
-                    customClass: {
-                        title: "swal2-title-create",
-                        popup: "swal2-popup-create",
-                    },
-                    iconColor: "#ffffff",
-                });
-            } else if (data.errors) {
-                const errorMessages = Object.values(data.errors)
-                    .flat()
-                    .join("\n");
-                Swal.fire({
-                    icon: "error",
-                    title: "Validasi Gagal",
-                    text: errorMessages,
-                });
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Gagal",
-                    text: data.message || "Gagal menyimpan data.",
-                });
+        // Mengirim data dengan AJAX
+        fetch(formTransaksi.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Kesalahan",
-                text: "Cek data Anda kembali",
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Terjadi kesalahan pada server');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Jika proses berhasil
+                if (data.success) {
+                    // Menutup modal menggunakan jQuery (cara yang lebih kompatibel)
+                    try {
+                        // Coba tutup dengan Bootstrap 5
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                            const modalElement = document.getElementById('transaksiModal');
+                            const modalObj = bootstrap.Modal.getInstance(modalElement);
+                            if (modalObj) {
+                                modalObj.hide();
+                            } else {
+                                // Fallback untuk Bootstrap 5 jika getInstance tidak bekerja
+                                $('#transaksiModal').modal('hide');
+                            }
+                        } else {
+                            // Fallback untuk Bootstrap 4 atau jQuery
+                            $('#transaksiModal').modal('hide');
+                        }
+                    } catch (err) {
+                        // Fallback jika terjadi error
+                        console.error('Error closing modal:', err);
+                        // Cobalah dengan DOM API
+                        const closeButton = transaksiModal.querySelector('.btn-close') || transaksiModal.querySelector('[data-bs-dismiss="modal"]');
+                        if (closeButton) {
+                            closeButton.click();
+                        }
+                    }
+
+                    // Menampilkan toast sukses
+                    showToast(data.message || 'Data transaksi berhasil disimpan!', 'success');
+
+                    // Reset form
+                    formTransaksi.reset();
+
+                    // Refresh DataTable
+                    transaksiTable.ajax.reload(null, false);
+                } else {
+                    // Menampilkan toast error
+                    showToast(data.message || 'Gagal menyimpan data transaksi!', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                // Mengembalikan button ke kondisi awal
+                btnSpinner.classList.add('d-none');
+                btnText.innerHTML = '<i class="fa fa-paper-plane"></i> Simpan';
+                btnSimpan.disabled = false;
             });
-        } finally {
-            btnSpinner.classList.add("d-none");
+    });
+
+    // Event listener untuk modal saat ditampilkan
+    if (transaksiModal) {
+        transaksiModal.addEventListener('shown.bs.modal', function () {
+            // Set default tanggal ke hari ini
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tgl_transaksi').value = today;
+
+            // Reset form
+            formTransaksi.reset();
+            document.getElementById('tgl_transaksi').value = today;
+
+            // Reset state tombol
+            btnSpinner.classList.add('d-none');
             btnText.innerHTML = '<i class="fa fa-paper-plane"></i> Simpan';
             btnSimpan.disabled = false;
-        }
-    });
+        });
+    }
+
+    // Event listener untuk select pemasukan dan pengeluaran
+    const pemasukanSelect = document.getElementById('pemasukan');
+    const pengeluaranSelect = document.getElementById('pengeluaran');
+
+    if (pemasukanSelect) {
+        pemasukanSelect.addEventListener('change', function () {
+            const pengeluaranValue = pengeluaranSelect.value;
+            if (this.value && pengeluaranValue) {
+                showToast('Disarankan mengisi salah satu saja: pemasukan atau pengeluaran', 'warning');
+            }
+        });
+    }
+
+    if (pengeluaranSelect) {
+        pengeluaranSelect.addEventListener('change', function () {
+            const pemasukanValue = pemasukanSelect.value;
+            if (this.value && pemasukanValue) {
+                showToast('Disarankan mengisi salah satu saja: pemasukan atau pengeluaran', 'warning');
+            }
+        });
+    }
 });
 
 // Edit

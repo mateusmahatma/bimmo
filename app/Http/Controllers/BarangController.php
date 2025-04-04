@@ -12,18 +12,11 @@ class BarangController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // Mendapatkan ID pengguna yang sedang login
             $userId = Auth::id();
-
-            // Filter data berdasarkan id_user
             $query = Barang::where('id_user', $userId);
-
             $status = $request->status;
-
             $totalBarang = $query->where('status', '1')->sum('harga');
-
             $query = Barang::where('id_user', $userId);
-
             if ($status === '1') {
                 $query = $query->where('status', '1');
             } elseif ($status === '0') {
@@ -70,7 +63,7 @@ class BarangController extends Controller
     {
         $validatedData = $request->validate([
             'nama_barang' => 'string',
-            'status' => 'in:terbeli,belum terbeli',
+            'status' => 'in:1,0',
             'nama_toko' => 'string',
             'harga' => 'numeric',
             'jumlah' => 'integer',

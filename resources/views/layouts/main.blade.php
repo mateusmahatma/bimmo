@@ -8,9 +8,8 @@
     <title>Dashboard</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- cdnjs -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/select2.min.css" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 
     <!-- Favicons -->
     <link href="/img/icon_pointech.png" rel="icon" />
@@ -56,8 +55,6 @@
     <script src="/vendor/php-email-form/validate.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-
-
     <!-- DataTables  & Plugins -->
     <script src="/js/jquery-3.7.0.min.js"></script>
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
@@ -98,6 +95,8 @@
     <!-- Load DataTables Moment JS -->
     <script src="https://cdn.datatables.net/plug-ins/1.11.5/dataRender/datetime.js"></script>
 
+    <!-- Untuk tombol.blade.php -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

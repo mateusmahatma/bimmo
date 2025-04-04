@@ -22,8 +22,7 @@
 </div>
 <nav>
     <ol class="breadcrumb">
-        <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item">Manajemen Keuangan</li>
+        <li class="breadcrumb-item">Transaksi</li>
         <li class="breadcrumb-item active">Jenis Pengeluaran</li>
     </ol>
 </nav>

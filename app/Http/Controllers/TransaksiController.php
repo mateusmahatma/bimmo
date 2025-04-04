@@ -75,9 +75,6 @@ class TransaksiController extends Controller
 
         $validatedData['id_user'] = Auth::id();
 
-        // transaksi::create($validatedData);
-        // return redirect('/transaksi');
-
         try {
             transaksi::create($validatedData);
             return response()->json([

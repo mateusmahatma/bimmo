@@ -18,9 +18,52 @@ $(document).ready(function () {
             { data: 'nama', className: 'text-center' },
             { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
             { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'aksi', }
+            { data: 'aksi' }
         ]
     });
+
+    // Fungsi untuk menampilkan toast notification
+    function showToast(message, type) {
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastId = 'toast-' + Date.now();
+        const colors = {
+            success: '#012970',  // Biru
+            danger: '#dc3545',   // Merah
+            warning: '#ffc107',  // Kuning
+            info: '#17a2b8',     // Biru muda
+            primary: '#007bff',  // Biru
+        };
+
+        const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        // Tambahkan toast ke container
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+        toast.show();
+
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
 
     // Function to handle Save & Update
     function simpanPemasukan(id = '') {
@@ -30,37 +73,13 @@ $(document).ready(function () {
         isRequesting = true;
 
         $('#pemasukanModal').on('shown.bs.modal', function () {
-            var toastMixin = Swal.mixin({
-                toast: true,
-                icon: 'success',
-                title: 'General Title',
-                animation: false,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                },
-                customClass: {
-                    title: 'swal2-title-create',
-                    popup: 'swal2-popup-create',
-                    icon: 'swal2-icon-success'
-                }
-            });
-
             $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan').on('click', '.tombol-simpan-pemasukan', function () {
                 var formData = {
                     nama: $('#nama').val().trim()
                 };
 
                 if (formData.nama === '') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Nama Harus Diisi!'
-                    });
+                    showToast('Nama Harus Diisi!', 'danger');
                     return;
                 }
 
@@ -71,15 +90,7 @@ $(document).ready(function () {
                     type: type,
                     data: formData,
                     success: function () {
-                        toastMixin.fire({
-                            animation: true,
-                            title: 'Data Berhasil disimpan',
-                            iconColor: '#012970',
-                            customClass: {
-                                title: 'swal2-title-create',
-                                icon: 'swal2-icon-success',
-                            }
-                        });
+                        showToast('Data Berhasil disimpan', 'success');
                         $('#pemasukanModal').modal('hide');
                         $('#pemasukanTable').DataTable().ajax.reload();
                     },
@@ -130,21 +141,6 @@ $(document).ready(function () {
     // Handle Delete
     $('body').on('click', '.tombol-del-pemasukan', function (e) {
         e.preventDefault();
-        var toastMixin = Swal.mixin({
-            toast: true,
-            icon: 'success',
-            title: 'General Title',
-            animation: false,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-
 
         Swal.fire({
             title: 'Yakin mau hapus data ini?',
@@ -165,59 +161,15 @@ $(document).ready(function () {
                     url: '/pemasukan/' + id,
                     type: 'DELETE',
                     success: function () {
-                        toastMixin.fire({
-                            animation: true,
-                            title: 'Data Berhasil dihapus',
-                            iconColor: '#012970',
-                            customClass: {
-                                title: 'swal2-title-create',
-                                icon: 'swal2-icon-success',
-                            }
-                        });
+                        showToast('Data Berhasil dihapus', 'success');
                         $('#pemasukanTable').DataTable().ajax.reload();
                     },
                     error: function () {
-                        $('#toastPemasukan').text('Data Gagal dihapus');
-                        $('.toast').addClass('bg-danger');
-                        $('.toast').toast('show');
+                        showToast('Data Gagal dihapus', 'danger');
                         $('#pemasukanTable').DataTable().ajax.reload();
                     }
                 });
             }
         });
     });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const darkModeDropdown = document.getElementById('darkModeDropdown');
-
-    const storedMode = localStorage.getItem('darkMode');
-    const isDarkMode = storedMode === 'enabled';
-
-    if (isDarkMode) {
-        enableDarkMode();
-        darkModeDropdown.style.color = 'white';
-        darkModeDropdown.value = 'dark';
-    }
-
-    darkModeDropdown.addEventListener('change', function () {
-        const selectedMode = darkModeDropdown.value;
-        if (selectedMode === 'dark') {
-            enableDarkMode();
-            darkModeDropdown.style.color = 'white';
-            localStorage.setItem('darkMode', 'enabled');
-        } else {
-            disableDarkMode();
-            darkModeDropdown.style.color = '';
-            localStorage.setItem('darkMode', null);
-        }
-    });
-
-    function enableDarkMode() {
-        document.body.classList.add('dark-mode');
-    }
-
-    function disableDarkMode() {
-        document.body.classList.remove('dark-mode');
-    }
 });

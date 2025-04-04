@@ -50,7 +50,7 @@ $(document).ready(function () {
 
                     if (!isNaN(numericValue)) {
                         var formattedNominal = numericValue.toLocaleString("id-ID");
-                        var color = (row.status === 'aset dimiliki') ? 'green' : 'red';
+                        var color = (row.status == '1') ? 'green' : 'red'; // Perbaikan logika
                         return (
                             '<span style="color: ' + color + ';">' +
                             formattedNominal +
@@ -66,7 +66,7 @@ $(document).ready(function () {
                 data: 'status',
                 className: 'text-center',
                 render: function (data) {
-                    var statusValue = data.toString().trim(); // Pastikan data dalam bentuk string
+                    var statusValue = data.toString().trim(); // Pastikan dalam bentuk string
                     var badgeClass = (statusValue === '1') ? 'badge-success' : 'badge-danger';
                     var badgeText = (statusValue === '1') ? 'Aset Dimiliki' : 'Aset Digadaikan';
                     return '<span class="badge ' + badgeClass + '">' + badgeText + '</span>';

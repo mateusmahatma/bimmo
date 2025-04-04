@@ -14,6 +14,7 @@ class LoginController extends Controller
     {
         return view('login.index');
     }
+
     public function authenticate(Request $request)
     {
         $credentials = $request->only('username', 'password');
@@ -22,9 +23,15 @@ class LoginController extends Controller
 
         if ($user && Hash::check($credentials['password'], $user->password)) {
             Auth::login($user);
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil Masuk',
+            ]);
         } else {
-            return response()->json(['success' => false, 'message' => 'Username atau password salah.']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Masuk',
+            ]);
         }
     }
 }

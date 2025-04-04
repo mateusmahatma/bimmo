@@ -21,9 +21,9 @@
                         <input type="file" name="file" id="file" class="form-control-file" required>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn-sm btn-color2" data-bs-dismiss="modal">
+                        <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">
                             <i class="fa fa-times"></i> Tutup</button>
-                        <button type="submit" class="btn-sm btn-color" id="importBtn">
+                        <button type="submit" class="cssbuttons-io-button" id="importBtn">
                             <i class="fa fa-download"></i> Import
                         </button>
                     </div>
