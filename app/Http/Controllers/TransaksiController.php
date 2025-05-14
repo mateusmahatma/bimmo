@@ -156,7 +156,6 @@ class TransaksiController extends Controller
         return $pdf->stream('Transaksi_Report.pdf');
     }
 
-
     public function downloadExcel(Request $request)
     {
         $userId = Auth::id();
@@ -237,7 +236,6 @@ class TransaksiController extends Controller
         return response()->json(['success' => false, 'message' => 'No file uploaded']);
     }
 
-
     public function downloadTemplate()
     {
         return Excel::download(new TransaksiTemplateExport, 'template_transaksi.xlsx');
@@ -245,7 +243,6 @@ class TransaksiController extends Controller
 
     public function import(Request $request)
     {
-
         $request->validate([
             'file' => 'required|mimes:xlsx',
         ]);

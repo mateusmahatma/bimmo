@@ -16,9 +16,16 @@ $(document).ready(function () {
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama', className: 'text-center' },
-            { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'aksi' }
+            { data: 'created_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            { data: 'updated_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            {
+                data: 'aksi', rderable: false,
+                searchable: false,
+                className: "text-center",
+                render: function (data, type, row) {
+                    return data;
+                },
+            }
         ]
     });
 
@@ -115,14 +122,14 @@ $(document).ready(function () {
 
     let isRequesting = false;
 
-    // Handle Add
+    // Handle Create Pemasukan
     $('body').on('click', '.tombol-tambah-pemasukan', function (e) {
         e.preventDefault();
         $('#pemasukanModal').modal('show');
         simpanPemasukan();
     });
 
-    // Handle Edit
+    // Handle Edit Pemasukan
     $('body').on('click', '.tombol-edit-pemasukan', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
@@ -138,7 +145,7 @@ $(document).ready(function () {
         });
     });
 
-    // Handle Delete
+    // Handle Delete Pemasukan
     $('body').on('click', '.tombol-del-pemasukan', function (e) {
         e.preventDefault();
 

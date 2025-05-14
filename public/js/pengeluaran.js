@@ -16,51 +16,78 @@ $(document).ready(function () {
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama', className: 'text-center' },
-            { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'aksi', }
+            { data: 'created_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            { data: 'updated_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            {
+                data: 'aksi', rderable: false,
+                searchable: false,
+                className: "text-center",
+                render: function (data, type, row) {
+                    return data;
+                },
+            }
+
         ]
     });
 
+    // Fungsi untuk menampilkan toast notification
+    function showToast(message, type) {
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastId = 'toast-' + Date.now();
+        const colors = {
+            success: '#012970',  // Biru
+            danger: '#dc3545',   // Merah
+            warning: '#ffc107',  // Kuning
+            info: '#17a2b8',     // Biru muda
+            primary: '#007bff',  // Biru
+        };
+
+        const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        // Tambahkan toast ke container
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+        toast.show();
+
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
+
     // Function to handle Save & Update
-    function simpanPemasukan(id = '') {
+    function simpanPengeluaran(id = '') {
         var url = id ? '/pengeluaran/' + id : '/pengeluaran';
         var type = id ? 'PUT' : 'POST';
 
         isRequesting = true;
 
         $('#pengeluaranModal').on('shown.bs.modal', function () {
-            var toastMixin = Swal.mixin({
-                toast: true,
-                icon: 'success',
-                title: 'General Title',
-                animation: false,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                },
-                customClass: {
-                    title: 'swal2-title-create',
-                    popup: 'swal2-popup-create',
-                    icon: 'swal2-icon-success'
-                }
-            });
-
             $('#pengeluaranModal').off('click', '.tombol-simpan-pengeluaran').on('click', '.tombol-simpan-pengeluaran', function () {
                 var formData = {
                     nama: $('#nama').val().trim()
                 };
 
                 if (formData.nama === '') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Nama Harus Diisi!'
-                    });
+                    showToast('Nama Harus Diisi!', 'danger');
                     return;
                 }
 
@@ -71,11 +98,7 @@ $(document).ready(function () {
                     type: type,
                     data: formData,
                     success: function () {
-                        toastMixin.fire({
-                            animation: true,
-                            title: 'Data Berhasil disimpan',
-                            iconColor: '#ffffff'
-                        });
+                        showToast('Data Berhasil disimpan', 'success');
                         $('#pengeluaranModal').modal('hide');
                         $('#pengeluaranTable').DataTable().ajax.reload();
                     },
@@ -100,14 +123,14 @@ $(document).ready(function () {
 
     let isRequesting = false;
 
-    // Handle Add Pemasukan
+    // Handle Create Pengeluaran
     $('body').on('click', '.tombol-tambah-pengeluaran', function (e) {
         e.preventDefault();
         $('#pengeluaranModal').modal('show');
-        simpanPemasukan();
+        simpanPengeluaran();
     });
 
-    // Handle Edit Pemasukan
+    // Handle Edit Pengeluaran
     $('body').on('click', '.tombol-edit-pengeluaran', function (e) {
         e.preventDefault();
         var id = $(this).data('id');
@@ -118,30 +141,14 @@ $(document).ready(function () {
             success: function (response) {
                 $('#pengeluaranModal').modal('show');
                 $('#nama').val(response.result.nama);
-                simpanPemasukan(id);
+                simpanPengeluaran(id);
             }
         });
     });
 
-    // Handle Delete Pemasukan
+    // Handle Delete Pengeluaran
     $('body').on('click', '.tombol-del-pengeluaran', function (e) {
         e.preventDefault();
-        var toastMixin = Swal.mixin({
-            toast: true,
-            icon: 'success',
-            title: 'General Title',
-            animation: false,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-
-
         Swal.fire({
             title: 'Yakin mau hapus data ini?',
             html: 'Data yang dihapus tidak dapat dikembalikan!',
@@ -161,21 +168,11 @@ $(document).ready(function () {
                     url: '/pengeluaran/' + id,
                     type: 'DELETE',
                     success: function () {
-                        toastMixin.fire({
-                            animation: true,
-                            title: 'Data Berhasil dihapus',
-                            customClass: {
-                                title: 'swal2-title-create',
-                                popup: 'swal2-popup-create',
-                            },
-                            iconColor: '#ffffff'
-                        });
+                        showToast('Data Berhasil dihapus', 'success');
                         $('#pengeluaranTable').DataTable().ajax.reload();
                     },
                     error: function () {
-                        $('#toastPengeluaran').text('Data Gagal dihapus');
-                        $('.toast').addClass('bg-danger');
-                        $('.toast').toast('show');
+                        showToast('Data Gagal dihapus', 'danger');
                         $('#pengeluaranTable').DataTable().ajax.reload();
                     }
                 });

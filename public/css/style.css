@@ -10,7 +10,7 @@
     --bs-white: #fff;
     --bs-gray: #6c757d;
     --bs-gray-dark: #343a40;
-    --bs-primary: black;
+    --bs-primary: #012970;
     --bs-secondary: #f9f9fb;
     --bs-success: #82d616;
     --bs-info: #17c1e8;
@@ -23,7 +23,7 @@
     --bs-dark-main2: #121317;
     --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
     --background-widget: #1e2023;
-    --bs-main: #f9fafb;
+    --bs-main: #f3f3f3;
     --light: #F9F9F9;
     --blue: #3C91E6;
     --light-blue: #CFE8FF;
@@ -504,14 +504,40 @@ a.disabled span {
 .badge-primary {
     display: inline-block;
     padding: 0.25em 0.4em;
-    font-size: 75%;
+    font-size: 100%;
     line-height: 1;
     color: #fff;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border-radius: 0.25rem;
     background-color: var(--bs-primary);
+    width: 120px;
+}
+
+.badge-orange {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 100%;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: var(--bs-orange);
+    width: 180px;
+}
+
+.badge-red {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 100%;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: var(--bs-purple);
+    width: 120px;
 }
 
 .badge-toggle {
@@ -624,12 +650,12 @@ a.disabled span {
     cursor: pointer;
     font-weight: 500;
     font-size: 14px;
-    padding: 0.6em 1.2em 0.6em 1em;
-    color: #012970;
-    background: var(--light);
+    padding: 0.3em 1em 0.3em 0.8em;
+    color: var(--bs-light);
+    background: var(--bs-primary);
     letter-spacing: 0.03em;
     border-radius: 8px;
-    border: 2px solid #012970;
+    border: var(--bs-primary);
     transition: all 0.3s ease-in-out;
 }
 
@@ -645,12 +671,12 @@ a.disabled span {
     cursor: pointer;
     font-weight: 500;
     font-size: 14px;
-    padding: 0.6em 1.2em 0.6em 1em;
-    color: red;
-    background: var(--light);
+    padding: 0.3em 1em 0.3em 0.8em;
+    color: var(--bs-light);
+    background: var(--bs-red);
     letter-spacing: 0.03em;
     border-radius: 8px;
-    border: 2px solid red;
+    border: var(--bs-red);
     transition: all 0.3s ease-in-out;
 }
 
@@ -3298,13 +3324,13 @@ footer {
 }
 
 .filter-dropdown:hover {
-    border-color: #2a4e80;
+    border-color: var(--bs-primary);
     box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);
 }
 
 .filter-dropdown:focus {
     outline: none;
-    border-color: #0056b3;
+    border-color: var(--bs-primary);
     box-shadow: 0 6px 12px rgba(0, 86, 179, 0.3);
 }
 

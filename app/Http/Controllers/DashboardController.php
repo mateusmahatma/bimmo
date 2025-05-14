@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Transaksi;
 use App\Models\Pinjaman;
 use App\Models\Barang;
+use App\Models\DanaDarurat;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -64,29 +65,38 @@ class DashboardController extends Controller
         }
 
         // Rasio Dana Darurat
-        // $averageNominal = Transaksi::select(
-        //     DB::raw('YEAR(tgl_transaksi) as year'),
-        //     DB::raw('MONTH(tgl_transaksi) as month'),
-        //     DB::raw('SUM(nominal) as total_per_bulan')
-        // )
-        //     ->where('id_user', $userId)
-        //     ->groupBy(DB::raw('YEAR(tgl_transaksi)'), DB::raw('MONTH(tgl_transaksi)'))
-        //     ->get()
-        //     ->avg('total_per_bulan');
-        // $totalBarang = Barang::where('id_user', $userId)->sum('harga');
-        // $rasio_dana_darurat = $averageNominal != 0 ? $totalBarang / $averageNominal : 0;
+        $totalMasuk = DanaDarurat::where('id_user', $userId)
+            ->where('jenis_transaksi_dana_darurat', 1)
+            ->sum('nominal_dana_darurat');
 
-        // Rasio Pengeluaran Terhadap Pendapatan Bulan Sebelumnya
-        // $lastMonth = $now->copy()->subMonth();
-        // $totalPemasukan = Transaksi::where('id_user', $userId)
-        //     ->whereYear('tgl_transaksi', $lastMonth->year)
-        //     ->whereMonth('tgl_transaksi', $lastMonth->month)
-        //     ->sum('nominal_pemasukan');
-        // $totalPengeluaran = Transaksi::where('id_user', $userId)
-        //     ->whereYear('tgl_transaksi', $lastMonth->year)
-        //     ->whereMonth('tgl_transaksi', $lastMonth->month)
-        //     ->sum('nominal');
-        // $rasio_pengeluaran_pendapatan = $totalPemasukan > 0 ? ($totalPengeluaran / $totalPemasukan) * 100 : 0;
+        $totalKeluar = DanaDarurat::where('id_user', $userId)
+            ->where('jenis_transaksi_dana_darurat', 2)
+            ->sum('nominal_dana_darurat');
+
+        $totalDanaDarurat = $totalMasuk - $totalKeluar;
+
+        // Ambil semua transaksi user
+        $transaksi = Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
+
+        // Hitung total pengeluaran
+        $totalPengeluaran = $transaksi->sum('nominal');
+
+        // Hitung selisih bulan dari transaksi pertama ke terakhir
+        if ($transaksi->count() > 1) {
+            $firstDate = Carbon::parse($transaksi->first()->tgl_transaksi)->startOfMonth();
+            $lastDate = Carbon::parse($transaksi->last()->tgl_transaksi)->startOfMonth();
+            $selisihBulan = $firstDate->diffInMonths($lastDate) + 1; // +1 supaya bulan awal ikut dihitung
+        } else {
+            $selisihBulan = 1; // fallback kalau cuma ada 1 data
+        }
+
+        // Rata-rata pengeluaran bulanan
+        $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaran / $selisihBulan : 0;
+
+        $targetDanaDarurat = $rataRataPengeluaran * 6;
+
+        $rasio_dana_darurat = $targetDanaDarurat > 0 ? ($totalDanaDarurat / $targetDanaDarurat) * 100 : 0;
+        // Rasio Dana Darurat
 
         // Rasio Pengeluaran Terhadap Pendapatan Bulan Ini
         $totalPemasukan = Transaksi::where('id_user', $userId)
@@ -100,8 +110,6 @@ class DashboardController extends Controller
             ->sum('nominal');
 
         $rasio_pengeluaran_pendapatan = $totalPemasukan > 0 ? ($totalPengeluaran / $totalPemasukan) * 100 : 0;
-
-
 
         // Total Nominal Harian
         $today = Carbon::today();
@@ -130,7 +138,7 @@ class DashboardController extends Controller
             'totalBarang',
             'rasio',
             'rasio_inflasi',
-            // 'rasio_dana_darurat',
+            'rasio_dana_darurat',
             'rasio_pengeluaran_pendapatan',
             'totalNominal',
             'totalNominalBulan',
@@ -272,8 +280,8 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Parameter tidak lengkap'], 400);
         }
 
-        $data = DB::table('transaksi')
-            ->select('keterangan', 'nominal')
+        $data = Transaksi::where('id_user', Auth::id())
+            ->select('tgl_transaksi', 'keterangan', 'nominal')
             ->where('pengeluaran', $pengeluaran)
             ->whereMonth('tgl_transaksi', $month)
             ->whereYear('tgl_transaksi', $year)

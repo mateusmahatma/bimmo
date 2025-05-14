@@ -8,19 +8,18 @@
 @extends('layouts.main')
 @section('container')
 
-<div class="pagetitle">
-    <h1>Tambah Pinjaman</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item">Manajemen Keuangan</li>
-            <li class="breadcrumb-item link"><a href="/pinjaman">Daftar Pinjaman</a></li>
-            <li class="breadcrumb-item active">Tambah Pinjaman</li>
-        </ol>
-    </nav>
-</div>
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="#">Tambah Data Pinjaman</a>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link" href="/pinjaman">
+                <span class="badge-red rounded-pill">Daftar Pinjaman</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
-<div class="card">
+<div class="card-header">
     <div class="card-body">
         <form action="{{ route('pinjaman.store') }}" method="POST">
             @csrf

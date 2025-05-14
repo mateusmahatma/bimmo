@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const filteredData = filterData(data, months);
         renderChart("bar", "#columnChart", filteredData, {
             plotOptions: {
-                bar: { columnWidth: "45%", borderRadius: 10 },
+                bar: { columnWidth: "45%", borderRadius: 5 },
             },
             dataLabels: {
                 enabled: false,
@@ -245,6 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </tr>`;
                 } else {
                     data.forEach(item => {
+                        let tanggalTransaksi = item.tgl_transaksi;
                         let numberedKeterangan = item.keterangan
                             .split("\n") // Pisahkan berdasarkan baris (jika ada newline)
                             .map((line, index) => `${index + 1}. ${line.trim()}`) // Tambahkan numbering
@@ -252,6 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         modalBody.innerHTML += `
                         <tr>
+                            <td>${tanggalTransaksi}</td>
                             <td>${numberedKeterangan}</td>
                             <td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal)}</td>
                         </tr>`;
@@ -466,18 +468,19 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const getColorDanaDarurat = (value, target) => {
-        if (value < target) return "#FF4560"; // Merah jika belum mencapai target
-        if (value === target) return "#FFA500"; // Oranye jika sama dengan target
-        return "#00E396"; // Hijau jika melebihi target
+        if (value < target) return "#FF4560";
+        if (value === target) return "#00E396";
+        return "#00E396";
     };
 
     const getColorInflasiGayaHidup = (value, target) => {
-        if (value > target) return "#FF4560"; // Merah jika belum mencapai target
-        if (value === target) return "#00E396"; // Oranye jika sama dengan target
-        if (value < target) return "#00E396"; // Oranye jika sama dengan target
-        return "#00E396"; // Hijau jika melebihi target
+        if (value > target) return "#FF4560";
+        if (value === target) return "#00E396";
+        if (value < target) return "#00E396";
+        return "#00E396";
     };
 
+    // Fungsi untuk analisis rasio
     function AnalisisRasio(rasio) {
         if (rasio < 20) {
             return "Sangat Sehat : Kamu memiliki sedikit utang dibandingkan aset. Ini menunjukkan stabilitas keuangan yang tinggi dan ruang yang luas untuk investasi atau pengembangan aset.";
@@ -485,6 +488,16 @@ document.addEventListener("DOMContentLoaded", function () {
             return "Cukup Sehat : Masih berada dalam batas aman, tetapi sebaiknya kamu mulai mengendalikan utang baru dan fokus membangun aset.";
         }
         return "Waspadai : Rasio utang terhadap aset sudah mulai tinggi. Segera kurangi utang atau tingkatkan aset.";
+    }
+
+    function AnalisisRasioDanaDarurat(rasio_dana_darurat) {
+        if (rasio_dana_darurat < 100) {
+            return "Kurang Aman : Dana darurat belum mencapai target. Segera tingkatkan tabungan untuk mencapai keamanan finansial.";
+        } else if (rasio_dana_darurat === 100) {
+            return "Ideal : Dana darurat sudah mencapai target. Tetap pertahankan dan perbarui sesuai kebutuhan.";
+        } else {
+            return "Lebih dari Cukup : Dana darurat melebihi target. Pertimbangkan untuk mengalokasikan ke investasi atau kebutuhan lainnya.";
+        }
     }
 
     function AnalisisRasioInflasi(rasio_inflasi) {
@@ -526,7 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         rumus = "Total Pinjaman / Total Aset";
                         target = '<20.00';
                         nominal = rasio.toFixed(2) + '%';
-                        Analisis = AnalisisRasio(null);
+                        Analisis = AnalisisRasio(rasio);
                     } else if (selectedIndex === 1) {
                         title = "Rasio Inflasi Gaya Hidup";
                         rumus = "(Pengeluaran Bulan Ini - Pengeluaran Bulan Sebelumnya)/(Pemasukan Bulan Ini - Pemasukan Bulan Sebelumnya) x 100%";
@@ -535,10 +548,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         Analisis = AnalisisRasioInflasi(rasio_inflasi);
                     } else if (selectedIndex === 2) {
                         title = "Rasio Dana Darurat";
-                        rumus = "Total Dana Darurat / Total Pengeluaran Bulanan";
-                        target = '≥3';
+                        rumus = "Total Dana Darurat / (Rata-rata Total Pengeluaran Setiap Bulan * 6)";
+                        target = '100';
                         nominal = rasio_dana_darurat.toFixed(2) + '%';
-                        Analisis = AnalisisRasio(null);
+                        Analisis = AnalisisRasioDanaDarurat(rasio_dana_darurat);
                     } else if (selectedIndex === 3) {
                         title = "Rasio Pengeluaran Terhadap Pendapatan";
                         rumus = "Total Pengeluaran Bulanan / Total Pendapatan Bulanan";
@@ -596,7 +609,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         goals: [
                             {
                                 name: "Target Rasio Dana Darurat",
-                                value: 3,
+                                value: 100,
                                 strokeWidth: 4,
                                 strokeColor: "#9B59B6"
                             }

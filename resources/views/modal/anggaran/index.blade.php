@@ -16,8 +16,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-sm btn-color2" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn-sm btn-color tombol-simpan-anggaran">Simpan</button>
+                <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="cssbuttons-io-button tombol-simpan-anggaran">Simpan</button>
             </div>
         </div>
     </div>

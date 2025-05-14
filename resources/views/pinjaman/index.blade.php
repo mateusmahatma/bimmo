@@ -8,21 +8,15 @@
 @extends('layouts.main')
 @section('container')
 
-<div class="pagetitle d-flex justify-content-between align-items-center mb-3">
-    <h1>Daftar Pinjaman</h1>
-    <div class="btn-group">
-        <a href="{{ route('pinjaman.create') }}">
-            <button class="btn-sm btn-color">
-                <i class="fa fa-plus"></i> Tambah Pinjaman
-            </button>
-        </a>
-    </div>
-</div>
-<nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">Pinjaman</li>
-        <li class="breadcrumb-item active">Daftar Pinjaman</li>
-    </ol>
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="#">Daftar Pinjaman</a>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('pinjaman.create') }}">
+                <span class="badge-primary rounded-pill">Tambah Data</span>
+            </a>
+        </li>
+    </ul>
 </nav>
 
 @include('modal.pinjaman.index')
@@ -33,22 +27,18 @@
 </div>
 @endif
 
-<div class="card">
-    <div class="card-header">
-    </div>
+<div class="card-header">
     <div class="card-body">
         <table id="pinjamanTable" class="customTable">
             <thead>
                 <tr>
-                    <th class="text-center">No</th>
+                    <th style="width: 3px;">No</th>
                     <th class="text-center">Nama Pinjaman</th>
-                    <th class="text-center">Jumlah</th>
+                    <th class="text-center">Nominal Pinjaman</th>
                     <th class="text-center">Status</th>
-                    <th class="text-center">Aksi</th>
+                    <th style="width: 3px;">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-            </tbody>
         </table>
         <div class="badge-danger" style="font-size: medium">
             Total Pinjaman: <span id="totalPinjaman">0</span>
@@ -58,5 +48,5 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/pinjaman.js') }}"></script>
+<script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
 @endsection

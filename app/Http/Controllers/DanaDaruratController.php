@@ -18,18 +18,29 @@ class DanaDaruratController extends Controller
         if ($request->ajax()) {
             $userId = Auth::id();
 
-            // Ambil data sesuai user yang login
+            // Ambil semua data transaksi untuk user
             $query = DanaDarurat::where('id_user', $userId);
 
-            // Hitung total dana darurat
-            $totalDanaDarurat = $query->sum('nominal_dana_darurat');
+            // Hitung total dana darurat: total masuk - total keluar
+            $totalMasuk = DanaDarurat::where('id_user', $userId)
+                ->where('jenis_transaksi_dana_darurat', 1)
+                ->sum('nominal_dana_darurat');
+
+            $totalKeluar = DanaDarurat::where('id_user', $userId)
+                ->where('jenis_transaksi_dana_darurat', 2)
+                ->sum('nominal_dana_darurat');
+
+            $totalDanaDarurat = $totalMasuk - $totalKeluar;
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('aksi', function ($dana) {
-                    // return view('dana_darurat.tombol')->with('request', $dana);
+                ->editColumn('jenis_transaksi_dana_darurat', function ($dana) {
+                    return $dana->jenis_transaksi_dana_darurat == 1 ? 'Masuk' : 'Keluar';
                 })
-                ->with('totalDanaDarurat', 'Rp ' . number_format($totalDanaDarurat, 0, ',', '.')) // Kirim total dana darurat ke frontend
+                ->addColumn('aksi', function ($dana) {
+                    return view('dana_darurat.tombol')->with('request', $dana);
+                })
+                ->with('totalDanaDarurat', $totalDanaDarurat)
                 ->toJson();
         } else {
             return view('dana_darurat.index');

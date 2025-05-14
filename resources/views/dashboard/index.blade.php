@@ -135,7 +135,7 @@
             <div id="chartKompas"
                 data-rasio="{{ $rasio ?? 0 }}"
                 data-rasio-inflasi="{{ $rasio_inflasi ?? 0 }}"
-                data-rasio-dana-darurat=""
+                data-rasio-dana-darurat="{{ $rasio_dana_darurat ?? 0 }}"
                 data-rasio-pengeluaran-pendapatan="{{ $rasio_pengeluaran_pendapatan ?? 0 }}">
             </div>
         </div>
@@ -172,7 +172,7 @@
             </div>
         </div>
 
-        <!-- modal jenis pengeluaran -->
+        <!-- Modal Jenis Pengeluaran -->
         <div class="modal fade" id="detailModalBarPengeluaran" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -184,6 +184,7 @@
                         <table class="display">
                             <thead>
                                 <tr>
+                                    <th>Tanggal Transaksi</th>
                                     <th>Keterangan</th>
                                     <th>Nominal</th>
                                 </tr>

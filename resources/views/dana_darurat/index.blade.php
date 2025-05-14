@@ -17,9 +17,6 @@
         <h5 class="card-title mb-0">Riwayat Transaksi Dana Darurat</h5>
         <ul class="nav nav-underline">
             <li class="nav-item">
-                <a class="nav-link active" href="/transaksi">Transaksi</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Tambah Data</a>
             </li>
         </ul>
@@ -41,6 +38,9 @@
             <tbody>
             </tbody>
         </table>
+        <div class="badge-success" style="font-size: medium;">
+            Total Dana Darurat: <span id="totalDanaDarurat">0</span>
+        </div>
     </div>
 </div>
 @endsection

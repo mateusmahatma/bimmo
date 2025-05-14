@@ -28,7 +28,7 @@
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet" />
 
     <!-- CSS File -->
-    <link href="/css/style.css" rel="stylesheet" />
+    <link href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 </head>

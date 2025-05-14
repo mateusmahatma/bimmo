@@ -40,8 +40,11 @@ $(document).ready(function () {
             },
             {
                 data: "jumlah_pinjaman",
+                className: "text-center",
+                render: function (data) {
+                    return data ? data : "-";
+                },
             },
-
             {
                 data: "status",
                 className: "text-center",

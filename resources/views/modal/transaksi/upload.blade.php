@@ -8,7 +8,7 @@
             <div class="modal-body">
                 <div class="alert alert-warning">
                     <ul>
-                        <li>File yang dapat diupload : jpg,jpeg,png,pdf,doc,docx</li>
+                        <li>File yang dapat diupload : xlsx,xls,csv</li>
                     </ul>
                 </div>
                 <form id="uploadForm" enctype="multipart/form-data">
@@ -18,9 +18,9 @@
                         <input type="file" name="file" required>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn-sm btn-color2" data-bs-dismiss="modal">
+                        <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">
                             <i class="fa fa-times"></i> Tutup</button>
-                        <button type="submit" class="btn-sm btn-color">
+                        <button type="submit" class="cssbuttons-io-button">
                             <i class="fa fa-upload"></i> Upload
                         </button>
                     </div>

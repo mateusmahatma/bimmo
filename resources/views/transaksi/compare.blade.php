@@ -1,5 +1,5 @@
 <head>
-    <title>Compare</title>
+    <title>Compare Pengeluaran</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,26 +8,24 @@
 @extends('layouts.main')
 @section('container')
 
-<div class="pagetitle d-flex justify-content-between align-items-center mb-3">
-    <h1>Data Transaksi</h1>
-</div>
-<nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">Transaksi</li>
-        <li class="breadcrumb-item active">Data Transaksi</li>
-    </ol>
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="/compare">Compare Pengeluaran</a>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link" href="/transaksi">
+                <span class="badge-primary rounded-pill">Data Transaksi</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/compare">
+                <span class="badge-orange rounded-pill">Compare Pengeluaran</span>
+            </a>
+        </li>
+    </ul>
 </nav>
 
-<div class="card">
-    <div class="card-header mb-3">
-        <ul class="nav nav-underline">
-            <li class="nav-item">
-                <a class="nav-link" href="/transaksi">Transaksi</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/compare">Compare Pengeluaran</a>
-            </li>
-        </ul>
+<div class="card-header">
+    <div class="card-header">
         <form id="compareForm">
             <div class="form-row align-items-center d-flex">
                 <div class="col mx-3">
@@ -66,9 +64,14 @@
         </form>
     </div>
     <div class="card-body">
-        <div class="alert alert-info" role="alert">
-            <strong>Informasi :</strong>
-            <br>GAP = Nominal Pengeluaran Periode 1 - Nominal Pengeluaran Periode 2.</br>
+        <div class="alert alert-info d-flex align-items-start gap-2" role="alert">
+            <i class="bi bi-info-circle-fill fs-4"></i>
+            <div>
+                <strong>Informasi:</strong>
+                <p class="mb-0">
+                    GAP = Nominal Pengeluaran Periode 1 - Nominal Pengeluaran Periode 2.
+                </p>
+            </div>
         </div>
         <table class="customTable" id="comparisonTable">
             <thead>
@@ -89,5 +92,5 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/compare.js') }}"></script>
+<script src="{{ asset('js/compare.js') }}?v={{ filemtime(public_path('js/compare.js')) }}"></script>
 @endsection

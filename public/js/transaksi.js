@@ -196,30 +196,8 @@ $(document).ready(function () {
                     return data ? data : "-";
                 },
             },
-            {
-                data: "created_at",
-                render: function (data) {
-                    var formattedTimestamp = moment(data).format(
-                        "YYYY-MM-DD HH:mm:ss"
-                    );
-                    return (
-                        "<span class>" + formattedTimestamp + "<br>" + "</span>"
-                    );
-                },
-                className: "text-center",
-            },
-            {
-                data: "updated_at",
-                render: function (data) {
-                    var formattedTimestamp = moment(data).format(
-                        "YYYY-MM-DD HH:mm:ss"
-                    );
-                    return (
-                        "<span class>" + formattedTimestamp + "<br>" + "</span>"
-                    );
-                },
-                className: "text-center",
-            },
+            { data: 'created_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            { data: 'updated_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
 
             {
                 data: "aksi",
@@ -238,7 +216,50 @@ $(document).ready(function () {
     });
 });
 
-// Create
+// Fungsi untuk menampilkan toast notification
+function showToast(message, type) {
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+
+    const toastId = 'toast-' + Date.now();
+    const colors = {
+        success: '#012970',  // Biru
+        danger: '#dc3545',   // Merah
+        warning: '#ffc107',  // Kuning
+        info: '#17a2b8',     // Biru muda
+        primary: '#007bff',  // Biru
+    };
+
+    const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+
+    const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+    // Tambahkan toast ke container
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+    toast.show();
+
+    toastElement.addEventListener('hidden.bs.toast', function () {
+        toastElement.remove();
+    });
+}
+
+// Create Transaksi
 document.addEventListener('DOMContentLoaded', function () {
     // Mengambil elemen form dan button
     const formTransaksi = document.getElementById('formTransaksi');
@@ -280,61 +301,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         return true;
-    }
-
-    // Fungsi untuk menampilkan toast notification
-    function showToast(message, type) {
-        // Buat container toast jika belum ada
-        let toastContainer = document.querySelector('.toast-container');
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-            document.body.appendChild(toastContainer);
-        }
-
-        // Buat ID unik untuk toast
-        const toastId = 'toast-' + Date.now();
-
-        // Buat elemen toast
-        const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        `;
-
-        // Tambahkan toast ke container
-        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-
-        // Inisialisasi dan tampilkan toast
-        const toastElement = document.getElementById(toastId);
-
-        // Cek apakah Bootstrap 5 tersedia
-        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-            const toast = new bootstrap.Toast(toastElement, {
-                autohide: true,
-                delay: 5000
-            });
-            toast.show();
-        } else {
-            // Fallback jika Bootstrap Toast tidak tersedia
-            toastElement.classList.add('show');
-            setTimeout(() => {
-                toastElement.classList.remove('show');
-                setTimeout(() => {
-                    toastElement.remove();
-                }, 300);
-            }, 5000);
-        }
-
-        // Hapus toast dari DOM setelah dihide
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            toastElement.remove();
-        });
     }
 
     // Fungsi untuk me-refresh tabel data
@@ -469,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     formTransaksi.reset();
 
                     // Refresh DataTable
-                    transaksiTable.ajax.reload(null, false);
+                    $("#transaksiTable").DataTable().ajax.reload(null, false);
                 } else {
                     // Menampilkan toast error
                     showToast(data.message || 'Gagal menyimpan data transaksi!', 'danger');
@@ -528,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Edit
+// Edit Transaksi
 $("body").on("click", ".tombol-edit-transaksi", function (e) {
     var id = $(this).data("id");
 
@@ -536,20 +502,17 @@ $("body").on("click", ".tombol-edit-transaksi", function (e) {
         url: "transaksi/" + id + "/edit",
         type: "GET",
         success: function (response) {
-            // Menampilkan modal
             $("#editTransaksiModal").modal("show");
 
-            // Mengisi data ke dalam modal
             var tgl_transaksi = response.result.tgl_transaksi;
             if (tgl_transaksi) {
                 var tanggal = new Date(tgl_transaksi);
                 var year = tanggal.getFullYear();
-                var month = (tanggal.getMonth() + 1)
-                    .toString()
-                    .padStart(2, "0");
+                var month = (tanggal.getMonth() + 1).toString().padStart(2, "0");
                 var day = tanggal.getDate().toString().padStart(2, "0");
                 tgl_transaksi = `${year}-${month}-${day}`;
             }
+
             $("#edit_tgl_transaksi").val(tgl_transaksi);
             $("#edit_pemasukan").val(response.result.pemasukan);
             $("#edit_nominal_pemasukan").val(response.result.nominal_pemasukan);
@@ -557,99 +520,54 @@ $("body").on("click", ".tombol-edit-transaksi", function (e) {
             $("#edit_nominal").val(response.result.nominal);
             $("#edit_keterangan").val(response.result.keterangan);
 
-            // Menyesuaikan action form untuk update
             var form = $("#editTransaksiForm");
-            form.attr("action", "transaksi/" + id); // Pastikan URL sudah sesuai
+            form.attr("action", "transaksi/" + id);
         },
         error: function (xhr, status, error) {
             console.error("Error fetching data:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Kesalahan",
-                text: "Gagal memuat data untuk edit",
-            });
+            showToast("Gagal memuat data untuk edit", "danger");
         },
     });
 });
 
-// Update
+// Update Transaksi
 $("body").on("submit", "#editTransaksiForm", function (e) {
-    e.preventDefault(); // Mencegah submit default form
+    e.preventDefault();
 
     var form = $(this);
-    var url = form.attr("action"); // URL update
-    var formData = form.serialize(); // Mengambil data dari form
-    var submitButton = form.find("button[type='submit']"); // Tombol submit
+    var url = form.attr("action");
+    var formData = form.serialize();
+    var submitButton = form.find("button[type='submit']");
 
-    // Ubah tombol menjadi spinner dan teks "Proses..."
-    submitButton
-        .html(
-            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses...'
-        )
-        .prop("disabled", true);
+    submitButton.html(
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses...'
+    ).prop("disabled", true);
 
     $.ajax({
         url: url,
-        type: "PUT", // Method untuk update
+        type: "PUT",
         data: formData,
         success: function (response) {
-            // Tutup modal
             $("#editTransaksiModal").modal("hide");
 
-            // Tampilkan SweetAlert setelah modal ditutup
             setTimeout(() => {
-                Swal.fire({
-                    icon: "success",
-                    title: "Data berhasil diupdate",
-                    timer: 3000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: "top",
-                    customClass: {
-                        title: "swal2-title-create",
-                        popup: "swal2-popup-create",
-                    },
-                    iconColor: "#ffffff",
-                });
-
-                // Reload tabel data
+                showToast("Data berhasil diupdate", "success");
                 $("#transaksiTable").DataTable().ajax.reload(null, false);
-            }, 300); // Beri jeda agar animasi modal selesai
+            }, 300);
         },
         error: function (xhr, status, error) {
             console.error("Error updating data:", error);
-
-            // Tampilkan pesan error
-            Swal.fire({
-                icon: "error",
-                title: "Kesalahan",
-                text: "Gagal memperbarui data transaksi",
-            });
+            showToast("Gagal memperbarui data transaksi", "danger");
         },
         complete: function () {
-            // Kembalikan tombol ke keadaan semula
             submitButton.html("Update").prop("disabled", false);
         },
     });
 });
 
-// Delete
+// Delete Transaksi
 $("body").on("click", ".tombol-del-transaksi", function (e) {
     e.preventDefault();
-    var toastMixin = Swal.mixin({
-        toast: true,
-        icon: "success",
-        title: "General Title",
-        animation: false,
-        position: "top",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: false,
-        didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-        },
-    });
 
     Swal.fire({
         title: "Yakin mau hapus data ini?",
@@ -663,25 +581,16 @@ $("body").on("click", ".tombol-del-transaksi", function (e) {
     }).then((result) => {
         if (result.isConfirmed) {
             var id = $(this).data("id");
+
             $.ajax({
                 url: "/transaksi/" + id,
                 type: "DELETE",
                 success: function () {
-                    toastMixin.fire({
-                        animation: true,
-                        title: "Data Berhasil dihapus",
-                        customClass: {
-                            title: "swal2-title-create",
-                            popup: "swal2-popup-create",
-                        },
-                        iconColor: "#ffffff",
-                    });
+                    showToast("Data berhasil dihapus", "success");
                     $("#transaksiTable").DataTable().ajax.reload();
                 },
                 error: function () {
-                    $("#toastTransaksi").text("Data Gagal dihapus");
-                    $(".toast").addClass("bg-danger");
-                    $(".toast").toast("show");
+                    showToast("Data gagal dihapus", "danger");
                     $("#transaksiTable").DataTable().ajax.reload();
                 },
             });
@@ -689,6 +598,7 @@ $("body").on("click", ".tombol-del-transaksi", function (e) {
     });
 });
 
+// Handle Download PDF
 function downloadPDFTransaksi() {
     var start_date = $("#daterange")
         .data("daterangepicker")
@@ -741,6 +651,7 @@ function downloadPDFTransaksi() {
     });
 }
 
+// Handle Download Excel
 function downloadExcel() {
     var start_date = $("#daterange")
         .data("daterangepicker")
@@ -935,7 +846,6 @@ document.getElementById("importForm").addEventListener("submit", function (e) {
             const form = e.target;
             const formData = new FormData(form);
             const importBtn = document.getElementById("importBtn");
-            const uploadStatus = document.getElementById("uploadStatus");
 
             importBtn.disabled = true;
             importBtn.innerHTML =
@@ -956,46 +866,33 @@ document.getElementById("importForm").addEventListener("submit", function (e) {
                     form.reset();
                     $("#importExcelModal").modal("hide");
 
-                    Swal.fire({
-                        icon: "success",
-                        title: "Data berhasil diimport",
-                        timer: 3000,
-                        showConfirmButton: false,
-                        toast: true,
-                        position: "top",
-                        customClass: {
-                            title: "swal2-title-create",
-                            popup: "swal2-popup-create",
-                        },
-                        iconColor: "#ffffff",
-                    });
+                    showToast("Data berhasil diimpor!", "success");
 
                     $("#transaksiTable").DataTable().ajax.reload();
-                    uploadStatus.innerHTML = `<div class="alert alert-success">Data berhasil diimpor!</div>`;
                 } else {
                     const message =
-                        data.message ||
-                        "Terjadi kesalahan saat mengimport file.";
+                        data.message || "Terjadi kesalahan saat mengimport file.";
                     Swal.fire({
                         title: "Error!",
                         text: message,
                         icon: "error",
                         confirmButtonColor: "#d33",
                     });
-                    uploadStatus.innerHTML = `<div class="alert alert-danger">Error: ${message}</div>`;
+                    showToast("Error: " + message, "danger");
                 }
             };
 
-            xhr.onerror = xhr.onloadend = function () {
-                if (xhr.status < 200 || xhr.status >= 300) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Terjadi kesalahan pada server.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                    });
-                    uploadStatus.innerHTML = `<div class="alert alert-danger">Error uploading file!</div>`;
-                }
+            xhr.onerror = function () {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Gagal terhubung ke server.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                });
+                showToast("Gagal terhubung ke server.", "danger");
+            };
+
+            xhr.onloadend = function () {
                 importBtn.disabled = false;
                 importBtn.innerHTML = '<i class="fa fa-upload"></i> Import';
             };
@@ -1004,3 +901,4 @@ document.getElementById("importForm").addEventListener("submit", function (e) {
         }
     });
 });
+
