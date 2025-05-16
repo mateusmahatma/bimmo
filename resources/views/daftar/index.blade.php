@@ -18,7 +18,7 @@
     <link href="/vendor/quill/quill.bubble.css" rel="stylesheet" />
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet" />
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet" />
-    <link href="/css/style.css" rel="stylesheet" />
+    <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
 </head>
 
@@ -32,10 +32,6 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="d-flex justify-content-center py-4">
-                                <a href="#" class="logo d-flex align-items-center w-auto">
-                                    <img src="/img/icon_pointech.png" alt="" class="icon-pointech" />
-                                    <span class="d-none d-lg-block">Pointech</span>
-                                </a>
                             </div>
 
                             <div class="card mb-3">

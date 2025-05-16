@@ -4,10 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Pointech</title>
+    <title>BIMMO</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link href="/img/icon_pointech.png" rel="icon" />
+    <link href="/img/bimmo_icon.png" rel="icon" />
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
     <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
@@ -15,7 +15,7 @@
     <link href="/vendor/quill/quill.bubble.css" rel="stylesheet" />
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet" />
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet" />
-    <link href="/css/style.css" rel="stylesheet" />
+    <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
 </head>
 
@@ -26,15 +26,12 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div class="d-flex justify-content-center py-4">
-                                <a href="#" class="logo d-flex align-items-center w-auto">
-                                    <img src="/img/icon_pointech.png" alt="" class="icon-pointech" />
-                                    <span class="d-none d-lg-block">Pointech</span>
-                                </a>
-                            </div>
-                            <div class="card mb-3">
+                            <div class="card-header">
                                 <div class="card-body">
                                     <div class="pt-4 pb-2">
+                                        <div class="text-center">
+                                            <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
+                                        </div>
                                         <h5 class="card-title text-center pb-0 fs-4">Selamat Datang Kembali</h5>
                                         <p class="text-center small">Masukkan Nama Pengguna & Kata Sandi Anda untuk masuk</p>
                                     </div>
@@ -60,9 +57,6 @@
                                         <div class="text-center">
                                             <button class="bg-gradient-info tombol-login" type="submit">Masuk</button>
                                         </div>
-                                        <div class="socials-row">
-                                            <a href="#"><img src="/img/google.png" alt="Google">Masuk dengan Google</a>
-                                        </div>
                                         <div class="col-12">
                                             <p class="small mb-0">Tidak memiliki akun? <a href="/daftar">Buat Akun</a></p>
                                         </div>
@@ -76,19 +70,13 @@
         </div>
     </main>
 
-    <footer>
-        <div class="footer-container">
-            <p class="footer-text">Copyright © 2024 <strong>@mateusbimahatma</strong>. All rights reserved.</p>
-        </div>
-    </footer>
-
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2@10') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
-    <script src="{{ asset('js/login.js') }}"></script>
+    <script src="{{ asset('js/login.js') }}?v={{ filemtime(public_path('js/login.js')) }}"></script>
 </body>
 
 </html>

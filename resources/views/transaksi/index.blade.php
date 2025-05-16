@@ -8,16 +8,6 @@
 @extends('layouts.main')
 @section('container')
 
-<!-- <div class="pagetitle d-flex justify-content-between align-items-center mb-3">
-    <h1>Data Transaksi</h1>
-</div>
-<nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">Transaksi</li>
-        <li class="breadcrumb-item active">Data Transaksi</li>
-    </ol>
-</nav> -->
-
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
     <a class="navbar-brand" href="/transaksi">Data Transaksi</a>
     <ul class="nav nav-pills">
@@ -58,7 +48,7 @@
                 <div class="col mx-3">
                     <p class="filter">Tanggal Transaksi</p>
                     <div id="daterange" class="daterange"> <i class="fa fa-calendar"></i>&nbsp;
-                        <span style="font-weight: bold;"></span>
+                        <span></span>
                         <i class="fa fa-caret-down"></i>
                     </div>
                 </div>
@@ -71,7 +61,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col">
+                <div class="col mx-3">
                     <p class="filter">Jenis Pengeluaran</p>
                     <select class="form-control" name="filter_pengeluaran">
                         <option value="">- Pilih -</option>
@@ -99,8 +89,6 @@
                     <th style="width: 3px;">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-            </tbody>
         </table>
         <div class="badge-success" style="font-size: medium;">
             Total Pemasukan: <span id="totalPemasukan">0</span>

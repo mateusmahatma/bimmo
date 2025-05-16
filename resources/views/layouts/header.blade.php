@@ -1,5 +1,5 @@
 <header id="header" class="header fixed-top d-flex align-items-center">
-    <img src="/img/icon_pointech.png" class="icon-pointech" />
+    <img src="/img/bimmo_icon.png" class="icon-bimmo" />
     <ul class="nav justify-content-center">
         <li class="nav-item">
             <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dashboard</a>

@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </tr>`;
                 } else {
                     data.forEach(item => {
-                        let tanggalTransaksi = item.tgl_transaksi;
+                        let tanggalTransaksi = new Date(item.tgl_transaksi).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         let numberedKeterangan = item.keterangan
                             .split("\n") // Pisahkan berdasarkan baris (jika ada newline)
                             .map((line, index) => `${index + 1}. ${line.trim()}`) // Tambahkan numbering

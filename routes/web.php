@@ -19,14 +19,13 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\LupaPasswordController;
 use App\Http\Controllers\UbahPasswordController;
 use App\Http\Controllers\DanaDaruratController;
-// use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 // Log in
 Route::get('/', function () {
-    return redirect()->route('pointech');
+    return redirect()->route('bimmo');
 })->name('login');
-Route::get('/pointech', [LoginController::class, 'index'])->name('pointech')->middleware('guest');
-Route::post('/pointech', [LoginController::class, 'authenticate']);
+Route::get('/bimmo', [LoginController::class, 'index'])->name('bimmo')->middleware('guest');
+Route::post('/bimmo', [LoginController::class, 'authenticate']);
 
 // Log in Google
 Route::get('/login/google', [GoogleLoginController::class, 'redirectToGoogle']);

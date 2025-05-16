@@ -25,7 +25,7 @@ $('body').on('click', '.tombol-login', function (e) {
     };
 
     $.ajax({
-        url: '/pointech',
+        url: '/bimmo',
         type: 'post',
         data: formData,
         headers: {
