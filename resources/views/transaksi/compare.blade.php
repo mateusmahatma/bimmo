@@ -13,12 +13,7 @@
     <ul class="nav nav-pills">
         <li class="nav-item">
             <a class="nav-link" href="/transaksi">
-                <span class="badge-primary rounded-pill">Data Transaksi</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/compare">
-                <span class="badge-orange rounded-pill">Compare Pengeluaran</span>
+                <span class="badge-primary">Data Transaksi</span>
             </a>
         </li>
     </ul>
@@ -73,7 +68,7 @@
                 </p>
             </div>
         </div>
-        <table class="customTable" id="comparisonTable">
+        <table id="comparisonTable" class="customTable">
             <thead>
                 <tr>
                     <th class="text-center">Nominal Pengeluaran Periode 1</th>

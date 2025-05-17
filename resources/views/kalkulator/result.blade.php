@@ -6,23 +6,22 @@
 </head>
 @extends('layouts.main')
 @section('container')
-<div class="pagetitle d-flex justify-content-between align-items-center mb-3">
-    <h1>Hasil Perhitungan Anggaran</h1>
-    <div class="btn-group">
-        <button class="btn-sm btn-color" id="downloadButton" onclick="downloadPDF()">
-            <i class="fa fa-file-pdf-o"></i> Download PDF
-        </button>
-    </div>
-</div>
-<nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item link"><a href="/dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item">Manajemen Keuangan</li>
-        <li class="breadcrumb-item link"><a href="/kalkulator">Kalkulator Anggaran</a></li>
-        <li class="breadcrumb-item active">Hasil Perhitungan</li>
-    </ol>
+
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="#">Hasil Perhitungan Anggaran</a>
+    <ul class="nav nav-pills">
+        <li class="nav-item dropdown">
+            <a class="nav-link" href="/kalkulator" role="button" aria-expanded="false">
+                <span class="badge-primary">Kalkulator Anggaran</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" role="button" id="downloadButton" onclick="downloadPDF()">
+                <span class="badge-pdf">Download PDF</span>
+            </a>
+        </li>
+    </ul>
 </nav>
-</div>
 
 <div class="card">
     <div class="card-header mb-3">

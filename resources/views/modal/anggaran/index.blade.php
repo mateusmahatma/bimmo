@@ -12,7 +12,18 @@
                 </div>
                 <div class="mb-3">
                     <label for="nama" class="col-form-label">Persentase</label>
-                    <input type="number" id="persentase_anggaran" class="form-control" name='perentase_anggaran' placeholder="Input Persentase Anggaran" required>
+                    <input type="number" id="persentase_anggaran" class="form-control" name='persentase_anggaran' placeholder="Input Persentase Anggaran" required>
+                </div>
+                <div class="mb-3">
+                    <label for="id_pengeluaran" class="col-form-label">Jenis Pengeluaran</label>
+                    <select name="id_pengeluaran[]" id="id_pengeluaran" class="form-select" multiple>
+                        @foreach ($pengeluarans as $pengeluaran)
+                        <option value="{{ $pengeluaran->id }}"
+                            {{ in_array($pengeluaran->id, (array) $anggaran->id_pengeluaran) ? 'selected' : '' }}>
+                            {{ $pengeluaran->nama }}
+                        </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">

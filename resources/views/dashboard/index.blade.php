@@ -13,7 +13,6 @@
 
 <section class="section dashboard" id="dashboard-container">
     <div class="row">
-        <!--  -->
         <div class="card-nominal">
             <div class="lock-icon">
                 <i class="bx bx-lock" onclick="toggleNominal()"></i>

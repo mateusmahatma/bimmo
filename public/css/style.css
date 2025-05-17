@@ -515,7 +515,12 @@ a.disabled span {
     white-space: nowrap;
     vertical-align: baseline;
     background-color: var(--bs-primary);
-    width: 120px;
+    width: 170px;
+    border-radius: 4px;
+}
+
+.navbar-brand {
+    color: var(--bs-primary);
 }
 
 .badge-orange {
@@ -528,7 +533,8 @@ a.disabled span {
     white-space: nowrap;
     vertical-align: baseline;
     background-color: var(--bs-orange);
-    width: 180px;
+    width: 170px;
+    border-radius: 4px;
 }
 
 .badge-red {
@@ -542,6 +548,20 @@ a.disabled span {
     vertical-align: baseline;
     background-color: var(--bs-purple);
     width: 120px;
+}
+
+.badge-pdf {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 100%;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: var(--bs-red);
+    width: 180px;
+    border-radius: 4px;
 }
 
 .badge-toggle {
@@ -658,7 +678,7 @@ a.disabled span {
     color: var(--bs-light);
     background: var(--bs-primary);
     letter-spacing: 0.03em;
-    border-radius: 8px;
+    border-radius: 4px;
     border: var(--bs-primary);
     transition: all 0.3s ease-in-out;
 }
@@ -679,7 +699,7 @@ a.disabled span {
     color: var(--bs-light);
     background: var(--bs-red);
     letter-spacing: 0.03em;
-    border-radius: 8px;
+    border-radius: 4px;
     border: var(--bs-red);
     transition: all 0.3s ease-in-out;
 }
@@ -865,10 +885,6 @@ body {
 
 input:checked+.slider {
     background-color: #2196F3;
-}
-
-input:focus+.slider {
-    /* box-shadow: 0 0 1px #2196F3; */
 }
 
 input:checked+.slider:before {
@@ -1060,7 +1076,7 @@ td {
 }
 
 .pagetitle h1 {
-    font-size: 24px;
+    font-size: 1.5rem;
     margin-bottom: 0;
     font-weight: 600;
     color: var(--bs-primary);
@@ -1475,9 +1491,9 @@ p {
 
 /* Breadcrumbs */
 .breadcrumb {
-    font-size: 14px;
+    font-size: 1.0rem;
     font-family: "Nunito", sans-serif;
-    color: #899bbd;
+    color: var(--bs-primary);
     font-weight: 600;
 }
 
@@ -1495,8 +1511,7 @@ p {
 }
 
 .breadcrumb .active {
-    color: #51678f;
-    font-weight: 600;
+    color: var(--bs-primary);
 }
 
 /* Bordered Tabs */
@@ -2369,75 +2384,6 @@ p {
     margin-bottom: 0;
 }
 
-.contact .php-email-form .error-message {
-    display: none;
-    color: #fff;
-    background: #ed3c0d;
-    text-align: left;
-    padding: 15px;
-    margin-bottom: 24px;
-    font-weight: 600;
-}
-
-.contact .php-email-form .sent-message {
-    display: none;
-    color: #fff;
-    background: #18d26e;
-    text-align: center;
-    padding: 15px;
-    margin-bottom: 24px;
-    font-weight: 600;
-}
-
-.contact .php-email-form .loading {
-    display: none;
-    background: #fff;
-    text-align: center;
-    padding: 15px;
-    margin-bottom: 24px;
-}
-
-.contact .php-email-form .loading:before {
-    content: "";
-    display: inline-block;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    margin: 0 10px -6px 0;
-    border: 3px solid #18d26e;
-    border-top-color: #eee;
-}
-
-.contact .php-email-form input,
-.contact .php-email-form textarea {
-    border-radius: 0;
-    /* box-shadow: none; */
-    font-size: 14px;
-    border-radius: 0;
-}
-
-.contact .php-email-form input:focus,
-.contact .php-email-form textarea:focus {
-    border-color: #4154f1;
-}
-
-.contact .php-email-form input {
-    padding: 10px 15px;
-}
-
-.contact .php-email-form textarea {
-    padding: 12px 15px;
-}
-
-.contact .php-email-form button[type="submit"] {
-    background: #4154f1;
-    border: 0;
-    padding: 10px 30px;
-    color: #fff;
-    transition: 0.4s;
-    border-radius: 4px;
-}
-
 /*--------------------------------------------------------------
 # Error 404
 --------------------------------------------------------------*/
@@ -2648,7 +2594,7 @@ footer {
 .table {
     border-collapse: collapse;
     width: 100%;
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
     border-color: #999;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
@@ -2706,6 +2652,7 @@ footer {
 }
 
 .filter {
+    margin-top: 15px;
     color: black;
 }
 
@@ -2914,7 +2861,7 @@ footer {
 
 .box-info li h3 {
     margin: 0;
-    font-size: 24px;
+    font-size: 1.0rem;
 }
 
 .box-info li p {
@@ -2952,7 +2899,7 @@ footer {
     margin: 0px 0;
     padding: 20px;
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 4px;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 

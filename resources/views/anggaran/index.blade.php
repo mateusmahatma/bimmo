@@ -29,6 +29,7 @@
                     <th style="width: 5px;">No</th>
                     <th class="text-center">Nama Anggaran</th>
                     <th class="text-center">Persentase</th>
+                    <th class="text-center">Jenis Pengeluaran</th>
                     <th style="width: 90px;">Dibuat Tanggal</th>
                     <th style="width: 90px;">Diupdate Tanggal</th>
                     <th style="width: 5px;">Aksi</th>
@@ -44,5 +45,5 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/anggaran.js') }}"></script>
+<script src="{{ asset('js/anggaran.js') }}?v={{ filemtime(public_path('js/anggaran.js')) }}"></script>
 @endsection

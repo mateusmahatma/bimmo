@@ -1,4 +1,16 @@
 $(document).ready(function () {
+    new TomSelect("#id_pengeluaran", {
+        plugins: ['remove_button'],
+        persist: false,
+        create: false,
+        maxItems: null,
+        placeholder: 'Pilih jenis pengeluaran',
+        render: {
+            item: function (data, escape) {
+                return '<div class="item">' + escape(data.text) + '</div>';
+            }
+        }
+    });
     $('#anggaranTable').DataTable({
         paging: true,
         responsive: true,
@@ -14,7 +26,6 @@ $(document).ready(function () {
             type: 'GET',
             dataSrc: function (json) {
                 $('#totalPersentase').text(json.totalPersentase.toLocaleString('id-ID'));
-                // Jika ada pesan exceedMessage, tampilkan
                 if (json.exceedMessage) {
                     $('#exceedMessage').text(json.exceedMessage).show();
                 } else {
@@ -31,6 +42,12 @@ $(document).ready(function () {
                 }
             },
             { data: 'persentase_anggaran', className: 'text-center' },
+            {
+                data: 'nama_pengeluaran',  // pakai accessor virtual tadi
+                name: 'nama_pengeluaran',
+                defaultContent: '-',
+                className: 'text-center',
+            },
             { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
             { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
             {
@@ -72,7 +89,8 @@ $(document).ready(function () {
             $('#anggaranModal').off('click', '.tombol-simpan-anggaran').on('click', '.tombol-simpan-anggaran', function () {
                 var formData = {
                     nama_anggaran: $('#nama_anggaran').val().trim(),
-                    persentase_anggaran: $('#persentase_anggaran').val().trim()
+                    persentase_anggaran: $('#persentase_anggaran').val().trim(),
+                    id_pengeluaran: $('#id_pengeluaran').val()  // Ini akan jadi array karena multiple select
                 };
 
                 if (formData.nama_anggaran === '') {

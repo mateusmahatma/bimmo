@@ -11,10 +11,9 @@
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
     <a class="navbar-brand" href="/transaksi">Data Transaksi</a>
     <ul class="nav nav-pills">
-
         <li class="nav-item dropdown">
             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span class="badge-primary rounded-pill dropdown-toggle">Aksi</span>
+                <span class="badge-primary dropdown-toggle">Aksi</span>
             </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Tambah Data</a></li>
@@ -29,7 +28,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/compare">
-                <span class="badge-orange rounded-pill">Compare Pengeluaran</span>
+                <span class="badge-orange">Compare Pengeluaran</span>
             </a>
         </li>
     </ul>
@@ -41,8 +40,6 @@
 
 <div class="card-header">
     <div class="card-header mb-3">
-        <ul class="nav nav-underline">
-        </ul>
         <form>
             <div class="form-row align-items-center d-flex">
                 <div class="col mx-3">
