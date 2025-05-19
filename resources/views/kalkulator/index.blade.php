@@ -9,12 +9,12 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="/anggaran">Kalkulator Anggaran</a>
+    <a class="navbar-brand" href="/anggaran">Proses Anggaran</a>
 </nav>
 
 <div class="card-header">
     <div class="card-body">
-        <form method="post" action="/kalkulator" id="form-kalkulator">
+        <form method="post" action="/kalkulator" id="formKalkulator" autocomplete="off">
             @csrf
             <div class="mt-3 mb-3">
                 <label for="monthly_income" class="form-label">Penghasilan Bulanan:</label>
@@ -40,8 +40,10 @@
             </div>
 
             <div class="button-group">
-                <!-- Pastikan tombol ini submit ke route store -->
-                <button type="submit" class="cssbuttons-io-button secondary" id="btnProses">Proses</button>
+                <button type="submit" class="cssbuttons-io-button" id="btnProses">
+                    <span id="btnProsesSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <span id="btnProsesText"><i class="fa fa-sync-alt"></i> Proses</span>
+                </button>
             </div>
         </form>
 

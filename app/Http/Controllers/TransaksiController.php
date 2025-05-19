@@ -197,7 +197,6 @@ class TransaksiController extends Controller
         }
     }
 
-
     public function cetak_pdf(Request $request)
     {
         $userId = Auth::id();

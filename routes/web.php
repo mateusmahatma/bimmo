@@ -85,9 +85,12 @@ Route::delete('/barang', [BarangController::class, 'destroy']);
 // Kalkulator
 Route::get('/kalkulator', [FinancialCalculatorController::class, 'index'])->name('kalkulator.index')->middleware('auth');
 Route::post('/kalkulator', [FinancialCalculatorController::class, 'store'])->name('kalkulator.store');
+Route::delete('/kalkulator/{id}', [FinancialCalculatorController::class, 'destroy']);
+Route::put('/kalkulator/{id}', [FinancialCalculatorController::class, 'update']);
 Route::post('/kalkulator/calculate', [FinancialCalculatorController::class, 'calculate'])->middleware('auth');
 Route::get('/kalkulator/calculate', [FinancialCalculatorController::class, 'showResult'])->name('showResult')->middleware('auth');
 Route::get('/kalkulator/cetak_pdf', [FinancialCalculatorController::class, 'cetak_pdf'])->middleware('auth');
+
 
 // Pinjaman
 Route::middleware(['auth'])->group(function () {

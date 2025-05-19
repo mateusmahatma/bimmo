@@ -18,7 +18,7 @@
                 </li>
                 <li>
                     <a class="dropdown-item {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator">
-                        <span>Kalkulator Anggaran</span>
+                        <span>Proses Anggaran</span>
                     </a>
                 </li>
             </ul>

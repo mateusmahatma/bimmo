@@ -29,16 +29,14 @@ class FinancialCalculatorController extends Controller
                     $sisa = $nominal - $digunakan;
                     return number_format($sisa, 0, ',', '.');
                 })
-                ->addColumn('aksi', function ($row) {
-                    // Buat tombol aksi jika perlu
-                    return '';
+                ->addColumn('aksi', function ($request) {
+                    return view('kalkulator.tombol')->with('request', $request);
                 })
                 ->rawColumns(['aksi'])
                 ->toJson();
         }
         return view('kalkulator.index');
     }
-
 
     public function store(Request $request)
     {
@@ -66,7 +64,7 @@ class FinancialCalculatorController extends Controller
                 'tanggal_mulai' => $tanggal_mulai,
                 'tanggal_selesai' => $tanggal_selesai,
                 'nama_anggaran' => $anggaran->nama_anggaran,
-                'jenis_pengeluaran' => $anggaran->id_pengeluaran, // Wrap dalam array
+                'jenis_pengeluaran' => $anggaran->id_pengeluaran,
                 'persentase_anggaran' => $anggaran->persentase_anggaran,
                 'nominal_anggaran' => $nominal,
                 'anggaran_yang_digunakan' => 0,
@@ -74,9 +72,37 @@ class FinancialCalculatorController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Anggaran berhasil diproses dan disimpan.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Data anggaran berhasil diproses.',
+            'redirect' => url('/kalkulator')
+        ]);
     }
 
+    public function update(Request $request, $id)
+    {
+        if ($request->ajax()) {
+            $data = HasilProsesAnggaran::orderBy('created_at', 'desc')->get();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('nama_pengeluaran', function ($row) {
+                    // Pastikan kolom ini benar ada
+                    return $row->nama_anggaran; // atau relasi jika ada
+                })
+                ->addColumn('sisa_anggaran', function ($row) {
+                    $nominal = floatval($row->nominal_anggaran);
+                    $digunakan = floatval($row->anggaran_yang_digunakan);
+                    $sisa = $nominal - $digunakan;
+                    return number_format($sisa, 0, ',', '.');
+                })
+                ->addColumn('aksi', function ($request) {
+                    return view('kalkulator.tombol')->with('request', $request);
+                })
+                ->rawColumns(['aksi'])
+                ->toJson();
+        }
+    }
 
     public function calculate(Request $request)
     {
@@ -183,5 +209,16 @@ class FinancialCalculatorController extends Controller
         ];
         $pdf = PDF::loadview('Kalkulator.pdf', $data);
         return $pdf->stream('');
+    }
+
+    public function destroy($id)
+    {
+        $deleted = HasilProsesAnggaran::where('id_proses_anggaran', $id)->delete();
+
+        if ($deleted) {
+            return response()->json(['message' => 'Data berhasil dihapus']);
+        }
+
+        return response()->json(['message' => 'Data tidak ditemukan'], 404);
     }
 }
