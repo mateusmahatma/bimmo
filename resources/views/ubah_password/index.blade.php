@@ -4,14 +4,16 @@
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
+
 @extends('layouts.main')
 @section('container')
-<div class="pagetitle">
-    <h1>Ubah Password</h1>
-</div>
 
-<div class="card">
-    <div class="card-header mb-3">
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="/ubah-password">Ubah Password</a>
+</nav>
+
+<div class="card-header">
+    <div class="card-body">
         @if(session('status'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('status') }}

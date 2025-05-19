@@ -14,33 +14,66 @@
 
 <div class="card-header">
     <div class="card-body">
-        <form method="post" action="/kalkulator/calculate">
+        <form method="post" action="/kalkulator" id="form-kalkulator">
             @csrf
             <div class="mt-3 mb-3">
-                <div class="alert alert-info d-flex align-items-start gap-2" role="alert">
-                    <i class="bi bi-info-circle-fill fs-4"></i>
-                    <div>
-                        <strong>Informasi:</strong>
-                        <p class="mb-0">
-                            Persentase alokasi anggaran berdasarkan pada "Daftar Anggaran" yang sudah dibuat
-                        </p>
-                    </div>
-                </div>
                 <label for="monthly_income" class="form-label">Penghasilan Bulanan:</label>
-                <input type="number" name="monthly_income" class="form-control" oninput="formatCurrency(this)" required>
-            </div>
-            <div class="mb-3">
-                <label for="additional_income" class="form-label">Pendapatan Tambahan:</label>
-                <input type="number" name="additional_income" class="form-control" oninput="formatCurrency(this)">
+                <input type="number" name="monthly_income" class="form-control" required>
             </div>
 
-            <button type="submit" class="cssbuttons-io-button">Hitung</button>
-            <!-- <button type="submit" class="btn-sm btn-color">Hitung</button> -->
+            <div class="mb-3">
+                <label for="additional_income" class="form-label">Pendapatan Tambahan:</label>
+                <input type="number" name="additional_income" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="daterange" class="form-label">Pilih Tanggal Periode Anggaran:</label>
+                <div id="daterange" class="daterange" style="cursor: pointer;">
+                    <i class="fa fa-calendar"></i>
+                    <span>Pilih rentang tanggal</span>
+                    <i class="fa fa-caret-down"></i>
+                </div>
+
+                <!-- Hidden inputs untuk dikirim ke backend -->
+                <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
+                <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
+            </div>
+
+            <div class="button-group">
+                <!-- Pastikan tombol ini submit ke route store -->
+                <button type="submit" class="cssbuttons-io-button secondary" id="btnProses">Proses</button>
+            </div>
         </form>
+
+
+    </div>
+</div>
+
+<div class="card-header">
+    <div class="card-body">
+        <div class="callout">
+            <h4>Tabel Anggaran</h4>
+        </div>
+        <table id="hasilAnggaranTable" class="customTable">
+            <thead>
+                <tr>
+                    <th style="width: 3px;">No</th>
+                    <th class="text-center">Tanggal Mulai</th>
+                    <th class="text-center">Tanggal Selesai</th>
+                    <th class="text-center">Nama Anggaran</th>
+                    <th class="text-center">Jenis Pengeluaran</th>
+                    <th class="text-center">Persentase Anggaran</th>
+                    <th class="text-center">Nominal Anggaran</th>
+                    <th class="text-center">Anggaran Yang Digunakan</th>
+                    <th class="text-center">Sisa Anggaran</th>
+                    <th style="width: 3px;">Aksi</th>
+                </tr>
+            </thead>
+        </table>
     </div>
 </div>
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/kalkulator.js') }}"></script>
+<script src="{{ asset('js/kalkulator.js') }}?v={{ filemtime(public_path('js/kalkulator.js')) }}"></script>
 @endsection

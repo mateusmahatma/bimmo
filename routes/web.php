@@ -19,6 +19,7 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\LupaPasswordController;
 use App\Http\Controllers\UbahPasswordController;
 use App\Http\Controllers\DanaDaruratController;
+use App\Http\Controllers\HasilProsesAnggaranController;
 
 // Log in
 Route::get('/', function () {
@@ -82,7 +83,8 @@ Route::post('/barang', [BarangController::class, 'store']);
 Route::delete('/barang', [BarangController::class, 'destroy']);
 
 // Kalkulator
-Route::get('/kalkulator', [FinancialCalculatorController::class, 'index'])->middleware('auth');
+Route::get('/kalkulator', [FinancialCalculatorController::class, 'index'])->name('kalkulator.index')->middleware('auth');
+Route::post('/kalkulator', [FinancialCalculatorController::class, 'store'])->name('kalkulator.store');
 Route::post('/kalkulator/calculate', [FinancialCalculatorController::class, 'calculate'])->middleware('auth');
 Route::get('/kalkulator/calculate', [FinancialCalculatorController::class, 'showResult'])->name('showResult')->middleware('auth');
 Route::get('/kalkulator/cetak_pdf', [FinancialCalculatorController::class, 'cetak_pdf'])->middleware('auth');
@@ -108,3 +110,6 @@ Route::resource('/lupa-password', LupaPasswordController::class);
 
 // Dana Darurat
 Route::get('/dana-darurat', [DanaDaruratController::class, 'index'])->middleware('auth');
+
+// Hasil Proses Anggaran
+Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)->middleware('auth');

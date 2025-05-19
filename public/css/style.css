@@ -666,7 +666,6 @@ a.disabled span {
     border-radius: 2px;
 }
 
-/* Gaya modern yang disesuaikan */
 .cssbuttons-io-button {
     display: flex;
     align-items: center;
@@ -680,7 +679,6 @@ a.disabled span {
     letter-spacing: 0.03em;
     border-radius: 4px;
     border: var(--bs-primary);
-    transition: all 0.3s ease-in-out;
 }
 
 .cssbuttons-io-button svg {
@@ -3128,4 +3126,63 @@ table.customTable tbody tr:hover {
     /* Batasi tinggi agar tidak terlalu panjang */
     overflow-y: auto;
     /* Scroll muncul jika grafik terlalu panjang */
+}
+
+/* Callout */
+.callout {
+    border-left: 6px solid #2196F3;
+    background-color: #f1f8ff;
+    color: #333;
+    padding: 15px 20px;
+    margin: 10px 0;
+    border-radius: 6px;
+}
+
+.callout h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+}
+
+.callout.info {
+    border-left-color: #2196F3;
+    background-color: #e7f3fe;
+}
+
+.callout.success {
+    border-left-color: #4CAF50;
+    background-color: #f0f9f0;
+}
+
+.callout.warning {
+    border-left-color: #ff9800;
+    background-color: #fff8e1;
+}
+
+.callout.danger {
+    border-left-color: #f44336;
+    background-color: #fdecea;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    /* Jarak antar tombol */
+    margin-top: 20px;
+}
+
+.cssbuttons-io-button.secondary {
+    display: flex;
+    align-items: center;
+    font-family: inherit;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0.3em 1em 0.3em 0.8em;
+    color: var(--bs-light);
+    background: var(--bs-red);
+    letter-spacing: 0.03em;
+    border-radius: 4px;
 }

@@ -16,6 +16,7 @@ use App\Exports\ExportExcel;
 use Illuminate\Support\Facades\Auth;
 use App\Imports\TransaksiImport;
 use App\Exports\TransaksiTemplateExport;
+use App\Models\HasilProsesAnggaran;
 
 class TransaksiController extends Controller
 {
@@ -68,15 +69,41 @@ class TransaksiController extends Controller
             'tgl_transaksi' => 'required|date',
             'pemasukan' => 'nullable|string',
             'nominal_pemasukan' => 'nullable|numeric',
-            'pengeluaran' => 'nullable|string',
-            'nominal' => 'nullable|numeric',
+            'pengeluaran' => 'nullable|string',  // menyimpan nama pengeluaran
+            'nominal' => 'nullable|numeric',     // validasi numeric supaya input benar
             'keterangan' => 'nullable|string|max:255',
         ]);
 
         $validatedData['id_user'] = Auth::id();
 
         try {
-            transaksi::create($validatedData);
+            // Simpan transaksi
+            $transaksi = Transaksi::create($validatedData);
+
+            // Cast nominal ke float agar cocok untuk operasi increment decimal
+            $nominal = floatval($transaksi->nominal);
+
+            if ($nominal > 0 && !empty($transaksi->pengeluaran)) {
+                // Cari id pengeluaran berdasarkan nama pengeluaran transaksi
+                $pengeluaran = Pengeluaran::where('nama', $transaksi->pengeluaran)->first();
+
+                if ($pengeluaran) {
+                    // Cast id pengeluaran ke string supaya cocok dengan tipe di JSON
+                    $pengeluaranId = (string) $pengeluaran->id;
+
+                    // Cari baris hasil_proses_anggaran sesuai id_pengeluaran dan rentang tanggal
+                    $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+                        ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
+                        ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
+                        ->first();
+
+                    if ($hasil) {
+                        // Tambahkan nominal ke anggaran_yang_digunakan
+                        $hasil->increment('anggaran_yang_digunakan', $nominal);
+                    }
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data transaksi berhasil disimpan.',
@@ -85,7 +112,8 @@ class TransaksiController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data.'
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -129,8 +157,46 @@ class TransaksiController extends Controller
 
     public function destroy($id)
     {
-        $id = transaksi::where('id', $id)->delete();
+        try {
+            $transaksi = Transaksi::findOrFail($id);
+
+            // Cast nominal untuk operasi pengurangan
+            $nominal = floatval($transaksi->nominal);
+
+            if ($nominal > 0 && !empty($transaksi->pengeluaran)) {
+                $pengeluaran = Pengeluaran::where('nama', $transaksi->pengeluaran)->first();
+
+                if ($pengeluaran) {
+                    $pengeluaranId = (string) $pengeluaran->id;
+
+                    $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+                        ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
+                        ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
+                        ->first();
+
+                    if ($hasil) {
+                        // Kurangi anggaran_yang_digunakan, pastikan tidak negatif
+                        $hasil->decrement('anggaran_yang_digunakan', $nominal);
+                    }
+                }
+            }
+
+            // Hapus transaksi setelah update anggaran
+            $transaksi->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus transaksi.',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
+
 
     public function cetak_pdf(Request $request)
     {

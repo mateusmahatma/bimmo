@@ -96,7 +96,7 @@
                         <select id="edit_pengeluaran" name="pengeluaran" class="form-select">
                             <option value="">- Pilih -</option>
                             @foreach ($pengeluaran as $item)
-                            <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
                             @endforeach
                         </select>
                     </div>

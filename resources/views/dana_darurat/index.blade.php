@@ -8,19 +8,18 @@
 @extends('layouts.main')
 @section('container')
 
-<div class="pagetitle d-flex justify-content-between align-items-center mb-3">
-    <h1>Dana Darurat</h1>
-</div>
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="/dana-darurat">Dana Darurat</a>
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link tombol-tambah-anggaran" href="#" data-bs-toggle="modal" data-bs-target="#">
+                <span class="badge-primary rounded-pill">Tambah Data</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
-<div class="card">
-    <div class="card-header mb-3 d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Riwayat Transaksi Dana Darurat</h5>
-        <ul class="nav nav-underline">
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Tambah Data</a>
-            </li>
-        </ul>
-    </div>
+<div class="card-header">
     <div class="card-body">
         <table id="danaDaruratTable" class="customTable">
             <thead>

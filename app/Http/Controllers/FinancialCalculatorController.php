@@ -7,14 +7,76 @@ use App\Models\Anggaran;
 use Illuminate\Support\Facades\Session;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\HasilProsesAnggaran;
+use Yajra\DataTables\DataTables;
 
 class FinancialCalculatorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            $data = HasilProsesAnggaran::orderBy('created_at', 'desc')->get();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('nama_pengeluaran', function ($row) {
+                    // Pastikan kolom ini benar ada
+                    return $row->nama_anggaran; // atau relasi jika ada
+                })
+                ->addColumn('sisa_anggaran', function ($row) {
+                    $nominal = floatval($row->nominal_anggaran);
+                    $digunakan = floatval($row->anggaran_yang_digunakan);
+                    $sisa = $nominal - $digunakan;
+                    return number_format($sisa, 0, ',', '.');
+                })
+                ->addColumn('aksi', function ($row) {
+                    // Buat tombol aksi jika perlu
+                    return '';
+                })
+                ->rawColumns(['aksi'])
+                ->toJson();
+        }
         return view('kalkulator.index');
     }
+
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'monthly_income' => 'required|numeric',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date',
+        ]);
+
+        $userId = Auth::id();
+        $monthly_income = $request->input('monthly_income');
+        $additional_income = $request->input('additional_income') ?? 0;
+        $tanggal_mulai = $request->input('tanggal_mulai');
+        $tanggal_selesai = $request->input('tanggal_selesai');
+        $totalIncome = $monthly_income + $additional_income;
+
+        $anggarans = Anggaran::where('id_user', $userId)
+            ->whereNotNull('id_pengeluaran')
+            ->get();
+
+        foreach ($anggarans as $anggaran) {
+            $nominal = ($anggaran->persentase_anggaran / 100) * $totalIncome;
+
+            HasilProsesAnggaran::create([
+                'tanggal_mulai' => $tanggal_mulai,
+                'tanggal_selesai' => $tanggal_selesai,
+                'nama_anggaran' => $anggaran->nama_anggaran,
+                'jenis_pengeluaran' => $anggaran->id_pengeluaran, // Wrap dalam array
+                'persentase_anggaran' => $anggaran->persentase_anggaran,
+                'nominal_anggaran' => $nominal,
+                'anggaran_yang_digunakan' => 0,
+                // 'sisa_anggaran' => $nominal - 0,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Anggaran berhasil diproses dan disimpan.');
+    }
+
 
     public function calculate(Request $request)
     {

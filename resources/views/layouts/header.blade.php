@@ -4,6 +4,26 @@
         <li class="nav-item">
             <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dashboard</a>
         </li>
+
+        <!-- Anggaran -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <span>Anggaran</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
+                        <span>Daftar Anggaran</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator">
+                        <span>Kalkulator Anggaran</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Transaksi -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
@@ -37,25 +57,6 @@
                 <li>
                     <a class="dropdown-item {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
                         <span>Daftar Pinjaman</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-        <!-- Anggaran -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Anggaran</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
-                        <span>Daftar Anggaran</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator">
-                        <span>Kalkulator Anggaran</span>
                     </a>
                 </li>
             </ul>
