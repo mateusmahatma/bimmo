@@ -578,7 +578,7 @@ a.disabled span {
 }
 
 .required:after {
-    content: " *wajib diisi";
+    content: " *required";
     font-size: smaller;
     color: red;
 }

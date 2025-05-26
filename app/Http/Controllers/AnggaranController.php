@@ -63,7 +63,7 @@ class AnggaranController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nama_anggaran' => ['required', 'min:3', 'max:255', 'unique:anggaran'],
+            'nama_anggaran' => ['required', 'min:3', 'max:255'],
             'persentase_anggaran' => ['required', 'numeric', 'between:0,100'],
             'id_pengeluaran' => ['array'],
             'id_pengeluaran.*' => ['exists:pengeluaran,id'],

@@ -68,7 +68,7 @@
                     <label for="chartType" class="filter-label">Show:</label>
                     <select id="chartType" class="filter-dropdown">
                         <option value="cashFlow">Bar</option>
-                        <option value="incomeExpense">Chart</option>
+                        <option value="incomeExpenses">Chart</option>
                     </select>
                 </div>
             </div>
@@ -90,8 +90,8 @@
                             <th class="text-center">No</th>
                             <th class="text-center">Income Type</th>
                             <th class="text-center">Income Nominal</th>
-                            <th class="text-center">Expenditure Type</th>
-                            <th class="text-center">Expenditure Nominal</th>
+                            <th class="text-center">Expenses Type</th>
+                            <th class="text-center">Expenses Nominal</th>
                             <th class="text-center" style="width: 25%;">Description</th>
                         </tr>
                     </thead>
@@ -103,7 +103,7 @@
 
         <!-- Bar Jenis Pengeluaran -->
         <div class="card-today">
-            <h3>Expenditure Bar</h3>
+            <h3>Expenses Bar</h3>
             <div class="filters-container">
                 <div class="filter-wrapper">
                     <label class="filter-label" for="filterMonth">Select Month:</label>

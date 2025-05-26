@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Budget List</title>
     <meta content="" name="description">
@@ -32,7 +35,7 @@
                     <th class="text-center">Expense Type</th>
                     <th style="width: 90px;">Created Date</th>
                     <th style="width: 90px;">Updated Date</th>
-                    <th style="width: 5px;">Action</th>
+                    <th style="width: 1px;"></th>
                 </tr>
             </thead>
         </table>

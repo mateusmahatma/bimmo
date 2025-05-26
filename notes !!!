@@ -1,0 +1,71 @@
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
+
+        @yield('scripts')
+
+    <!-- Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+        <!-- Daterange Picker -->
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> -->
+
+        <!-- Load DataTables JS -->
+    <!-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script> -->
+
+        <!-- Load Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+        <!-- Load DataTables Moment JS -->
+    <!-- <script src="https://cdn.datatables.net/plug-ins/1.11.5/dataRender/datetime.js"></script> -->
+
+        <!-- Untuk tombol.blade.php -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Tom Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+
+
+// Handle Dark Mode
+document.addEventListener("DOMContentLoaded", function () {
+    const darkModeDropdown = document.getElementById("darkModeDropdown");
+
+    const storedMode = localStorage.getItem("darkMode");
+    const isDarkMode = storedMode === "enabled";
+
+    if (isDarkMode) {
+        enableDarkMode();
+        darkModeDropdown.style.color = "white";
+        darkModeDropdown.value = "dark";
+    }
+
+    darkModeDropdown.addEventListener("change", function () {
+        const selectedMode = darkModeDropdown.value;
+        if (selectedMode === "dark") {
+            enableDarkMode();
+            darkModeDropdown.style.color = "white";
+            localStorage.setItem("darkMode", "enabled");
+        } else {
+            disableDarkMode();
+            darkModeDropdown.style.color = "";
+            localStorage.setItem("darkMode", null);
+        }
+    });
+
+    function enableDarkMode() {
+        document.body.classList.add("dark-mode");
+    }
+
+    function disableDarkMode() {
+        document.body.classList.remove("dark-mode");
+    }
+});
+
+
+        document.getElementById("filterPeriodLine").addEventListener("change", handleFilterChange);

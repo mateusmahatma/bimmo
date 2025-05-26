@@ -293,6 +293,6 @@ class DashboardController extends Controller
     function logout()
     {
         Auth::logout();
-        return redirect('/bimmo')->with('success', 'Berhasil Logout');
+        return redirect('/bimmo')->with('success', 'Successful Log out');
     }
 }

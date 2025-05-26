@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Budget Results</title>
     <meta content="" name="description">
@@ -46,8 +49,6 @@
                 </button>
             </div>
         </form>
-
-
     </div>
 </div>
 
@@ -68,7 +69,7 @@
                     <th class="text-center">Budget Amount</th>
                     <th class="text-center">Used Budget</th>
                     <th class="text-center">Remaining Budget</th>
-                    <th style="width: 3px;">Action</th>
+                    <th style="width: 1px;"></th>
                 </tr>
             </thead>
         </table>

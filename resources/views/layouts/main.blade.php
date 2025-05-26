@@ -8,8 +8,6 @@
     <title>Dashboard</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="stylesheet" href="/css/select2.min.css" />
-
     <!-- Favicons -->
     <link href="/img/bimmo_icon.png" rel="icon" />
 
@@ -17,6 +15,7 @@
     <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="/css/select2.min.css" />
 
     <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -55,8 +54,6 @@
     <script src="/vendor/quill/quill.min.js"></script>
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
-    <script src="/vendor/php-email-form/validate.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <!-- DataTables  & Plugins -->
     <script src="/js/jquery-3.7.0.min.js"></script>
@@ -78,31 +75,12 @@
 
     @yield('scripts')
 
-    <!-- Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-    <!-- Daterange Picker -->
-    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-
-    <!-- Load DataTables JS -->
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Load Moment.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
-    <!-- Load DataTables Moment JS -->
-    <script src="https://cdn.datatables.net/plug-ins/1.11.5/dataRender/datetime.js"></script>
-
-    <!-- Untuk tombol.blade.php -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Tom Select JS -->
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <!-- Vendor JS -->
+    <script src="{{ asset('js/vendor/sweetalert2.js') }}"></script>
+    <script src="{{ asset('js/vendor/moment.min.js') }}"></script>
+    <script src="{{ asset('js/vendor/daterangepicker.min.js') }}"></script>
+    <script src="{{ asset('js/vendor/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/vendor/tom-select.complete.min.js') }}"></script>
 
 </body>
 

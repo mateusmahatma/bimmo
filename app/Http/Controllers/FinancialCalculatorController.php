@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HasilProsesAnggaran;
 use Yajra\DataTables\DataTables;
+use App\Models\Transaksi;
 
 class FinancialCalculatorController extends Controller
 {
@@ -87,13 +88,23 @@ class FinancialCalculatorController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('nama_pengeluaran', function ($row) {
-                    // Pastikan kolom ini benar ada
-                    return $row->nama_anggaran; // atau relasi jika ada
+                    return $row->nama_anggaran;
+                })
+                ->addColumn('anggaran_digunakan_terkini', function ($row) {
+                    // Ambil total transaksi berdasarkan id_pengeluaran dan tanggal
+                    $total = Transaksi::whereIn('pengeluaran', $row->jenis_pengeluaran)
+                        ->whereBetween('tgl_transaksi', [$row->tanggal_mulai, $row->tanggal_selesai])
+                        ->sum('nominal');
+
+                    return number_format($total, 0, ',', '.');
                 })
                 ->addColumn('sisa_anggaran', function ($row) {
-                    $nominal = floatval($row->nominal_anggaran);
-                    $digunakan = floatval($row->anggaran_yang_digunakan);
-                    $sisa = $nominal - $digunakan;
+                    $total = Transaksi::whereIn('pengeluaran', $row->jenis_pengeluaran)
+                        ->whereBetween('tgl_transaksi', [$row->tanggal_mulai, $row->tanggal_selesai])
+                        ->sum('nominal');
+
+                    $sisa = floatval($row->nominal_anggaran) - $total;
+
                     return number_format($sisa, 0, ',', '.');
                 })
                 ->addColumn('aksi', function ($request) {

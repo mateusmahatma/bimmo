@@ -33,7 +33,7 @@ $('body').on('click', '.tombol-login', function (e) {
         },
         success: function (response) {
             $('.tombol-login').prop('disabled', false);
-            $('.tombol-login').html('Masuk');
+            $('.tombol-login').html('Log in');
             if (response.success) {
                 showToast(response.message, 'success'); // Pesan dari controller
                 window.location.href = '/dashboard';

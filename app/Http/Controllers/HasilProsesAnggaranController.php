@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HasilProsesAnggaran;
+use App\Models\Transaksi;
 
 
 class HasilProsesAnggaranController extends Controller
@@ -74,8 +75,22 @@ class HasilProsesAnggaranController extends Controller
 
         $data->update($validated);
 
+        // Ambil total transaksi yang cocok dengan jenis_pengeluaran dan dalam rentang tanggal
+        $totalPengeluaran = Transaksi::whereIn('id_pengeluaran', $validated['jenis_pengeluaran'])
+            ->whereBetween('tanggal_transaksi', [$validated['tanggal_mulai'], $validated['tanggal_selesai']])
+            ->sum('nominal');
+
+        // Hitung sisa anggaran berdasarkan transaksi
+        $sisa = $validated['nominal_anggaran'] - $totalPengeluaran;
+
+        // Update kembali anggaran_yang_digunakan dan sisa_anggaran
+        $data->update([
+            'anggaran_yang_digunakan' => $totalPengeluaran,
+            'sisa_anggaran' => $sisa
+        ]);
+
         return redirect()->route('hasil_proses_anggaran.index')
-            ->with('success', 'Data berhasil diperbarui.');
+            ->with('success', 'Data updated successfully.');
     }
 
     // Hapus data

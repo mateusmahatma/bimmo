@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Event listener untuk filter periode
         document.getElementById("filterPeriod").addEventListener("change", handleFilterChange);
-        document.getElementById("filterPeriodLine").addEventListener("change", handleFilterChange);
     });
 
     // Fungsi render chart arus kas
@@ -365,41 +364,6 @@ $(document).ready(function () {
     getTodayTransactions();
 });
 
-// Handle Dark Mode
-document.addEventListener("DOMContentLoaded", function () {
-    const darkModeDropdown = document.getElementById("darkModeDropdown");
-
-    const storedMode = localStorage.getItem("darkMode");
-    const isDarkMode = storedMode === "enabled";
-
-    if (isDarkMode) {
-        enableDarkMode();
-        darkModeDropdown.style.color = "white";
-        darkModeDropdown.value = "dark";
-    }
-
-    darkModeDropdown.addEventListener("change", function () {
-        const selectedMode = darkModeDropdown.value;
-        if (selectedMode === "dark") {
-            enableDarkMode();
-            darkModeDropdown.style.color = "white";
-            localStorage.setItem("darkMode", "enabled");
-        } else {
-            disableDarkMode();
-            darkModeDropdown.style.color = "";
-            localStorage.setItem("darkMode", null);
-        }
-    });
-
-    function enableDarkMode() {
-        document.body.classList.add("dark-mode");
-    }
-
-    function disableDarkMode() {
-        document.body.classList.remove("dark-mode");
-    }
-});
-
 document.addEventListener("DOMContentLoaded", () => {
     initializeNominalDisplay();
 });
@@ -416,9 +380,6 @@ window.addEventListener('load', () => {
             h3.textContent = h3.getAttribute("data-value");
         }
     });
-
-    // Jika nominal disembunyikan, beri kelas 'active' pada toggle switch
-    toggleSwitch.classList.toggle('active', isHidden);
 });
 
 // Inisialisasi saat halaman dimuat show hide nominal

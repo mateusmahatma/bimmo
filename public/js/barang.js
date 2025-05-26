@@ -16,15 +16,11 @@ $(document).ready(function () {
                 d.status = $('select[name="status"]').val();
             },
             dataSrc: function (json) {
-                console.log("Response dari server:", json); // Debugging
-
                 if (!json.totalBarang) {
                     console.warn("totalBarang tidak ditemukan dalam response server!");
                     $("#totalAset").text("Rp 0");
                     return json.data;
                 }
-
-                console.log("Total harga aset dimiliki dari server:", json.totalBarang);
 
                 let totalHargaAsetDimiliki = parseInt(json.totalBarang.replace(/[^\d]/g, '')) || 0; // Ambil hanya angka
 
@@ -68,7 +64,7 @@ $(document).ready(function () {
                 render: function (data) {
                     var statusValue = data.toString().trim(); // Pastikan dalam bentuk string
                     var badgeClass = (statusValue === '1') ? 'badge-success' : 'badge-danger';
-                    var badgeText = (statusValue === '1') ? 'Aset Dimiliki' : 'Aset Digadaikan';
+                    var badgeText = (statusValue === '1') ? 'Assets owned' : 'Mortgaged Assets';
                     return '<span class="badge ' + badgeClass + '">' + badgeText + '</span>';
                 }
             },
