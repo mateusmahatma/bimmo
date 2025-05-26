@@ -1,5 +1,5 @@
 <head>
-    <title>Anggaran</title>
+    <title>Budget List</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -9,11 +9,11 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="/anggaran">Daftar Anggaran</a>
+    <a class="navbar-brand" href="/anggaran">Budget List</a>
     <ul class="nav nav-pills">
         <li class="nav-item">
             <a class="nav-link tombol-tambah-anggaran" href="#" data-bs-toggle="modal" data-bs-target="#pemasukanModal">
-                <span class="badge-primary rounded-pill">Tambah Data</span>
+                <span class="badge-primary rounded-pill">Add Data</span>
             </a>
         </li>
     </ul>
@@ -27,17 +27,17 @@
             <thead>
                 <tr>
                     <th style="width: 5px;">No</th>
-                    <th class="text-center">Nama Anggaran</th>
-                    <th class="text-center">Persentase</th>
-                    <th class="text-center">Jenis Pengeluaran</th>
-                    <th style="width: 90px;">Dibuat Tanggal</th>
-                    <th style="width: 90px;">Diupdate Tanggal</th>
-                    <th style="width: 5px;">Aksi</th>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Percentage</th>
+                    <th class="text-center">Expense Type</th>
+                    <th style="width: 90px;">Created Date</th>
+                    <th style="width: 90px;">Updated Date</th>
+                    <th style="width: 5px;">Action</th>
                 </tr>
             </thead>
         </table>
         <div>
-            <div class="badge-success" style="font-size: medium;">Total Persentase: <span id="totalPersentase">0</span>%</div>
+            <div class="badge-success" style="font-size: medium;">Total Percentage: <span id="totalPersentase">0</span>%</div>
             <span id="exceedMessage" style="color: red; font-size: medium; margin-left: 10px;"></span>
         </div>
     </div>

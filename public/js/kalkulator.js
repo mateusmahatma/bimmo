@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Disable button & show spinner
         btnSpinner.classList.remove('d-none');
-        btnText.textContent = ' Memproses...';
         btnProses.disabled = true;
 
         // Kirim data form via fetch POST
@@ -154,7 +153,11 @@ document.addEventListener('DOMContentLoaded', function () {
             body: formData
         })
             .then(response => {
-                if (!response.ok) throw new Error('Terjadi kesalahan saat memproses anggaran');
+                if (formData.monthly_income === '') {
+                    showToast('The monthly income must be filled in!', 'danger');
+                    return;
+                }
+                // if (!response.ok) throw new Error('Terjadi kesalahan saat memproses anggaran');
                 return response.json();
             })
             .then(data => {
@@ -175,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .finally(() => {
                 btnSpinner.classList.add('d-none');
-                btnText.innerHTML = '<i class="fa fa-sync-alt"></i> Proses';
+                // btnText.innerHTML = '<i class="fa fa-sync-alt"></i> Proccess';
                 btnProses.disabled = false;
             });
     });

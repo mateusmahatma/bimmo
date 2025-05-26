@@ -1,4 +1,16 @@
 $(document).ready(function () {
+    // Inisialisasi DataTables
+    var comparisonTable = $('#comparisonTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        language: {
+            processing:
+                '<div class="loader-container"><div class="loader"></div></div>',
+        }
+    });
+
     var today = moment();
     var start_date = today.startOf('day');
     var end_date = today.endOf('day');
@@ -20,8 +32,8 @@ $(document).ready(function () {
         applyClass: 'dark-mode',
     }, function (chosen_start_date, chosen_end_date) {
         setDateRangeText('#daterange', chosen_start_date, chosen_end_date);
-        $('#start_date_1').val(chosen_start_date.format('DD-MM-YYYY'));
-        $('#end_date_1').val(chosen_end_date.format('DD-MM-YYYY'));
+        $('#start_date_1').val(chosen_start_date.format('YYYY-MM-DD'));
+        $('#end_date_1').val(chosen_end_date.format('YYYY-MM-DD'));
     });
 
     setDateRangeText('#daterange2', start_date, end_date);
@@ -64,29 +76,23 @@ $(document).ready(function () {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-
-                // Kembalikan tombol submit ke teks asli
                 $('.tombol-compare').html('Compare');
                 $('.tombol-compare').prop('disabled', false);
 
-                let tbody = $('#comparisonTable tbody');
-                tbody.empty();
+                // Gunakan DataTables API untuk update data
+                comparisonTable.clear().draw();
 
                 response.data.forEach((item) => {
-                    let row = `
-                        <tr>
-                            <td class="text-center">${item.nominalPeriode1.toLocaleString()}</td>
-                            <td class="text-center">${item.nominalPeriode2.toLocaleString()}</td>
-                            <td class="text-center" style="color: ${item.color}">${item.gap.toLocaleString()}</td>                        </tr>
-                    `;
-                    tbody.append(row);
+                    comparisonTable.row.add([
+                        `<div class="text-center">${item.nominalPeriode1.toLocaleString()}</div>`,
+                        `<div class="text-center">${item.nominalPeriode2.toLocaleString()}</div>`,
+                        `<div class="text-center" style="color: ${item.color}">${item.gap.toLocaleString()}</div>`
+                    ]).draw(false);
                 });
 
                 $('#message').text(response.message);
             },
             error: function (xhr) {
-
-                // Kembalikan tombol submit ke teks asli
                 $('.tombol-compare').html('Compare');
                 $('.tombol-compare').prop('disabled', false);
 

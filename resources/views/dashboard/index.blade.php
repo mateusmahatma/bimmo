@@ -5,7 +5,7 @@
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item active">
-                Halo, {{ auth()->user()->name }}
+                Hi, {{ auth()->user()->name }}
             </li>
         </ol>
     </nav>
@@ -22,28 +22,28 @@
                     <i class='bx bxs-chevrons-down'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominalBulanPemasukan) }}">{{ number_format($totalNominalBulanPemasukan) }}</h3>
-                        <p>Total Pemasukan Bulan ini</p>
+                        <p>Total Income for the Month</p>
                     </span>
                 </li>
                 <li>
                     <i class='bx bxs-chevrons-up'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominalBulan) }}">{{ number_format($totalNominalBulan) }}</h3>
-                        <p>Total Pengeluaran Bulan ini</p>
+                        <p>Total Expenses for the Month</p>
                     </span>
                 </li>
                 <li>
                     <i class='bx bxs-chevron-up'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominal) }}">{{ number_format($totalNominal) }}</h3>
-                        <p>Total Pengeluaran Hari ini</p>
+                        <p>Total Expenses Today</p>
                     </span>
                 </li>
                 <li>
                     <i class='bx bxs-credit-card-alt'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominalSisa) }}">{{ number_format($totalNominalSisa) }}</h3>
-                        <p>Saldo Bulan ini</p>
+                        <p>Balance of the Month</p>
                     </span>
                 </li>
             </ul>
@@ -51,21 +51,21 @@
 
         <!-- Arus Kas -->
         <div class="card-penyiar mb-4">
-            <h3>Arus Kas</h3>
+            <h3>Cash Flow</h3>
             <div class="filters-container">
                 <div class="filter-wrapper">
-                    <label for="filterPeriod" class="filter-label">Periode:</label>
+                    <label for="filterPeriod" class="filter-label">Period:</label>
                     <select id="filterPeriod" class="filter-dropdown">
-                        <option value="2">2 Bulan Terakhir</option>
-                        <option value="4">4 Bulan Terakhir</option>
-                        <option value="6" selected>6 Bulan Terakhir</option>
-                        <option value="12">1 Tahun Terakhir</option>
-                        <option value="all">Tampilkan Semua</option>
+                        <option value="2">Last 2 Months</option>
+                        <option value="4">Last 4 Months</option>
+                        <option value="6" selected>Last 6 Months</option>
+                        <option value="12">Last 1 Year</option>
+                        <option value="all">Show All</option>
                     </select>
                 </div>
 
                 <div class="filter-wrapper">
-                    <label for="chartType" class="filter-label">Tampilkan:</label>
+                    <label for="chartType" class="filter-label">Show:</label>
                     <select id="chartType" class="filter-dropdown">
                         <option value="cashFlow">Bar</option>
                         <option value="incomeExpense">Chart</option>
@@ -82,17 +82,17 @@
 
         <!-- Transaksi Hari ini -->
         <div class="card-today">
-            <h3>Transaksi Hari Ini</h3>
+            <h3>Today's Transaction</h3>
             <div class="card-body">
                 <table id="todayTransactionsTable" class="display">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Pemasukan</th>
-                            <th class="text-center">Nominal Pemasukan</th>
-                            <th class="text-center">Pengeluaran</th>
-                            <th class="text-center">Nominal Pengeluaran</th>
-                            <th class="text-center" style="width: 50%;">Keterangan</th>
+                            <th class="text-center">Income Type</th>
+                            <th class="text-center">Income Nominal</th>
+                            <th class="text-center">Expenditure Type</th>
+                            <th class="text-center">Expenditure Nominal</th>
+                            <th class="text-center" style="width: 25%;">Description</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,10 +103,10 @@
 
         <!-- Bar Jenis Pengeluaran -->
         <div class="card-today">
-            <h3>Bar Jenis Pengeluaran</h3>
+            <h3>Expenditure Bar</h3>
             <div class="filters-container">
                 <div class="filter-wrapper">
-                    <label class="filter-label" for="filterMonth">Pilih Bulan:</label>
+                    <label class="filter-label" for="filterMonth">Select Month:</label>
                     <select class="filter-dropdown" id="filterMonth">
                         @for ($i = 1; $i <= 12; $i++)
                             <option value="{{ $i }}" {{ $i == now()->month ? 'selected' : '' }}>
@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="filter-wrapper">
-                    <label class="filter-label" for="filterYear">Pilih Tahun:</label>
+                    <label class="filter-label" for="filterYear">Select Year:</label>
                     <select class="filter-dropdown" id="filterYear">
                         @for ($y = now()->year - 5; $y <= now()->year; $y++)
                             <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
@@ -130,7 +130,7 @@
 
         <!-- Kompas -->
         <div class="card-today">
-            <h3>Kompas</h3>
+            <h3>Compass</h3>
             <div id="chartKompas"
                 data-rasio="{{ $rasio ?? 0 }}"
                 data-rasio-inflasi="{{ $rasio_inflasi ?? 0 }}"
@@ -150,7 +150,7 @@
                     <div class="modal-body">
                         <table class="display">
                             <tr>
-                                <th>Rumus</th>
+                                <th>Formula</th>
                                 <td><span id="modalRumus"></span></td>
                             </tr>
                             <tr>
@@ -158,11 +158,11 @@
                                 <td><span id="modalTarget"></span></td>
                             </tr>
                             <tr>
-                                <th>Aktual</th>
+                                <th>Actual</th>
                                 <td><span id="modalNominal"></span></td>
                             </tr>
                             <tr>
-                                <th>Analisis</th>
+                                <th>Analysis</th>
                                 <td><span id="modalAnalisis"></span></td>
                             </tr>
                         </table>
@@ -176,15 +176,15 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Detail Transaksi</h5>
+                        <h5 class="modal-title" id="modalTitle">Transaction Details</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <table class="display">
                             <thead>
                                 <tr>
-                                    <th>Tanggal Transaksi</th>
-                                    <th>Keterangan</th>
+                                    <th>Transaction Date</th>
+                                    <th>Description</th>
                                     <th>Nominal</th>
                                 </tr>
                             </thead>

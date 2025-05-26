@@ -39,7 +39,7 @@
 @include('modal.transaksi.upload')
 
 <div class="card-header">
-    <div class="card-header mb-3">
+    <div class="card-header">
         <form>
             <div class="form-row align-items-center d-flex">
                 <div class="col mx-3">

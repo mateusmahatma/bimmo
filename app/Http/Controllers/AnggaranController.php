@@ -22,15 +22,14 @@ class AnggaranController extends Controller
 
             $exceedMessage = null;
             if ($totalPersentase > 100) {
-                $exceedMessage = 'Persentase anggaran melebihi 100% !';
+                $exceedMessage = 'Percentage of budget exceeds 100%!';
             } elseif ($totalPersentase < 100) {
-                $exceedMessage = 'Persentase anggaran kurang dari 100%!';
+                $exceedMessage = 'The budget percentage is less than 100%!';
             }
 
             return DataTables::eloquent($query)
                 ->addIndexColumn()
 
-                // tambahkan kolom nama_pengeluaran dari accessor
                 ->addColumn('nama_pengeluaran', function ($anggaran) {
                     return $anggaran->nama_pengeluaran;
                 })
@@ -44,20 +43,30 @@ class AnggaranController extends Controller
                 ->toJson();
         }
 
-        $anggaran = new Anggaran(); // objek kosong agar tidak error di view
-        $pengeluarans = Pengeluaran::all();
+        $anggaran = new Anggaran();
+        // Dapatkan id_pengeluaran yang sudah dipakai di tabel anggaran milik user ini
+        $usedPengeluaranIds = Anggaran::where('id_user', $userId)
+            ->whereNotNull('id_pengeluaran')
+            ->get()
+            ->pluck('id_pengeluaran')
+            ->flatten()
+            ->unique()
+            ->toArray();
+        // Ambil pengeluaran yang belum dipakai
+        $pengeluarans = Pengeluaran::where('id_user', $userId)
+            ->whereNotIn('id', $usedPengeluaranIds)
+            ->get();
 
         return view('anggaran.index', compact('anggaran', 'pengeluarans'));
     }
-
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'nama_anggaran' => ['required', 'min:3', 'max:255', 'unique:anggaran'],
             'persentase_anggaran' => ['required', 'numeric', 'between:0,100'],
-            'id_pengeluaran' => ['array'],           // wajib array
-            'id_pengeluaran.*' => ['exists:pengeluaran,id'],    // validasi tiap id pengeluaran ada di tabel pengeluaran
+            'id_pengeluaran' => ['array'],
+            'id_pengeluaran.*' => ['exists:pengeluaran,id'],
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -78,7 +87,7 @@ class AnggaranController extends Controller
         $validasi = Validator::make($request->all(), [
             'nama_anggaran' => 'required',
         ], [
-            'nama_anggaran.required' => 'Nama Anggaran wajib diisi',
+            'nama_anggaran.required' => 'Budget name required',
         ]);
 
         if ($validasi->fails()) {
@@ -88,6 +97,7 @@ class AnggaranController extends Controller
         $data = [
             'nama_anggaran' => $request->nama_anggaran,
             'persentase_anggaran' => $request->persentase_anggaran,
+            'id_pengeluaran' => $request->id_pengeluaran ? json_encode($request->id_pengeluaran) : null,
         ];
 
         Anggaran::where('id_anggaran', $id)->update($data);

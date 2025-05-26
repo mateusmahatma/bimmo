@@ -18,7 +18,7 @@ togglePassword.addEventListener("click", function () {
 $('body').on('click', '.tombol-login', function (e) {
     e.preventDefault();
     $('.tombol-login').prop('disabled', true);
-    $('.tombol-login').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...');
+    $('.tombol-login').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
     var formData = {
         username: $('#username').val(),
         password: $('#password').val(),

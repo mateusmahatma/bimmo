@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>BIMMO</title>
+    <title>BIMMO - Log in</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="/img/bimmo_icon.png" rel="icon" />
@@ -32,8 +32,8 @@
                                         <div class="text-center">
                                             <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
                                         </div>
-                                        <h5 class="card-title text-center pb-0 fs-4">Selamat Datang Kembali</h5>
-                                        <p class="text-center small">Masukkan Nama Pengguna & Kata Sandi Anda untuk masuk</p>
+                                        <h5 class="card-title text-center pb-0 fs-4">Welcome back</h5>
+                                        <p class="text-center small">Enter your username & password to log in</p>
                                     </div>
                                     @if (session('success'))
                                     <div class="alert alert-success">
@@ -44,21 +44,21 @@
                                         @csrf
                                         <div class="form-floating">
                                             <input type="text" name="username" class="form-control rounded-bottom" id="username" placeholder="Nama Pengguna" autocomplete="off" required />
-                                            <label for="username">Nama Pengguna</label>
+                                            <label for="username">Username</label>
                                         </div>
                                         <div class="form-floating">
                                             <input type="password" name="password" class="form-control rounded-bottom" id="password" placeholder="Password" autocomplete="off" required />
-                                            <label for="password">Kata Sandi</label>
+                                            <label for="password">Password</label>
                                             <span class="password-toggle-icon"><i class="fas fa-eye-slash"></i></span>
                                         </div>
                                         <div class="text-end mt-0 small-text">
-                                            <a href="/lupa-password"><small>Lupa Kata Sandi ?</small></a>
+                                            <a href="/lupa-password"><small>Forgot Password?</small></a>
                                         </div>
                                         <div class="text-center">
-                                            <button class="bg-gradient-info tombol-login" type="submit">Masuk</button>
+                                            <button class="bg-gradient-info tombol-login" type="submit">Log in</button>
                                         </div>
                                         <div class="col-12">
-                                            <p class="small mb-0">Tidak memiliki akun? <a href="/daftar">Buat Akun</a></p>
+                                            <p class="small mb-0">Don't have an account? <a href="/daftar">Create an Account</a></p>
                                         </div>
                                     </form>
                                 </div>

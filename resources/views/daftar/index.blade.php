@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Daftar</title>
+    <title>BIMMO - Register</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
-    <link href="/img/icon_pointech.png" rel="icon" />
+    <link href="/img/bimmo_icon.png" rel="icon" />
     <link href="/img/apple-touch-icon.png" rel="apple-touch-icon" />
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
@@ -31,17 +31,17 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div class="d-flex justify-content-center py-4">
-                            </div>
-
-                            <div class="card mb-3">
+                            <div class="card-header">
                                 <div class="card-body">
                                     <div class="pt-4 pb-2">
+                                        <div class="text-center">
+                                            <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
+                                        </div>
                                         <h5 class="card-title text-center pb-0 fs-4">
-                                            Buat sebuah Akun
+                                            Create an account
                                         </h5>
                                         <p class="text-center small">
-                                            Masukkan detail pribadi Anda untuk membuat akun
+                                            Enter your personal details to create an account
                                         </p>
                                     </div>
                                     <!-- csrf agar tidak bisa di cross side -->
@@ -49,7 +49,7 @@
                                         @csrf
                                         <div class="form-floating">
                                             <input type="text" name="name" class="form-control rounded-bottom @error('name') is-invalid @enderror" id="yourName" placeholder="Nama" required />
-                                            <label for="yourName">Nama</label>
+                                            <label for="yourName">Full Name</label>
                                             @error('name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -91,9 +91,8 @@
                                         <div class="col-12">
                                             <div class="form-check">
                                                 <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required />
-                                                <label class="form-check-label" for="acceptTerms">Saya setuju dan
-                                                    menerima
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">syarat dan Ketentuan</a></label>
+                                                <label class="form-check-label" for="acceptTerms">I agree and accept
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">the terms and conditions</a></label>
                                                 <div class="invalid-feedback">
                                                 </div>
                                             </div>
@@ -101,13 +100,13 @@
 
                                         <div class="col-12">
                                             <button class="bg-gradient-info tombol-login" name="/create" type="submit">
-                                                Buat Akun
+                                                Create an account
                                             </button>
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">
-                                                Sudah memiliki akun?
-                                                <a href="/pointech">Masuk</a>
+                                                Already have an account?
+                                                <a href="/bimmo">Log in</a>
                                             </p>
                                         </div>
                                     </form>

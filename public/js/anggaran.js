@@ -1,10 +1,53 @@
+// Fungsi untuk menampilkan toast notification
+function showToast(message, type) {
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+
+    const toastId = 'toast-' + Date.now();
+    const colors = {
+        success: '#012970',  // Biru
+        danger: '#dc3545',   // Merah
+        warning: '#ffc107',  // Kuning
+        info: '#17a2b8',     // Biru muda
+        primary: '#007bff',  // Biru
+    };
+
+    const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+
+    const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+    // Tambahkan toast ke container
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+    toast.show();
+
+    toastElement.addEventListener('hidden.bs.toast', function () {
+        toastElement.remove();
+    });
+}
+
 $(document).ready(function () {
     new TomSelect("#id_pengeluaran", {
         plugins: ['remove_button'],
         persist: false,
         create: false,
         maxItems: null,
-        placeholder: 'Pilih jenis pengeluaran',
+        placeholder: 'Select Expense Type',
         render: {
             item: function (data, escape) {
                 return '<div class="item">' + escape(data.text) + '</div>';
@@ -43,10 +86,37 @@ $(document).ready(function () {
             },
             { data: 'persentase_anggaran', className: 'text-center' },
             {
-                data: 'nama_pengeluaran',  // pakai accessor virtual tadi
+                data: 'nama_pengeluaran',
                 name: 'nama_pengeluaran',
+                className: 'text-left',
                 defaultContent: '-',
-                className: 'text-center',
+                render: function (data, type, row) {
+                    if (type === "display") {
+                        if (data && typeof data === "string") {
+                            var lines = data.split(","); // ubah \n jadi koma kalau memang datanya koma
+                            var table = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <colgroup>
+                        <col style="width: 30px;">
+                        <col>
+                    </colgroup>`;
+
+                            lines.forEach(function (line, index) {
+                                table += `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${index + 1}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${line.trim()}</td>
+                    </tr>`;
+                            });
+
+                            table += "</table>";
+                            return table;
+                        } else {
+                            return "-";
+                        }
+                    }
+                    return data ? data : "-";
+                }
             },
             { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
             { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
@@ -94,26 +164,23 @@ $(document).ready(function () {
                 };
 
                 if (formData.nama_anggaran === '') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Nama Anggaran Harus Diisi!'
-                    });
+                    showToast('The budget name must be filled in!', 'danger');
                     return;
                 }
 
-                $('.tombol-simpan-anggaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...');
+                if (formData.persentase_anggaran === '') {
+                    showToast('The percentage must be filled in!', 'danger');
+                    return;
+                }
+
+                $('.tombol-simpan-anggaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Process ...');
 
                 $.ajax({
                     url: url,
                     type: type,
                     data: formData,
                     success: function () {
-                        toastMixin.fire({
-                            animation: true,
-                            title: 'Data Berhasil disimpan',
-                            iconColor: '#ffffff'
-                        });
+                        showToast('Data saved successfully', 'success');
                         $('#anggaranModal').modal('hide');
                         $('#anggaranTable').DataTable().ajax.reload();
                     },
@@ -158,6 +225,7 @@ $(document).ready(function () {
                 $('#anggaranModal').modal('show');
                 $('#nama_anggaran').val(response.result.nama_anggaran);
                 $('#persentase_anggaran').val(response.result.persentase_anggaran);
+                $('#id_pengeluaran').val(response.result.id_pengeluaran); // Trigger change untuk TomSelect
                 simpanAnggaran(id);
             }
         });
@@ -165,32 +233,15 @@ $(document).ready(function () {
 
     // Handle Delete Pemasukan
     $('body').on('click', '.tombol-del-anggaran', function (e) {
-        e.preventDefault();
-        var toastMixin = Swal.mixin({
-            toast: true,
-            icon: 'success',
-            title: 'General Title',
-            animation: false,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        });
-
-
         Swal.fire({
-            title: 'Yakin mau hapus data ini?',
-            html: 'Data yang dihapus tidak dapat dikembalikan!',
+            title: 'Are you sure you want to delete this data?',
+            html: 'Deleted data cannot be recovered!',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
+            confirmButtonColor: '#012970',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, delete!',
+            cancelButtonText: 'Cancel',
             customClass: {
                 popup: 'dark-mode'
             }
@@ -201,21 +252,11 @@ $(document).ready(function () {
                     url: '/anggaran/' + id,
                     type: 'DELETE',
                     success: function () {
-                        toastMixin.fire({
-                            animation: true,
-                            title: 'Data Berhasil dihapus',
-                            customClass: {
-                                title: 'swal2-title-create',
-                                popup: 'swal2-popup-create',
-                            },
-                            iconColor: '#ffffff'
-                        });
+                        showToast('Data successfully deleted', 'success');
                         $('#anggaranTable').DataTable().ajax.reload();
                     },
                     error: function () {
-                        $('#toastAnggaran').text('Data Gagal dihapus');
-                        $('.toast').addClass('bg-danger');
-                        $('.toast').toast('show');
+                        showToast('Data failed to be deleted', 'danger');
                         $('#anggaranTable').DataTable().ajax.reload();
                     }
                 });

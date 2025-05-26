@@ -76,11 +76,6 @@
                     <th class="text-center">GAP</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td colspan="3" class="text-center">Belum ada data</td>
-                </tr>
-            </tbody>
         </table>
     </div>
 </div>
