@@ -69,3 +69,53 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         document.getElementById("filterPeriodLine").addEventListener("change", handleFilterChange);
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const darkModeDropdown = document.getElementById("darkModeDropdown");
+
+    const storedMode = localStorage.getItem("darkMode");
+    const isDarkMode = storedMode === "enabled";
+
+    if (isDarkMode) {
+        enableDarkMode();
+        darkModeDropdown.value = "dark";
+    }
+
+    darkModeDropdown.addEventListener("change", function () {
+        const selectedMode = darkModeDropdown.value;
+        if (selectedMode === "dark") {
+            enableDarkMode();
+            localStorage.setItem("darkMode", "enabled");
+        } else {
+            disableDarkMode();
+            localStorage.setItem("darkMode", null);
+        }
+    });
+
+    function enableDarkMode() {
+        document.body.classList.add("dark-mode");
+    }
+
+    function disableDarkMode() {
+        document.body.classList.remove("dark-mode");
+    }
+});
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+
+    .sidebar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    height: 300vh;
+    width: 280px;
+    z-index: 996;
+    transition: all 0.3s;
+    padding: 20px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #aab7cf transparent;
+    background-color: var(--bs-white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

@@ -19,6 +19,12 @@ class Pemasukan extends Model
         return $this->belongsTo(User::class, 'id_user');
     }
 
+    // Di model Pemasukan
+    public function transaksi()
+    {
+        return $this->hasMany(Transaksi::class, 'pemasukan', 'id');
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -28,6 +34,12 @@ class Pemasukan extends Model
             $nextNumber = $lastNumber + 1;
 
             $pemasukan->kode_pemasukan = sprintf('M%04d', $nextNumber);
+        });
+
+        static::deleting(function ($pemasukan) {
+            if ($pemasukan->transaksi()->exists()) {
+                throw new \Exception;
+            }
         });
     }
 }

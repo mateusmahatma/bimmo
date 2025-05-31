@@ -13,6 +13,7 @@
 
 <section class="section dashboard" id="dashboard-container">
     <div class="row">
+        <!-- Informasi -->
         <div class="card-nominal">
             <div class="lock-icon">
                 <i class="bx bx-lock" onclick="toggleNominal()"></i>
@@ -83,8 +84,8 @@
         <!-- Transaksi Hari ini -->
         <div class="card-today">
             <h3>Today's Transaction</h3>
-            <div class="card-body">
-                <table id="todayTransactionsTable" class="display">
+            <div class="card-header">
+                <table id="todayTransactionsTable" class="customTable">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -95,8 +96,6 @@
                             <th class="text-center" style="width: 25%;">Description</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -139,7 +138,7 @@
             </div>
         </div>
 
-        <!-- Modal Detail -->
+        <!-- Modal Kompas -->
         <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -171,7 +170,7 @@
             </div>
         </div>
 
-        <!-- Modal Jenis Pengeluaran -->
+        <!-- Modal Bar Jenis Pengeluaran -->
         <div class="modal fade" id="detailModalBarPengeluaran" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

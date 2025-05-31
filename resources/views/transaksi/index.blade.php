@@ -1,5 +1,8 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
-    <title>Data Transaksi</title>
+    <title>Cash Flow</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -9,26 +12,26 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="/transaksi">Data Transaksi</a>
+    <a class="navbar-brand" href="/transaksi">Cash Flow</a>
     <ul class="nav nav-pills">
         <li class="nav-item dropdown">
             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span class="badge-primary dropdown-toggle">Aksi</span>
+                <span class="badge-primary dropdown-toggle">Action</span>
             </a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Tambah Data</a></li>
-                <li><a class=" dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importExcelModal">Import Data</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Add Data</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importExcelModal">Import Data</a></li>
                 <li><a class="dropdown-item" href="#" onclick="downloadPDFTransaksi()">Download PDF</a></li>
                 <li><a class="dropdown-item" href="#" onclick="downloadExcel()">Download Excel</a></li>
                 <li>
                     <hr class=" dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="/compare">Compare Pengeluaran</a></li>
+                <li><a class="dropdown-item" href="/compare">Compare Cash Flow</a></li>
             </ul>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/compare">
-                <span class="badge-orange">Compare Pengeluaran</span>
+                <span class="badge-orange">Compare Cash Flow</span>
             </a>
         </li>
     </ul>
@@ -43,14 +46,14 @@
         <form>
             <div class="form-row align-items-center d-flex">
                 <div class="col mx-3">
-                    <p class="filter">Tanggal Transaksi</p>
+                    <p class="filter">Transaction Date</p>
                     <div id="daterange" class="daterange"> <i class="fa fa-calendar"></i>&nbsp;
                         <span></span>
                         <i class="fa fa-caret-down"></i>
                     </div>
                 </div>
                 <div class="col mx-3">
-                    <p class="filter">Jenis Pemasukan</p>
+                    <p class="filter">Income Type</p>
                     <select class="form-control" name="filter_pemasukan">
                         <option value="">- Pilih -</option>
                         @foreach ($pemasukan as $pemasukan)
@@ -59,7 +62,7 @@
                     </select>
                 </div>
                 <div class="col mx-3">
-                    <p class="filter">Jenis Pengeluaran</p>
+                    <p class="filter">Expense Type</p>
                     <select class="form-control" name="filter_pengeluaran">
                         <option value="">- Pilih -</option>
                         @foreach ($pengeluaran as $pengeluaran)
@@ -70,28 +73,30 @@
             </div>
         </form>
     </div>
-    <div class="card-body">
-        <table id="transaksiTable" class="customTable">
-            <thead>
-                <tr>
-                    <th style="width: 3px;">No</th>
-                    <th class="text-center">Tanggal Transaksi</th>
-                    <th class="text-center">Pemasukan</th>
-                    <th class="text-center">Nominal Pemasukan</th>
-                    <th class="text-center">Pengeluaran</th>
-                    <th class="text-center">Nominal Pengeluaran</th>
-                    <th style="width: 200px;" class="text-center">Keterangan</th>
-                    <th style="width: 60px;">Dibuat Tanggal</th>
-                    <th style="width: 60px;">Diupdate Tanggal</th>
-                    <th style="width: 3px;">Aksi</th>
-                </tr>
-            </thead>
-        </table>
-        <div class="badge-success" style="font-size: medium;">
-            Total Pemasukan: <span id="totalPemasukan">0</span>
-        </div>
-        <div class="badge-danger" style="font-size: medium">
-            Total Pengeluaran: <span id="totalPengeluaran">0</span>
+    <div class="card-header">
+        <div class="card-body">
+            <table id="transaksiTable" class="customTable">
+                <thead>
+                    <tr>
+                        <th style="width: 1px;">No</th>
+                        <th class="text-center">Transaction Date</th>
+                        <th class="text-center">Income</th>
+                        <th class="text-center">Nominal Income</th>
+                        <th class="text-center">Expense</th>
+                        <th class="text-center">Nominal Expense</th>
+                        <th style="width: 200px;" class="text-center">Description</th>
+                        <th style="width: 60px;" class="text-center">Created Date</th>
+                        <th style="width: 60px;" class="text-center">Updated Date</th>
+                        <th style="width: 1px;"></th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="badge-success" style="font-size: small">
+                Total Income: <span id="totalPemasukan">0</span>
+            </div>
+            <div class="badge-danger" style="font-size: small">
+                Total Expense: <span id="totalPengeluaran">0</span>
+            </div>
         </div>
     </div>
 </div>

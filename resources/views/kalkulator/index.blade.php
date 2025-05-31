@@ -37,7 +37,6 @@
                     <i class="fa fa-caret-down"></i>
                 </div>
 
-                <!-- Hidden inputs untuk dikirim ke backend -->
                 <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
                 <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
             </div>
@@ -54,9 +53,6 @@
 
 <div class="card-header">
     <div class="card-body">
-        <div class="callout">
-            <h4>Budget Results</h4>
-        </div>
         <table id="hasilAnggaranTable" class="customTable">
             <thead>
                 <tr>

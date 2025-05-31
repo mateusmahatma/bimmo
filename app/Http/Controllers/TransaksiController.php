@@ -26,7 +26,7 @@ class TransaksiController extends Controller
 
             $userId = Auth::id();
 
-            $data = Transaksi::where('id_user', $userId);
+            $data = Transaksi::with(['pengeluaran', 'pemasukan'])->where('id_user', $userId);
 
             if ($request->filled('start_date') && $request->filled('end_date')) {
                 $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
@@ -66,41 +66,59 @@ class TransaksiController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'tgl_transaksi' => 'required|date',
-            'pemasukan' => 'nullable|string',
-            'nominal_pemasukan' => 'nullable|numeric',
-            'pengeluaran' => 'nullable|string',  // menyimpan nama pengeluaran
-            'nominal' => 'nullable|numeric',     // validasi numeric supaya input benar
-            'keterangan' => 'nullable|string|max:255',
+            'tgl_transaksi'      => 'required|date',
+            'pemasukan'          => 'nullable|string',  // input berupa nama
+            'nominal_pemasukan'  => 'nullable|numeric',
+            'pengeluaran'        => 'nullable|string',  // input berupa nama
+            'nominal'            => 'nullable|numeric',
+            'keterangan'         => 'nullable|string',
         ]);
 
         $validatedData['id_user'] = Auth::id();
 
         try {
+            // Mapping nama pengeluaran menjadi ID
+            if (!empty($validatedData['pengeluaran'])) {
+                $pengeluaran = Pengeluaran::where('nama', $validatedData['pengeluaran'])->first();
+
+                if (!$pengeluaran) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Jenis pengeluaran tidak ditemukan.',
+                    ]);
+                }
+
+                $validatedData['pengeluaran'] = $pengeluaran->id;
+            }
+
+            // Mapping nama pemasukan menjadi ID
+            if (!empty($validatedData['pemasukan'])) {
+                $pemasukan = Pemasukan::where('nama', $validatedData['pemasukan'])->first();
+
+                if (!$pemasukan) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Jenis pemasukan tidak ditemukan.',
+                    ]);
+                }
+
+                $validatedData['pemasukan'] = $pemasukan->id;
+            }
+
             // Simpan transaksi
             $transaksi = Transaksi::create($validatedData);
 
-            // Cast nominal ke float agar cocok untuk operasi increment decimal
-            $nominal = floatval($transaksi->nominal);
+            // Proses anggaran jika ada nominal pengeluaran dan ID pengeluaran
+            if (!empty($transaksi->pengeluaran) && $transaksi->nominal > 0) {
+                $pengeluaranId = (string) $transaksi->pengeluaran;
 
-            if ($nominal > 0 && !empty($transaksi->pengeluaran)) {
-                // Cari id pengeluaran berdasarkan nama pengeluaran transaksi
-                $pengeluaran = Pengeluaran::where('nama', $transaksi->pengeluaran)->first();
+                $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+                    ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
+                    ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
+                    ->first();
 
-                if ($pengeluaran) {
-                    // Cast id pengeluaran ke string supaya cocok dengan tipe di JSON
-                    $pengeluaranId = (string) $pengeluaran->id;
-
-                    // Cari baris hasil_proses_anggaran sesuai id_pengeluaran dan rentang tanggal
-                    $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
-                        ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
-                        ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
-                        ->first();
-
-                    if ($hasil) {
-                        // Tambahkan nominal ke anggaran_yang_digunakan
-                        $hasil->increment('anggaran_yang_digunakan', $nominal);
-                    }
+                if ($hasil) {
+                    $hasil->increment('anggaran_yang_digunakan', floatval($transaksi->nominal));
                 }
             }
 
@@ -126,30 +144,39 @@ class TransaksiController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validasi = Validator::make($request->all(), [
-            'tgl_transaksi' => 'required',
-        ], [
-            'tgl_transaksi' => [''],
-            'pemasukan' => [''],
-            'nominal_pemasukan' => [''],
-            'pengeluaran' => [''],
-            'nominal' => [''],
-            'keterangan' => [''],
+        $validatedData = $request->validate([
+            'tgl_transaksi'      => 'required|date',
+            'pemasukan'          => 'nullable|numeric',
+            'nominal_pemasukan'  => 'nullable|numeric',
+            'pengeluaran'        => 'nullable|numeric',
+            'nominal'            => 'nullable|numeric',
+            'keterangan'         => 'nullable|string|max:255',
         ]);
 
-        if ($validasi->fails()) {
-            return response()->json(['errors' => $validasi->errors()]);
-        } else {
-            $data = [
-                'tgl_transaksi' => $request->tgl_transaksi,
-                'pemasukan' => $request->pemasukan,
-                'nominal_pemasukan' => $request->nominal_pemasukan,
-                'pengeluaran' => $request->pengeluaran,
-                'nominal' => $request->nominal,
-                'keterangan' => $request->keterangan,
-            ];
-            transaksi::where('id', $id)->update($data);
+        try {
+            // Update transaksi
+            transaksi::where('id', $id)->update($validatedData);
+
+            // Proses anggaran jika pengeluaran dan nominal ada
+            if (!empty($validatedData['pengeluaran']) && $validatedData['nominal'] > 0) {
+                $pengeluaranId = (string) $validatedData['pengeluaran'];
+                $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+                    ->where('tanggal_mulai', '<=', $validatedData['tgl_transaksi'])
+                    ->where('tanggal_selesai', '>=', $validatedData['tgl_transaksi'])
+                    ->first();
+
+                if ($hasil) {
+                    $hasil->increment('anggaran_yang_digunakan', floatval($validatedData['nominal']));
+                }
+            }
+
             return response()->json(['success' => "Berhasil melakukan update data"]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat update.',
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

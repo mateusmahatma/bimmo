@@ -1,4 +1,4 @@
-<header id="header" class="header fixed-top d-flex align-items-center">
+<header id="header" class="header fixed-top d-flex align-items-center shadow">
     <img src="/img/bimmo_icon.png" class="icon-bimmo" />
     <ul class="nav justify-content-center">
         <li class="nav-item">

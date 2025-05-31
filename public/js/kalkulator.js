@@ -106,7 +106,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 { data: "tanggal_mulai", name: "tanggal_mulai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
                 { data: "tanggal_selesai", name: "tanggal_selesai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
                 { data: "nama_anggaran", name: "nama_anggaran", className: "text-center", render: d => d || "-" },
-                { data: 'nama_jenis_pengeluaran', name: 'jenis_pengeluaran', className: 'text-center', defaultContent: '-' },
+                {
+                    data: 'nama_jenis_pengeluaran', name: 'jenis_pengeluaran', className: 'text-center', defaultContent: '-', render: function (data, type, row) {
+                        if (type === "display") {
+                            if (data && typeof data === "string") {
+                                var lines = data.split(","); // ubah \n jadi koma kalau memang datanya koma
+                                var table = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <colgroup>
+                        <col style="width: 30px;">
+                        <col>
+                    </colgroup>`;
+
+                                lines.forEach(function (line, index) {
+                                    table += `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${index + 1}</td>
+                        <td style="border: 1px solid #ddd; padding: 4px;">${line.trim()}</td>
+                    </tr>`;
+                                });
+
+                                table += "</table>";
+                                return table;
+                            } else {
+                                return "-";
+                            }
+                        }
+                        return data ? data : "-";
+                    }
+                },
                 { data: "persentase_anggaran", name: "persentase_anggaran", className: "text-center", render: d => d ? d + "%" : "0%" },
                 { data: "nominal_anggaran", name: "nominal_anggaran", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
                 { data: "anggaran_yang_digunakan", name: "anggaran_yang_digunakan", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },

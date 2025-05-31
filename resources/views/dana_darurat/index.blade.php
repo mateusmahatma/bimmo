@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Dana Darurat</title>
     <meta charset="UTF-8">
@@ -31,7 +34,7 @@
                     <th>Keterangan</th>
                     <th>Dibuat Tanggal</th>
                     <th>Diubah Tanggal</th>
-                    <th>Aksi</th>
+                    <th style="width: 1px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -45,5 +48,5 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/dana-darurat.js') }}"></script>
+<script src="{{ asset('js/dana-darurat.js') }}?v={{ filemtime(public_path('js/dana-darurat.js')) }}"></script>
 @endsection

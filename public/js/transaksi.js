@@ -112,13 +112,15 @@ $(document).ready(function () {
                     });
                 },
             },
+
             {
-                data: "pemasukan",
+                data: null,
                 className: "text-center",
                 render: function (data, type, row) {
-                    return data ? data : "-";
-                },
+                    return row.pemasukan?.nama ?? "-";
+                }
             },
+
             {
                 data: "nominal_pemasukan",
                 className: "text-center",
@@ -137,12 +139,13 @@ $(document).ready(function () {
                     }
                 },
             },
+
             {
-                data: "pengeluaran",
+                data: null,
                 className: "text-center",
                 render: function (data, type, row) {
-                    return data ? data : "-";
-                },
+                    return row.pengeluaran?.nama ?? "-";
+                }
             },
 
             {
@@ -213,6 +216,21 @@ $(document).ready(function () {
 
     $('select[name="filter_pengeluaran"]').on("change", function () {
         transaksiTable.ajax.reload();
+    });
+});
+
+// Filter Tomselect
+document.addEventListener('DOMContentLoaded', function () {
+    new TomSelect('#pengeluaran', {
+        allowEmptyOption: true,
+        placeholder: '- Pilih -',
+        create: false,
+        onInitialize: function () {
+            // Jika tidak ada nilai terpilih, pakai placeholder
+            if (!this.getValue()) {
+                this.setTextboxValue('');
+            }
+        }
     });
 });
 
@@ -707,37 +725,6 @@ function downloadExcel() {
 function validasiInput(inputElement) {
     inputElement.value = inputElement.value.replace(/[^0-9]/g, "");
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-    const darkModeDropdown = document.getElementById("darkModeDropdown");
-
-    const storedMode = localStorage.getItem("darkMode");
-    const isDarkMode = storedMode === "enabled";
-
-    if (isDarkMode) {
-        enableDarkMode();
-        darkModeDropdown.value = "dark";
-    }
-
-    darkModeDropdown.addEventListener("change", function () {
-        const selectedMode = darkModeDropdown.value;
-        if (selectedMode === "dark") {
-            enableDarkMode();
-            localStorage.setItem("darkMode", "enabled");
-        } else {
-            disableDarkMode();
-            localStorage.setItem("darkMode", null);
-        }
-    });
-
-    function enableDarkMode() {
-        document.body.classList.add("dark-mode");
-    }
-
-    function disableDarkMode() {
-        document.body.classList.remove("dark-mode");
-    }
-});
 
 // Handle Upload File
 $(document).ready(function () {

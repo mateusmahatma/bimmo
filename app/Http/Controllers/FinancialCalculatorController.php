@@ -16,7 +16,13 @@ class FinancialCalculatorController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = HasilProsesAnggaran::orderBy('created_at', 'desc')->get();
+
+            $userId = Auth::id();
+
+            // Ambil data hasil proses anggaran untuk user yg sedang login, urutkan terbaru
+            $data = HasilProsesAnggaran::where('id_user', $userId)
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -36,7 +42,9 @@ class FinancialCalculatorController extends Controller
                 ->rawColumns(['aksi'])
                 ->toJson();
         }
-        return view('kalkulator.index');
+        return view('kalkulator.index', [
+            'hasilProses' => HasilProsesAnggaran::where('id_user', Auth::id())->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -54,11 +62,26 @@ class FinancialCalculatorController extends Controller
         $tanggal_selesai = $request->input('tanggal_selesai');
         $totalIncome = $monthly_income + $additional_income;
 
+        // Ambil semua anggaran user
         $anggarans = Anggaran::where('id_user', $userId)
             ->whereNotNull('id_pengeluaran')
             ->get();
 
         foreach ($anggarans as $anggaran) {
+            // Pastikan ID pengeluaran dikonversi ke array
+            $jenisPengeluaran = is_array($anggaran->id_pengeluaran)
+                ? $anggaran->id_pengeluaran
+                : json_decode($anggaran->id_pengeluaran, true);
+
+            if (!is_array($jenisPengeluaran)) {
+                $jenisPengeluaran = [$anggaran->id_pengeluaran];
+            }
+
+            // Hitung total transaksi dalam rentang tanggal
+            $totalTransaksi = Transaksi::whereIn('pengeluaran', $jenisPengeluaran)
+                ->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])
+                ->sum('nominal');
+
             $nominal = ($anggaran->persentase_anggaran / 100) * $totalIncome;
 
             HasilProsesAnggaran::create([
@@ -68,8 +91,8 @@ class FinancialCalculatorController extends Controller
                 'jenis_pengeluaran' => $anggaran->id_pengeluaran,
                 'persentase_anggaran' => $anggaran->persentase_anggaran,
                 'nominal_anggaran' => $nominal,
-                'anggaran_yang_digunakan' => 0,
-                // 'sisa_anggaran' => $nominal - 0,
+                'anggaran_yang_digunakan' => $totalTransaksi,
+                'id_user' => $userId,
             ]);
         }
 
@@ -83,37 +106,48 @@ class FinancialCalculatorController extends Controller
     public function update(Request $request, $id)
     {
         if ($request->ajax()) {
-            $data = HasilProsesAnggaran::orderBy('created_at', 'desc')->get();
+            $prosesAnggaran = HasilProsesAnggaran::find($id);
 
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('nama_pengeluaran', function ($row) {
-                    return $row->nama_anggaran;
-                })
-                ->addColumn('anggaran_digunakan_terkini', function ($row) {
-                    // Ambil total transaksi berdasarkan id_pengeluaran dan tanggal
-                    $total = Transaksi::whereIn('pengeluaran', $row->jenis_pengeluaran)
-                        ->whereBetween('tgl_transaksi', [$row->tanggal_mulai, $row->tanggal_selesai])
-                        ->sum('nominal');
+            if (!$prosesAnggaran) {
+                return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            }
 
-                    return number_format($total, 0, ',', '.');
-                })
-                ->addColumn('sisa_anggaran', function ($row) {
-                    $total = Transaksi::whereIn('pengeluaran', $row->jenis_pengeluaran)
-                        ->whereBetween('tgl_transaksi', [$row->tanggal_mulai, $row->tanggal_selesai])
-                        ->sum('nominal');
+            // Update data sesuai request, jika ada
+            $prosesAnggaran->fill($request->all());
 
-                    $sisa = floatval($row->nominal_anggaran) - $total;
+            // Pastikan jenis_pengeluaran berupa array untuk whereIn()
+            $jenisPengeluaran = $prosesAnggaran->jenis_pengeluaran;
 
-                    return number_format($sisa, 0, ',', '.');
-                })
-                ->addColumn('aksi', function ($request) {
-                    return view('kalkulator.tombol')->with('request', $request);
-                })
-                ->rawColumns(['aksi'])
-                ->toJson();
+            if (is_string($jenisPengeluaran)) {
+                $decoded = json_decode($jenisPengeluaran, true);
+                if (is_array($decoded)) {
+                    $jenisPengeluaran = $decoded;
+                } else {
+                    $jenisPengeluaran = [$jenisPengeluaran];
+                }
+            } elseif (is_int($jenisPengeluaran)) {
+                $jenisPengeluaran = [$jenisPengeluaran];
+            }
+
+            // Hitung total transaksi terbaru sesuai filter
+            $totalTransaksi = Transaksi::whereIn('pengeluaran', $jenisPengeluaran)
+                ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                ->sum('nominal');
+
+            $prosesAnggaran->anggaran_yang_digunakan = $totalTransaksi;
+            $prosesAnggaran->save();
+
+            $sisaAnggaran = floatval($prosesAnggaran->nominal_anggaran) - $totalTransaksi;
+
+            return response()->json([
+                'id' => $prosesAnggaran->id,
+                'nama_pengeluaran' => $prosesAnggaran->nama_anggaran,
+                'anggaran_digunakan_terkini' => number_format($totalTransaksi, 0, ',', '.'),
+                'sisa_anggaran' => number_format($sisaAnggaran, 0, ',', '.'),
+            ]);
         }
     }
+
 
     public function calculate(Request $request)
     {

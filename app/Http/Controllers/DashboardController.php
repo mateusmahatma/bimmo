@@ -245,7 +245,7 @@ class DashboardController extends Controller
         $startDate = Carbon::now('Asia/Jakarta')->startOfDay();
         $endDate = Carbon::now('Asia/Jakarta')->endOfDay();
 
-        $todayTransactions = Transaksi::where('id_user', $userId)
+        $todayTransactions = Transaksi::with(['pengeluaran', 'pemasukan'])->where('id_user', $userId)
             ->whereBetween('tgl_transaksi', [$startDate, $endDate])
             ->orderBy('tgl_transaksi', 'desc')
             ->get();

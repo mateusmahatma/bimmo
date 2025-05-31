@@ -48,9 +48,7 @@ class PemasukanController extends Controller
         return redirect('/pemasukan');
     }
 
-    public function show()
-    {
-    }
+    public function show() {}
 
     public function edit($id)
     {
@@ -80,6 +78,7 @@ class PemasukanController extends Controller
 
     public function destroy($id)
     {
-        $id = Pemasukan::where('id', $id)->delete();
+        $pemasukan = Pemasukan::findOrFail($id);
+        $pemasukan->delete();
     }
 }

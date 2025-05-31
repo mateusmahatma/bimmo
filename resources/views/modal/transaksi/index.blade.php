@@ -62,7 +62,7 @@
     </div>
 </div>
 
-<!-- Modal Update -->
+<!-- Modal Edit -->
 <div class="modal fade" id="editTransaksiModal" tabindex="-1" aria-labelledby="editTransaksiModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-mg">
         <div class="modal-content">
@@ -83,7 +83,7 @@
                         <select id="edit_pemasukan" name="pemasukan" class="form-select">
                             <option value="">- Pilih -</option>
                             @foreach ($pemasukan as $item)
-                            <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
                             @endforeach
                         </select>
                     </div>

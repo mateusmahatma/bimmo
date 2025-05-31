@@ -172,7 +172,7 @@ $(document).ready(function () {
                         $('#pemasukanTable').DataTable().ajax.reload();
                     },
                     error: function () {
-                        showToast('Data Gagal dihapus', 'danger');
+                        showToast('Delete failed, data in cash flow', 'danger');
                         $('#pemasukanTable').DataTable().ajax.reload();
                     }
                 });

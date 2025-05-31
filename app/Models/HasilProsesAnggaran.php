@@ -26,7 +26,7 @@ class HasilProsesAnggaran extends Model
         'persentase_anggaran',
         'nominal_anggaran',
         'anggaran_yang_digunakan',
-        // 'sisa_anggaran',
+        'id_user',
     ];
 
     protected $appends = ['nama_jenis_pengeluaran'];

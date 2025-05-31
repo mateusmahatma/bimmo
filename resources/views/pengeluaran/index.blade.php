@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Jenis Pengeluaran</title>
     <meta content="" name="description">
@@ -23,6 +26,9 @@
 
 <div class="card-header">
     <div class="card-body">
+        <div class="callout-danger">
+            <h4>Attention: Do not use commas (,) when creating expense types</h4>
+        </div>
         <table id="pengeluaranTable" class="customTable">
             <thead>
                 <tr>
@@ -30,7 +36,7 @@
                     <th class="text-center" style="width: 600px;">Nama</th>
                     <th class="text-center">Dibuat Tanggal</th>
                     <th class="text-center">Diupdate Tanggal</th>
-                    <th style="width: 3px;">Aksi</th>
+                    <th style="width: 1px;"></th>
                 </tr>
             </thead>
         </table>

@@ -28,7 +28,7 @@ $(document).ready(function () {
 
                 });
 
-                $("#totalAset").text(formattedTotalHarga); // Update tampilan
+                $("#totalAset").text(formattedTotalHarga);
 
                 return json.data;
             }

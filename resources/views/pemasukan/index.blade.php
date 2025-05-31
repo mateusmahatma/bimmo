@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Jenis Pemasukan</title>
     <meta content="" name="description">

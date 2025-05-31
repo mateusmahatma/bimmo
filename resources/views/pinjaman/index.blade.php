@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Daftar Pinjaman</title>
     <meta charset="UTF-8">
@@ -40,7 +43,7 @@
                 </tr>
             </thead>
         </table>
-        <div class="badge-danger" style="font-size: medium">
+        <div class="badge-danger" style="font-size: small">
             Total Pinjaman: <span id="totalPinjaman">0</span>
         </div>
     </div>

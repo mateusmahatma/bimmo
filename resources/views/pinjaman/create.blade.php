@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
     <title>Tambah Pinjaman</title>
     <meta charset="UTF-8">

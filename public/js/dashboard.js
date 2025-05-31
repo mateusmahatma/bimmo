@@ -314,51 +314,44 @@ $(document).ready(function () {
     }
 
     function populateTodayTransactionsTable(data) {
-        var tableBody = $("#todayTransactionsTable tbody");
-        tableBody.empty();
+        var table = $("#todayTransactionsTable");
+
+        // Hapus semua <tr> kecuali baris pertama (header)
+        table.find("tr:gt(0)").remove();
 
         var cardTitle = $(".card-transaksi h3");
 
         if (data.length === 0) {
-            var noDataRow =
-                "<tr>" +
-                '<td class="text-center" colspan="6">No data available in table</td>' +
-                "</tr>";
-            tableBody.append(noDataRow);
+            var noDataRow = `
+            <tr>
+                <td class="text-center" colspan="6">No data available in table</td>
+            </tr>
+        `;
+            table.append(noDataRow);
         } else {
             $.each(data, function (key, transaction) {
-                var row =
-                    "<tr>" +
-                    '<td class="text-center">' +
-                    (key + 1) +
-                    "</td>" +
-                    '<td class="text-center">' +
-                    (transaction.pemasukan ? transaction.pemasukan : "-") +
-                    "</td>" +
-                    '<td class="text-center">' +
-                    (transaction.nominal_pemasukan
-                        ? formatNumberWithSeparator(
-                            transaction.nominal_pemasukan
-                        )
-                        : "0") +
-                    "</td>" +
-                    '<td class="text-left">' +
-                    (transaction.pengeluaran ? transaction.pengeluaran : "-") +
-                    "</td>" +
-                    '<td class="text-center">' +
-                    (transaction.nominal
-                        ? formatNumberWithSeparator(transaction.nominal)
-                        : "0") +
-                    "</td>" +
-                    '<td class="text-left">' +
-                    (transaction.keterangan
-                        ? formatKeterangan(transaction.keterangan)
-                        : "-") +
-                    "</td>" +
-                    "</tr>";
-                tableBody.append(row);
+                var row = `
+                <tr>
+                    <td class="text-center">${key + 1}</td>
+                    <td class="text-center">
+                        ${transaction.pemasukan && transaction.pemasukan.nama ? transaction.pemasukan.nama : "-"}
+                    </td>
+                    <td class="text-center">
+                        ${transaction.nominal_pemasukan ? formatNumberWithSeparator(transaction.nominal_pemasukan) : "0"}
+                    </td>
+                    <td class="text-center">
+                        ${transaction.pengeluaran && transaction.pengeluaran.nama ? transaction.pengeluaran.nama : "-"}
+                    </td>
+                    <td class="text-center">
+                        ${transaction.nominal ? formatNumberWithSeparator(transaction.nominal) : "0"}
+                    </td>
+                    <td class="text-left">
+                        ${transaction.keterangan ? formatKeterangan(transaction.keterangan) : "-"}
+                    </td>
+                </tr>
+            `;
+                table.append(row);
             });
-            cardTitle.text("Transaksi Hari ini");
         }
     }
     getTodayTransactions();

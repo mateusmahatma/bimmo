@@ -225,7 +225,7 @@ $(document).ready(function () {
                 $('#anggaranModal').modal('show');
                 $('#nama_anggaran').val(response.result.nama_anggaran);
                 $('#persentase_anggaran').val(response.result.persentase_anggaran);
-                $('#id_pengeluaran').val(response.result.id_pengeluaran); // Trigger change untuk TomSelect
+                $('#id_pengeluaran').val([response.result.id_pengeluaran]).trigger('change');
                 simpanAnggaran(id);
             }
         });
@@ -263,38 +263,4 @@ $(document).ready(function () {
             }
         });
     });
-});
-
-// Handle Dark Mode
-document.addEventListener('DOMContentLoaded', function () {
-    const darkModeDropdown = document.getElementById('darkModeDropdown');
-
-    // Cek apakah dark mode telah dipilih sebelumnya
-    const storedMode = localStorage.getItem('darkMode');
-    const isDarkMode = storedMode === 'enabled';
-
-    // Setel status dark mode berdasarkan preferensi sebelumnya
-    if (isDarkMode) {
-        enableDarkMode();
-        darkModeDropdown.value = 'dark';
-    }
-
-    darkModeDropdown.addEventListener('change', function () {
-        const selectedMode = darkModeDropdown.value;
-        if (selectedMode === 'dark') {
-            enableDarkMode();
-            localStorage.setItem('darkMode', 'enabled');
-        } else {
-            disableDarkMode();
-            localStorage.setItem('darkMode', null);
-        }
-    });
-
-    function enableDarkMode() {
-        document.body.classList.add('dark-mode');
-    }
-
-    function disableDarkMode() {
-        document.body.classList.remove('dark-mode');
-    }
 });

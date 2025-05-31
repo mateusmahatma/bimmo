@@ -9,29 +9,26 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicons -->
-    <link href="/img/bimmo_icon.png" rel="icon" />
+    <link rel="icon" href="{{ asset('img/bimmo_icon.png') }}" />
 
-    <!-- DataTables -->
-    <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-    <link rel="stylesheet" href="/css/select2.min.css" />
+    <!-- Vendor CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/boxicons/css/boxicons.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/quill/quill.snow.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/quill/quill.bubble.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/remixicon/remixicon.css') }}" />
 
-    <!-- Vendor CSS Files -->
-    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
-    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
-    <link href="/vendor/quill/quill.snow.css" rel="stylesheet" />
-    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet" />
-    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/tom-select.bootstrap5.min.css') }}" />
 
-    <!-- Tom Select CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-
-
-    <!-- CSS File -->
-    <link href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}" />
+    <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}" />
 
 </head>
 
@@ -71,7 +68,8 @@
     <script src="/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="/js/main.js"></script>
+    <script src="{{ asset('js/main.js') }}?v={{ filemtime(public_path('js/main.js')) }}"></script>
+
 
     @yield('scripts')
 
