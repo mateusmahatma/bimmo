@@ -26,7 +26,7 @@
 
         <!-- Investment -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('barang') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+            <a class="nav-link dropdown-toggle {{ Request::is('barang', 'dana-darurat') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                 <span>Investment</span>
             </a>
             <ul class="dropdown-menu">
@@ -71,20 +71,6 @@
                 </li>
             </ul>
         </li>
-
-        <!-- Pinjaman -->
-        <!-- <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('pinjaman') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Pinjaman</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
-                        <span>Daftar Pinjaman</span>
-                    </a>
-                </li>
-            </ul>
-        </li> -->
 
         <!-- Pengaturan -->
         <li class="nav-item dropdown">

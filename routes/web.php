@@ -74,23 +74,21 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Compare
-Route::get('/compare', [CompareController::class, 'index'])->middleware('auth');
-Route::post('/compare', [CompareController::class, 'index'])->middleware('auth');
+Route::match(['get', 'post'], '/compare', [CompareController::class, 'index'])->middleware('auth');
 
 // Barang
 Route::resource('/barang', BarangController::class)->middleware('auth');
-Route::post('/barang', [BarangController::class, 'store']);
-Route::delete('/barang', [BarangController::class, 'destroy']);
 
 // Kalkulator
-Route::get('/kalkulator', [FinancialCalculatorController::class, 'index'])->name('kalkulator.index')->middleware('auth');
-Route::post('/kalkulator', [FinancialCalculatorController::class, 'store'])->name('kalkulator.store');
-Route::delete('/kalkulator/{id}', [FinancialCalculatorController::class, 'destroy']);
-Route::put('/kalkulator/{id}', [FinancialCalculatorController::class, 'update']);
-Route::post('/kalkulator/calculate', [FinancialCalculatorController::class, 'calculate'])->middleware('auth');
-Route::get('/kalkulator/calculate', [FinancialCalculatorController::class, 'showResult'])->name('showResult')->middleware('auth');
-Route::get('/kalkulator/cetak_pdf', [FinancialCalculatorController::class, 'cetak_pdf'])->middleware('auth');
-
+Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
+    Route::get('/', 'index')->name('kalkulator.index');
+    Route::post('/', 'store')->name('kalkulator.store');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+    Route::post('/calculate', 'calculate');
+    Route::get('/calculate', 'showResult')->name('showResult');
+    Route::get('/cetak_pdf', 'cetak_pdf');
+});
 
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
@@ -101,8 +99,6 @@ Route::middleware(['auth'])->group(function () {
 
 // Anggaran
 Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
-Route::post('/anggaran', [AnggaranController::class, 'store']);
-Route::delete('/anggaran', [AnggaranController::class, 'destroy']);
 
 // Ubah Password
 Route::get('/ubah-password', [UbahPasswordController::class, 'index'])->middleware('auth');
@@ -112,7 +108,13 @@ Route::post('/ubah-password', [UbahPasswordController::class, 'store'])->middlew
 Route::resource('/lupa-password', LupaPasswordController::class);
 
 // Dana Darurat
-Route::get('/dana-darurat', [DanaDaruratController::class, 'index'])->middleware('auth');
+Route::middleware('auth')->prefix('dana-darurat')->group(function () {
+    Route::get('/', [DanaDaruratController::class, 'index']);
+    Route::post('/', [DanaDaruratController::class, 'store']);
+    Route::get('/{id}/edit', [DanaDaruratController::class, 'edit']);
+    Route::put('/{id}', [DanaDaruratController::class, 'update']);
+    Route::delete('/{id}', [DanaDaruratController::class, 'destroy']);
+});
 
 // Hasil Proses Anggaran
 Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)->middleware('auth');

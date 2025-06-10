@@ -107,32 +107,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 { data: "tanggal_selesai", name: "tanggal_selesai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
                 { data: "nama_anggaran", name: "nama_anggaran", className: "text-center", render: d => d || "-" },
                 {
-                    data: 'nama_jenis_pengeluaran', name: 'jenis_pengeluaran', className: 'text-center', defaultContent: '-', render: function (data, type, row) {
-                        if (type === "display") {
-                            if (data && typeof data === "string") {
-                                var lines = data.split(","); // ubah \n jadi koma kalau memang datanya koma
-                                var table = `
-                <table style="width: 100%; border-collapse: collapse;">
-                    <colgroup>
-                        <col style="width: 30px;">
-                        <col>
-                    </colgroup>`;
+                    data: 'nama_jenis_pengeluaran', className: 'text-left',
+                    defaultContent: '-',
+                    render: function (data, type, row) {
+                        if (type !== "display" || !data || typeof data !== "string") {
+                            return data ? data : "-";
+                        }
 
-                                lines.forEach(function (line, index) {
-                                    table += `
+                        var lines = data.split(",");
+                        var showLimit = 3;
+                        var hasMore = lines.length > showLimit;
+                        var visibleLines = lines.slice(0, showLimit);
+                        var hiddenLines = lines.slice(showLimit);
+
+                        var tableId = `detail-table-${row.id || Math.random().toString(36).substring(7)}`;
+
+                        var table = `
+            <table style="width: 100%; border-collapse: collapse;" id="${tableId}">
+                <colgroup>
+                    <col style="width: 30px;">
+                    <col>
+                </colgroup>
+                ${visibleLines.map((line, index) => `
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${index + 1}</td>
                         <td style="border: 1px solid #ddd; padding: 4px;">${line.trim()}</td>
-                    </tr>`;
-                                });
+                    </tr>
+                `).join('')}
+        `;
 
-                                table += "</table>";
-                                return table;
-                            } else {
-                                return "-";
-                            }
+                        if (hasMore) {
+                            table += hiddenLines.map((line, index) => `
+                <tr class="hidden-row" style="display: none;">
+                    <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${showLimit + index + 1}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px;">${line.trim()}</td>
+                </tr>
+            `).join('');
                         }
-                        return data ? data : "-";
+
+                        table += `</table>`;
+
+                        if (hasMore) {
+                            table += `
+                <button type="button" class="btn btn-link toggle-btn" data-target="${tableId}">
+                    More Details
+                </button>
+            `;
+                        }
+                        return table;
                     }
                 },
                 { data: "persentase_anggaran", name: "persentase_anggaran", className: "text-center", render: d => d ? d + "%" : "0%" },
@@ -143,6 +165,20 @@ document.addEventListener('DOMContentLoaded', function () {
             ],
         });
     }
+
+    $(document).on('click', '.toggle-btn', function () {
+        const tableId = $(this).data('target');
+        const $table = $('#' + tableId);
+        const $hiddenRows = $table.find('.hidden-row');
+
+        if ($hiddenRows.is(':visible')) {
+            $hiddenRows.hide();
+            $(this).text('More Details');
+        } else {
+            $hiddenRows.show();
+            $(this).text('Show Less');
+        }
+    });
 
     // Validasi form sederhana
     function validateForm() {

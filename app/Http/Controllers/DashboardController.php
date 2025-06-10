@@ -253,41 +253,60 @@ class DashboardController extends Controller
         return response()->json($todayTransactions);
     }
 
+    // Expenses Bar
     public function getJenisPengeluaran(Request $request)
     {
         $userId = Auth::id();
         $selectedMonth = $request->input('month', Carbon::now()->month);
         $selectedYear = $request->input('year', Carbon::now()->year);
 
-        $jenisPengeluaran = Transaksi::select('pengeluaran', DB::raw('SUM(nominal) as total'))
-            ->where('id_user', $userId)
+        $jenisPengeluaran = Transaksi::select(
+            'pengeluaran.id as pengeluaran_id',  // TAMBAHAN: ID pengeluaran
+            'pengeluaran.nama as pengeluaran_nama',
+            DB::raw('SUM(nominal) as total')
+        )
+            ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
+            ->where('transaksi.id_user', $userId)
             ->whereYear('tgl_transaksi', $selectedYear)
             ->whereMonth('tgl_transaksi', $selectedMonth)
-            ->groupBy('pengeluaran')
+            ->groupBy('pengeluaran.id', 'pengeluaran.nama')  // PERBAIKAN: Group by ID juga
             ->orderByDesc('total')
             ->get();
 
         return response()->json($jenisPengeluaran);
     }
 
+    // Detail Modal Expense Bar - Tetap sama
     public function getTransaksiByPengeluaran(Request $request)
     {
-        $pengeluaran = $request->query('pengeluaran');
-        $month = $request->query('month');
-        $year = $request->query('year');
+        try {
+            $pengeluaran = $request->query('pengeluaran');
+            $month = $request->query('month');
+            $year = $request->query('year');
 
-        if (!$pengeluaran || !$month || !$year) {
-            return response()->json(['error' => 'Parameter tidak lengkap'], 400);
+            if (!$pengeluaran || !$month || !$year) {
+                return response()->json(['error' => 'Parameter tidak lengkap'], 400);
+            }
+
+            $data = Transaksi::select(
+                'transaksi.tgl_transaksi',
+                'transaksi.keterangan',
+                'transaksi.nominal',
+                'pengeluaran.nama as pengeluaran_nama'
+            )
+                ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
+                ->where('transaksi.id_user', Auth::id())
+                ->where('transaksi.pengeluaran', $pengeluaran)
+                ->whereMonth('transaksi.tgl_transaksi', $month)
+                ->whereYear('transaksi.tgl_transaksi', $year)
+                ->orderBy('transaksi.tgl_transaksi')
+                ->get();
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+
+            return response()->json(['error' => 'Terjadi kesalahan server'], 500);
         }
-
-        $data = Transaksi::where('id_user', Auth::id())
-            ->select('tgl_transaksi', 'keterangan', 'nominal')
-            ->where('pengeluaran', $pengeluaran)
-            ->whereMonth('tgl_transaksi', $month)
-            ->whereYear('tgl_transaksi', $year)
-            ->get();
-
-        return response()->json($data);
     }
 
     function logout()

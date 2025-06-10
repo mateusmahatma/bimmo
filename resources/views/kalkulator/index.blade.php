@@ -60,7 +60,7 @@
                     <th class="text-center">Start Date</th>
                     <th class="text-center">End Date</th>
                     <th class="text-center">Budget Name</th>
-                    <th class="text-center">Expense Type</th>
+                    <th class="text-center" style="width: 250px;">Expense Type</th>
                     <th class="text-center">Budget Percentage</th>
                     <th class="text-center">Budget Amount</th>
                     <th class="text-center">Used Budget</th>

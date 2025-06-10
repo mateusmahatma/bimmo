@@ -67,9 +67,9 @@ class TransaksiController extends Controller
     {
         $validatedData = $request->validate([
             'tgl_transaksi'      => 'required|date',
-            'pemasukan'          => 'nullable|string',  // input berupa nama
+            'pemasukan'          => 'nullable|string',
             'nominal_pemasukan'  => 'nullable|numeric',
-            'pengeluaran'        => 'nullable|string',  // input berupa nama
+            'pengeluaran'        => 'nullable|string',
             'nominal'            => 'nullable|numeric',
             'keterangan'         => 'nullable|string',
         ]);

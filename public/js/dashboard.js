@@ -168,7 +168,7 @@ function toggleNominal() {
     localStorage.setItem("nominalHidden", !isHidden);
 }
 
-// Bar Jenis Pengeluaran
+// Expenses Bar
 document.addEventListener("DOMContentLoaded", function () {
     let barChart = null;
 
@@ -176,108 +176,307 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`/dashboard/jenis-pengeluaran?month=${month}&year=${year}`)
             .then(response => response.json())
             .then(data => {
+                // console.log("Data dari API:", data); // Debug data
+
                 if (!data || data.length === 0) {
-                    data = [{ pengeluaran: "Data Tidak Ada", total: 0 }];
+                    if (barChart) {
+                        barChart.destroy();
+                        barChart = null;
+                    }
+
+                    const chartElement = document.querySelector("#barJenisPengeluaran");
+                    if (chartElement) {
+                        chartElement.style.height = "100px";
+                        chartElement.style.minHeight = "unset";
+                        chartElement.style.maxHeight = "unset";
+                        chartElement.style.padding = "0";
+                        chartElement.style.display = "flex";
+                        chartElement.style.justifyContent = "center";
+                        chartElement.style.alignItems = "center";
+                        chartElement.style.background = "#f3f3f3";
+                        chartElement.innerHTML = `<span class="text-muted">No data available for this month/year.</span>`;
+                    }
+                    return
+                }
+                else {
+                    const chartElement = document.querySelector("#barJenisPengeluaran");
+                    if (chartElement) {
+                        chartElement.style.background = "#ffffff"; // background putih saat grafik tampil
+                    }
                 }
 
-                // Filter data terlebih dahulu untuk menghilangkan item dengan pengeluaran null
-                const filteredData = data.filter(item => item.pengeluaran !== null);
 
-                // Kemudian gunakan data yang sudah difilter untuk membuat labels
-                const labels = filteredData.map(item => item.pengeluaran);
+                // Filter data yang punya pengeluaran_id tidak null
+                const filteredData = data.filter(item => item.pengeluaran_id !== null);
+
+                if (filteredData.length === 0) {
+                    console.log("Tidak ada data yang valid");
+                    return;
+                }
+
+                // PERBAIKAN: Ambil ID dan nama dari field yang benar
+                const labels = filteredData.map(item => item.pengeluaran_nama);
+                const pengeluaranIds = filteredData.map(item => item.pengeluaran_id); // PERBAIKAN: gunakan pengeluaran_id
                 const values = filteredData.map(item => parseFloat(item.total) || 0);
 
+                // debug
+                // console.log("Labels:", labels);
+                // console.log("Pengeluaran IDs:", pengeluaranIds);
+                // console.log("Values:", values);
+
                 const chartElement = document.querySelector("#barJenisPengeluaran");
-                if (!chartElement) return;
+                if (!chartElement) {
+                    // console.error("Element chart tidak ditemukan!");
+                    return;
+                }
 
                 chartElement.innerHTML = "";
-                if (barChart) barChart.destroy();
+                if (barChart) {
+                    barChart.destroy();
+                    barChart = null;
+                }
 
-                var chartHeight = Math.min(800, Math.max(400, data.length * 30));
+                var chartHeight = Math.min(800, Math.max(400, filteredData.length * 60));
                 var maxXValue = Math.max(...values) * 1.2;
 
                 var options = {
-                    series: [{ data: values }],
+                    series: [{
+                        name: 'Total Pengeluaran',
+                        data: values
+                    }],
                     chart: {
                         type: 'bar',
                         height: chartHeight,
                         events: {
                             dataPointSelection: function (event, chartContext, config) {
-                                const selectedCategory = labels[config.dataPointIndex];
-                                fetchTransactionDetails(selectedCategory, month, year);
+                                // console.log("Bar diklik:", config);
+                                // console.log("Data point index:", config.dataPointIndex);
+
+                                const selectedPengeluaranId = pengeluaranIds[config.dataPointIndex];
+                                // console.log("Selected pengeluaran ID:", selectedPengeluaranId);
+
+                                if (selectedPengeluaranId) {
+                                    fetchTransactionDetails(selectedPengeluaranId, month, year);
+                                } else {
+                                    // console.error("Pengeluaran ID tidak ditemukan untuk index:", config.dataPointIndex);
+                                }
                             }
                         }
                     },
                     plotOptions: {
-                        bar: { borderRadius: 4, horizontal: true, barHeight: "80%" }
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: true,
+                            barHeight: "70%",
+                            distributed: false
+                        }
                     },
                     dataLabels: {
                         enabled: true,
                         formatter: function (value) {
-                            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+                            return new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            }).format(value);
+                        },
+                        style: {
+                            fontSize: '12px',
+                            fontWeight: 'bold'
                         }
                     },
                     xaxis: {
                         categories: labels,
                         max: maxXValue,
-                        labels: { style: { fontSize: '12px' } }
+                        labels: {
+                            style: { fontSize: '12px' },
+                            formatter: function (value) {
+                                return new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value);
+                            }
+                        }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: { fontSize: '12px' }
+                        }
+                    },
+                    colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
+                    tooltip: {
+                        y: {
+                            formatter: function (value) {
+                                return new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value);
+                            }
+                        }
                     }
                 };
 
                 barChart = new ApexCharts(chartElement, options);
-                barChart.render();
+                barChart.render()
+                // .then(() => {
+                //     console.log("Chart berhasil di-render");
+                // })
+                // .catch(error => {
+                //     console.error("Error rendering chart:", error);
+                // });
             })
-            .catch(error => console.error("Error fetching data:", error));
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
     }
 
-    function fetchTransactionDetails(pengeluaran, month, year) {
-        fetch(`/dashboard/transaksi?pengeluaran=${pengeluaran}&month=${month}&year=${year}`)
-            .then(response => response.json())
-            .then(data => {
-                const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-                modalBody.innerHTML = ""; // Kosongkan isi tabel sebelum diisi ulang
+    function fetchTransactionDetails(pengeluaranId, month, year) {
+        // console.log("Fetching transaction details untuk:", { pengeluaranId, month, year });
 
-                if (data.length === 0) {
-                    modalBody.innerHTML = `
-                    <tr>
-                        <td colspan="2" class="text-center">Tidak ada transaksi</td>
-                    </tr>`;
-                } else {
-                    data.forEach(item => {
-                        let tanggalTransaksi = new Date(item.tgl_transaksi).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                        let numberedKeterangan = item.keterangan
-                            .split("\n") // Pisahkan berdasarkan baris (jika ada newline)
-                            .map((line, index) => `${index + 1}. ${line.trim()}`) // Tambahkan numbering
-                            .join("<br>"); // Gabungkan kembali dengan line break
+        // Validasi parameter
+        if (!pengeluaranId || pengeluaranId === 'undefined' || pengeluaranId === null) {
+            console.error("pengeluaranId tidak valid:", pengeluaranId);
+            alert("Data pengeluaran tidak valid. Silakan coba lagi.");
+            return;
+        }
 
-                        modalBody.innerHTML += `
-                        <tr>
-                            <td>${tanggalTransaksi}</td>
-                            <td>${numberedKeterangan}</td>
-                            <td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.nominal)}</td>
-                        </tr>`;
-                    });
+        if (!month || !year) {
+            console.error("Month atau year tidak valid:", { month, year });
+            alert("Parameter bulan/tahun tidak valid.");
+            return;
+        }
+
+        // Tampilkan loading di modal
+        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        Loading...
+                    </td>
+                </tr>`;
+        }
+
+        // Tampilkan modal terlebih dahulu
+        const modal = new bootstrap.Modal(document.getElementById('detailModalBarPengeluaran'));
+        modal.show();
+
+        fetch(`/dashboard/transaksi?pengeluaran=${pengeluaranId}&month=${month}&year=${year}`)
+            .then(response => {
+                // console.log("Response status:", response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
-                // Tampilkan modal
-                const modal = new bootstrap.Modal(document.getElementById('detailModalBarPengeluaran'));
-                modal.show();
+                return response.json();
             })
-            .catch(error => console.error("Error fetching transactions:", error));
+            .then(data => {
+                // console.log("Response transaksi:", data);
+                displayTransactionData(data);
+            })
+            .catch(error => {
+                console.error("Error fetching transactions:", error);
+                displayError(error.message);
+            });
     }
 
+    function displayTransactionData(data) {
+        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+
+        if (!modalBody) {
+            console.error("Modal body tidak ditemukan!");
+            return;
+        }
+
+        modalBody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            modalBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted">
+                        <i class="fas fa-inbox"></i><br>
+                        Tidak ada transaksi ditemukan
+                    </td>
+                </tr>`;
+        } else {
+            let htmlContent = "";
+            data.forEach((item, index) => {
+                let tanggalTransaksi = new Date(item.tgl_transaksi).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                let keterangan = item.keterangan || 'Tidak ada keterangan';
+                let numberedKeterangan = keterangan
+                    .split("\n")
+                    .filter(line => line.trim() !== '')
+                    .map((line, idx) => `${idx + 1}. ${line.trim()}`)
+                    .join("<br>");
+
+                htmlContent += `
+                    <tr class="transaction-row">
+                        <td class="fw-semibold">${tanggalTransaksi}</td>
+                        <td>${numberedKeterangan}</td>
+                        <td class="text-end fw-bold text-primary">
+                            ${new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(item.nominal)}
+                        </td>
+                    </tr>`;
+            });
+            modalBody.innerHTML = htmlContent;
+
+            // Update modal title dengan nama pengeluaran
+            const modalTitle = document.querySelector("#modalTitle");
+            if (modalTitle && data.length > 0) {
+                modalTitle.textContent = `Detail Transaksi - ${data[0].pengeluaran_nama}`;
+            }
+        }
+    }
+
+    function displayError(errorMessage) {
+        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-danger">
+                        <i class="fas fa-exclamation-triangle"></i><br>
+                        <strong>Error:</strong> ${errorMessage}
+                    </td>
+                </tr>`;
+        }
+    }
+
+    // Inisialisasi
     const filterMonth = document.getElementById("filterMonth");
     const filterYear = document.getElementById("filterYear");
 
-    fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-
-    filterMonth.addEventListener("change", () => {
+    if (filterMonth && filterYear) {
+        // Load data pertama kali
         fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-    });
 
-    filterYear.addEventListener("change", () => {
-        fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-    });
+        // Event listeners
+        filterMonth.addEventListener("change", () => {
+            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+        });
+
+        filterYear.addEventListener("change", () => {
+            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+        });
+    } else {
+        console.error("Filter elements tidak ditemukan!");
+    }
 });
 
 // Transaksi Hari ini
@@ -401,7 +600,7 @@ function initializeNominalDisplay() {
     });
 }
 
-// Kompas
+// Compass
 document.addEventListener("DOMContentLoaded", function () {
     const chartElement = document.getElementById("chartKompas");
 

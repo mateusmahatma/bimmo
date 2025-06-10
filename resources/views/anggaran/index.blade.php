@@ -29,18 +29,19 @@
         <table id="anggaranTable" class="customTable">
             <thead>
                 <tr>
-                    <th style="width: 5px;">No</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Percentage</th>
-                    <th class="text-center">Expense Type</th>
-                    <th style="width: 90px;">Created Date</th>
-                    <th style="width: 90px;">Updated Date</th>
-                    <th style="width: 1px;"></th>
+                    <th scope="col" style="width: 1px;">No</th>
+                    <th scope="col" class="text-center align-middle">Name</th>
+                    <th scope="col" class="text-center align-middle">Percentage</th>
+                    <th scope="col" class="text-center align-middle" style="width: 250px;">Expense Type</th>
+                    <th scope="col" class="text-center align-middle">Created</th>
+                    <th scope="col" class="text-center align-middle">Updated</th>
+                    <th scope="col" style="width: 1px;"></th>
+
                 </tr>
             </thead>
         </table>
         <div>
-            <div class="badge-success" style="font-size: medium;">Total Percentage: <span id="totalPersentase">0</span>%</div>
+            <div class="badge-success" style="font-size: small;">Total Percentage: <span id="totalPersentase">0</span>%</div>
             <span id="exceedMessage" style="color: red; font-size: medium; margin-left: 10px;"></span>
         </div>
     </div>

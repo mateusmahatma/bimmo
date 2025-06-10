@@ -16,7 +16,7 @@
     <ul class="nav nav-pills">
         <li class="nav-item dropdown">
             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span class="badge-primary dropdown-toggle">Action</span>
+                <span class="badge-primary rounded-pill dropdown-toggle">Action</span>
             </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#barangModal">Add Data</a></li>
@@ -31,7 +31,7 @@
 
 <div class="card-header">
     <div class="card-body">
-        <form>
+        <!-- <form>
             <div class="col-md-3">
                 <select class="form-control select-2" name="status">
                     <option value="">Show Asset Status All</option>
@@ -39,26 +39,25 @@
                     <option value="0">Mortgaged Assets</option>
                 </select>
             </div>
-        </form>
-    </div>
-    <div class="card-body">
-        <table id="barangTable" class="customTable">
-            <thead>
-                <tr>
-                    <th class="text-center">No</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Store</th>
-                    <th class="text-center">Price</th>
-                    <th class="text-center">Total Assets</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center">Created Date</th>
-                    <th class="text-center">Updated Date</th>
-                    <th class="text-center"></th>
-                </tr>
-            </thead>
-        </table>
-        <div class="badge-success" style="font-size: medium">
-            Total assets owned: <span id="totalAset">Rp 0</span>
+        </form> -->
+        <div class="card-body">
+            <table id="barangTable" class="customTable">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 1px;">No</th>
+                        <th scope="col" class="text-center align-middle">Name</th>
+                        <th scope="col" class="text-center align-middle">Store</th>
+                        <th scope="col" class="text-center align-middle">Price</th>
+                        <th scope="col" class="text-center align-middle">Status</th>
+                        <th scope="col" class="text-center align-middle">Created</th>
+                        <th scope="col" class="text-center align-middle">Updated</th>
+                        <th scope="col" style="width: 1px;"></th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="badge-success" style="font-size: small">
+                Total assets owned: <span id="totalAset">Rp 0</span>
+            </div>
         </div>
     </div>
 </div>

@@ -16,7 +16,7 @@
     <ul class="nav nav-pills">
         <li class="nav-item dropdown">
             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span class="badge-primary dropdown-toggle">Action</span>
+                <span class="badge-primary dropdown-toggle rounded-pill">Action</span>
             </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Add Data</a></li>
@@ -31,7 +31,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/compare">
-                <span class="badge-orange">Compare Cash Flow</span>
+                <span class="badge-secondary rounded-pill">Compare Cash Flow</span>
             </a>
         </li>
     </ul>

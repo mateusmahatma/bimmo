@@ -60,7 +60,17 @@ class DanaDaruratController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'tgl_transaksi_dana_darurat'    => 'required|date',
+            'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
+            'nominal_dana_darurat'          => 'decimal:2',
+            'keterangan'                    => 'string',
+        ]);
+
+        $validatedData['id_user'] = Auth::id();
+
+        DanaDarurat::create($validatedData);
+        return redirect('/dana-darurat');
     }
 
     /**
@@ -74,24 +84,34 @@ class DanaDaruratController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $data = DanaDarurat::where('id_dana_darurat', $id)->first();
+        return response()->json(['result' => $data]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'tgl_transaksi_dana_darurat'    => 'required|date',
+            'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
+            'nominal_dana_darurat'          => 'decimal:2',
+            'keterangan'                    => 'string',
+        ]);
+
+        DanaDarurat::where('id_dana_darurat', $id)->update($validatedData);
+        return response()->json(['success' => "Berhasil melakukan update data"]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $dana = DanaDarurat::findOrFail($id);
+        $dana->delete();
     }
 }

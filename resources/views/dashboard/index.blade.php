@@ -13,11 +13,12 @@
 
 <section class="section dashboard" id="dashboard-container">
     <div class="row">
-        <!-- Informasi -->
         <div class="card-nominal">
-            <div class="lock-icon">
+            <h3>Financial Overview</h3>
+            <!-- <div class="lock-icon">
                 <i class="bx bx-lock" onclick="toggleNominal()"></i>
-            </div>
+            </div> -->
+            <!-- ikon strip 3 di pojok kanan atas -->
             <ul class="box-info">
                 <li>
                     <i class='bx bxs-chevrons-down'></i>
@@ -85,7 +86,7 @@
         <div class="card-today">
             <h3>Today's Transaction</h3>
             <div class="card-header">
-                <table id="todayTransactionsTable" class="customTable">
+                <table id="todayTransactionsTable" class="dashboardTable">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -100,7 +101,7 @@
             </div>
         </div>
 
-        <!-- Bar Jenis Pengeluaran -->
+        <!-- Expense Bar -->
         <div class="card-today">
             <h3>Expenses Bar</h3>
             <div class="filters-container">
@@ -129,7 +130,7 @@
 
         <!-- Kompas -->
         <div class="card-today">
-            <h3>Compass</h3>
+            <h3>Performance Ratio</h3>
             <div id="chartKompas"
                 data-rasio="{{ $rasio ?? 0 }}"
                 data-rasio-inflasi="{{ $rasio_inflasi ?? 0 }}"
@@ -170,7 +171,7 @@
             </div>
         </div>
 
-        <!-- Modal Bar Jenis Pengeluaran -->
+        <!-- Modal Detail Transaksi -->
         <div class="modal fade" id="detailModalBarPengeluaran" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -195,7 +196,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 @endsection

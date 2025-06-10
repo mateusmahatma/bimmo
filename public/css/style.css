@@ -527,7 +527,7 @@ a.disabled span {
     color: var(--bs-primary);
 }
 
-.badge-orange {
+.badge-secondary {
     display: inline-block;
     padding: 0.25em 0.4em;
     font-size: 100%;
@@ -536,7 +536,7 @@ a.disabled span {
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    background-color: var(--bs-orange);
+    background-color: var(--bs-danger);
     width: 170px;
     border-radius: 4px;
 }
@@ -615,6 +615,7 @@ a.disabled span {
 
 .box-info li .text p {
     color: var(--dark);
+    font-size: 1rem;
 }
 
 .icon-gear {
@@ -1481,7 +1482,8 @@ p {
 }
 
 .breadcrumb .active {
-    color: var(--bs-primary);
+    color: black;
+    font-weight: lighter;
 }
 
 /* Bordered Tabs */
@@ -2431,9 +2433,9 @@ footer {
     border-radius: 0.25rem;
 }
 
-.filter {
+/* .filter {
     margin-bottom: 20px;
-}
+} */
 
 .form-row {
     margin-bottom: 10px;
@@ -2599,6 +2601,7 @@ footer {
 .filter {
     margin-top: 15px;
     color: black;
+    font-size: 0.9rem;
 }
 
 .alert-info {
@@ -2733,12 +2736,6 @@ footer {
 }
 
 /* Dashboard */
-.card-nominal {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 4px;
-    margin-bottom: 0px;
-}
 
 /* Container toggle switch */
 .toggle-switch {
@@ -2843,7 +2840,6 @@ footer {
     padding: 20px;
     background-color: #fff;
     border-radius: 4px;
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 
 .mb-4 {
@@ -2996,24 +2992,27 @@ table.customTable {
     border-spacing: 0;
     background-color: #fff;
     color: #333;
+    border-radius: 8px;
+    overflow: hidden;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
 }
 
-/* Header dengan sudut membulat */
 table.customTable thead {
-    background-color: #f8f9fa;
+    background-color: #fff;
     color: #333;
     font-weight: bold;
 }
 
 table.customTable thead th:first-child {
     border-top-left-radius: 8px;
+
 }
 
 table.customTable thead th:last-child {
     border-top-right-radius: 8px;
 }
 
-/* Body dengan border di bawah */
 table.customTable tbody tr:last-child td:first-child {
     border-bottom-left-radius: 8px;
 }
@@ -3034,6 +3033,54 @@ table.customTable td {
 table.customTable tbody tr:hover {
     background-color: #f1f1f1;
     transition: background 0.3s ease-in-out;
+}
+
+/* Tabel Dashboard */
+table.dashboardTable {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background-color: #ffffff;
+    color: #333333;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+}
+
+table.dashboardTable thead {
+    background-color: #f8f9fa;
+    color: #212529;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+table.dashboardTable th,
+table.dashboardTable td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+table.dashboardTable tbody tr:hover {
+    background-color: #f1f3f5;
+    cursor: pointer;
+}
+
+table.dashboardTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    table.dashboardTable {
+        font-size: 12px;
+    }
+
+    table.dashboardTable th,
+    table.dashboardTable td {
+        padding: 10px 12px;
+    }
 }
 
 /* Modal */
@@ -3142,4 +3189,10 @@ table.customTable tbody tr:hover {
     background: var(--bs-red);
     letter-spacing: 0.03em;
     border-radius: 4px;
+}
+
+.more-details td {
+    background-color: #f9f9f9;
+    color: var(--bs-primary);
+    font-style: italic;
 }

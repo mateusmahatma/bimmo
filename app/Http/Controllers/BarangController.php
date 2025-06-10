@@ -43,7 +43,6 @@ class BarangController extends Controller
             'status' => 'required|in:0,1',
             'nama_toko' => 'string',
             'harga' => 'numeric',
-            'jumlah' => 'integer',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -66,7 +65,6 @@ class BarangController extends Controller
             'status' => 'in:1,0',
             'nama_toko' => 'string',
             'harga' => 'numeric',
-            'jumlah' => 'integer',
         ]);
 
         Barang::where('id', $id)->update($validatedData);

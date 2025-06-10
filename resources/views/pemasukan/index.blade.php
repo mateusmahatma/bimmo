@@ -29,11 +29,11 @@
         <table id="pemasukanTable" class="customTable">
             <thead>
                 <tr>
-                    <th style="width: 3px;">No</th>
-                    <th class="text-center" style="width: 600px;">Nama</th>
-                    <th class="text-center">Dibuat Tanggal</th>
-                    <th class="text-center">Diupdate Tanggal</th>
-                    <th style="width: 3px;">Aksi</th>
+                    <th scope="col" style="width: 1px;">No</th>
+                    <th scope="col" class="text-center align-middle" style="width: 250px;">Nama</th>
+                    <th scope="col" class="text-center align-middle">Created</th>
+                    <th scope="col" class="text-center align-middle">Updated</th>
+                    <th scope="col" style="width: 1px;"></th>
                 </tr>
             </thead>
         </table>

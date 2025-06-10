@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('#pemasukanTable').DataTable({
+    const table = $('#pemasukanTable').DataTable({
         paging: true,
         responsive: true,
         lengthChange: true,
@@ -19,17 +19,18 @@ $(document).ready(function () {
             { data: 'created_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
             { data: 'updated_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
             {
-                data: 'aksi', rderable: false,
+                data: 'aksi',
+                orderable: false,
                 searchable: false,
                 className: "text-center",
-                render: function (data, type, row) {
+                render: function (data) {
                     return data;
                 },
             }
         ]
     });
 
-    // Fungsi untuk menampilkan toast notification
+    // Toast Notification
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
         if (!toastContainer) {
@@ -40,114 +41,85 @@ $(document).ready(function () {
 
         const toastId = 'toast-' + Date.now();
         const colors = {
-            success: '#012970',  // Biru
-            danger: '#dc3545',   // Merah
-            warning: '#ffc107',  // Kuning
-            info: '#17a2b8',     // Biru muda
-            primary: '#007bff',  // Biru
+            success: '#012970',
+            danger: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8',
+            primary: '#007bff',
         };
-
-        const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+        const bgColor = colors[type] || '#6c757d';
 
         const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert">
                 <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
-            </div>
-        `;
+            </div>`;
 
-        // Tambahkan toast ke container
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-
         const toastElement = document.getElementById(toastId);
         const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
         toast.show();
-
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            toastElement.remove();
-        });
+        toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
     }
 
-    // Function to handle Save & Update
+    // Submit Form
     function simpanPemasukan(id = '') {
-        var url = id ? '/pemasukan/' + id : '/pemasukan';
-        var type = id ? 'PUT' : 'POST';
+        const url = id ? `/pemasukan/${id}` : '/pemasukan';
+        const method = id ? 'PUT' : 'POST';
+        const nama = $('#nama').val().trim();
 
-        isRequesting = true;
-
-        $('#pemasukanModal').on('shown.bs.modal', function () {
-            $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan').on('click', '.tombol-simpan-pemasukan', function () {
-                var formData = {
-                    nama: $('#nama').val().trim()
-                };
-
-                if (formData.nama === '') {
-                    showToast('Nama Harus Diisi!', 'danger');
-                    return;
-                }
-
-                $('.tombol-simpan-pemasukan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...');
-
-                $.ajax({
-                    url: url,
-                    type: type,
-                    data: formData,
-                    success: function () {
-                        showToast('Data Berhasil disimpan', 'success');
-                        $('#pemasukanModal').modal('hide');
-                        $('#pemasukanTable').DataTable().ajax.reload();
-                    },
-                    complete: function () {
-                        $('.tombol-simpan-pemasukan').prop('disabled', false).html('Simpan');
-                    }
-                });
-            });
-
-            $('#pemasukanModal').on('hidden.bs.modal', function () {
-                $('#nama').val('');
-            });
-        });
-    }
-
-    // Global Setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        if (nama === '') {
+            showToast('Nama Harus Diisi!', 'danger');
+            return;
         }
-    });
 
-    let isRequesting = false;
-
-    // Handle Create Pemasukan
-    $('body').on('click', '.tombol-tambah-pemasukan', function (e) {
-        e.preventDefault();
-        $('#pemasukanModal').modal('show');
-        simpanPemasukan();
-    });
-
-    // Handle Edit Pemasukan
-    $('body').on('click', '.tombol-edit-pemasukan', function (e) {
-        e.preventDefault();
-        var id = $(this).data('id');
+        $('.tombol-simpan-pemasukan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Proses ...');
 
         $.ajax({
-            url: '/pemasukan/' + id + '/edit',
-            type: 'GET',
-            success: function (response) {
-                $('#pemasukanModal').modal('show');
-                $('#nama').val(response.result.nama);
-                simpanPemasukan(id);
+            url,
+            type: method,
+            data: { nama },
+            success: () => {
+                showToast('Data Berhasil disimpan', 'success');
+                $('#pemasukanModal').modal('hide');
+                table.ajax.reload();
+            },
+            complete: () => {
+                $('.tombol-simpan-pemasukan').prop('disabled', false).html('Simpan');
             }
+        });
+    }
+
+    // Tambah
+    $('body').on('click', '.tombol-tambah-pemasukan', function (e) {
+        e.preventDefault();
+        $('#nama').val('');
+        $('#pemasukanModal').modal('show');
+
+        $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan')
+            .on('click', '.tombol-simpan-pemasukan', () => simpanPemasukan());
+    });
+
+    // Edit
+    $('body').on('click', '.tombol-edit-pemasukan', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+
+        $.get(`/pemasukan/${id}/edit`, function (response) {
+            $('#nama').val(response.result.nama);
+            $('#pemasukanModal').modal('show');
+
+            $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan')
+                .on('click', '.tombol-simpan-pemasukan', () => simpanPemasukan(id));
         });
     });
 
-    // Handle Delete Pemasukan
+    // Hapus
     $('body').on('click', '.tombol-del-pemasukan', function (e) {
         e.preventDefault();
+        const id = $(this).data('id');
 
         Swal.fire({
             title: 'Yakin mau hapus data ini?',
@@ -158,25 +130,27 @@ $(document).ready(function () {
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal',
-            customClass: {
-                popup: 'dark-mode'
-            }
+            customClass: { popup: 'dark-mode' }
         }).then((result) => {
             if (result.isConfirmed) {
-                var id = $(this).data('id');
                 $.ajax({
-                    url: '/pemasukan/' + id,
+                    url: `/pemasukan/${id}`,
                     type: 'DELETE',
-                    success: function () {
+                    success: () => {
                         showToast('Data Berhasil dihapus', 'success');
-                        $('#pemasukanTable').DataTable().ajax.reload();
+                        table.ajax.reload();
                     },
-                    error: function () {
+                    error: () => {
                         showToast('Delete failed, data in cash flow', 'danger');
-                        $('#pemasukanTable').DataTable().ajax.reload();
+                        table.ajax.reload();
                     }
                 });
             }
         });
+    });
+
+    // CSRF Setup
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 });
