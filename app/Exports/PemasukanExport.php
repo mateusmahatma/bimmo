@@ -15,13 +15,13 @@ class PemasukanExport implements FromCollection, WithHeadings, WithTitle
     public function collection()
     {
         return Pemasukan::where('id_user', Auth::id())
-            ->get(['kode_pemasukan', 'nama']);
+            ->get(['id', 'nama']);
     }
 
     public function headings(): array
     {
         return [
-            'kode_pemasukan',
+            'id',
             'nama'
         ];
     }

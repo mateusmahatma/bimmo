@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-bs-theme="auto">
 
 <head>
     <meta charset="utf-8">
@@ -41,8 +41,6 @@
         @yield('container')
     </main>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
     <!-- Vendor JS Files -->
     <script src="/vendor/apexcharts/apexcharts.min.js" async></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -79,6 +77,13 @@
     <script src="{{ asset('js/vendor/daterangepicker.min.js') }}"></script>
     <script src="{{ asset('js/vendor/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/vendor/tom-select.complete.min.js') }}"></script>
+
+    <script>
+        window.userSkin = "{{ auth()->user()->skin ?? 'auto' }}";
+        window.updateSkinUrl = "{{ route('user.update.skin') }}";
+        window.csrfToken = "{{ csrf_token() }}";
+    </script>
+
 
 </body>
 

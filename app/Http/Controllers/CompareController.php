@@ -32,6 +32,7 @@ class CompareController extends Controller
                 ->when($jenisPengeluaran, function ($query) use ($jenisPengeluaran) {
                     return $query->where('pengeluaran', $jenisPengeluaran);
                 })
+                ->where('status', 1)
                 ->sum('nominal');
 
             // Total Nominal Periode 2
@@ -40,6 +41,7 @@ class CompareController extends Controller
                 ->when($jenisPengeluaran, function ($query) use ($jenisPengeluaran) {
                     return $query->where('pengeluaran', $jenisPengeluaran);
                 })
+                ->where('status', 1)
                 ->sum('nominal');
 
             // Selisih

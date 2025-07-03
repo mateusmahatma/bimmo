@@ -8,15 +8,12 @@
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="/compare">Compare Pengeluaran</a>
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-            <a class="nav-link" href="/transaksi">
-                <span class="badge-primary">Data Transaksi</span>
-            </a>
-        </li>
-    </ul>
+<nav id="navbar-example2" class="navbar px-3">
+    <span class="navbar-text breadcrumb-nav">
+        <a class="text-decoration-none" href="/transaksi">Cash Flow</a>
+        &nbsp;<span class="mx-1">&gt;</span>&nbsp;
+        <a class="text-decoration-none" href="/compare">Compare Expense</a>
+    </span>
 </nav>
 
 <div class="card-header">
@@ -59,8 +56,7 @@
         </form>
     </div>
     <div class="card-body">
-        <div class="alert alert-info d-flex align-items-start gap-2" role="alert">
-            <i class="bi bi-info-circle-fill fs-4"></i>
+        <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
             <div>
                 <strong>Informasi:</strong>
                 <p class="mb-0">

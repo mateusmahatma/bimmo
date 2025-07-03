@@ -26,9 +26,6 @@
 
 <div class="card-header">
     <div class="card-body">
-        <div class="callout-danger">
-            <h4>Attention: Do not use commas (,) when creating expense types</h4>
-        </div>
         <table id="pengeluaranTable" class="customTable">
             <thead>
                 <tr>

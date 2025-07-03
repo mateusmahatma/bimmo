@@ -1,7 +1,7 @@
-// Arus Kas
+// Cash Flow
 document.addEventListener("DOMContentLoaded", function () {
-    let charts = {}; // Menyimpan semua instance chart
-    let chartData = {}; // Menyimpan data mentah chart
+    let charts = {};
+    let chartData = {};
 
     // Fungsi untuk memfilter data berdasarkan bulan yang dipilih
     function filterData(data, months) {
@@ -20,13 +20,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fungsi umum untuk merender chart
     function renderChart(type, selector, data, options) {
+        const theme = document.documentElement.getAttribute("data-bs-theme") || "light";
+        const isDark = theme === "dark";
+
         const defaultOptions = {
             chart: {
                 type: type,
                 height: 350,
-                toolbar: { show: true, tools: { download: true } },
+                toolbar: { show: true, tools: { download: false } },
+                foreColor: isDark ? '#fff' : '#333'
             },
-            xaxis: { categories: data.labels },
+            xaxis: {
+                categories: data.labels,
+                labels: {
+                    style: {
+                        colors: isDark ? '#ccc' : '#555'
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: isDark ? '#ccc' : '#555'
+                    },
+                    formatter: (val) => val.toLocaleString('id-ID')
+                }
+            },
+            dataLabels: {
+                style: {
+                    colors: [isDark ? '#fff' : '#000']
+                }
+            },
+            tooltip: {
+                theme: isDark ? "dark" : "light"
+            },
             series: [],
         };
 
@@ -39,6 +66,17 @@ document.addEventListener("DOMContentLoaded", function () {
             charts[selector].render();
         }
     }
+
+    document.addEventListener("themeChanged", function () {
+        const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+
+        // Render ulang chart dengan tema baru
+        const months = document.getElementById("filterPeriod")?.value || "all";
+        const parsedMonths = months === "all" ? "all" : parseInt(months);
+
+        renderCashFlowChart(chartData["cashFlow"], parsedMonths);
+        renderIncomeExpenseChart(chartData["incomeExpense"], parsedMonths);
+    });
 
     // Ambil data dan render chart awal
     Promise.all([
@@ -66,11 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 enabled: false,
             },
             series: [
-                { name: "Pemasukan", data: filteredData.pemasukan },
-                { name: "Pengeluaran", data: filteredData.pengeluaran },
+                { name: "Expense", data: filteredData.pemasukan },
+                { name: "Income", data: filteredData.pengeluaran },
             ],
             tooltip: {
-                theme: "light",
+                theme: (document.documentElement.getAttribute("data-bs-theme") === "dark") ? "dark" : "light",
                 y: {
                     formatter: (val) => "Rp " + val.toLocaleString(),
                 },
@@ -78,17 +116,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Fungsi render chart pendapatan dan pengeluaran
+    // Fungsi render line
     function renderIncomeExpenseChart(data, months = "all") {
         const filteredData = filterData(data, months);
         renderChart("line", "#barChart", filteredData, {
             series: [
-                { name: "Pengeluaran", data: filteredData.data_pengeluaran },
-                { name: "Pemasukan", data: filteredData.data_pemasukan },
+                { name: "Income", data: filteredData.data_pemasukan },
+                { name: "Expense", data: filteredData.data_pengeluaran },
             ],
             yaxis: [
-                { title: { text: "Pengeluaran (IDR)" } },
-                { opposite: true, title: { text: "Pemasukan (IDR)" } },
+                {
+                    labels: {
+                        formatter: (val) => val.toLocaleString('id-ID')
+                    }
+                }
             ],
         });
     }
@@ -135,352 +176,26 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 0);
     }
 
-    // Tampilan default saat load
+    // Tampilan chart saat halaman dimuat
     window.onload = () => {
+        const chartType = document.getElementById("chartType")?.value || "cashFlow";
         const columnChart = document.getElementById("columnChart");
         const barChart = document.getElementById("barChart");
-        columnChart.style.display = "block";
-        columnChart.classList.add("show");
-        barChart.style.display = "none";
+
+        if (chartType === "cashFlow") {
+            columnChart.style.display = "block";
+            columnChart.classList.add("show");
+            barChart.style.display = "none";
+        } else {
+            barChart.style.display = "block";
+            barChart.classList.add("show");
+            columnChart.style.display = "none";
+        }
     };
 });
 
-// Handle Show Hide Nominal
-function toggleNominal() {
-    // Ambil elemen-elemen <h3> yang ada dalam .box-info
-    const h3Elements = document.querySelectorAll(".box-info h3");
-
-    // Periksa apakah data saat ini sedang disembunyikan
-    const isHidden = localStorage.getItem("nominalHidden") === "true";
-
-    // Lakukan perubahan pada setiap elemen <h3>
-    h3Elements.forEach((h3) => {
-        if (isHidden) {
-            // Tampilkan nilai asli dari data-value
-            h3.textContent = h3.getAttribute("data-value");
-        } else {
-            // Sembunyikan nilai dengan asterisk
-            h3.textContent = "****";
-        }
-    });
-
-    // Perbarui status di localStorage
-    localStorage.setItem("nominalHidden", !isHidden);
-}
-
-// Expenses Bar
+// Today's Transaction
 document.addEventListener("DOMContentLoaded", function () {
-    let barChart = null;
-
-    function fetchDataAndRenderChart(month, year) {
-        fetch(`/dashboard/jenis-pengeluaran?month=${month}&year=${year}`)
-            .then(response => response.json())
-            .then(data => {
-                // console.log("Data dari API:", data); // Debug data
-
-                if (!data || data.length === 0) {
-                    if (barChart) {
-                        barChart.destroy();
-                        barChart = null;
-                    }
-
-                    const chartElement = document.querySelector("#barJenisPengeluaran");
-                    if (chartElement) {
-                        chartElement.style.height = "100px";
-                        chartElement.style.minHeight = "unset";
-                        chartElement.style.maxHeight = "unset";
-                        chartElement.style.padding = "0";
-                        chartElement.style.display = "flex";
-                        chartElement.style.justifyContent = "center";
-                        chartElement.style.alignItems = "center";
-                        chartElement.style.background = "#f3f3f3";
-                        chartElement.innerHTML = `<span class="text-muted">No data available for this month/year.</span>`;
-                    }
-                    return
-                }
-                else {
-                    const chartElement = document.querySelector("#barJenisPengeluaran");
-                    if (chartElement) {
-                        chartElement.style.background = "#ffffff"; // background putih saat grafik tampil
-                    }
-                }
-
-
-                // Filter data yang punya pengeluaran_id tidak null
-                const filteredData = data.filter(item => item.pengeluaran_id !== null);
-
-                if (filteredData.length === 0) {
-                    console.log("Tidak ada data yang valid");
-                    return;
-                }
-
-                // PERBAIKAN: Ambil ID dan nama dari field yang benar
-                const labels = filteredData.map(item => item.pengeluaran_nama);
-                const pengeluaranIds = filteredData.map(item => item.pengeluaran_id); // PERBAIKAN: gunakan pengeluaran_id
-                const values = filteredData.map(item => parseFloat(item.total) || 0);
-
-                // debug
-                // console.log("Labels:", labels);
-                // console.log("Pengeluaran IDs:", pengeluaranIds);
-                // console.log("Values:", values);
-
-                const chartElement = document.querySelector("#barJenisPengeluaran");
-                if (!chartElement) {
-                    // console.error("Element chart tidak ditemukan!");
-                    return;
-                }
-
-                chartElement.innerHTML = "";
-                if (barChart) {
-                    barChart.destroy();
-                    barChart = null;
-                }
-
-                var chartHeight = Math.min(800, Math.max(400, filteredData.length * 60));
-                var maxXValue = Math.max(...values) * 1.2;
-
-                var options = {
-                    series: [{
-                        name: 'Total Pengeluaran',
-                        data: values
-                    }],
-                    chart: {
-                        type: 'bar',
-                        height: chartHeight,
-                        events: {
-                            dataPointSelection: function (event, chartContext, config) {
-                                // console.log("Bar diklik:", config);
-                                // console.log("Data point index:", config.dataPointIndex);
-
-                                const selectedPengeluaranId = pengeluaranIds[config.dataPointIndex];
-                                // console.log("Selected pengeluaran ID:", selectedPengeluaranId);
-
-                                if (selectedPengeluaranId) {
-                                    fetchTransactionDetails(selectedPengeluaranId, month, year);
-                                } else {
-                                    // console.error("Pengeluaran ID tidak ditemukan untuk index:", config.dataPointIndex);
-                                }
-                            }
-                        }
-                    },
-                    plotOptions: {
-                        bar: {
-                            borderRadius: 4,
-                            horizontal: true,
-                            barHeight: "70%",
-                            distributed: false
-                        }
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function (value) {
-                            return new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            }).format(value);
-                        },
-                        style: {
-                            fontSize: '12px',
-                            fontWeight: 'bold'
-                        }
-                    },
-                    xaxis: {
-                        categories: labels,
-                        max: maxXValue,
-                        labels: {
-                            style: { fontSize: '12px' },
-                            formatter: function (value) {
-                                return new Intl.NumberFormat('id-ID', {
-                                    style: 'currency',
-                                    currency: 'IDR',
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0
-                                }).format(value);
-                            }
-                        }
-                    },
-                    yaxis: {
-                        labels: {
-                            style: { fontSize: '12px' }
-                        }
-                    },
-                    colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
-                    tooltip: {
-                        y: {
-                            formatter: function (value) {
-                                return new Intl.NumberFormat('id-ID', {
-                                    style: 'currency',
-                                    currency: 'IDR',
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0
-                                }).format(value);
-                            }
-                        }
-                    }
-                };
-
-                barChart = new ApexCharts(chartElement, options);
-                barChart.render()
-                // .then(() => {
-                //     console.log("Chart berhasil di-render");
-                // })
-                // .catch(error => {
-                //     console.error("Error rendering chart:", error);
-                // });
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error);
-            });
-    }
-
-    function fetchTransactionDetails(pengeluaranId, month, year) {
-        // console.log("Fetching transaction details untuk:", { pengeluaranId, month, year });
-
-        // Validasi parameter
-        if (!pengeluaranId || pengeluaranId === 'undefined' || pengeluaranId === null) {
-            console.error("pengeluaranId tidak valid:", pengeluaranId);
-            alert("Data pengeluaran tidak valid. Silakan coba lagi.");
-            return;
-        }
-
-        if (!month || !year) {
-            console.error("Month atau year tidak valid:", { month, year });
-            alert("Parameter bulan/tahun tidak valid.");
-            return;
-        }
-
-        // Tampilkan loading di modal
-        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-        if (modalBody) {
-            modalBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center">
-                        <div class="spinner-border spinner-border-sm" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        Loading...
-                    </td>
-                </tr>`;
-        }
-
-        // Tampilkan modal terlebih dahulu
-        const modal = new bootstrap.Modal(document.getElementById('detailModalBarPengeluaran'));
-        modal.show();
-
-        fetch(`/dashboard/transaksi?pengeluaran=${pengeluaranId}&month=${month}&year=${year}`)
-            .then(response => {
-                // console.log("Response status:", response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // console.log("Response transaksi:", data);
-                displayTransactionData(data);
-            })
-            .catch(error => {
-                console.error("Error fetching transactions:", error);
-                displayError(error.message);
-            });
-    }
-
-    function displayTransactionData(data) {
-        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-
-        if (!modalBody) {
-            console.error("Modal body tidak ditemukan!");
-            return;
-        }
-
-        modalBody.innerHTML = "";
-
-        if (!data || data.length === 0) {
-            modalBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-muted">
-                        <i class="fas fa-inbox"></i><br>
-                        Tidak ada transaksi ditemukan
-                    </td>
-                </tr>`;
-        } else {
-            let htmlContent = "";
-            data.forEach((item, index) => {
-                let tanggalTransaksi = new Date(item.tgl_transaksi).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                });
-
-                let keterangan = item.keterangan || 'Tidak ada keterangan';
-                let numberedKeterangan = keterangan
-                    .split("\n")
-                    .filter(line => line.trim() !== '')
-                    .map((line, idx) => `${idx + 1}. ${line.trim()}`)
-                    .join("<br>");
-
-                htmlContent += `
-                    <tr class="transaction-row">
-                        <td class="fw-semibold">${tanggalTransaksi}</td>
-                        <td>${numberedKeterangan}</td>
-                        <td class="text-end fw-bold text-primary">
-                            ${new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                }).format(item.nominal)}
-                        </td>
-                    </tr>`;
-            });
-            modalBody.innerHTML = htmlContent;
-
-            // Update modal title dengan nama pengeluaran
-            const modalTitle = document.querySelector("#modalTitle");
-            if (modalTitle && data.length > 0) {
-                modalTitle.textContent = `Detail Transaksi - ${data[0].pengeluaran_nama}`;
-            }
-        }
-    }
-
-    function displayError(errorMessage) {
-        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-        if (modalBody) {
-            modalBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-danger">
-                        <i class="fas fa-exclamation-triangle"></i><br>
-                        <strong>Error:</strong> ${errorMessage}
-                    </td>
-                </tr>`;
-        }
-    }
-
-    // Inisialisasi
-    const filterMonth = document.getElementById("filterMonth");
-    const filterYear = document.getElementById("filterYear");
-
-    if (filterMonth && filterYear) {
-        // Load data pertama kali
-        fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-
-        // Event listeners
-        filterMonth.addEventListener("change", () => {
-            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-        });
-
-        filterYear.addEventListener("change", () => {
-            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-        });
-    } else {
-        console.error("Filter elements tidak ditemukan!");
-    }
-});
-
-// Transaksi Hari ini
-$(document).ready(function () {
     function getTodayTransactions() {
         $.ajax({
             url: "/dashboard/todayTransactions",
@@ -556,55 +271,298 @@ $(document).ready(function () {
     getTodayTransactions();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    initializeNominalDisplay();
-});
+// Expenses Bar
+document.addEventListener("DOMContentLoaded", function () {
+    let barChart = null;
+    let chartData = null;
+    let chartLabels = null;
+    let chartPengeluaranIds = null;
 
-// Cek status toggle saat halaman dimuat
-window.addEventListener('load', () => {
-    const isHidden = localStorage.getItem("nominalHidden") === "true";
-    const h3Elements = document.querySelectorAll(".box-info h3");
+    function isDarkMode() {
+        return document.documentElement.getAttribute("data-bs-theme") === "dark";
+    }
 
-    h3Elements.forEach((h3) => {
-        if (isHidden) {
-            h3.textContent = "****";
-        } else {
-            h3.textContent = h3.getAttribute("data-value");
+    function fetchDataAndRenderChart(month, year) {
+        fetch(`/dashboard/jenis-pengeluaran?month=${month}&year=${year}`)
+            .then(response => response.json())
+            .then(data => {
+                const chartElement = document.querySelector("#barJenisPengeluaran");
+
+                if (!data || data.length === 0 || !chartElement) {
+                    if (barChart) {
+                        barChart.destroy();
+                        barChart = null;
+                    }
+
+                    if (chartElement) {
+                        const dark = isDarkMode();
+                        chartElement.innerHTML = "";
+                        chartElement.style.height = "100px";
+                        chartElement.style.minHeight = "unset";
+                        chartElement.style.maxHeight = "unset";
+                        chartElement.style.padding = "0";
+                        chartElement.style.display = "flex";
+                        chartElement.style.justifyContent = "center";
+                        chartElement.style.alignItems = "center";
+                        chartElement.style.background = dark ? "#2c2f33" : "#c9c9c9";
+                        chartElement.innerHTML = `<span class="${dark ? 'text-light' : 'text-muted'}">No data available for this month/year.</span>`;
+                    }
+                    return;
+                } else {
+                    chartElement.innerHTML = "";
+                }
+
+                const filteredData = data.filter(item => item.pengeluaran_id !== null);
+                if (filteredData.length === 0) return;
+
+                chartLabels = filteredData.map(item => item.pengeluaran_nama);
+                chartPengeluaranIds = filteredData.map(item => item.pengeluaran_id);
+                chartData = filteredData.map(item => parseFloat(item.total) || 0);
+
+                if (barChart) {
+                    barChart.destroy();
+                    barChart = null;
+                }
+
+                const chartHeight = Math.min(800, Math.max(400, filteredData.length * 60));
+                const maxXValue = Math.max(...chartData) * 1.2;
+                const dark = isDarkMode();
+
+                const options = {
+                    series: [{
+                        name: 'Total Pengeluaran',
+                        data: chartData
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: chartHeight,
+                        foreColor: dark ? '#ddd' : '#333',
+                        background: 'transparent',
+                        events: {
+                            dataPointSelection: function (event, chartContext, config) {
+                                const selectedPengeluaranId = chartPengeluaranIds[config.dataPointIndex];
+                                if (selectedPengeluaranId) {
+                                    fetchTransactionDetails(selectedPengeluaranId, month, year);
+                                }
+                            }
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: true,
+                            barHeight: "70%",
+                            distributed: false
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            colors: [dark ? '#ffffff' : '#ffffff']
+                        },
+                        formatter: value => new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(value)
+                    },
+                    xaxis: {
+                        categories: chartLabels,
+                        max: maxXValue,
+                        labels: {
+                            style: { fontSize: '12px', colors: dark ? '#bbb' : '#444' },
+                            formatter: value => new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                            }).format(value)
+                        }
+                    },
+                    yaxis: {
+                        labels: {
+                            style: { fontSize: '12px', colors: dark ? '#bbb' : '#444' }
+                        }
+                    },
+                    colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
+                    tooltip: {
+                        theme: dark ? 'dark' : 'light',
+                        y: {
+                            formatter: value => new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0
+                            }).format(value)
+                        }
+                    }
+                };
+
+                barChart = new ApexCharts(chartElement, options);
+                barChart.render();
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+    }
+
+    function fetchTransactionDetails(pengeluaranId, month, year) {
+        if (!pengeluaranId || !month || !year) {
+            alert("Data tidak valid");
+            return;
         }
-    });
-});
 
-// Inisialisasi saat halaman dimuat show hide nominal
-document.addEventListener("DOMContentLoaded", () => {
-    // Ambil status terakhir dari localStorage
-    const isHidden = localStorage.getItem("nominalHidden") === "true";
-
-    // Sinkronkan tampilan sesuai status
-    const h3Elements = document.querySelectorAll(".box-info h3");
-    h3Elements.forEach((h3) => {
-        h3.textContent = isHidden ? "****" : h3.getAttribute("data-value");
-    });
-});
-
-// Hidden nominal
-function initializeNominalDisplay() {
-    const isHidden = localStorage.getItem("nominalHidden") === "true";
-    const h3Elements = document.querySelectorAll(".box-info h3");
-
-    h3Elements.forEach((h3) => {
-        if (isHidden) {
-            h3.textContent = "****";
-        } else {
-            h3.textContent = h3.getAttribute("data-value");
+        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        Loading...
+                    </td>
+                </tr>`;
         }
-    });
-}
 
-// Compass
+        const modal = new bootstrap.Modal(document.getElementById('detailModalBarPengeluaran'));
+        modal.show();
+
+        fetch(`/dashboard/transaksi?pengeluaran=${pengeluaranId}&month=${month}&year=${year}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (isDarkMode()) {
+                    modalBody.classList.add('bg-dark', 'text-light');
+                } else {
+                    modalBody.classList.remove('bg-dark', 'text-light');
+                }
+                displayTransactionData(data);
+            })
+            .catch(error => displayError(error.message));
+    }
+
+    function displayTransactionData(data) {
+        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+        const modalTitle = document.querySelector("#modalTitle");
+
+        if (!modalBody) return;
+        modalBody.innerHTML = "";
+
+        const isDark = isDarkMode();
+
+        if (!data || data.length === 0) {
+            modalBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center ${isDark ? 'text-light' : 'text-muted'}">
+                        <i class="fas fa-inbox"></i><br>
+                        Tidak ada transaksi ditemukan
+                    </td>
+                </tr>`;
+        } else {
+            let html = data.map((item, index) => {
+                const tgl = new Date(item.tgl_transaksi).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                });
+
+                const ket = (item.keterangan || 'Tidak ada keterangan')
+                    .split("\n")
+                    .filter(line => line.trim())
+                    .map((line, i) => `${i + 1}. ${line}`)
+                    .join("<br>");
+
+                return `
+                    <tr class="transaction-row">
+                        <td class="fw-semibold">${tgl}</td>
+                        <td>${ket}</td>
+                        <td class="text-end fw-bold text-primary">
+                            ${new Intl.NumberFormat('id-ID', {
+                    style: 'currency', currency: 'IDR', minimumFractionDigits: 0
+                }).format(item.nominal)}
+                        </td>
+                    </tr>`;
+            }).join("");
+
+            modalBody.innerHTML = html;
+
+            if (modalTitle && data[0]) {
+                modalTitle.textContent = `Detail Transaksi - ${data[0].pengeluaran_nama}`;
+            }
+        }
+    }
+
+    function displayError(msg) {
+        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-danger">
+                        <i class="fas fa-exclamation-triangle"></i><br>
+                        <strong>Error:</strong> ${msg}
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function updateChartTheme() {
+        if (!barChart) return;
+        const dark = isDarkMode();
+
+        barChart.updateOptions({
+            chart: {
+                foreColor: dark ? '#ddd' : '#333'
+            },
+            dataLabels: {
+                style: {
+                    colors: [dark ? '#ffffff' : '#ffffff']
+                }
+            },
+            xaxis: {
+                labels: {
+                    style: { colors: dark ? '#bbb' : '#444' }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: dark ? '#bbb' : '#444' }
+                }
+            },
+            tooltip: {
+                theme: dark ? 'dark' : 'light'
+            }
+        });
+    }
+
+    // Inisialisasi
+    const filterMonth = document.getElementById("filterMonth");
+    const filterYear = document.getElementById("filterYear");
+
+    if (filterMonth && filterYear) {
+        fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+
+        filterMonth.addEventListener("change", () => {
+            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+        });
+        filterYear.addEventListener("change", () => {
+            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+        });
+    } else {
+        console.error("Filter elements tidak ditemukan!");
+    }
+
+    // Saat ganti tema, update chart langsung tanpa fetch ulang
+    document.addEventListener("themeChanged", () => {
+        updateChartTheme();
+    });
+});
+
+// Performance Ratio
 document.addEventListener("DOMContentLoaded", function () {
     const chartElement = document.getElementById("chartKompas");
+    let chart;
 
-    // Ambil data dari atribut HTML
     const totalPinjaman = parseFloat(chartElement.dataset.totalPinjaman);
     const totalBarang = parseFloat(chartElement.dataset.totalBarang);
     const rasio = parseFloat(chartElement.dataset.rasio);
@@ -612,7 +570,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const rasio_dana_darurat = parseFloat(chartElement.dataset.rasioDanaDarurat);
     const rasio_pengeluaran_pendapatan = parseFloat(chartElement.dataset.rasioPengeluaranPendapatan);
 
-    // Fungsi untuk menentukan warna berdasarkan target
     const getColorByTarget = (value, target) => {
         if (value < 0) return "#800080";
         if (value < target) return "#00E396";
@@ -622,206 +579,283 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getColorDanaDarurat = (value, target) => {
         if (value < target) return "#FF4560";
-        if (value === target) return "#00E396";
         return "#00E396";
     };
 
     const getColorInflasiGayaHidup = (value, target) => {
         if (value > target) return "#FF4560";
-        if (value === target) return "#00E396";
-        if (value < target) return "#00E396";
         return "#00E396";
     };
 
-    // Fungsi untuk analisis rasio
     function AnalisisRasio(rasio) {
-        if (rasio < 20) {
-            return "Sangat Sehat : Kamu memiliki sedikit utang dibandingkan aset. Ini menunjukkan stabilitas keuangan yang tinggi dan ruang yang luas untuk investasi atau pengembangan aset.";
-        } else if (rasio >= 20 && rasio <= 40) {
-            return "Cukup Sehat : Masih berada dalam batas aman, tetapi sebaiknya kamu mulai mengendalikan utang baru dan fokus membangun aset.";
-        }
-        return "Waspadai : Rasio utang terhadap aset sudah mulai tinggi. Segera kurangi utang atau tingkatkan aset.";
+        if (rasio < 20) return "Sangat Sehat...";
+        if (rasio >= 20 && rasio <= 40) return "Cukup Sehat...";
+        return "Waspadai...";
     }
 
-    function AnalisisRasioDanaDarurat(rasio_dana_darurat) {
-        if (rasio_dana_darurat < 100) {
-            return "Kurang Aman : Dana darurat belum mencapai target. Segera tingkatkan tabungan untuk mencapai keamanan finansial.";
-        } else if (rasio_dana_darurat === 100) {
-            return "Ideal : Dana darurat sudah mencapai target. Tetap pertahankan dan perbarui sesuai kebutuhan.";
-        } else {
-            return "Lebih dari Cukup : Dana darurat melebihi target. Pertimbangkan untuk mengalokasikan ke investasi atau kebutuhan lainnya.";
-        }
+    function AnalisisRasioDanaDarurat(rasio) {
+        if (rasio < 100) return "Kurang Aman...";
+        if (rasio === 100) return "Ideal...";
+        return "Lebih dari Cukup...";
     }
 
-    function AnalisisRasioInflasi(rasio_inflasi) {
-        if (rasio_inflasi < 0) {
-            return "Sangat Ideal : Pengeluaran naik jauh lebih lambat dibanding kenaikan pendapatan. Artinya, kamu memiliki ruang lebih untuk menabung, berinvestasi, atau mempercepat pencapaian tujuan keuangan.";
-        } else if (rasio_inflasi >= 50 && rasio_inflasi <= 80) {
-            return "Masih Aman : Pengeluaran tetap terkendali, tetapi kenaikan sudah mulai signifikan. Sebaiknya mulai dievaluasi, apalagi jika pengeluaran ini bersifat konsumtif.";
-        } else if (rasio_inflasi > 80 && rasio_inflasi <= 100) {
-            return "Perlu Waspada : Hampir seluruh kenaikan pendapatan terpakai untuk pengeluaran. Kurangi pengeluaran yang tidak perlu agar bisa meningkatkan tabungan atau investasi.";
-        } else {
-            return "Warning : Pengeluaran naik lebih cepat dari pendapatan. Ini bisa menjadi pertanda kamu mulai terjebak dalam inflasi gaya hidup.";
-        }
+    function AnalisisRasioInflasi(rasio) {
+        if (rasio < 0) return "Sangat Ideal...";
+        if (rasio >= 50 && rasio <= 80) return "Masih Aman...";
+        if (rasio > 80 && rasio <= 100) return "Perlu Waspada...";
+        return "Warning...";
     }
 
-    function AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan) {
-        if (rasio_pengeluaran_pendapatan <= 50) {
-            return "Sangat Sehat : Pengeluaran terkendali, kamu memiliki cukup ruang untuk menabung, berinvestasi, dan mengatur dana darurat. Ideal untuk mencapai kebebasan finansial.";
-        } else if (rasio_pengeluaran_pendapatan >= 50 && rasio_pengeluaran_pendapatan <= 70) {
-            return "Cukup Sehat : Masih dalam batas aman, tapi sebaiknya mulai mengevaluasi pengeluaran yang bisa dikurangi, terutama yang bersifat konsumtif.";
-        } else {
-            return "Perlu Waspada : Pengeluaran sudah mulai melebihi pendapatan. Segera kurangi pengeluaran yang tidak perlu atau tingkatkan pendapatan.";
-        }
+    function AnalisisRasioPengeluaranPendapatan(rasio) {
+        if (rasio <= 50) return "Sangat Sehat...";
+        if (rasio >= 50 && rasio <= 70) return "Cukup Sehat...";
+        return "Perlu Waspada...";
     }
 
-    var options = {
-        chart: {
-            type: "bar",
-            height: 250,
-            events: {
-                dataPointSelection: function (event, chartContext, config) {
-                    const selectedIndex = config.dataPointIndex;
-                    let title = "";
-                    let rumus = "";
-                    let nominal = "";
-                    let target = 0;
+    function getTextColor() {
+        const theme = document.documentElement.getAttribute("data-bs-theme") || "light";
+        return theme === "dark" ? "#ffffff" : "#000000";
+    }
 
-                    if (selectedIndex === 0) {
-                        title = "Rasio Utang terhadap Aset";
-                        rumus = "Total Pinjaman / Total Aset";
-                        target = '<20.00';
-                        nominal = rasio.toFixed(2) + '%';
-                        Analisis = AnalisisRasio(rasio);
-                    } else if (selectedIndex === 1) {
-                        title = "Rasio Inflasi Gaya Hidup";
-                        rumus = "(Pengeluaran Bulan Ini - Pengeluaran Bulan Sebelumnya)/(Pemasukan Bulan Ini - Pemasukan Bulan Sebelumnya) x 100%";
-                        target = '0';
-                        nominal = rasio_inflasi.toFixed(2) + '%';
-                        Analisis = AnalisisRasioInflasi(rasio_inflasi);
-                    } else if (selectedIndex === 2) {
-                        title = "Rasio Dana Darurat";
-                        rumus = "Total Dana Darurat / (Rata-rata Total Pengeluaran Setiap Bulan * 6)";
-                        target = '100';
-                        nominal = rasio_dana_darurat.toFixed(2) + '%';
-                        Analisis = AnalisisRasioDanaDarurat(rasio_dana_darurat);
-                    } else if (selectedIndex === 3) {
-                        title = "Rasio Pengeluaran Terhadap Pendapatan";
-                        rumus = "Total Pengeluaran Bulanan / Total Pendapatan Bulanan";
-                        target = '50';
-                        nominal = rasio_pengeluaran_pendapatan.toFixed(2) + '%';
-                        Analisis = AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan);
+    function getChartOptions() {
+        const textColor = getTextColor();
+
+        return {
+            chart: {
+                type: "bar",
+                height: 250,
+                events: {
+                    dataPointSelection: function (event, chartContext, config) {
+                        const idx = config.dataPointIndex;
+                        let title = "", rumus = "", nominal = "", target = "", analisis = "";
+
+                        if (idx === 0) {
+                            title = "Rasio Utang terhadap Aset";
+                            rumus = "Total Pinjaman / Total Aset";
+                            target = '<20.00%';
+                            nominal = rasio.toFixed(2) + '%';
+                            analisis = AnalisisRasio(rasio);
+                        } else if (idx === 1) {
+                            title = "Rasio Inflasi Gaya Hidup";
+                            rumus = "(Pengeluaran Bulan Ini - Bulan Lalu)/(Pemasukan Bulan Ini - Lalu) x 100%";
+                            target = '0%';
+                            nominal = rasio_inflasi.toFixed(2) + '%';
+                            analisis = AnalisisRasioInflasi(rasio_inflasi);
+                        } else if (idx === 2) {
+                            title = "Rasio Dana Darurat";
+                            rumus = "Total Dana Darurat / (Pengeluaran Bulanan * 6)";
+                            target = '100%';
+                            nominal = rasio_dana_darurat.toFixed(2) + '%';
+                            analisis = AnalisisRasioDanaDarurat(rasio_dana_darurat);
+                        } else if (idx === 3) {
+                            title = "Rasio Pengeluaran terhadap Pendapatan";
+                            rumus = "Pengeluaran / Pendapatan";
+                            target = '50%';
+                            nominal = rasio_pengeluaran_pendapatan.toFixed(2) + '%';
+                            analisis = AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan);
+                        }
+
+                        showModal(title, rumus, nominal, target, analisis);
                     }
-
-                    showModal(title, rumus, nominal, `${target}%`);
                 }
-            }
-        },
-        states: {
-            hover: {
-                filter: {
-                    type: "darken",
-                    value: 0.15
-                }
-            }
-        },
-        series: [
-            {
+            },
+            series: [{
                 name: "Rasio",
                 data: [
                     {
                         x: ["Rasio Utang", "terhadap Aset"],
                         y: rasio > 0 ? rasio : 0.5,
                         fillColor: getColorByTarget(rasio, 20),
-                        goals: [
-                            {
-                                name: "Target Rasio Utang terhadap Aset",
-                                value: 20,
-                                strokeWidth: 4,
-                                strokeColor: "#9B59B6"
-                            }
-                        ]
+                        goals: [{ name: "Target", value: 20, strokeWidth: 4, strokeColor: "#9B59B6" }]
                     },
                     {
                         x: "Rasio Inflasi Gaya Hidup",
                         y: rasio_inflasi > 0 ? rasio_inflasi : 0.5,
                         fillColor: getColorInflasiGayaHidup(rasio_inflasi, 0),
-                        goals: [
-                            {
-                                name: "Target Rasio Inflasi Gaya Hidup",
-                                value: 0,
-                                strokeWidth: 4,
-                                strokeColor: "#9B59B6"
-                            }
-                        ]
+                        goals: [{ name: "Target", value: 0, strokeWidth: 4, strokeColor: "#9B59B6" }]
                     },
                     {
                         x: ["Rasio Dana", "Darurat"],
                         y: rasio_dana_darurat > 0 ? rasio_dana_darurat : 0.5,
-                        fillColor: getColorDanaDarurat(rasio_dana_darurat, 3),
-                        goals: [
-                            {
-                                name: "Target Rasio Dana Darurat",
-                                value: 100,
-                                strokeWidth: 4,
-                                strokeColor: "#9B59B6"
-                            }
-                        ]
+                        fillColor: getColorDanaDarurat(rasio_dana_darurat, 100),
+                        goals: [{ name: "Target", value: 100, strokeWidth: 4, strokeColor: "#9B59B6" }]
                     },
                     {
                         x: ["Rasio Pengeluaran", "Terhadap Pendapatan"],
                         y: rasio_pengeluaran_pendapatan > 0 ? rasio_pengeluaran_pendapatan : 0.5,
-                        fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 70),
-                        goals: [
-                            {
-                                name: "Target Rasio Dana Darurat",
-                                value: 49,
-                                strokeWidth: 4,
-                                strokeColor: "#9B59B6"
-                            }
-                        ]
+                        fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 50),
+                        goals: [{ name: "Target", value: 49, strokeWidth: 4, strokeColor: "#9B59B6" }]
                     }
                 ]
+            }],
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    borderRadius: 8
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: val => `${val.toFixed(2)}%`,
+                style: {
+                    colors: [textColor]
+                }
+            },
+            tooltip: { enabled: false },
+            xaxis: {
+                title: {
+                    text: "%",
+                    style: { colors: textColor }
+                },
+                labels: {
+                    style: { colors: textColor }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: textColor }
+                }
             }
-        ],
-        plotOptions: {
-            bar: {
-                horizontal: true,
-                borderRadius: 8
-            }
-        },
-        colors: ["#FF4560", "#008FFB", "#00E396"],
-        dataLabels: {
-            enabled: true,
-            formatter: function (val) {
-                return `${val.toFixed(2)}%`;
-            }
-        },
-        tooltip: {
-            enabled: false
-        },
-        xaxis: {
-            title: {
-                text: "Nilai"
-            }
-        },
-    };
+        };
+    }
 
-    var chart = new ApexCharts(chartElement, options);
-    chart.render();
+    function updateChartTheme() {
+        const textColor = getTextColor();
+        if (chart) {
+            chart.updateOptions({
+                dataLabels: {
+                    style: {
+                        colors: [textColor]
+                    }
+                },
+                xaxis: {
+                    title: {
+                        style: { colors: textColor }
+                    },
+                    labels: {
+                        style: { colors: textColor }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: textColor }
+                    }
+                }
+            });
+        }
+    }
 
-    // Fungsi untuk menampilkan modal detail
-    function showModal(title, rumus, nominal, target, capaian) {
+    function isDarkMode() {
+        return document.documentElement.getAttribute("data-bs-theme") === "dark";
+    }
+
+    function updateModalTheme() {
+        const dark = isDarkMode();
+        const modalContent = document.querySelector("#detailModal .modal-content");
+        if (!modalContent) return;
+
+        modalContent.classList.toggle("bg-dark", dark);
+        modalContent.classList.toggle("text-white", dark);
+        modalContent.classList.toggle("bg-white", !dark);
+        modalContent.classList.toggle("text-dark", !dark);
+    }
+
+    function showModal(title, rumus, nominal, target, analisis) {
         const modal = document.getElementById("detailModal");
         document.getElementById("modalTitle").innerText = title;
         document.getElementById("modalRumus").innerText = rumus;
         document.getElementById("modalNominal").innerText = nominal;
         document.getElementById("modalTarget").innerText = target;
-        document.getElementById("modalAnalisis").innerText = Analisis;
+        document.getElementById("modalAnalisis").innerText = analisis;
 
+        updateModalTheme(); // Terapkan tema modal
 
-        // Tampilkan modal (asumsi menggunakan Bootstrap)
         const bootstrapModal = new bootstrap.Modal(modal);
         bootstrapModal.show();
     }
+
+
+    // Buat chart awal
+    chart = new ApexCharts(chartElement, getChartOptions());
+    chart.render();
+
+    // Saat tema berubah, update chart
+    document.addEventListener("themeChanged", function () {
+        updateChartTheme();
+    });
+
+    // Expose jika perlu manual trigger
+    window.updateChartTheme = updateChartTheme;
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    // ==== THEME HANDLER ====
+    const skin = window.userSkin || 'auto';
+    const updateSkinUrl = window.updateSkinUrl;
+    const csrfToken = window.csrfToken;
+
+    function applyTheme(mode) {
+        if (mode === 'light' || mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', mode);
+        } else {
+            document.documentElement.removeAttribute('data-bs-theme'); // auto
+        }
+        document.dispatchEvent(new Event("themeChanged"));
+    }
+
+    function highlightActiveSkin(mode) {
+        document.querySelectorAll('.dropdown-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
+                el.classList.add('active');
+            }
+        });
+    }
+
+    function setTheme(mode) {
+        applyTheme(mode);
+        highlightActiveSkin(mode);
+
+        fetch(updateSkinUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ skin: mode })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) alert("Gagal menyimpan tema.");
+            })
+            .catch(err => console.error("Gagal update tema:", err));
+    }
+
+    // Eksekusi awal tema
+    applyTheme(skin);
+    highlightActiveSkin(skin);
+    window.setTheme = setTheme;
+
+    // ==== NOMINAL DISPLAY HANDLER ====
+    function updateNominalDisplay(isHidden) {
+        document.querySelectorAll(".box-info h3").forEach(h3 => {
+            h3.textContent = isHidden ? "****" : h3.getAttribute("data-value");
+        });
+    }
+
+    function initializeNominalDisplay() {
+        const isHidden = localStorage.getItem("nominalHidden") === "true";
+        updateNominalDisplay(isHidden);
+    }
+
+    function toggleNominal() {
+        const isHidden = localStorage.getItem("nominalHidden") === "true";
+        const newState = !isHidden;
+        localStorage.setItem("nominalHidden", newState);
+        updateNominalDisplay(newState);
+    }
+
+    // Eksekusi awal nominal
+    initializeNominalDisplay();
+    window.toggleNominal = toggleNominal;
 });

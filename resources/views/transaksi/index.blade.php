@@ -11,12 +11,12 @@
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+<nav id="navbar-example2" class="navbar px-3">
     <a class="navbar-brand" href="/transaksi">Cash Flow</a>
     <ul class="nav nav-pills">
         <li class="nav-item dropdown">
             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span class="badge-primary dropdown-toggle rounded-pill">Action</span>
+                <span class="badge-primary dropdown-toggle">Action</span>
             </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Add Data</a></li>
@@ -31,7 +31,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/compare">
-                <span class="badge-secondary rounded-pill">Compare Cash Flow</span>
+                <span class="badge-secondary">Compare Cash Flow</span>
             </a>
         </li>
     </ul>
@@ -47,7 +47,8 @@
             <div class="form-row align-items-center d-flex">
                 <div class="col mx-3">
                     <p class="filter">Transaction Date</p>
-                    <div id="daterange" class="daterange"> <i class="fa fa-calendar"></i>&nbsp;
+                    <div id="daterange" class="daterange">
+                        <i class="fa fa-calendar"></i>&nbsp;
                         <span></span>
                         <i class="fa fa-caret-down"></i>
                     </div>
@@ -85,8 +86,8 @@
                         <th class="text-center">Expense</th>
                         <th class="text-center">Nominal Expense</th>
                         <th style="width: 200px;" class="text-center">Description</th>
-                        <th style="width: 60px;" class="text-center">Created Date</th>
-                        <th style="width: 60px;" class="text-center">Updated Date</th>
+                        <th style="width: 60px;" class="text-center">Created</th>
+                        <th style="width: 60px;" class="text-center">Updated</th>
                         <th style="width: 1px;"></th>
                     </tr>
                 </thead>

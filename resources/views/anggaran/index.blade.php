@@ -11,7 +11,7 @@
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+<nav class="navbar px-3">
     <a class="navbar-brand" href="/anggaran">Budget List</a>
     <ul class="nav nav-pills">
         <li class="nav-item">

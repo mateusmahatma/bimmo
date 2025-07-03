@@ -1,4 +1,51 @@
 $(document).ready(function () {
+    // Theme Handler
+    const skin = window.userSkin || 'auto';
+    const updateSkinUrl = window.updateSkinUrl;
+    const csrfToken = window.csrfToken;
+
+    function applyTheme(mode) {
+        if (mode === 'light' || mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', mode);
+        } else {
+            document.documentElement.removeAttribute('data-bs-theme'); // auto
+        }
+        document.dispatchEvent(new Event("themeChanged"));
+    }
+
+    function highlightActiveSkin(mode) {
+        document.querySelectorAll('.dropdown-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
+                el.classList.add('active');
+            }
+        });
+    }
+
+    function setTheme(mode) {
+        applyTheme(mode);
+        highlightActiveSkin(mode);
+
+        fetch(updateSkinUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ skin: mode })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) alert("Gagal menyimpan tema.");
+            })
+            .catch(err => console.error("Gagal update tema:", err));
+    }
+
+    // Eksekusi awal tema
+    applyTheme(skin);
+    highlightActiveSkin(skin);
+    window.setTheme = setTheme;
+
     $.ajaxSetup({
         headers: {
             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -37,7 +84,7 @@ $(document).ready(function () {
                     moment().subtract(1, "year").endOf("year"),
                 ],
             },
-            applyClass: "dark-mode",
+            containerClass: document.documentElement.getAttribute("data-bs-theme") === "dark" ? "dark-mode" : ""
         },
         function (chosen_start_date, chosen_end_date) {
             if (
@@ -60,7 +107,7 @@ $(document).ready(function () {
         paging: true,
         responsive: true,
         lengthChange: true,
-        autoWidth: true,
+        autoWidth: false,
         serverSide: true,
         processing: true,
         language: {
@@ -82,12 +129,11 @@ $(document).ready(function () {
             },
             dataSrc: function (json) {
                 $("#totalPemasukan").text(
-                    json.totalPemasukan.toLocaleString("id-ID")
+                    json.totalPemasukan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                 );
                 $("#totalPengeluaran").text(
-                    json.totalPengeluaran.toLocaleString("id-ID")
+                    json.totalPengeluaran.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                 );
-
                 return json.data;
             },
         },
@@ -130,12 +176,12 @@ $(document).ready(function () {
                         var formattedNominal =
                             numericValue.toLocaleString("id-ID");
                         return (
-                            '<span style="color: green;">' +
+                            '<span>' +
                             formattedNominal +
                             "</span>"
                         );
                     } else {
-                        return '<span style="color: green;">0</span>';
+                        return '<span>0</span>';
                     }
                 },
             },
@@ -158,12 +204,12 @@ $(document).ready(function () {
                         var formattedNominal =
                             numericValue.toLocaleString("id-ID");
                         return (
-                            '<span style="color: red;">' +
+                            '<span>' +
                             formattedNominal +
                             "</span>"
                         );
                     } else {
-                        return '<span style="color: red;">0</span>';
+                        return '<span>0</span>';
                     }
                 },
             },
@@ -199,8 +245,8 @@ $(document).ready(function () {
                     return data ? data : "-";
                 },
             },
-            { data: 'created_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
-            { data: 'updated_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            { data: 'created_at', className: 'text-center' },
+            { data: 'updated_at', className: 'text-center' },
 
             {
                 data: "aksi",
@@ -209,6 +255,11 @@ $(document).ready(function () {
                 className: "text-center",
             },
         ],
+        createdRow: function (row, data, dataIndex) {
+            if (data.status == 0) {
+                $(row).addClass('table-danger');
+            }
+        }
     });
     $('select[name="filter_pemasukan"]').on("change", function () {
         transaksiTable.ajax.reload();
@@ -758,7 +809,7 @@ $(document).ready(function () {
                     .prop("disabled", true);
 
                 $.ajax({
-                    url: "/upload",
+                    url: "/transaksi/upload",
                     method: "POST",
                     data: formData,
                     processData: false,
@@ -810,6 +861,42 @@ $(document).ready(function () {
                             .html('<i class="fa fa-upload"></i> Upload');
                     },
                 });
+            }
+        });
+    });
+});
+
+// Handle toggle status
+$(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $('#transaksiTable').on('click', '.tombol-toggle-status', function () {
+        let button = $(this);
+        let id = button.data('id');
+        let row = button.closest('tr');
+
+        $.ajax({
+            url: '/transaksi/' + id + '/toggle-status',
+            method: 'POST',
+            success: function (response) {
+                let newStatus = response.new_status;
+
+                // Update tampilan tombol
+                button.text(newStatus == 1 ? 'Non Aktif' : 'Aktifkan');
+
+                // Update warna baris
+                if (newStatus == 0) {
+                    row.addClass('table-danger');
+                } else {
+                    row.removeClass('table-danger');
+                }
+            },
+            error: function () {
+                alert('Gagal mengubah status.');
             }
         });
     });
@@ -888,4 +975,3 @@ document.getElementById("importForm").addEventListener("submit", function (e) {
         }
     });
 });
-

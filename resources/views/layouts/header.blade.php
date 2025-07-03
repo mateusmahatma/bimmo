@@ -1,5 +1,5 @@
 <header id="header" class="header fixed-top d-flex align-items-center shadow">
-    <img src="/img/bimmo_icon.png" class="icon-bimmo" />
+    <img src="/img/bimmo_icon.png" style="height: 22px; width: 22px;" />
     <ul class="nav justify-content-center">
         <li class="nav-item">
             <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dashboard</a>
@@ -99,9 +99,34 @@
             <div class="search-bar center-search-bar">
             </div>
 
+            <!-- Dropdown Tema -->
+            <li class="nav-item dropdown">
+                <a
+                    class="nav-link"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="bottom"
+                    title="Ganti Tema">
+                    <i class="bi bi-lightbulb-fill" style="color: orange; font-size: 1.5em;"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2"></i> Light</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon me-2"></i> Dark</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="bi bi-circle-half me-2"></i> Auto</a></li>
+                </ul>
+            </li>
+
+            <!-- Garis pemisah -->
+            <li class="nav-item d-flex align-items-center">
+                <div class="vr mx-2" style="height: 24px;"></div>
+            </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" href="/logout">
-                    <i class="bi bi-power" style="color: red; font-size: 1.5em; transform: scale(1.0);"></i>
+                    <img src="/icon/logout.png" alt="Logout" style="height: 22px; width: 22px;">
                 </a>
             </li>
         </ul>

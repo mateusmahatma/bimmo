@@ -1,71 +1,75 @@
-// Fungsi untuk menampilkan toast notification
-function showToast(message, type) {
-    let toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        document.body.appendChild(toastContainer);
+$(document).ready(function () {
+    // ======================= //
+    // ==== THEME HANDLER ==== //
+    // ======================= //
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const skin = window.userSkin || 'auto';
+    const updateSkinUrl = window.updateSkinUrl;
+
+    function applyTheme(mode) {
+        if (mode === 'light' || mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', mode);
+        } else {
+            document.documentElement.removeAttribute('data-bs-theme'); // auto
+        }
+        document.dispatchEvent(new Event("themeChanged"));
     }
 
-    const toastId = 'toast-' + Date.now();
-    const colors = {
-        success: '#012970',  // Biru
-        danger: '#dc3545',   // Merah
-        warning: '#ffc107',  // Kuning
-        info: '#17a2b8',     // Biru muda
-        primary: '#007bff',  // Biru
-    };
+    function highlightActiveSkin(mode) {
+        document.querySelectorAll('.dropdown-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
+                el.classList.add('active');
+            }
+        });
+    }
 
-    const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+    function setTheme(mode) {
+        applyTheme(mode);
+        highlightActiveSkin(mode);
 
-    const toastHtml = `
-        <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-    `;
+        fetch(updateSkinUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ skin: mode })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) alert("Gagal menyimpan tema.");
+            })
+            .catch(err => console.error("Gagal update tema:", err));
+    }
 
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    applyTheme(skin);
+    highlightActiveSkin(skin);
+    window.setTheme = setTheme;
 
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
-    toast.show();
+    // ========================= //
+    // ==== KALKULATOR INIT ==== //
+    // ========================= //
+    const formKalkulator = $('#formKalkulator');
+    const btnProses = $('#btnProses');
+    const btnSpinner = $('#btnProsesSpinner');
+    const daterangeSpan = $('#daterange span');
+    const tanggalMulaiInput = $('#tanggal_mulai');
+    const tanggalSelesaiInput = $('#tanggal_selesai');
+    let hasilAnggaranTable = null;
 
-    toastElement.addEventListener('hidden.bs.toast', function () {
-        toastElement.remove();
-    });
-}
+    function initDateRangePicker() {
+        const today = moment();
+        const start = today.clone().startOf('day');
+        const end = today.clone().endOf('day');
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Setup CSRF token header for fetch if needed
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    // Elements
-    const formKalkulator = document.getElementById('formKalkulator');
-    const btnProses = document.getElementById('btnProses');
-    const btnSpinner = document.getElementById('btnProsesSpinner');
-    const btnText = document.getElementById('btnProsesText');
-
-    // Date Range picker initialization (assuming daterangepicker & moment loaded)
-    const today = moment();
-    const start_date = today.clone().startOf('day');
-    const end_date = today.clone().endOf('day');
-
-    // Set initial date range text & hidden inputs
-    const daterangeSpan = document.querySelector('#daterange span');
-    const tanggalMulaiInput = document.getElementById('tanggal_mulai');
-    const tanggalSelesaiInput = document.getElementById('tanggal_selesai');
-
-    if (daterangeSpan && tanggalMulaiInput && tanggalSelesaiInput) {
-        daterangeSpan.textContent = start_date.format('YYYY-MM-DD') + ' - ' + end_date.format('YYYY-MM-DD');
-        tanggalMulaiInput.value = start_date.format('YYYY-MM-DD');
-        tanggalSelesaiInput.value = end_date.format('YYYY-MM-DD');
+        daterangeSpan.text(`${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}`);
+        tanggalMulaiInput.val(start.format('YYYY-MM-DD'));
+        tanggalSelesaiInput.val(end.format('YYYY-MM-DD'));
 
         $('#daterange').daterangepicker({
-            startDate: start_date,
-            endDate: end_date,
+            startDate: start,
+            endDate: end,
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -74,19 +78,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 'This Year': [moment().startOf('year'), moment().endOf('year')],
                 'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
             },
-            locale: {
-                format: 'YYYY-MM-DD'
-            }
+            locale: { format: 'YYYY-MM-DD' }
         }, function (start, end) {
-            daterangeSpan.textContent = start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD');
-            tanggalMulaiInput.value = start.format('YYYY-MM-DD');
-            tanggalSelesaiInput.value = end.format('YYYY-MM-DD');
+            daterangeSpan.text(`${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')}`);
+            tanggalMulaiInput.val(start.format('YYYY-MM-DD'));
+            tanggalSelesaiInput.val(end.format('YYYY-MM-DD'));
         });
     }
 
-    // Inisialisasi DataTable (jika pakai DataTable)
-    let hasilAnggaranTable = null;
-    if ($('#hasilAnggaranTable').length) {
+    function showToast(message, type) {
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastId = 'toast-' + Date.now();
+        const colors = {
+            success: '#012970',
+            danger: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8',
+            primary: '#007bff',
+        };
+        const bgColor = colors[type] || '#6c757d';
+
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>`;
+
+        $(toastContainer).append(toastHtml);
+        const toastElement = document.getElementById(toastId);
+        new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 }).show();
+        toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+    }
+
+    function initDataTable() {
         hasilAnggaranTable = $('#hasilAnggaranTable').DataTable({
             paging: true,
             responsive: true,
@@ -97,118 +129,66 @@ document.addEventListener('DOMContentLoaded', function () {
             language: {
                 processing: '<div class="loader-container"><div class="loader"></div></div>',
             },
-            ajax: {
-                url: '/kalkulator',
-                type: 'GET',
-            },
+            ajax: { url: '/kalkulator', type: 'GET' },
             columns: [
-                { data: "DT_RowIndex", name: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
-                { data: "tanggal_mulai", name: "tanggal_mulai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
-                { data: "tanggal_selesai", name: "tanggal_selesai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
-                { data: "nama_anggaran", name: "nama_anggaran", className: "text-center", render: d => d || "-" },
+                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
+                { data: "tanggal_mulai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
+                { data: "tanggal_selesai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
+                { data: "nama_anggaran", className: "text-center", render: d => d || "-" },
                 {
-                    data: 'nama_jenis_pengeluaran', className: 'text-left',
-                    defaultContent: '-',
+                    data: 'nama_jenis_pengeluaran', className: 'text-left', defaultContent: '-',
                     render: function (data, type, row) {
-                        if (type !== "display" || !data || typeof data !== "string") {
-                            return data ? data : "-";
-                        }
+                        if (type !== "display" || !data || typeof data !== "string") return data || "-";
+                        const lines = data.split(",");
+                        const showLimit = 3;
+                        const visible = lines.slice(0, showLimit);
+                        const hidden = lines.slice(showLimit);
+                        const tableId = `detail-table-${row.id || Math.random().toString(36).substring(7)}`;
 
-                        var lines = data.split(",");
-                        var showLimit = 3;
-                        var hasMore = lines.length > showLimit;
-                        var visibleLines = lines.slice(0, showLimit);
-                        var hiddenLines = lines.slice(showLimit);
-
-                        var tableId = `detail-table-${row.id || Math.random().toString(36).substring(7)}`;
-
-                        var table = `
-            <table style="width: 100%; border-collapse: collapse;" id="${tableId}">
-                <colgroup>
-                    <col style="width: 30px;">
-                    <col>
-                </colgroup>
-                ${visibleLines.map((line, index) => `
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${index + 1}</td>
-                        <td style="border: 1px solid #ddd; padding: 4px;">${line.trim()}</td>
-                    </tr>
-                `).join('')}
-        `;
-
-                        if (hasMore) {
-                            table += hiddenLines.map((line, index) => `
-                <tr class="hidden-row" style="display: none;">
-                    <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${showLimit + index + 1}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px;">${line.trim()}</td>
-                </tr>
-            `).join('');
-                        }
-
+                        let table = `<table style="width:100%;border-collapse:collapse;" id="${tableId}"><colgroup><col style="width:30px;"><col></colgroup>`;
+                        visible.forEach((line, i) => {
+                            table += `<tr><td style="border:1px solid #ddd;padding:4px;text-align:center;">${i + 1}</td><td style="border:1px solid #ddd;padding:4px;">${line.trim()}</td></tr>`;
+                        });
+                        hidden.forEach((line, i) => {
+                            table += `<tr class="hidden-row" style="display:none;"><td style="border:1px solid #ddd;padding:4px;text-align:center;">${showLimit + i + 1}</td><td style="border:1px solid #ddd;padding:4px;">${line.trim()}</td></tr>`;
+                        });
                         table += `</table>`;
-
-                        if (hasMore) {
-                            table += `
-                <button type="button" class="btn btn-link toggle-btn" data-target="${tableId}">
-                    More Details
-                </button>
-            `;
+                        if (hidden.length) {
+                            table += `<button type="button" class="btn btn-link toggle-btn" data-target="${tableId}">More Details</button>`;
                         }
                         return table;
                     }
                 },
-                { data: "persentase_anggaran", name: "persentase_anggaran", className: "text-center", render: d => d ? d + "%" : "0%" },
-                { data: "nominal_anggaran", name: "nominal_anggaran", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
-                { data: "anggaran_yang_digunakan", name: "anggaran_yang_digunakan", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
-                { data: "sisa_anggaran", name: "sisa_anggaran", className: "text-center" },
+                { data: "persentase_anggaran", className: "text-center", render: d => d ? `${d}%` : "0%" },
+                { data: "nominal_anggaran", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
+                { data: "anggaran_yang_digunakan", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
+                { data: "sisa_anggaran", className: "text-center" },
                 { data: "aksi", orderable: false, searchable: false, className: "text-center" },
             ],
         });
     }
 
-    $(document).on('click', '.toggle-btn', function () {
-        const tableId = $(this).data('target');
-        const $table = $('#' + tableId);
-        const $hiddenRows = $table.find('.hidden-row');
-
-        if ($hiddenRows.is(':visible')) {
-            $hiddenRows.hide();
-            $(this).text('More Details');
-        } else {
-            $hiddenRows.show();
-            $(this).text('Show Less');
-        }
-    });
-
-    // Validasi form sederhana
     function validateForm() {
-        const dateRangeText = daterangeSpan ? daterangeSpan.textContent : '';
-        if (!dateRangeText.includes(' - ')) {
+        if (!daterangeSpan.text().includes(' - ')) {
             showToast('Silakan pilih rentang tanggal terlebih dahulu!', 'danger');
             return false;
         }
         return true;
     }
 
-    // Handler tombol Proses
-    btnProses.addEventListener('click', function (e) {
-        e.preventDefault();
-
+    function submitForm() {
         if (!validateForm()) return;
 
-        // Ambil tanggal dari date range picker
-        const [start, end] = daterangeSpan.textContent.split(' - ');
-        tanggalMulaiInput.value = start.trim();
-        tanggalSelesaiInput.value = end.trim();
+        const [start, end] = daterangeSpan.text().split(' - ');
+        tanggalMulaiInput.val(start.trim());
+        tanggalSelesaiInput.val(end.trim());
 
-        // Disable button & show spinner
-        btnSpinner.classList.remove('d-none');
-        btnProses.disabled = true;
+        btnSpinner.removeClass('d-none');
+        btnProses.prop('disabled', true);
 
-        // Kirim data form via fetch POST
-        const formData = new FormData(formKalkulator);
+        const formData = new FormData(formKalkulator[0]);
 
-        fetch(formKalkulator.action, {
+        fetch(formKalkulator.attr('action'), {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -216,68 +196,63 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: formData
         })
-            .then(response => {
-                if (formData.monthly_income === '') {
-                    showToast('The monthly income must be filled in!', 'danger');
-                    return;
-                }
-                // if (!response.ok) throw new Error('Terjadi kesalahan saat memproses anggaran');
-                return response.json();
-            })
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     showToast(data.message || 'Anggaran berhasil diproses!', 'success');
-                    // Reload datatable kalau ada
-                    if (hasilAnggaranTable) {
-                        hasilAnggaranTable.ajax.reload(null, false);
-                    }
-                    formKalkulator.reset();
+                    hasilAnggaranTable?.ajax.reload(null, false);
+                    formKalkulator[0].reset();
                 } else {
                     showToast(data.message || 'Gagal memproses anggaran', 'danger');
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Terjadi kesalahan: ' + error.message, 'danger');
+            .catch(err => {
+                console.error(err);
+                showToast('Terjadi kesalahan: ' + err.message, 'danger');
             })
             .finally(() => {
-                btnSpinner.classList.add('d-none');
-                // btnText.innerHTML = '<i class="fa fa-sync-alt"></i> Proccess';
-                btnProses.disabled = false;
+                btnSpinner.addClass('d-none');
+                btnProses.prop('disabled', false);
             });
+    }
+
+    btnProses.on('click', function (e) {
+        e.preventDefault();
+        submitForm();
     });
 
-    // Global Setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+    $('body').on('click', '.toggle-btn', function () {
+        const $table = $('#' + $(this).data('target'));
+        const $hiddenRows = $table.find('.hidden-row');
+        const isVisible = $hiddenRows.is(':visible');
+        $hiddenRows.toggle(!isVisible);
+        $(this).text(isVisible ? 'More Details' : 'Show Less');
     });
 
-    // Handle Proses Update
     $('body').on('click', '.tombol-update-proses-anggaran', function (e) {
         e.preventDefault();
-
-        // Logic for handling update process goes here
         const id = $(this).data('id');
         $.ajax({
-            url: '/kalkulator/' + id,
-            type: 'PUT',
+            url: `/kalkulator/${id}`,
+            type: 'POST',
+            data: {
+                _token: csrfToken,
+                _method: 'PUT'
+            },
             success: function () {
                 showToast('Data Berhasil diperbarui', 'success');
-                $('#hasilAnggaranTable').DataTable().ajax.reload();
+                hasilAnggaranTable?.ajax.reload();
             },
             error: function () {
                 showToast('Gagal memperbarui data', 'danger');
-                $('#hasilAnggaranTable').DataTable().ajax.reload();
+                hasilAnggaranTable?.ajax.reload();
             }
         });
     });
 
-    // Handle Proses Delete
     $('body').on('click', '.tombol-del-proses-anggaran', function (e) {
         e.preventDefault();
-
+        const id = $(this).data('id');
         Swal.fire({
             title: 'Yakin mau hapus data ini?',
             html: 'Data yang dihapus tidak dapat dikembalikan!',
@@ -287,32 +262,30 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal',
-            customClass: {
-                popup: 'dark-mode'
-            }
+            customClass: { popup: 'dark-mode' }
         }).then((result) => {
             if (result.isConfirmed) {
-                var id = $(this).data('id');
                 $.ajax({
-                    url: '/kalkulator/' + id,
+                    url: `/kalkulator/${id}`,
                     type: 'DELETE',
-                    success: function () {
+                    success: () => {
                         showToast('Data Berhasil dihapus', 'success');
-                        $('#hasilAnggaranTable').DataTable().ajax.reload();
+                        hasilAnggaranTable?.ajax.reload();
                     },
-                    error: function () {
+                    error: () => {
                         showToast('Data Gagal dihapus', 'danger');
-                        $('#hasilAnggaranTable').DataTable().ajax.reload();
+                        hasilAnggaranTable?.ajax.reload();
                     }
                 });
             }
         });
     });
-});
 
-// Batasi input hanya digit 0-9 secara realtime
-document.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('input', function () {
+    $('input[type="number"]').on('input', function () {
         this.value = this.value.replace(/[^0-9]/g, '');
     });
+
+    // Inisialisasi
+    initDateRangePicker();
+    initDataTable();
 });

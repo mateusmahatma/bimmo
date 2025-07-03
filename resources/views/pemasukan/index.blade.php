@@ -11,12 +11,12 @@
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+<nav id="navbar-example2" class="navbar px-3">
     <a class="navbar-brand" href="/pemasukan">Jenis Pemasukan</a>
     <ul class="nav nav-pills">
         <li class="nav-item">
             <a class="nav-link tombol-tambah-pemasukan" href="#" data-bs-toggle="modal" data-bs-target="#pemasukanModal">
-                <span class="badge-primary rounded-pill">Tambah Data</span>
+                <span class="badge-primary">Tambah Data</span>
             </a>
         </li>
     </ul>

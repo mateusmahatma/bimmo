@@ -20,6 +20,7 @@ use App\Http\Controllers\LupaPasswordController;
 use App\Http\Controllers\UbahPasswordController;
 use App\Http\Controllers\DanaDaruratController;
 use App\Http\Controllers\HasilProsesAnggaranController;
+use App\Http\Controllers\UserController;
 
 // Log in
 Route::get('/', function () {
@@ -68,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/import', [TransaksiController::class, 'import'])->name('import-transaksi');
         Route::get('/download-template', [TransaksiController::class, 'downloadTemplate'])->name('download-template');
         Route::post('/upload', [TransaksiController::class, 'upload'])->name('upload');
+        Route::post('/{id}/toggle-status', [TransaksiController::class, 'toggleStatus'])->name('transaksi.toggleStatus');
     });
 
     Route::resource('transaksi', TransaksiController::class);
@@ -118,3 +120,6 @@ Route::middleware('auth')->prefix('dana-darurat')->group(function () {
 
 // Hasil Proses Anggaran
 Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)->middleware('auth');
+
+// Update skin
+Route::middleware(['auth'])->post('/user/skin', [UserController::class, 'updateSkin'])->name('user.update.skin');

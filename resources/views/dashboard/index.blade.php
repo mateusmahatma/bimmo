@@ -14,11 +14,7 @@
 <section class="section dashboard" id="dashboard-container">
     <div class="row">
         <div class="card-nominal">
-            <h3>Financial Overview</h3>
-            <!-- <div class="lock-icon">
-                <i class="bx bx-lock" onclick="toggleNominal()"></i>
-            </div> -->
-            <!-- ikon strip 3 di pojok kanan atas -->
+            <h3>Financial Overview <img src="/icon/eye.png" style="height: 22px; width: 22px" onclick=" toggleNominal()"></img></h3>
             <ul class="box-info">
                 <li>
                     <i class='bx bxs-chevrons-down'></i>
@@ -51,7 +47,7 @@
             </ul>
         </div>
 
-        <!-- Arus Kas -->
+        <!-- Cash Flow -->
         <div class="card-penyiar mb-4">
             <h3>Cash Flow</h3>
             <div class="filters-container">
@@ -76,13 +72,13 @@
             </div>
 
             <!-- Chart Container -->
-            <div class="chart-container">
-                <div id="columnChart"></div>
-                <div id="barChart"></div>
+            <div>
+                <div id="columnChart" class="chart-container"></div>
+                <div id="barChart" class="chart-container"></div>
             </div>
         </div>
 
-        <!-- Transaksi Hari ini -->
+        <!-- Today's Transaction -->
         <div class="card-today">
             <h3>Today's Transaction</h3>
             <div class="card-header">

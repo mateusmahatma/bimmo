@@ -14,13 +14,13 @@ class PengeluaranExport implements FromCollection, WithHeadings, WithTitle
     public function collection()
     {
         return Pengeluaran::where('id_user', Auth::id())
-            ->get(['kode_pengeluaran', 'nama']);
+            ->get(['id', 'nama']);
     }
 
     public function headings(): array
     {
         return [
-            'kode_pengeluaran',
+            'id',
             'nama'
         ];
     }

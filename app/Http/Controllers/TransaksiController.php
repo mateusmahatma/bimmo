@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Imports\TransaksiImport;
 use App\Exports\TransaksiTemplateExport;
 use App\Models\HasilProsesAnggaran;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class TransaksiController extends Controller
 {
@@ -43,11 +46,23 @@ class TransaksiController extends Controller
                 $data = $data->where('pengeluaran', $request->pengeluaran);
             }
 
-            $totalPemasukan = $data->sum('nominal_pemasukan');
-            $totalPengeluaran = $data->sum('nominal');
+            $totalPemasukan = (clone $data)->where('status', 1)->sum('nominal_pemasukan');
+            $totalPengeluaran = (clone $data)->where('status', 1)->sum('nominal');
+
+            $data = $data->get();
+
+            foreach ($data as $item) {
+                $item->file_exists = !is_null($item->file) && Storage::disk('public')->exists('uploads/' . $item->file);
+            }
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->format('Y-m-d H:i:s');
+                })
+                ->editColumn('updated_at', function ($row) {
+                    return $row->updated_at->format('Y-m-d H:i:s');
+                })
                 ->addColumn('aksi', function ($request) {
                     return view('transaksi.tombol')->with('request', $request);
                 })
@@ -314,15 +329,26 @@ class TransaksiController extends Controller
             'id' => 'required',
         ]);
 
-        if ($request->file('file')) {
-            $path = $request->file('file')->store('uploads', 'public');
-            $fileName = basename($path);
+        $transaksi = Transaksi::findOrFail($request->id);
 
-            $transaksi = Transaksi::find($request->id);
+        if ($request->hasFile('file')) {
+            // Hapus file lama jika ada
+            if (!empty($transaksi->file) && Storage::disk('public')->exists('uploads/' . $transaksi->file)) {
+                Storage::disk('public')->delete('uploads/' . $transaksi->file);
+            }
+
+            // Buat nama file baru dengan ekstensi
+            $ext = $request->file('file')->getClientOriginalExtension();
+            $fileName = Str::random(40) . '.' . $ext;
+
+            // Simpan file ke disk 'public/uploads'
+            $request->file('file')->storeAs('uploads', $fileName, 'public');
+
+            // Update database
             $transaksi->file = $fileName;
             $transaksi->save();
 
-            return response()->json(['success' => true, 'message' => 'File uploaded successfully']);
+            return response()->json(['success' => true, 'message' => 'File uploaded & replaced successfully']);
         }
 
         return response()->json(['success' => false, 'message' => 'No file uploaded']);
@@ -345,5 +371,14 @@ class TransaksiController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false], 500);
         }
+    }
+
+    public function toggleStatus($id)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+        $transaksi->status = $transaksi->status == 1 ? 0 : 1;
+        $transaksi->save();
+
+        return response()->json(['success' => true, 'new_status' => $transaksi->status]);
     }
 }
