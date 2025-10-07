@@ -8,7 +8,6 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-
 class PengeluaranExport implements FromCollection, WithHeadings, WithTitle
 {
     public function collection()

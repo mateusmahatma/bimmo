@@ -59,9 +59,7 @@ class CompareController extends Controller
                         'color' => $color
                     ]
                 ],
-                'message' => 'Comparison calculated successfully'
             ];
-
             return response()->json($response);
         } else {
             return view('transaksi.compare', [

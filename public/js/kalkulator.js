@@ -1,7 +1,5 @@
 $(document).ready(function () {
-    // ======================= //
-    // ==== THEME HANDLER ==== //
-    // ======================= //
+    // Theme Handler
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
     const skin = window.userSkin || 'auto';
     const updateSkinUrl = window.updateSkinUrl;
@@ -123,12 +121,9 @@ $(document).ready(function () {
             paging: true,
             responsive: true,
             lengthChange: true,
-            autoWidth: true,
+            autoWidth: false,
             serverSide: true,
             processing: true,
-            language: {
-                processing: '<div class="loader-container"><div class="loader"></div></div>',
-            },
             ajax: { url: '/kalkulator', type: 'GET' },
             columns: [
                 { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },

@@ -46,6 +46,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/line-data', [DashboardController::class, 'lineData']);
     Route::get('/jenis-pengeluaran', [DashboardController::class, 'getJenisPengeluaran']);
     Route::get('/transaksi', [DashboardController::class, 'getTransaksiByPengeluaran']);
+    Route::get('/saving-rate-data', [DashboardController::class, 'getSavingRateData']);
 });
 
 Route::get('/logout', [DashboardController::class, 'logout']);
@@ -80,6 +81,8 @@ Route::match(['get', 'post'], '/compare', [CompareController::class, 'index'])->
 
 // Barang
 Route::resource('/barang', BarangController::class)->middleware('auth');
+Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
+
 
 // Kalkulator
 Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {

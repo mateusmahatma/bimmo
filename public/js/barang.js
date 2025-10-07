@@ -1,4 +1,50 @@
 $(document).ready(function () {
+    // Theme Handler
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const skin = window.userSkin || 'auto';
+    const updateSkinUrl = window.updateSkinUrl;
+
+    function applyTheme(mode) {
+        if (mode === 'light' || mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', mode);
+        } else {
+            document.documentElement.removeAttribute('data-bs-theme'); // auto
+        }
+        document.dispatchEvent(new Event("themeChanged"));
+    }
+
+    function highlightActiveSkin(mode) {
+        document.querySelectorAll('.dropdown-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
+                el.classList.add('active');
+            }
+        });
+    }
+
+    function setTheme(mode) {
+        applyTheme(mode);
+        highlightActiveSkin(mode);
+
+        fetch(updateSkinUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ skin: mode })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) alert("Gagal menyimpan tema.");
+            })
+            .catch(err => console.error("Gagal update tema:", err));
+    }
+
+    applyTheme(skin);
+    highlightActiveSkin(skin);
+    window.setTheme = setTheme;
+
     // Fungsi Toast
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
@@ -49,9 +95,6 @@ $(document).ready(function () {
         autoWidth: false,
         serverSide: true,
         processing: true,
-        language: {
-            processing: '<div class="loader-container"><div class="loader"></div></div>'
-        },
         ajax: {
             url: '/barang',
             type: 'GET',
@@ -89,10 +132,19 @@ $(document).ready(function () {
                 data: 'status',
                 className: 'text-center',
                 render: function (data) {
-                    const badge = data.toString().trim() === '1'
-                        ? { class: 'badge-success', text: 'Assets owned' }
-                        : { class: 'badge-danger', text: 'Mortgaged Assets' };
-                    return `<span class="badge ${badge.class}">${badge.text}</span>`;
+                    if (data.toString().trim() === '1') {
+                        return `
+                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small" style="background-color:#d4edda; color:#155724;">
+                            <i class="bi bi-check-circle me-1"></i> Aset Dimiliki
+                        </span>
+                    `;
+                    } else {
+                        return `
+                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small" style="background-color:#f8d7da; color:#721c24;">
+                            <i class="bi bi-x-circle me-1"></i> Aset Dipinjamkan
+                        </span>
+                    `;
+                    }
                 }
             },
             { data: 'created_at', render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },

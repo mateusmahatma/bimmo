@@ -24,15 +24,14 @@ class ExportExcel implements FromCollection, ShouldAutoSize, WithHeadings, WithS
         $numberedData = $this->data->map(function ($item, $key) {
             return [
                 'No' => $key + 1,
-                'Tanggal Transaksi' => Carbon::parse($item->tgl_transaksi)->format('Y-m-d'), // Ubah format di sini
-                'Pemasukan' => $item->pemasukan,
+                'Tanggal Transaksi' => Carbon::parse($item->tgl_transaksi)->format('Y-m-d'),
+                'Pemasukan' => $item->pemasukanRelation?->nama ?? '-',
                 'Nominal Pemasukan' => $item->nominal_pemasukan,
-                'Pengeluaran' => $item->pengeluaran,
+                'Pengeluaran' => $item->pengeluaranRelation?->nama ?? '-',
                 'Nominal' => $item->nominal,
                 'Keterangan' => $item->keterangan,
             ];
         });
-
         return $numberedData;
     }
 

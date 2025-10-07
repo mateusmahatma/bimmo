@@ -29,7 +29,7 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-8 col-md-12 d-flex flex-column align-items-center justify-content-center">
-                            <div class="card mb-3">
+                            <div class="card-header">
                                 <div class="card-body">
                                     <div class="pt-4 pb-2">
                                         <h5 class="card-title text-center pb-0 fs-4">Lupa Kata Sandi</h5>
@@ -45,7 +45,7 @@
                                         </div>
                                         <div class="col-12">
                                             <p class="text-end mt-0 small-text">
-                                                <a href="/pointech"><small>Kembali ke Masuk</small></a>
+                                                <a href="/bimmo"><small>Kembali ke Masuk</small></a>
                                             </p>
                                         </div>
                                     </form>
@@ -95,7 +95,7 @@
             $('body').on('click', '.tombol-reset', function(e) {
                 e.preventDefault();
                 $('.tombol-reset').prop('disabled', true);
-                $('.tombol-reset').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...');
+                $('.tombol-reset').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atur Ulang Kata Sandi');
                 var formData = {
                     email: $('#email').val(),
                 };
@@ -112,7 +112,7 @@
                             alert(response.error);
                         } else {
                             $('.tombol-reset').prop('disabled', false);
-                            $('.tombol-reset').html('Reset Password');
+                            $('.tombol-reset').html('Atur Ulang Kata Sandi');
                             $('.tombol-reset .spinner-border').remove();
                             $('#newPassword').text(response.newPassword);
                             $('#passwordModal').modal('show');
@@ -123,18 +123,18 @@
                             var response = xhr.responseJSON;
                             if (response && response.error) {
                                 $('.tombol-reset').prop('disabled', false);
-                                $('.tombol-reset').html('Reset Password');
+                                $('.tombol-reset').html('Atur Ulang Kata Sandi');
                                 $('.tombol-reset .spinner-border').remove();
                                 alert(response.error);
                             } else {
                                 $('.tombol-reset').prop('disabled', false);
-                                $('.tombol-reset').html('Reset Password');
+                                $('.tombol-reset').html('Atur Ulang Kata Sandi');
                                 $('.tombol-reset .spinner-border').remove();
                                 alert('Terjadi kesalahan. Silakan coba lagi.');
                             }
                         } else {
                             $('.tombol-reset').prop('disabled', false);
-                            $('.tombol-reset').html('Reset Password');
+                            $('.tombol-reset').html('Atur Ulang Kata Sandi');
                             $('.tombol-reset .spinner-border').remove();
                             alert('Terjadi kesalahan. Silakan coba lagi.');
                         }

@@ -16,7 +16,7 @@
     <ul class="nav nav-pills">
         <li class="nav-item">
             <a class="nav-link tombol-tambah-pemasukan" href="#" data-bs-toggle="modal" data-bs-target="#pemasukanModal">
-                <span class="badge-primary">Tambah Data</span>
+                <button class="btn btn-success">Tambah Data</button>
             </a>
         </li>
     </ul>
@@ -29,11 +29,11 @@
         <table id="pemasukanTable" class="customTable">
             <thead>
                 <tr>
-                    <th scope="col" style="width: 1px;">No</th>
-                    <th scope="col" class="text-center align-middle" style="width: 250px;">Nama</th>
-                    <th scope="col" class="text-center align-middle">Created</th>
-                    <th scope="col" class="text-center align-middle">Updated</th>
-                    <th scope="col" style="width: 1px;"></th>
+                    <th style="width: 1%;">No</th>
+                    <th class="text-center" style="width: 600px;">Nama</th>
+                    <th class="text-center">Dibuat Tanggal</th>
+                    <th class="text-center">Diupdate Tanggal</th>
+                    <th style="width: 1%;"></th>
                 </tr>
             </thead>
         </table>

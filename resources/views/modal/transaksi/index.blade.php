@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-dialog-scrollable modal-mg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="transaksiModalLabel">Tambah Data Transaksi</h1>
+                <h1 class="modal-title fs-5" id="transaksiModalLabel">Tambah Data</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formTransaksi" action="{{ route('transaksi.store') }}" method="POST">
@@ -44,18 +44,32 @@
                         <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Input nominal">
                         <span class="input-group-text">.00</span>
                     </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="asset_list" id="checkAssetList" name="kategori[]">
+                        <label class="form-check-label" for="checkAssetList">
+                            Asset List
+                        </label>
+                    </div>
+                    <div class="mb-3" id="selectBarangContainer" style="display: none;">
+                        <label for="barang_id" class="form-label">Select Asset</label>
+                        <select id="barang_id" name="barang_id" class="form-select">
+                            <option value="">-- Select Asset --</option>
+                        </select>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" value="emergency_fund" id="checkEmergencyFund" name="kategori[]">
+                        <label class="form-check-label" for="checkEmergencyFund">
+                            Emergency Fund
+                        </label>
+                    </div>
                     <div class="mb-3">
                         <label for="keterangan" class="col-form-label">Keterangan</label>
                         <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Keterangan"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">
-                        <i class="fa fa-times"></i> Tutup</button>
-                    <button type="button" id="btnSimpan" class="cssbuttons-io-button">
-                        <span class="spinner-border spinner-border-sm d-none" id="btnSpinner" role="status" aria-hidden="true"></span>
-                        <span id="btnText"><i class="fa fa-paper-plane"></i> Simpan</span>
-                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button id="btnSimpan" type="button" class="btn btn-success">Save</button>
                 </div>
             </form>
         </div>
@@ -110,11 +124,11 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">
-                        <i class="fa fa-times"></i> Tutup</button>
-                    <button type="submit" id="btnSimpan" class="cssbuttons-io-button">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        Tutup</button>
+                    <button type="submit" id="btnSimpan" class="btn btn-success">
                         <span class="spinner-border spinner-border-sm d-none" id="btnSpinner" role="status" aria-hidden="true"></span>
-                        <span id="btnText"><i class="fa fa-paper-plane"></i> Update</span>
+                        <span id="btnText">Memperbarui</span>
                     </button>
                 </div>
             </form>

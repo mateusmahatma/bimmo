@@ -7,12 +7,19 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-warning">
-                    <ul>
+                    <ol type="1">
                         <li>Pastikan cell pada file Excel tidak ada yang di MERGE, jika ada yang di MERGE harap melakukan UNMERGE terlebih dahulu!</li>
                         <li>Pastikan file Excel tidak di Freeze</li>
                         <li>Pastikan file tidak dalam kondisi Protected View</li>
-                    </ul>
-                    <a href="{{ route('download-template') }}" download>Download Template Excel</a>
+                        <li>
+                            <button id="btn-download-template" class="btn btn-success" data-url=" {{ route('download-template') }}">
+                                <span class="d-flex align-items-center gap-2">
+                                    <span>Download Template Excel</span>
+                                    <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </span>
+                            </button>
+                        </li>
+                    </ol>
                 </div>
                 <form id="importForm" action="{{ route('import-transaksi') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -21,9 +28,9 @@
                         <input type="file" name="file" id="file" class="form-control-file" required>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                             <i class="fa fa-times"></i> Tutup</button>
-                        <button type="submit" class="cssbuttons-io-button" id="importBtn">
+                        <button type="submit" class="btn btn-success" id="importBtn">
                             <i class="fa fa-download"></i> Import
                         </button>
                     </div>

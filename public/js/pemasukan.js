@@ -53,9 +53,6 @@ $(document).ready(function () {
         autoWidth: false,
         serverSide: true,
         processing: true,
-        language: {
-            processing: '<div class="loader-container"><div class="loader"></div></div>'
-        },
         ajax: {
             url: '/pemasukan',
             type: 'GET',
@@ -63,8 +60,8 @@ $(document).ready(function () {
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama', className: 'text-center' },
-            { data: 'created_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
-            { data: 'updated_at', render: data => moment(data).format('D MMMM YYYY HH:mm:ss'), className: 'text-center' },
+            { data: 'created_at', className: 'text-center' },
+            { data: 'updated_at', className: 'text-center' },
             {
                 data: 'aksi',
                 orderable: false,

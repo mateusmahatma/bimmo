@@ -2,7 +2,7 @@
 <html lang="id">
 
 <head>
-    <title>Asset List</title>
+    <title>Daftar Aset</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -11,19 +11,19 @@
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="/barang">Asset List</a>
+<nav id="navbar-example2" class="navbar px-3">
+    <a class="navbar-brand" href="/barang">Daftar Aset</a>
     <ul class="nav nav-pills">
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span class="badge-primary rounded-pill dropdown-toggle">Action</span>
-            </a>
+        <div class="btn-group dropstart">
+            <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Pilih Opsi
+            </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#barangModal">Add Data</a></li>
-                <li><a class="dropdown-item" href="#" onclick="downloadPDFbarang()">Download PDF</a></li>
-                <li><a class="dropdown-item" href="#" onclick="downloadExcel()">Download Excel</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#barangModal">Tambah Data</a></li>
+                <li><a class="dropdown-item" href="#" onclick="downloadPDFbarang()">Unduh PDF</a></li>
+                <li><a class="dropdown-item" href="#" onclick="downloadExcel()">Unduh Excel</a></li>
             </ul>
-        </li>
+        </div>
     </ul>
 </nav>
 
@@ -31,34 +31,34 @@
 
 <div class="card-header">
     <div class="card-body">
-        <!-- <form>
-            <div class="col-md-3">
-                <select class="form-control select-2" name="status">
-                    <option value="">Show Asset Status All</option>
-                    <option value="1">Assets owned</option>
-                    <option value="0">Mortgaged Assets</option>
-                </select>
-            </div>
-        </form> -->
-        <div class="card-body">
-            <table id="barangTable" class="customTable">
-                <thead>
+        <div class="custom-alert" role="alert">
+            <div class="mt-3 mb-3">
+                <table class="table table-noborder mb-0" style="width:auto">
                     <tr>
-                        <th scope="col" style="width: 1px;">No</th>
-                        <th scope="col" class="text-center align-middle">Name</th>
-                        <th scope="col" class="text-center align-middle">Store</th>
-                        <th scope="col" class="text-center align-middle">Price</th>
-                        <th scope="col" class="text-center align-middle">Status</th>
-                        <th scope="col" class="text-center align-middle">Created</th>
-                        <th scope="col" class="text-center align-middle">Updated</th>
-                        <th scope="col" style="width: 1px;"></th>
+                        <td>Total aset yang tercatat</td>
+                        <td class="px-2">:</td>
+                        <td>
+                            <span id="totalAset">0</span>
+                            <span id="exceedMessage" style="color: red; font-size: small; margin-left: 10px;"></span>
+                        </td>
                     </tr>
-                </thead>
-            </table>
-            <div class="badge-success" style="font-size: small">
-                Total assets owned: <span id="totalAset">Rp 0</span>
+                </table>
             </div>
         </div>
+        <table id="barangTable" class="customTable">
+            <thead>
+                <tr>
+                    <th style="width: 1%;">No</th>
+                    <th class="text-center align-middle" style="width: 250px;">Nama</th>
+                    <th class="text-center align-middle">Menyimpan</th>
+                    <th class="text-center align-middle">Harga</th>
+                    <th class="text-center align-middle">Status</th>
+                    <th class="text-center align-middle">Dibuat</th>
+                    <th class="text-center align-middle">Diperbarui</th>
+                    <th style="width: 1%;"></th>
+                </tr>
+            </thead>
+        </table>
     </div>
 </div>
 @endsection

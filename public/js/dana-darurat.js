@@ -48,9 +48,6 @@ $(document).ready(function () {
         autoWidth: false,
         serverSide: true,
         processing: true,
-        language: {
-            processing: '<div class="loader-container"><div class="loader"></div></div>'
-        },
         ajax: {
             url: '/dana-darurat',
             type: 'GET',

@@ -1,11 +1,11 @@
 @extends('layouts.main')
 @section('container')
 <div class="pagetitle">
-    <h1>Dashboard</h1>
+    <h1>Dasbor</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item active">
-                Hi, {{ auth()->user()->name }}
+                Hai, {{ auth()->user()->name }}
             </li>
         </ol>
     </nav>
@@ -13,73 +13,90 @@
 
 <section class="section dashboard" id="dashboard-container">
     <div class="row">
-        <div class="card-nominal">
-            <h3>Financial Overview <img src="/icon/eye.png" style="height: 22px; width: 22px" onclick=" toggleNominal()"></img></h3>
+        <!-- Financial Overview -->
+        <div class="card-dashboard">
+            <h3>
+                Ikhtisar Keuangan
+                <img src="/icon/eye.png" style="height: 22px; width: 22px; cursor: pointer;" onclick="toggleNominal()">
+            </h3>
             <ul class="box-info">
                 <li>
-                    <i class='bx bxs-chevrons-down'></i>
+                    <i class='bx bxs-chevrons-down icon-income'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominalBulanPemasukan) }}">{{ number_format($totalNominalBulanPemasukan) }}</h3>
-                        <p>Total Income for the Month</p>
+                        <p>Total Pendapatan untuk Bulan Ini</p>
                     </span>
                 </li>
                 <li>
-                    <i class='bx bxs-chevrons-up'></i>
+                    <i class='bx bxs-chevrons-up icon-expense'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominalBulan) }}">{{ number_format($totalNominalBulan) }}</h3>
-                        <p>Total Expenses for the Month</p>
+                        <p>Total Pengeluaran untuk Bulan Ini</p>
                     </span>
                 </li>
                 <li>
-                    <i class='bx bxs-chevron-up'></i>
+                    <i class='bx bxs-chevron-up icon-today'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominal) }}">{{ number_format($totalNominal) }}</h3>
-                        <p>Total Expenses Today</p>
+                        <p>Total Pengeluaran Hari Ini</p>
                     </span>
                 </li>
                 <li>
-                    <i class='bx bxs-credit-card-alt'></i>
+                    <i class='bx bxs-credit-card-alt icon-balance'></i>
                     <span class="text">
                         <h3 data-value="{{ number_format($totalNominalSisa) }}">{{ number_format($totalNominalSisa) }}</h3>
-                        <p>Balance of the Month</p>
+                        <p>Saldo Bulan Ini</p>
                     </span>
                 </li>
             </ul>
         </div>
 
         <!-- Cash Flow -->
-        <div class="card-penyiar mb-4">
-            <h3>Cash Flow</h3>
+        <div class="card-dashboard">
+            <h3>Arus Kas</h3>
             <div class="filters-container">
                 <div class="filter-wrapper">
-                    <label for="filterPeriod" class="filter-label">Period:</label>
+                    <label for="filterPeriod" class="filter-label">Periode:</label>
                     <select id="filterPeriod" class="filter-dropdown">
-                        <option value="2">Last 2 Months</option>
-                        <option value="4">Last 4 Months</option>
-                        <option value="6" selected>Last 6 Months</option>
-                        <option value="12">Last 1 Year</option>
-                        <option value="all">Show All</option>
+                        <option value="2">2 Bulan Terakhir</option>
+                        <option value="4">4 Bulan Terakhir</option>
+                        <option value="6" selected>6 Bulan Terakhir</option>
+                        <option value="12">1 Tahun Terakhir</option>
+                        <option value="all">Tampilkan Semua</option>
                     </select>
                 </div>
 
                 <div class="filter-wrapper">
-                    <label for="chartType" class="filter-label">Show:</label>
+                    <label for="chartType" class="filter-label">Tampilkan:</label>
                     <select id="chartType" class="filter-dropdown">
                         <option value="cashFlow">Bar</option>
-                        <option value="incomeExpenses">Chart</option>
+                        <option value="incomeExpenses">Garis</option>
                     </select>
                 </div>
             </div>
 
             <!-- Chart Container -->
-            <div>
-                <div id="columnChart" class="chart-container"></div>
-                <div id="barChart" class="chart-container"></div>
+            <div class="chart-container">
+                <div id="columnChart"></div>
+                <div id="barChart"></div>
             </div>
+            <table class="table table-noborder mb-0" style="width:auto">
+                <tr>
+                    <td><strong>Rata-rata pemasukan</strong></td>
+                    <td class="px-2">:</td>
+                    <span id="rataPemasukan" data-value="{{ $avgPemasukan }}">
+                        {{ number_format($avgPemasukan, 0, ',', '.') }}
+                    </span>
+                    <span id="rataPengeluaran" data-value="{{ $avgPengeluaran }}">
+                        {{ number_format($avgPengeluaran, 0, ',', '.') }}
+                    </span>
+
+                </tr>
+            </table>
         </div>
 
         <!-- Today's Transaction -->
-        <div class="card-today">
+        <div class="card-dashboard">
             <h3>Today's Transaction</h3>
             <div class="card-header">
                 <table id="todayTransactionsTable" class="dashboardTable">
@@ -98,7 +115,7 @@
         </div>
 
         <!-- Expense Bar -->
-        <div class="card-today">
+        <div class="card-dashboard">
             <h3>Expenses Bar</h3>
             <div class="filters-container">
                 <div class="filter-wrapper">
@@ -125,7 +142,7 @@
         </div>
 
         <!-- Kompas -->
-        <div class="card-today">
+        <div class="card-dashboard">
             <h3>Performance Ratio</h3>
             <div id="chartKompas"
                 data-rasio="{{ $rasio ?? 0 }}"
@@ -133,6 +150,22 @@
                 data-rasio-dana-darurat="{{ $rasio_dana_darurat ?? 0 }}"
                 data-rasio-pengeluaran-pendapatan="{{ $rasio_pengeluaran_pendapatan ?? 0 }}">
             </div>
+        </div>
+
+        <!-- Saving Rate -->
+        <div class="card-dashboard">
+            <h3>Saving Rate</h3>
+            <div class="filter-wrapper">
+                <label for="filterPeriodSavingRate" class="filter-label">Period:</label>
+                <select id="filterPeriodSavingRate" class="filter-dropdown">
+                    <option value="2">Last 2 Months</option>
+                    <option value="4">Last 4 Months</option>
+                    <option value="6" selected>Last 6 Months</option>
+                    <option value="12">Last 1 Year</option>
+                    <option value="all">Show All</option>
+                </select>
+            </div>
+            <div id="savingRateChart"></div>
         </div>
 
         <!-- Modal Kompas -->

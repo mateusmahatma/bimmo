@@ -35,8 +35,8 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">Back</button>
-                <button type="button" class="cssbuttons-io-button tombol-simpan-dana-darurat">Save</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success tombol-simpan-dana-darurat">Simpan</button>
             </div>
         </div>
     </div>

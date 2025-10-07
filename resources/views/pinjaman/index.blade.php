@@ -3,20 +3,20 @@
 
 <head>
     <title>Daftar Pinjaman</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="" name="description">
+    <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
+<nav class="navbar px-3">
     <a class="navbar-brand" href="#">Daftar Pinjaman</a>
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('pinjaman.create') }}">
-                <span class="badge-primary rounded-pill">Tambah Data</span>
+            <a href="{{ route('pinjaman.create') }}" class="btn btn-success">
+                Tambah Data
             </a>
         </li>
     </ul>
@@ -24,28 +24,35 @@
 
 @include('modal.pinjaman.index')
 
-@if (session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
-@endif
-
 <div class="card-header">
     <div class="card-body">
+        <div class="custom-alert" role="alert">
+            <h4 class="custom-alert-heading">Laporan Pinjaman</h4>
+            <p class="mb-2">Di bawah ini adalah ringkasan total pinjaman berdasarkan data yang tersedia.</p>
+            <div class="mt-3 mb-3">
+                <table class="table table-noborder mb-0" style="width:auto">
+                    <tr>
+                        <td><strong>Total Pinjaman</strong></td>
+                        <td class="px-2">:</td>
+                        <td><span id="totalPinjaman">0</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <hr>
+            <p class="mb-0">Harap tinjau kembali nilai-nilai di atas untuk memastikan keakuratan data Anda.</p>
+        </div>
         <table id="pinjamanTable" class="customTable">
             <thead>
                 <tr>
-                    <th style="width: 3px;">No</th>
-                    <th class="text-center">Nama Pinjaman</th>
-                    <th class="text-center">Nominal Pinjaman</th>
-                    <th class="text-center">Status</th>
-                    <th style="width: 3px;">Aksi</th>
+                    <th style="width: 1%;">No</th>
+                    <th>Nama Pinjaman</th>
+                    <th>Nominal Pinjaman</th>
+                    <th>Status</th>
+                    <th style="width: 1%;"></th>
                 </tr>
             </thead>
         </table>
-        <div class="badge-danger" style="font-size: small">
-            Total Pinjaman: <span id="totalPinjaman">0</span>
-        </div>
     </div>
 </div>
 @endsection

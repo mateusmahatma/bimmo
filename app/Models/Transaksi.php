@@ -19,17 +19,16 @@ class Transaksi extends Model
         'nominal',
         'keterangan',
         'id_user',
+        'status'
     ];
 
-    public function pengeluaran()
+    public function pengeluaranRelation()
     {
         return $this->belongsTo(Pengeluaran::class, 'pengeluaran', 'id');
-        // asumsikan kolom foreign key di transaksi adalah 'pengeluaran'
     }
 
-    public function pemasukan()
+    public function pemasukanRelation()
     {
         return $this->belongsTo(Pemasukan::class, 'pemasukan', 'id');
-        // asumsikan kolom foreign key di transaksi adalah 'pemasukan'
     }
 }

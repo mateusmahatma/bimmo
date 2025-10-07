@@ -17,11 +17,16 @@ class PemasukanController extends Controller
             // Mendapatkan ID pengguna yang sedang login
             $userId = Auth::id();
 
-            // Filter data berdasarkan id_user
             $query = Pemasukan::where('id_user', $userId);
 
             return DataTables::of($query)
                 ->addIndexColumn()
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->format('Y-m-d H:i:s');
+                })
+                ->editColumn('updated_at', function ($row) {
+                    return $row->updated_at->format('Y-m-d H:i:s');
+                })
                 ->addColumn('aksi', function ($pemasukan) {
                     return view('pemasukan.tombol')->with('request', $pemasukan);
                 })

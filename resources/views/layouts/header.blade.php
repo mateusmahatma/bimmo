@@ -1,43 +1,45 @@
-<header id="header" class="header fixed-top d-flex align-items-center shadow">
+<header id="header" class="header fixed-top d-flex align-items-center">
     <img src="/img/bimmo_icon.png" style="height: 22px; width: 22px;" />
     <ul class="nav justify-content-center">
         <li class="nav-item">
-            <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dashboard</a>
+            <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dasbor</a>
         </li>
 
         <!-- Budgeting -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Budgeting</span>
+            <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : 'collapsed' }}"
+                data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                <span>Penganggaran</span>
             </a>
             <ul class="dropdown-menu">
                 <li>
-                    <a class="dropdown-item {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
-                        <span>Budget List</span>
-                    </a>
+                    <a class="dropdown-item {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran" data-pjax>Anggaran</a>
                 </li>
                 <li>
-                    <a class="dropdown-item {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator">
-                        <span>Budget Results</span>
+                    <a data-pjax
+                        class="dropdown-item {{ Request::is('kalkulator') ? 'active' : '' }}"
+                        href="{{ route('kalkulator.index') }}">
+                        <span>Hasil Anggaran</span>
                     </a>
                 </li>
             </ul>
         </li>
 
+
         <!-- Investment -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('barang', 'dana-darurat') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Investment</span>
+                <span>Investasi</span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <a class="dropdown-item {{ Request::is('barang') ? 'active' : '' }}" href="/barang">
-                        <span>Asset List</span>
+                        <span>Daftar Aset</span>
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item {{ Request::is('dana-darurat') ? 'active' : '' }}" href="/dana-darurat">
-                        <span>Emergency Fund</span>
+                        <span>Dana Darurat</span>
                     </a>
                 </li>
             </ul>
@@ -46,27 +48,27 @@
         <!-- Transaksi -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Money Movement</span>
+                <span>Pergerakan Uang</span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <a class="dropdown-item {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
-                        <span>Income Type</span>
+                        <span>Jenis Pemasukan</span>
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran">
-                        <span>Expense Type</span>
+                        <span>Jenis Pengeluaran</span>
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item {{ Request::is('transaksi', 'compare') ? 'active' : '' }}" href="/transaksi">
-                        <span>Cash Flow</span>
+                        <span>Arus Kas</span>
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
-                        <span>Loans</span>
+                        <span>Pinjaman</span>
                     </a>
                 </li>
             </ul>
@@ -75,12 +77,12 @@
         <!-- Pengaturan -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {{ Request::is('ubah-password') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Setting</span>
+                <span>Pengaturan</span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <a class="dropdown-item {{ Request::is('ubah-password') ? 'active' : '' }}" href="/ubah-password">
-                        <span>Change Password</span>
+                        <span>Ubah Kata Sandi</span>
                     </a>
                 </li>
             </ul>

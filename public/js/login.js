@@ -18,7 +18,7 @@ togglePassword.addEventListener("click", function () {
 $('body').on('click', '.tombol-login', function (e) {
     e.preventDefault();
     $('.tombol-login').prop('disabled', true);
-    $('.tombol-login').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+    $('.tombol-login').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     var formData = {
         username: $('#username').val(),
         password: $('#password').val(),
@@ -33,12 +33,12 @@ $('body').on('click', '.tombol-login', function (e) {
         },
         success: function (response) {
             $('.tombol-login').prop('disabled', false);
-            $('.tombol-login').html('Log in');
+            $('.tombol-login').html('Masuk');
             if (response.success) {
-                showToast(response.message, 'success'); // Pesan dari controller
+                showToast(response.message, 'success');
                 window.location.href = '/dashboard';
             } else {
-                showToast(response.message, 'danger'); // Pesan dari controller
+                showToast(response.message, 'danger');
             }
         },
     });

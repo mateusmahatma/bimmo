@@ -19,35 +19,36 @@ use App\Exports\TransaksiTemplateExport;
 use App\Models\HasilProsesAnggaran;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
+use App\Models\Barang;
 
 class TransaksiController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-
             $userId = Auth::id();
 
-            $data = Transaksi::with(['pengeluaran', 'pemasukan'])->where('id_user', $userId);
+            $data = Transaksi::with(['pengeluaranRelation', 'pemasukanRelation'])
+                ->where('id_user', $userId);
 
             if ($request->filled('start_date') && $request->filled('end_date')) {
                 $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
                 $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
-
                 $data = $data->whereBetween('tgl_transaksi', [$startDate, $endDate]);
             }
 
-            if ($request->filled('pemasukan')) {
-                $data = $data->where('pemasukan', $request->pemasukan);
+            if ($request->filled('filter_pemasukan')) {
+                $data = $data->whereIn('pemasukan', $request->filter_pemasukan);
             }
 
-            if ($request->filled('pengeluaran')) {
-                $data = $data->where('pengeluaran', $request->pengeluaran);
+            if ($request->filled('filter_pengeluaran')) {
+                $data = $data->whereIn('pengeluaran', $request->filter_pengeluaran);
             }
+
 
             $totalPemasukan = (clone $data)->where('status', 1)->sum('nominal_pemasukan');
             $totalPengeluaran = (clone $data)->where('status', 1)->sum('nominal');
+            $netIncome = number_format($totalPemasukan - $totalPengeluaran, 2, '.', '');
 
             $data = $data->get();
 
@@ -57,26 +58,41 @@ class TransaksiController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+
+                ->addColumn('pemasukan_nama', function ($row) {
+                    return $row->pemasukanRelation?->nama ?? '-';
+                })
+
+                ->addColumn('pengeluaran_nama', function ($row) {
+                    return $row->pengeluaranRelation?->nama ?? '-';
+                })
+
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->format('Y-m-d H:i:s');
+                    return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '-';
                 })
+
                 ->editColumn('updated_at', function ($row) {
-                    return $row->updated_at->format('Y-m-d H:i:s');
+                    return $row->updated_at ? $row->updated_at->format('Y-m-d H:i:s') : '-';
                 })
-                ->addColumn('aksi', function ($request) {
-                    return view('transaksi.tombol')->with('request', $request);
+
+                ->addColumn('aksi', function ($row) {
+                    return view('transaksi.tombol', ['request' => $row]);
                 })
+
                 ->with('totalPemasukan', $totalPemasukan)
                 ->with('totalPengeluaran', $totalPengeluaran)
+                ->with('netIncome', $netIncome)
+
                 ->toJson();
-        } else {
-            return view('transaksi.index', [
-                'transaksi' => Transaksi::where('id_user', Auth::id())->get(),
-                'pemasukan' => Pemasukan::where('id_user', Auth::id())->get(),
-                'pengeluaran' => Pengeluaran::where('id_user', Auth::id())->get(),
-            ])->with('message', 'Pastikan format tanggal yang Anda kirimkan adalah YYYY-MM-DD.');
         }
+
+        return view('transaksi.index', [
+            'transaksi' => Transaksi::where('id_user', Auth::id())->get(),
+            'pemasukan' => Pemasukan::where('id_user', Auth::id())->get(),
+            'pengeluaran' => Pengeluaran::where('id_user', Auth::id())->get(),
+        ])->with('message', 'Pastikan format tanggal yang Anda kirimkan adalah YYYY-MM-DD.');
     }
+
 
     public function store(Request $request)
     {
@@ -87,6 +103,7 @@ class TransaksiController extends Controller
             'pengeluaran'        => 'nullable|string',
             'nominal'            => 'nullable|numeric',
             'keterangan'         => 'nullable|string',
+            'barang_id'          => 'nullable|exists:barang,id',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -120,10 +137,21 @@ class TransaksiController extends Controller
                 $validatedData['pemasukan'] = $pemasukan->id;
             }
 
+            // Tambahkan status 2 jika asset list dicentang
+            if (in_array('asset_list', $request->kategori ?? [])) {
+                $validatedData['status'] = 2;
+            }
+
             // Simpan transaksi
             $transaksi = Transaksi::create($validatedData);
 
-            // Proses anggaran jika ada nominal pengeluaran dan ID pengeluaran
+            // Tambahkan nominal ke kolom harga barang (jika ada barang_id dan nominal)
+            if (!empty($validatedData['barang_id']) && $transaksi->nominal > 0) {
+                Barang::where('id', $validatedData['barang_id'])
+                    ->increment('harga', $transaksi->nominal);
+            }
+
+            // Proses anggaran jika ada pengeluaran dan nominal
             if (!empty($transaksi->pengeluaran) && $transaksi->nominal > 0) {
                 $pengeluaranId = (string) $transaksi->pengeluaran;
 
@@ -278,11 +306,10 @@ class TransaksiController extends Controller
         $start_date_formatted = Carbon::parse($start_date)->format('Y-m-d');
         $end_date_formatted = Carbon::parse($end_date)->format('Y-m-d');
 
-        $data = Transaksi::select('tgl_transaksi', 'pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan')
+        $data = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
             ->where('id_user', $userId)
-            ->whereBetween('tgl_transaksi', [$start_date_formatted, $end_date_formatted])
+            ->whereBetween('tgl_transaksi', [$start_date, $end_date])
             ->get();
-
         return Excel::download(new ExportExcel($data), 'Data_Transaksi_' . time() . '.xlsx');
     }
 

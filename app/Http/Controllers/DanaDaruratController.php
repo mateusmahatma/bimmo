@@ -64,7 +64,7 @@ class DanaDaruratController extends Controller
             'tgl_transaksi_dana_darurat'    => 'required|date',
             'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
             'nominal_dana_darurat'          => 'decimal:2',
-            'keterangan'                    => 'string',
+            'keterangan' => ['nullable', 'string'],
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -99,7 +99,7 @@ class DanaDaruratController extends Controller
             'tgl_transaksi_dana_darurat'    => 'required|date',
             'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
             'nominal_dana_darurat'          => 'decimal:2',
-            'keterangan'                    => 'string',
+            'keterangan' => ['nullable', 'string'],
         ]);
 
         DanaDarurat::where('id_dana_darurat', $id)->update($validatedData);

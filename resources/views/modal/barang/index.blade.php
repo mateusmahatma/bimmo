@@ -17,8 +17,8 @@
                 <div class="mb-3">
                     <label for="status_barang" class="form-label">Status</label>
                     <select id="status_barang" class="form-control">
-                        <option value="1">Assets Owned</option>
-                        <option value="0">Mortgaged Assets</option>
+                        <option value="1">Owned Assets</option>
+                        <option value="0">Non-owned Assets</option>
                     </select>
                 </div>
 

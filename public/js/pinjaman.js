@@ -6,10 +6,6 @@ $(document).ready(function () {
         autoWidth: false,
         serverSide: true,
         processing: true,
-        language: {
-            processing:
-                '<div class="loader-container"><div class="loader"></div></div>',
-        },
         ajax: {
             url: "/pinjaman",
             type: "GET",
@@ -33,38 +29,37 @@ $(document).ready(function () {
             },
             {
                 data: "nama_pinjaman",
-                className: "text-center",
-                render: function (data) {
-                    return data ? data : "-";
-                },
+                name: "nama_pinjaman",
             },
             {
                 data: "jumlah_pinjaman",
-                className: "text-center",
-                render: function (data) {
-                    return data ? data : "-";
-                },
+                name: "jumlah_pinjaman",
             },
             {
                 data: "status",
+                name: "status",
                 className: "text-center",
                 render: function (data) {
                     if (data === "belum_lunas") {
-                        return '<span class="badge badge-danger">Belum Lunas</span>';
+                        return `
+                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small" style="background-color:#f8d7da; color:#721c24;">
+                            <i class="bi bi-x-circle me-1"></i> Belum Lunas
+                        </span>
+                    `;
                     } else if (data === "lunas") {
-                        return '<span class="badge badge-success">Lunas</span>';
+                        return `
+                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small" style="background-color:#d4edda; color:#155724;">
+                            <i class="bi bi-check-circle me-1"></i> Lunas
+                        </span>
+                    `;
                     }
-                    return data ? data : "-";
-                },
+                    return data ? data : '<span class="text-muted">-</span>';
+                }
             },
             {
                 data: "aksi",
                 orderable: false,
                 searchable: false,
-                className: "text-center",
-                render: function (data, type, row) {
-                    return data;
-                },
             },
         ],
     });

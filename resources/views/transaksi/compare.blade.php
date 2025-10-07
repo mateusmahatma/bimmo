@@ -1,5 +1,8 @@
+<!DOCTYPE html>
+<html lang="id">
+
 <head>
-    <title>Compare Pengeluaran</title>
+    <title>Bandingkan Biaya Pengeluaran</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -9,19 +12,19 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar px-3">
-    <span class="navbar-text breadcrumb-nav">
-        <a class="text-decoration-none" href="/transaksi">Cash Flow</a>
-        &nbsp;<span class="mx-1">&gt;</span>&nbsp;
-        <a class="text-decoration-none" href="/compare">Compare Expense</a>
-    </span>
+    <div class="d-flex align-items-center">
+        <a class="navbar-brand me-2" href="/transaksi">Arus Kas</a>
+        <span class="me-2">/</span>
+        <a class="navbar-brand" href="/compare">Bandingkan Biaya Pengeluaran</a>
+    </div>
 </nav>
 
 <div class="card-header">
-    <div class="card-header">
+    <div class="card-body">
         <form id="compareForm">
-            <div class="form-row align-items-center d-flex">
-                <div class="col mx-3">
-                    <p class="filter">Tanggal Pengeluaran Periode 1</p>
+            <div class="row mb-3">
+                <div class="col md-4">
+                    <p class="filter">Pilih Tanggal Pengeluaran Periode 1</p>
                     <div id="daterange" class="daterange">
                         <i class="fa fa-calendar"></i>&nbsp;
                         <span style="font-weight: bold;"></span>
@@ -31,7 +34,7 @@
                     <input type="hidden" id="end_date_1" name="end_date_1">
                 </div>
                 <div class="col mx-3">
-                    <p class="filter">Tanggal Pengeluaran Periode 2</p>
+                    <p class="filter">Pilih Tanggal Pengeluaran Periode 2</p>
                     <div id="daterange2" class="daterange">
                         <i class="fa fa-calendar"></i>&nbsp;
                         <span style="font-weight: bold;"></span>
@@ -41,27 +44,27 @@
                     <input type="hidden" id="end_date_2" name="end_date_2">
                 </div>
                 <div class="col mx-3">
-                    <p class="filter">Jenis Pengeluaran</p>
+                    <p class="filter">Pilih Jenis Pengeluaran</p>
                     <select class="form-control" name="filter_pengeluaran" id="pengeluaran">
                         <option value="">- Pilih -</option>
                         @foreach ($pengeluaran as $pengeluaran)
-                        <option value="{{ $pengeluaran->nama }}">{{ $pengeluaran->nama }}</option>
+                        <option value="{{ $pengeluaran->id }}">{{ $pengeluaran->nama }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
-            <div class="col mx-3">
-                <button type="submit" class="cssbuttons-io-button tombol-compare">Compare</button>
+            <div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-success tombol-compare">Bandingkan</button>
+                </div>
             </div>
         </form>
     </div>
     <div class="card-body">
-        <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+        <div class="custom-alert" role="alert">
             <div>
-                <strong>Informasi:</strong>
-                <p class="mb-0">
-                    GAP = Nominal Pengeluaran Periode 1 - Nominal Pengeluaran Periode 2.
-                </p>
+                <h4 class="custom-alert-heading">Information:</h4>
+                <p class="mb-2"> GAP = Nominal Pengeluaran Periode 1 - Nominal Pengeluaran Periode 2.</p>
             </div>
         </div>
         <table id="comparisonTable" class="customTable">

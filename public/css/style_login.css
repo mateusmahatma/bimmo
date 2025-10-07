@@ -76,7 +76,6 @@ body {
 }
 
 .form-control {
-    border-radius: 10px;
     border: 1px solid #ccc;
     padding: 1rem;
     transition: all 0.3s ease-in-out;
@@ -106,13 +105,11 @@ label {
     color: #333;
 }
 
-/* Button styling */
 .tombol-login {
     background: var(--bs-primary);
     color: white;
     padding: 0.75rem;
     font-size: 0.9rem;
-    border-radius: 30px;
     font-weight: 600;
     width: 100%;
     transition: all 0.3s ease;

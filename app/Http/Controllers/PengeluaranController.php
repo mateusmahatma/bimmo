@@ -20,6 +20,12 @@ class PengeluaranController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->format('Y-m-d H:i:s');
+                })
+                ->editColumn('updated_at', function ($row) {
+                    return $row->updated_at->format('Y-m-d H:i:s');
+                })
                 ->addColumn('aksi', function ($request) {
                     return view('pengeluaran.tombol')->with('request', $request);
                 })

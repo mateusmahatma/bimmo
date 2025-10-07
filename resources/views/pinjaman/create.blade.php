@@ -13,13 +13,6 @@
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
     <a class="navbar-brand" href="#">Tambah Data Pinjaman</a>
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-            <a class="nav-link" href="/pinjaman">
-                <span class="badge-red rounded-pill">Daftar Pinjaman</span>
-            </a>
-        </li>
-    </ul>
 </nav>
 
 <div class="card-header">
@@ -53,7 +46,7 @@
                     <option value="belum_lunas">Belum Lunas</option>
                 </select>
             </div>
-            <button type="submit" class="btn-sm btn-color">Simpan</button>
+            <button type="submit" class="btn btn-success">Simpan</button>
         </form>
     </div>
 </div>

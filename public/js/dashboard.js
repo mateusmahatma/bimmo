@@ -1,11 +1,24 @@
-// Cash Flow
 document.addEventListener("DOMContentLoaded", function () {
-    let charts = {};
-    let chartData = {};
+    const charts = {};
+    const chartData = {};
 
-    // Fungsi untuk memfilter data berdasarkan bulan yang dipilih
+    function isValidChartData(data) {
+        return data && Array.isArray(data.labels);
+    }
+
     function filterData(data, months) {
+        if (!isValidChartData(data)) {
+            return {
+                labels: [],
+                pemasukan: [],
+                pengeluaran: [],
+                data_pemasukan: [],
+                data_pengeluaran: [],
+            };
+        }
+
         if (months === "all") return data;
+
         const startIndex = Math.max(data.labels.length - months, 0);
         const filtered = { labels: data.labels.slice(startIndex) };
 
@@ -18,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return filtered;
     }
 
-    // Fungsi umum untuk merender chart
     function renderChart(type, selector, data, options) {
         const theme = document.documentElement.getAttribute("data-bs-theme") || "light";
         const isDark = theme === "dark";
@@ -28,60 +40,103 @@ document.addEventListener("DOMContentLoaded", function () {
                 type: type,
                 height: 350,
                 toolbar: { show: true, tools: { download: false } },
-                foreColor: isDark ? '#fff' : '#333'
+                foreColor: isDark ? "#fff" : "#333",
             },
             xaxis: {
                 categories: data.labels,
                 labels: {
-                    style: {
-                        colors: isDark ? '#ccc' : '#555'
-                    }
+                    style: { colors: isDark ? "#ccc" : "#555" }
                 }
             },
             yaxis: {
                 labels: {
-                    style: {
-                        colors: isDark ? '#ccc' : '#555'
-                    },
-                    formatter: (val) => val.toLocaleString('id-ID')
+                    style: { colors: isDark ? "#ccc" : "#555" },
+                    formatter: (val) => val.toLocaleString("id-ID")
                 }
             },
             dataLabels: {
-                style: {
-                    colors: [isDark ? '#fff' : '#000']
-                }
+                enabled: false
             },
             tooltip: {
                 theme: isDark ? "dark" : "light"
             },
             series: [],
+            ...options,
         };
 
-        const finalOptions = { ...defaultOptions, ...options };
+        const el = document.querySelector(selector);
+        if (!el) return;
 
         if (charts[selector]) {
-            charts[selector].updateOptions(finalOptions);
+            charts[selector].updateOptions(defaultOptions);
         } else {
-            charts[selector] = new ApexCharts(document.querySelector(selector), finalOptions);
+            charts[selector] = new ApexCharts(el, defaultOptions);
             charts[selector].render();
         }
     }
 
-    document.addEventListener("themeChanged", function () {
-        const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+    function renderCashFlowChart(data, months = "all") {
+        const filteredData = filterData(data, months);
 
-        // Render ulang chart dengan tema baru
-        const months = document.getElementById("filterPeriod")?.value || "all";
-        const parsedMonths = months === "all" ? "all" : parseInt(months);
+        if (!Array.isArray(filteredData.pemasukan) || !Array.isArray(filteredData.pengeluaran)) {
+            console.warn("Data cash flow tidak lengkap:", filteredData);
+            return;
+        }
 
-        renderCashFlowChart(chartData["cashFlow"], parsedMonths);
-        renderIncomeExpenseChart(chartData["incomeExpense"], parsedMonths);
-    });
+        renderChart("bar", "#columnChart", filteredData, {
+            colors: ["#28a745", "#dc3545"],
+            plotOptions: {
+                bar: {
+                    columnWidth: "30%",
+                },
+            },
+            series: [
+                { name: "Income", data: filteredData.pemasukan },
+                { name: "Expense", data: filteredData.pengeluaran },
+            ],
+            legend: {
+                position: "top",
+                horizontalAlign: "center",
+            },
+        });
+    }
 
-    // Ambil data dan render chart awal
+    function renderIncomeExpenseChart(data, months = "all") {
+        const filteredData = filterData(data, months);
+
+        if (!Array.isArray(filteredData.data_pemasukan) || !Array.isArray(filteredData.data_pengeluaran)) {
+            console.warn("Data income/expense tidak lengkap:", filteredData);
+            return;
+        }
+
+        renderChart("line", "#barChart", filteredData, {
+            colors: ["#28a745", "#dc3545"],
+            stroke: {
+                curve: "smooth",
+                width: 2,
+            },
+            markers: { size: 0 },
+            series: [
+                { name: "Income", data: filteredData.data_pemasukan },
+                { name: "Expense", data: filteredData.data_pengeluaran },
+            ],
+            legend: {
+                position: "top",
+                horizontalAlign: "center",
+            },
+        });
+    }
+
+    function handleFilterChange(e) {
+        const months = e.target.value === "all" ? "all" : parseInt(e.target.value);
+        renderCashFlowChart(chartData["cashFlow"], months);
+        renderIncomeExpenseChart(chartData["incomeExpense"], months);
+    }
+
+    // Ambil data awal
     Promise.all([
-        fetch("/dashboard/line-data").then((res) => res.json()),
-        fetch("/dashboard/chart-data").then((res) => res.json()),
+        fetch("/dashboard/line-data").then(res => res.json()),
+        fetch("/dashboard/chart-data").then(res => res.json())
     ]).then(([cashFlowData, incomeExpenseData]) => {
         chartData["cashFlow"] = cashFlowData;
         chartData["incomeExpense"] = incomeExpenseData;
@@ -89,62 +144,23 @@ document.addEventListener("DOMContentLoaded", function () {
         renderCashFlowChart(cashFlowData, 6);
         renderIncomeExpenseChart(incomeExpenseData, 6);
 
-        // Event listener untuk filter periode
-        document.getElementById("filterPeriod").addEventListener("change", handleFilterChange);
+        const filter = document.getElementById("filterPeriod");
+        if (filter) filter.addEventListener("change", handleFilterChange);
+    }).catch(err => {
+        console.error("Gagal memuat data chart:", err);
     });
 
-    // Fungsi render chart arus kas
-    function renderCashFlowChart(data, months = "all") {
-        const filteredData = filterData(data, months);
-        renderChart("bar", "#columnChart", filteredData, {
-            plotOptions: {
-                bar: { columnWidth: "45%", borderRadius: 5 },
-            },
-            dataLabels: {
-                enabled: false,
-            },
-            series: [
-                { name: "Expense", data: filteredData.pemasukan },
-                { name: "Income", data: filteredData.pengeluaran },
-            ],
-            tooltip: {
-                theme: (document.documentElement.getAttribute("data-bs-theme") === "dark") ? "dark" : "light",
-                y: {
-                    formatter: (val) => "Rp " + val.toLocaleString(),
-                },
-            },
-        });
-    }
+    // Theme switching
+    document.addEventListener("themeChanged", () => {
+        const filter = document.getElementById("filterPeriod");
+        const months = filter?.value === "all" ? "all" : parseInt(filter?.value || "6");
 
-    // Fungsi render line
-    function renderIncomeExpenseChart(data, months = "all") {
-        const filteredData = filterData(data, months);
-        renderChart("line", "#barChart", filteredData, {
-            series: [
-                { name: "Income", data: filteredData.data_pemasukan },
-                { name: "Expense", data: filteredData.data_pengeluaran },
-            ],
-            yaxis: [
-                {
-                    labels: {
-                        formatter: (val) => val.toLocaleString('id-ID')
-                    }
-                }
-            ],
-        });
-    }
-
-    // Fungsi untuk menangani perubahan filter
-    function handleFilterChange(e) {
-        const months = e.target.value === "all" ? "all" : parseInt(e.target.value);
         renderCashFlowChart(chartData["cashFlow"], months);
         renderIncomeExpenseChart(chartData["incomeExpense"], months);
-    }
+    });
 
-    // Toggle antara chart dengan animasi
-    document.getElementById("chartType").addEventListener("change", toggleChart);
-
-    function toggleChart() {
+    // Chart switch toggle
+    document.getElementById("chartType")?.addEventListener("change", () => {
         const chartType = document.getElementById("chartType").value;
         const columnChart = document.getElementById("columnChart");
         const barChart = document.getElementById("barChart");
@@ -159,24 +175,16 @@ document.addEventListener("DOMContentLoaded", function () {
             if (chartType === "cashFlow") {
                 columnChart.style.display = "block";
                 setTimeout(() => columnChart.classList.add("show"), 50);
-                refreshChart(columnChart);
+                window.dispatchEvent(new Event("resize"));
             } else {
                 barChart.style.display = "block";
                 setTimeout(() => barChart.classList.add("show"), 50);
-                refreshChart(barChart);
+                window.dispatchEvent(new Event("resize"));
             }
         }, 300);
-    }
+    });
 
-    // Refresh chart untuk memaksa resize
-    function refreshChart(chartElement) {
-        setTimeout(() => {
-            chartElement.style.display = "block";
-            window.dispatchEvent(new Event("resize"));
-        }, 0);
-    }
-
-    // Tampilan chart saat halaman dimuat
+    // Set default chart saat halaman pertama dimuat
     window.onload = () => {
         const chartType = document.getElementById("chartType")?.value || "cashFlow";
         const columnChart = document.getElementById("columnChart");
@@ -248,13 +256,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 <tr>
                     <td class="text-center">${key + 1}</td>
                     <td class="text-center">
-                        ${transaction.pemasukan && transaction.pemasukan.nama ? transaction.pemasukan.nama : "-"}
+                        ${transaction.pemasukan && transaction.pemasukan_relation?.nama
+                        ? transaction.pemasukan_relation?.nama
+                        : "-"}
                     </td>
                     <td class="text-center">
                         ${transaction.nominal_pemasukan ? formatNumberWithSeparator(transaction.nominal_pemasukan) : "0"}
                     </td>
                     <td class="text-center">
-                        ${transaction.pengeluaran && transaction.pengeluaran.nama ? transaction.pengeluaran.nama : "-"}
+                        ${transaction.pengeluaran && transaction.pengeluaran_relation?.nama
+                        ? transaction.pengeluaran_relation.nama
+                        : "-"}
                     </td>
                     <td class="text-center">
                         ${transaction.nominal ? formatNumberWithSeparator(transaction.nominal) : "0"}
@@ -858,4 +870,162 @@ document.addEventListener("DOMContentLoaded", function () {
     // Eksekusi awal nominal
     initializeNominalDisplay();
     window.toggleNominal = toggleNominal;
+});
+
+// Saving rate
+document.addEventListener("DOMContentLoaded", function () {
+    const charts = {};           // Menyimpan semua instance chart
+    const chartData = {};        // Menyimpan data untuk tiap chart
+
+    const theme = () => document.documentElement.getAttribute("data-bs-theme") || "light";
+
+    /**
+     * Fungsi validasi data chart
+     */
+    function isValidChartData(data) {
+        return data && Array.isArray(data.labels);
+    }
+
+    /**
+     * Fungsi dasar konfigurasi chart Apex
+     */
+    function getBaseChartOptions(type, series, categories, customOptions = {}) {
+        const isDark = theme() === "dark";
+
+        return {
+            chart: {
+                type: type,
+                height: 350,
+                toolbar: { show: true, tools: { download: false } },
+                foreColor: isDark ? '#fff' : '#333'
+            },
+            xaxis: {
+                categories: categories,
+                labels: {
+                    style: { colors: isDark ? '#ccc' : '#555' }
+                },
+                title: {
+                    style: { color: isDark ? '#ccc' : '#555' }
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: val => val.toLocaleString('id-ID'),
+                    style: { colors: isDark ? '#ccc' : '#555' }
+                },
+                title: {
+                    text: "Nominal (Rp)",
+                    style: { color: isDark ? '#ccc' : '#555' }
+                }
+            },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light',
+                y: {
+                    formatter: val => "Rp " + val.toLocaleString('id-ID')
+                }
+            },
+            stroke: { curve: "smooth", width: 2 },
+            markers: { size: 5 },
+            colors: ['#28a745'],
+            legend: {
+                position: "top",
+                horizontalAlign: "center"
+            },
+            series: series,
+            ...customOptions
+        };
+    }
+
+    /**
+     * Fungsi untuk memfilter data berdasarkan jumlah bulan terakhir
+     */
+    function filterData(data, months) {
+        if (!isValidChartData(data)) {
+            console.warn("filterData error: data.labels tidak valid", data);
+            return { labels: [], pemasukan: [], pengeluaran: [] };
+        }
+
+        if (months === "all") return data;
+
+        const startIndex = Math.max(data.labels.length - months, 0);
+        const filtered = { labels: data.labels.slice(startIndex) };
+
+        Object.keys(data).forEach((key) => {
+            if (Array.isArray(data[key])) {
+                filtered[key] = data[key].slice(startIndex);
+            }
+        });
+
+        return filtered;
+    }    /**
+     * Fungsi umum render chart
+     */
+    function renderChart(selector, type, series, categories, options = {}) {
+        const el = document.querySelector(selector);
+        if (!el) return;
+
+        const config = getBaseChartOptions(type, series, categories, options);
+
+        if (charts[selector]) {
+            charts[selector].updateOptions(config);
+        } else {
+            charts[selector] = new ApexCharts(el, config);
+            charts[selector].render();
+        }
+    }
+
+    /**
+     * FETCH & RENDER saving rate chart
+     */
+    function loadSavingRateChart(period = '6') {
+        const url = `/dashboard/saving-rate-data?periode=${period}`;
+
+        const loader = document.getElementById("savingRateLoader");
+        if (loader) loader.style.display = "inline-block";
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (!isValidChartData(data)) throw new Error("Invalid chart data");
+
+                chartData.savingRate = data;
+                renderChart("#savingRateChart", "line", [
+                    { name: "Saving Rate", data: data.data }
+                ], data.labels, {
+                    markers: {
+                        size: 5,
+                        strokeColors: '#28a745',
+                        strokeWidth: 2,
+                        hover: { size: 7 }
+                    }
+                });
+            })
+            .catch(err => console.error("Gagal memuat saving rate:", err))
+            .finally(() => {
+                if (loader) loader.style.display = "none";
+            });
+    }
+
+    /**
+     * ON FILTER CHANGE
+     */
+    const filterSaving = document.getElementById("filterPeriodSavingRate");
+    if (filterSaving) {
+        loadSavingRateChart(filterSaving.value);
+
+        filterSaving.addEventListener("change", function () {
+            loadSavingRateChart(this.value);
+        });
+
+        document.addEventListener("themeChanged", function () {
+            loadSavingRateChart(filterSaving.value);
+        });
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const avgPemasukan = parseFloat(document.getElementById("rataPemasukan").dataset.value);
+    const avgPengeluaran = parseFloat(document.getElementById("rataPengeluaran").dataset.value);
+
+    console.log("Pemasukan:", avgPemasukan, "Pengeluaran:", avgPengeluaran);
 });

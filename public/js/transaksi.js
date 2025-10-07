@@ -99,21 +99,17 @@ $(document).ready(function () {
                 " - " +
                 chosen_end_date.format("YYYY-MM-DD")
             );
-            transaksiTable.draw();
+            table.draw();
         }
     );
 
-    var transaksiTable = $("#transaksiTable").DataTable({
+    const table = $("#transaksiTable").DataTable({
         paging: true,
         responsive: true,
         lengthChange: true,
         autoWidth: false,
         serverSide: true,
         processing: true,
-        language: {
-            processing:
-                '<div class="loader-container"><div class="loader"></div></div>',
-        },
         ajax: {
             url: "/transaksi",
             type: "GET",
@@ -124,8 +120,8 @@ $(document).ready(function () {
                 d.end_date = $("#daterange")
                     .data("daterangepicker")
                     .endDate.format("YYYY-MM-DD");
-                d.pemasukan = $('select[name="filter_pemasukan"]').val();
-                d.pengeluaran = $('select[name="filter_pengeluaran"]').val();
+                d.filter_pemasukan = $('select[name="filter_pemasukan"]').val();
+                d.filter_pengeluaran = $('select[name="filter_pengeluaran"]').val();
             },
             dataSrc: function (json) {
                 $("#totalPemasukan").text(
@@ -133,6 +129,9 @@ $(document).ready(function () {
                 );
                 $("#totalPengeluaran").text(
                     json.totalPengeluaran.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                );
+                $("#netIncome").text(
+                    json.netIncome.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                 );
                 return json.data;
             },
@@ -147,8 +146,7 @@ $(document).ready(function () {
             },
             {
                 data: "tgl_transaksi",
-                className: "text-center",
-                render: function (data, type, row) {
+                render: function (data) {
                     var date = new Date(data);
                     return date.toLocaleDateString("id-ID", {
                         weekday: "long",
@@ -159,120 +157,73 @@ $(document).ready(function () {
                 },
             },
 
-            {
-                data: null,
-                className: "text-center",
-                render: function (data, type, row) {
-                    return row.pemasukan?.nama ?? "-";
-                }
-            },
-
+            { data: 'pemasukan_nama', name: 'pemasukan_nama' },
             {
                 data: "nominal_pemasukan",
-                className: "text-center",
-                render: function (data, type, row) {
-                    var numericValue = parseFloat(data);
-                    if (!isNaN(numericValue)) {
-                        var formattedNominal =
-                            numericValue.toLocaleString("id-ID");
-                        return (
-                            '<span>' +
-                            formattedNominal +
-                            "</span>"
-                        );
-                    } else {
-                        return '<span>0</span>';
-                    }
-                },
-            },
-
-            {
-                data: null,
-                className: "text-center",
-                render: function (data, type, row) {
-                    return row.pengeluaran?.nama ?? "-";
+                render: data => {
+                    const value = parseFloat(data);
+                    return `<span>${isNaN(value) ? 0 : value.toLocaleString("id-ID")}</span>`;
                 }
             },
-
+            { data: 'pengeluaran_nama', name: 'pengeluaran_nama' },
             {
                 data: "nominal",
-                className: "text-center",
-                render: function (data, type, row) {
-                    var numericValue = parseFloat(data);
-
-                    if (!isNaN(numericValue)) {
-                        var formattedNominal =
-                            numericValue.toLocaleString("id-ID");
-                        return (
-                            '<span>' +
-                            formattedNominal +
-                            "</span>"
-                        );
-                    } else {
-                        return '<span>0</span>';
-                    }
-                },
+                render: data => {
+                    const value = parseFloat(data);
+                    return `<span>${isNaN(value) ? 0 : value.toLocaleString("id-ID")}</span>`;
+                }
             },
-
             {
                 data: "keterangan",
-                className: "text-left",
-                render: function (data, type, row) {
-                    if (type === "display") {
-                        if (data && typeof data === "string") {
-                            var lines = data.split("\n");
-                            var table = `
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <colgroup>
-                            <col style="width: 30px;">
-                            <col>
-                        </colgroup>`;
+                render: (data, type) => {
+                    if (type !== "display") return data || "-";
 
-                            lines.forEach(function (line, index) {
-                                table += `
-                        <tr>
-                            <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${index + 1}</td>
-                            <td style="border: 1px solid #ddd; padding: 4px;">${line}</td>
-                        </tr>`;
-                            });
+                    if (typeof data !== "string" || !data.trim()) return "-";
 
-                            table += "</table>";
-                            return table;
-                        } else {
-                            return "-";
-                        }
-                    }
-                    return data ? data : "-";
-                },
+                    const rows = data.split("\n").map(
+                        (line, i) => `
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${i + 1}</td>
+                                <td style="border: 1px solid #ddd; padding: 4px;">${line}</td>
+                            </tr>`
+                    ).join("");
+
+                    return `
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <colgroup>
+                                <col style="width: 30px;">
+                                <col>
+                            </colgroup>
+                            ${rows}
+                        </table>`;
+                }
             },
-            { data: 'created_at', className: 'text-center' },
-            { data: 'updated_at', className: 'text-center' },
-
+            { data: 'created_at' },
+            { data: 'updated_at' },
             {
-                data: "aksi",
+                data: 'aksi',
                 orderable: false,
                 searchable: false,
-                className: "text-center",
             },
         ],
-        createdRow: function (row, data, dataIndex) {
+        createdRow: function (row, data) {
             if (data.status == 0) {
                 $(row).addClass('table-danger');
             }
         }
     });
     $('select[name="filter_pemasukan"]').on("change", function () {
-        transaksiTable.ajax.reload();
+        table.ajax.reload();
     });
 
     $('select[name="filter_pengeluaran"]').on("change", function () {
-        transaksiTable.ajax.reload();
+        table.ajax.reload();
     });
 });
 
 // Filter Tomselect
 document.addEventListener('DOMContentLoaded', function () {
-    new TomSelect('#pengeluaran', {
+    new TomSelect('#pemasukan', '#filter_pemasukan', {
         allowEmptyOption: true,
         placeholder: '- Pilih -',
         create: false,
@@ -284,6 +235,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// Filter Tomselect
+document.addEventListener('DOMContentLoaded', function () {
+    new TomSelect('#pengeluaran', '#filter_pengeluaran', {
+        allowEmptyOption: true,
+        placeholder: '- Pilih -',
+        create: false,
+        onInitialize: function () {
+            // Jika tidak ada nilai terpilih, pakai placeholder
+            if (!this.getValue()) {
+                this.setTextboxValue('');
+            }
+        }
+    });
+});
+
+// JS
+document.addEventListener('DOMContentLoaded', function () {
+    // TomSelect untuk filter pemasukan
+    new TomSelect('#filter_pemasukan', {
+        allowEmptyOption: true,
+        placeholder: '- Pilih -',
+        create: false,
+        onInitialize: function () {
+            if (!this.getValue()) {
+                this.setTextboxValue('');
+            }
+        }
+    });
+
+    // TomSelect untuk filter pengeluaran
+    new TomSelect('#filter_pengeluaran', {
+        allowEmptyOption: true,
+        placeholder: '- Pilih -',
+        create: false,
+        onInitialize: function () {
+            if (!this.getValue()) {
+                this.setTextboxValue('');
+            }
+        }
+    });
+});
+
 
 // Fungsi untuk menampilkan toast notification
 function showToast(message, type) {
@@ -373,68 +367,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Fungsi untuk me-refresh tabel data
-    function refreshTable() {
-        // Tambahkan loading spinner ke tabel
-        const tableContainer = document.querySelector('.table-responsive');
-        if (tableContainer) {
-            // Tambahkan overlay loading jika belum ada
-            let loadingOverlay = tableContainer.querySelector('.loading-overlay');
-            if (!loadingOverlay) {
-                loadingOverlay = document.createElement('div');
-                loadingOverlay.className = 'loading-overlay';
-                loadingOverlay.innerHTML = `
-                    <div class="d-flex justify-content-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                `;
-                tableContainer.style.position = 'relative';
-                loadingOverlay.style.position = 'absolute';
-                loadingOverlay.style.top = '0';
-                loadingOverlay.style.left = '0';
-                loadingOverlay.style.width = '100%';
-                loadingOverlay.style.height = '100%';
-                loadingOverlay.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
-                loadingOverlay.style.display = 'flex';
-                loadingOverlay.style.alignItems = 'center';
-                loadingOverlay.style.zIndex = '10';
-                tableContainer.appendChild(loadingOverlay);
-            } else {
-                loadingOverlay.style.display = 'flex';
-            }
-
-            // Fetch data terbaru dan update tabel
-            fetch(window.location.href, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(response => response.text())
-                .then(html => {
-                    // Extract tabel dari response
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newTable = doc.querySelector('.table-responsive table');
-
-                    // Update tabel dengan data baru
-                    if (newTable) {
-                        const currentTable = tableContainer.querySelector('table');
-                        if (currentTable) {
-                            currentTable.innerHTML = newTable.innerHTML;
-                        }
-                    }
-
-                    // Sembunyikan loading overlay
-                    loadingOverlay.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error refreshing table:', error);
-                    loadingOverlay.style.display = 'none';
-                    showToast('Gagal memperbarui tabel: ' + error.message, 'danger');
-                });
-        }
-    }
 
     // Event listener untuk button simpan
     btnSimpan.addEventListener('click', function (event) {
@@ -447,7 +379,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Menampilkan spinner dan menonaktifkan button
         btnSpinner.classList.remove('d-none');
-        btnText.textContent = ' Menyimpan...';
         btnSimpan.disabled = true;
 
         // Mengambil data form
@@ -564,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Edit Transaksi
-$("body").on("click", ".tombol-edit-transaksi", function (e) {
+$("body").on("click", ".tombol-edit-transaksi", function () {
     var id = $(this).data("id");
 
     $.ajax({
@@ -616,7 +547,7 @@ $("body").on("submit", "#editTransaksiForm", function (e) {
         url: url,
         type: "PUT",
         data: formData,
-        success: function (response) {
+        success: function () {
             $("#editTransaksiModal").modal("hide");
 
             setTimeout(() => {
@@ -974,4 +905,77 @@ document.getElementById("importForm").addEventListener("submit", function (e) {
             xhr.send(formData);
         }
     });
+});
+
+$(document).ready(function () {
+    $('#transaksiModal').on('shown.bs.modal', function () {
+        // Bind ulang setiap kali modal dibuka
+        $('#checkAssetList').off('change').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#selectBarangContainer').slideDown();
+
+                // Load data hanya jika belum ada
+                if ($('#barang_id option').length === 1) {
+                    $.ajax({
+                        url: '/api/barang',
+                        method: 'GET',
+                        success: function (data) {
+                            data.forEach(function (item) {
+                                $('#barang_id').append(`<option value="${item.id}">${item.nama_barang}</option>`);
+                            });
+                        },
+                        error: function () {
+                            alert('Gagal memuat data barang.');
+                        }
+                    });
+                }
+
+            } else {
+                $('#selectBarangContainer').slideUp();
+                $('#barang_id').val('');
+            }
+        });
+    });
+
+    // Reset saat modal ditutup (opsional)
+    $('#transaksiModal').on('hidden.bs.modal', function () {
+        $('#checkAssetList').prop('checked', false);
+        $('#selectBarangContainer').hide();
+        $('#barang_id').empty().append('<option value="">-- Pilih Barang --</option>');
+    });
+});
+
+document.getElementById('btn-download-template').addEventListener('click', function () {
+    const spinner = document.getElementById('spinner');
+    const url = this.getAttribute('data-url');
+
+    spinner.classList.remove('d-none');
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal mengunduh file');
+            return response.blob();
+        })
+        .then(blob => {
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = 'template_arus_kas_bimmo.xlsx';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Terjadi kesalahan saat mengunduh template.');
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+        });
 });

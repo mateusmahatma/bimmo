@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
         persist: false,
         create: false,
         maxItems: null,
-        placeholder: 'Select Expense Type',
+        placeholder: 'Pilih Jenis Pengeluaran',
     });
 
     // DataTable
@@ -102,14 +102,11 @@ document.addEventListener("DOMContentLoaded", function () {
         processing: true,
         lengthChange: true,
         autoWidth: false,
-        language: {
-            processing: '<div class="loader-container"><div class="loader"></div></div>'
-        },
         ajax: {
             url: '/anggaran',
             type: 'GET',
             dataSrc: function (json) {
-                $('#totalPersentase').text(json.totalPersentase.toLocaleString('id-ID'));
+                $('#totalPersentase').text(json.totalPersentase.toLocaleString('id-ID') + '%');
                 if (json.exceedMessage) {
                     $('#exceedMessage').text(json.exceedMessage).show();
                 } else {
@@ -205,11 +202,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function validasiFormAnggaran(data) {
         if (!data.nama_anggaran) {
-            showToast('The budget name must be filled in!', 'danger');
+            showToast('Nama anggaran harus diisi!', 'danger');
             return false;
         }
         if (!data.persentase_anggaran) {
-            showToast('The percentage must be filled in!', 'danger');
+            showToast('Persentase harus diisi!', 'danger');
             return false;
         }
         return true;
@@ -220,16 +217,16 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#persentase_anggaran').val('');
         $('#id_pengeluaran')[0].tomselect.clear();
         $('#anggaranModal').removeData('id');
-        $('#anggaranModalLabel').text('Add Budget');
-        $('.tombol-simpan-anggaran').html('Save');
+        $('#anggaranModalLabel');
+        $('.tombol-simpan-anggaran');
     }
 
     function spinnerButton() {
-        return '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Process ...';
+        return '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
     }
 
     function resetTombolSimpanAnggaran() {
-        $('.tombol-simpan-anggaran').prop('disabled', false).html('Save');
+        $('.tombol-simpan-anggaran').prop('disabled', false).html('Simpan');
     }
 
     function onSuccessSimpanAnggaran() {
@@ -273,23 +270,35 @@ document.addEventListener("DOMContentLoaded", function () {
     $('body').on('click', '.tombol-edit-anggaran', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
+
         $.get('/anggaran/' + id + '/edit', function (res) {
             const anggaran = res.result;
+
             $('#anggaranModal').modal('show');
+            $('#anggaranModalLabel').text('Edit Anggaran');
+            $('.tombol-simpan-anggaran').html('Memperbarui');
+
             $('#nama_anggaran').val(anggaran.nama_anggaran);
             $('#persentase_anggaran').val(anggaran.persentase_anggaran);
+
             const selectInstance = $('#id_pengeluaran')[0].tomselect;
-            selectInstance.clear(); // Kosongkan dulu agar tidak stack
-            if (Array.isArray(anggaran.id_pengeluaran)) {
-                anggaran.id_pengeluaran.forEach(val => selectInstance.addItem(val));
-            } else if (anggaran.id_pengeluaran) {
-                selectInstance.addItem(anggaran.id_pengeluaran);
-            }
+            selectInstance.clear();
+
+            // Tambahkan opsi id => nama
+            Object.entries(anggaran.id_pengeluaran).forEach(([id, nama]) => {
+                if (!selectInstance.options[id]) {
+                    selectInstance.addOption({ value: id, text: nama });
+                }
+            });
+
+            // Set value hanya id
+            selectInstance.setValue(Object.keys(anggaran.id_pengeluaran));
+
             $('#anggaranModal').data('id', id);
-            $('#anggaranModalLabel').text('Edit Budget');
-            $('.tombol-simpan-anggaran').html('Update');
         });
     });
+
+
 
     $('body').on('click', '.tombol-simpan-anggaran', function (e) {
         e.preventDefault();
@@ -306,14 +315,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
         Swal.fire({
-            title: 'Are you sure you want to delete this data?',
-            html: 'Deleted data cannot be recovered!',
+            title: 'Apakah Anda yakin ingin menghapus data ini?',
+            html: 'Data yang dihapus tidak dapat dipulihkan!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: isDarkMode ? '#6f42c1' : '#012970',
             cancelButtonColor: '#dc3545',
-            confirmButtonText: 'Yes, delete!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
             background: isDarkMode ? '#2c2c3c' : '#ffffff',
             color: isDarkMode ? '#ffffff' : '#000000',
             customClass: {
@@ -325,11 +334,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     url: '/anggaran/' + id,
                     type: 'DELETE',
                     success: function () {
-                        showToast('Data successfully deleted', 'success');
+                        showToast('Data berhasil dihapus', 'success');
                         $('#anggaranTable').DataTable().ajax.reload();
                     },
                     error: function () {
-                        showToast('Data failed to be deleted', 'danger');
+                        showToast('Data gagal dihapus', 'danger');
                         $('#anggaranTable').DataTable().ajax.reload();
                     }
                 });

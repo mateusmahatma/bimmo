@@ -46,7 +46,7 @@
                 <label for="toggle-password">Lihat Password Baru</label>
             </div>
 
-            <button type="submit" class="btn-sm btn-color">Simpan</button>
+            <button type="submit" class="btn btn-warning">Simpan</button>
         </form>
     </div>
 </div>

@@ -75,4 +75,15 @@ class BarangController extends Controller
     {
         $id = Barang::where('id', $id)->delete();
     }
+
+    public function getList()
+    {
+        $userId = Auth::id();
+        $barang = Barang::where('status', 1)
+            ->where('id_user', $userId)
+            ->select('id', 'nama_barang')
+            ->get();
+
+        return response()->json($barang);
+    }
 }

@@ -2,7 +2,7 @@
 <html lang="id">
 
 <head>
-    <title>Budget Results</title>
+    <title>Hasil Anggaran</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -12,60 +12,67 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar px-3">
-    <a class="navbar-brand" href="/anggaran">Budget Results</a>
+    <a class="navbar-brand" href="/anggaran">Hasil Anggaran</a>
 </nav>
 
 <div class="card-header">
     <div class="card-body">
+        <div class="custom-alert" role="alert">
+            <h4 class="custom-alert-heading">Langkah-langkah untuk memproses anggaran:</h4>
+            <ol class="mb-0">
+                <li>Isi kolom "Input Pendapatan Bulanan".</li>
+                <li>Isi kolom "Masukan Penghasilan Tambahan", kolom ini bersifat opsional.</li>
+                <li>Pilih rentang tanggal untuk mengatur periode anggaran.</li>
+                <li>Klik tombol "Proses"</li>
+            </ol>
+        </div>
         <form method="post" action="/kalkulator" id="formKalkulator" autocomplete="off">
             @csrf
-            <div class="mt-3 mb-3">
-                <label for="monthly_income" class="form-label required">Monthly Income:</label>
-                <input type="number" name="monthly_income" class="form-control" placeholder="Enter here monthly income" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="additional_income" class="form-label">Additional Income:</label>
-                <input type="number" name="additional_income" class="form-control" placeholder="Enter here additional income">
-            </div>
-
-            <div class="mb-3">
-                <label for="daterange" class="form-label">Select Budget Period Date:</label>
-                <div id="daterange" class="daterange" style="cursor: pointer;">
-                    <i class="fa fa-calendar"></i>
-                    <span>Select a date range</span>
-                    <i class="fa fa-caret-down"></i>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <p for="monthly_income" class="filter required">Input Pendapatan Bulanan:</p>
+                    <input type="number" name="monthly_income" class="form-control" placeholder="Enter here monthly income" required>
                 </div>
 
-                <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
-                <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
-            </div>
+                <div class="col-md-4">
+                    <p for="additional_income" class="filter">Masukan Pendapatan Tambahan:</p>
+                    <input type="number" name="additional_income" class="form-control" placeholder="Enter here additional income">
+                </div>
 
-            <div class="button-group">
-                <button type="submit" class="cssbuttons-io-button" id="btnProses">
-                    <span id="btnProsesSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                    <span id="btnProsesText"><i class="fa fa-sync-alt"></i> Process</span>
-                </button>
+                <div class="col-md-4">
+                    <p for="daterange" class="filter">Pilih Tanggal Periode Anggaran:</p>
+                    <div id="daterange" class="daterange" style="cursor: pointer;">
+                        <i class="fa fa-calendar"></i>
+                        <span></span>
+                        <i class="fa fa-caret-down"></i>
+                    </div>
+
+                    <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
+                    <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-warning" id="btnProses">
+                        <span id="btnProsesSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <span id="btnProsesText"><i class="fa fa-sync-alt"></i> Proses</span>
+                    </button>
+                </div>
             </div>
         </form>
-    </div>
-</div>
 
-<div class="card-header">
-    <div class="card-body">
         <table id="hasilAnggaranTable" class="customTable">
             <thead>
                 <tr>
-                    <th style="width: 3px;">No</th>
-                    <th class="text-center">Start Date</th>
-                    <th class="text-center">End Date</th>
-                    <th class="text-center">Budget Name</th>
-                    <th class="text-center" style="width: 250px;">Expense Type</th>
-                    <th class="text-center">Budget Percentage</th>
-                    <th class="text-center">Budget Amount</th>
-                    <th class="text-center">Used Budget</th>
-                    <th class="text-center">Remaining Budget</th>
-                    <th style="width: 1px;"></th>
+                    <th style="width: 1%;">No</th>
+                    <th class="text-center">Tanggal Mulai</th>
+                    <th class="text-center">Tanggal Akhir</th>
+                    <th class="text-center">Nama Anggaran</th>
+                    <th class="text-center" style="width: 200px;">Jenis Pengeluaran</th>
+                    <th class="text-center">Persentase Anggaran</th>
+                    <th class="text-center">Jumlah Anggaran</th>
+                    <th class="text-center">Anggaran yang digunakan</th>
+                    <th class="text-center">Sisa Anggaran</th>
+                    <th style="width: 1%;"></th>
                 </tr>
             </thead>
         </table>

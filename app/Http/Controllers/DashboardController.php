@@ -34,12 +34,14 @@ class DashboardController extends Controller
 
         // Total nominal bulan ini
         $totalThisMonth = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $now->year)
             ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal');
 
         // Total nominal bulan lalu
         $totalLastMonth = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $lastMonth->year)
             ->whereMonth('tgl_transaksi', $lastMonth->month)
             ->sum('nominal');
@@ -79,7 +81,7 @@ class DashboardController extends Controller
         $transaksi = Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
 
         // Hitung total pengeluaran
-        $totalPengeluaran = $transaksi->sum('nominal');
+        $totalPengeluaran = $transaksi->where('status', '1')->sum('nominal');
 
         // Hitung selisih bulan dari transaksi pertama ke terakhir
         if ($transaksi->count() > 1) {
@@ -87,7 +89,8 @@ class DashboardController extends Controller
             $lastDate = Carbon::parse($transaksi->last()->tgl_transaksi)->startOfMonth();
             $selisihBulan = $firstDate->diffInMonths($lastDate) + 1; // +1 supaya bulan awal ikut dihitung
         } else {
-            $selisihBulan = 1; // fallback kalau cuma ada 1 data
+            // fallback kalau cuma ada 1 data
+            $selisihBulan = 1;
         }
 
         // Rata-rata pengeluaran bulanan
@@ -105,6 +108,7 @@ class DashboardController extends Controller
             ->sum('nominal_pemasukan');
 
         $totalPengeluaran = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $now->year)
             ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal');
@@ -120,6 +124,7 @@ class DashboardController extends Controller
         // Total Nominal Bulanan
         $now = Carbon::now();
         $totalNominalBulan = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $now->year)
             ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal');
@@ -130,6 +135,9 @@ class DashboardController extends Controller
             ->sum('nominal_pemasukan');
 
         $totalNominalSisa = $totalNominalBulanPemasukan - $totalNominalBulan;
+
+        $avgPemasukan = array_sum(['pemasukan']) / count(['pemasukan']);
+        $avgPengeluaran = array_sum(['pengeluaran']) / count(['pengeluaran']);
 
         // Kirim semua data ke view
         return view('dashboard.index', compact(
@@ -144,6 +152,8 @@ class DashboardController extends Controller
             'totalNominalBulan',
             'totalNominalBulanPemasukan',
             'totalNominalSisa',
+            'avgPemasukan',
+            'avgPengeluaran',
         ));
     }
 
@@ -151,7 +161,7 @@ class DashboardController extends Controller
     public function lineData()
     {
         $userId = Auth::id();
-        $transaksi = Transaksi::where('id_user', $userId)->get();
+        $transaksi = Transaksi::where('id_user', $userId)->where('status', '1')->get();
 
         $data = [];
         foreach ($transaksi as $transaksi) {
@@ -182,6 +192,7 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
         $transaksi = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->get();
 
         $data = [];
@@ -209,6 +220,7 @@ class DashboardController extends Controller
         $now = Carbon::now();
 
         $transaksi = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $now->year)
             ->whereMonth('tgl_transaksi', $now->month)
             ->where('pengeluaran', '!=', '')
@@ -245,7 +257,8 @@ class DashboardController extends Controller
         $startDate = Carbon::now('Asia/Jakarta')->startOfDay();
         $endDate = Carbon::now('Asia/Jakarta')->endOfDay();
 
-        $todayTransactions = Transaksi::with(['pengeluaran', 'pemasukan'])->where('id_user', $userId)
+        $todayTransactions = Transaksi::with(['pengeluaranRelation', 'pemasukanRelation'])
+            ->where('id_user', $userId)
             ->whereBetween('tgl_transaksi', [$startDate, $endDate])
             ->orderBy('tgl_transaksi', 'desc')
             ->get();
@@ -261,12 +274,13 @@ class DashboardController extends Controller
         $selectedYear = $request->input('year', Carbon::now()->year);
 
         $jenisPengeluaran = Transaksi::select(
-            'pengeluaran.id as pengeluaran_id',  // TAMBAHAN: ID pengeluaran
+            'pengeluaran.id as pengeluaran_id',
             'pengeluaran.nama as pengeluaran_nama',
             DB::raw('SUM(nominal) as total')
         )
             ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
             ->where('transaksi.id_user', $userId)
+            ->where('transaksi.status', '1')
             ->whereYear('tgl_transaksi', $selectedYear)
             ->whereMonth('tgl_transaksi', $selectedMonth)
             ->groupBy('pengeluaran.id', 'pengeluaran.nama')  // PERBAIKAN: Group by ID juga
@@ -307,6 +321,52 @@ class DashboardController extends Controller
 
             return response()->json(['error' => 'Terjadi kesalahan server'], 500);
         }
+    }
+
+    // Saving Rate
+    public function getSavingRateData(Request $request)
+    {
+        $userId = Auth::id();
+        $periode = $request->query('periode', '6');
+
+        if ($periode === 'all') {
+            $startDate = Transaksi::where('id_user', $userId)
+                ->where('status', 2)
+                ->min('tgl_transaksi');
+
+            $start = $startDate ? Carbon::parse($startDate)->startOfMonth() : Carbon::now()->startOfMonth();
+        } else {
+            $months = intval($periode);
+            $start = Carbon::now()->subMonthsNoOverflow($months - 1)->startOfMonth();
+        }
+
+        $end = Carbon::now()->endOfMonth();
+
+        $transaksi = Transaksi::where('id_user', $userId)
+            ->where('status', 2)
+            ->whereBetween('tgl_transaksi', [$start, $end])
+            ->get();
+
+        // Inisialisasi bulan
+        $data = [];
+        $current = $start->copy();
+        while ($current <= $end) {
+            $label = $current->format('F Y');
+            $data[$label] = 0;
+            $current->addMonth();
+        }
+
+        foreach ($transaksi as $item) {
+            $label = Carbon::parse($item->tgl_transaksi)->format('F Y');
+            if (isset($data[$label])) {
+                $data[$label] += $item->nominal;
+            }
+        }
+
+        return response()->json([
+            'labels' => array_keys($data),
+            'data' => array_values($data),
+        ]);
     }
 
     function logout()
