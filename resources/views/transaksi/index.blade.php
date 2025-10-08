@@ -120,7 +120,7 @@
                     <th>Jumlah Pendapatan</th>
                     <th>Jenis Pengeluaran</th>
                     <th>Jumlah Pengeluaran</th>
-                    <th style="width:20%">Catatan</th>
+                    <th style="width:20%">Keterangan</th>
                     <th>Dibuat</th>
                     <th>Diperbarui</th>
                     <th style="width: 1%;"></th>

@@ -177,25 +177,14 @@ $(document).ready(function () {
                 data: "keterangan",
                 render: (data, type) => {
                     if (type !== "display") return data || "-";
+                    if (!data?.trim()) return "-";
 
-                    if (typeof data !== "string" || !data.trim()) return "-";
+                    const rows = data
+                        .split("\n")
+                        .map((line, i) => `<tr><td>${i + 1}</td><td>${line}</td></tr>`)
+                        .join("");
 
-                    const rows = data.split("\n").map(
-                        (line, i) => `
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 4px; text-align: center;">${i + 1}</td>
-                                <td style="border: 1px solid #ddd; padding: 4px;">${line}</td>
-                            </tr>`
-                    ).join("");
-
-                    return `
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <colgroup>
-                                <col style="width: 30px;">
-                                <col>
-                            </colgroup>
-                            ${rows}
-                        </table>`;
+                    return `<table class="table-static">${rows}</table>`;
                 }
             },
             { data: 'created_at' },
@@ -367,8 +356,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return true;
     }
-
-    // Fungsi untuk me-refresh tabel data
 
     // Event listener untuk button simpan
     btnSimpan.addEventListener('click', function (event) {

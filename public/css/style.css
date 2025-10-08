@@ -611,7 +611,6 @@ p {
     transition: all 0.2s ease-out;
 
     &:hover {
-        /* box-shadow: 0px 4px 8px rgba(38, 38, 38, 0.2); */
         top: -4px;
         border: 1px solid #cccccc;
         background-color: white;
@@ -2249,35 +2248,12 @@ table.customTable thead {
     font-weight: bold;
 }
 
-/* table.customTable thead th:first-child {
-    border-top-left-radius: 8px;
-
-}
-
-table.customTable thead th:last-child {
-    border-top-right-radius: 8px;
-}
-
-table.customTable tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 8px;
-}
-
-table.customTable tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 8px;
-} */
-
 /* Sel dan border */
 table.customTable th,
 table.customTable td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-}
-
-/* Efek hover */
-table.customTable tbody tr:hover {
-    background-color: #f1f1f1;
-    transition: background 0.3s ease-in-out;
 }
 
 /* Tabel Dashboard */
@@ -2433,15 +2409,11 @@ table.dashboardTable tbody tr:last-child td {
 }
 
 .table-danger {
-    background-color: #DB504A !important;
+    background-color: #E53935 !important;
 }
 
 .table-success {
     background-color: #4CAF50 !important;
-}
-
-:root[data-bs-theme='dark'] .table-danger {
-    background-color: #6f42c1 !important;
 }
 
 .table-noborder {
@@ -2639,4 +2611,24 @@ table.dashboardTable tbody tr:last-child td {
     background-color: var(--dt-active-bg);
     color: var(--dt-active-color);
     border-color: var(--dt-active-bg);
+}
+
+/* tabel di keterangan transaksi */
+.table-static {
+    width: 100%;
+    border-collapse: collapse;
+    color: #000 !important;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.table-static td {
+    border: 1px solid #ddd;
+    padding: 2px 4px;
+    vertical-align: top;
+}
+
+.table-static td:first-child {
+    text-align: center;
+    width: 25px;
 }
