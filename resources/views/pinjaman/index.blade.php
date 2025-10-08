@@ -26,6 +26,24 @@
 
 <div class="card-header">
     <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <p class="filter d-flex align-items-center">
+                    Status Pinjaman
+                    <i class="bi bi-exclamation-circle ms-2 text-muted"
+                        style="font-size: 14px; cursor: pointer;"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Pilih status pinjaman belum lunas atau lunas">
+                    </i>
+                </p>
+                <select class="form-select" id="filter_status" name="filter_status">
+                    <option value="">Belum Lunas dan Lunas</option>
+                    <option value="belum_lunas">Belum Lunas</option>
+                    <option value="lunas">Lunas</option>
+                </select>
+            </div>
+        </div>
         <div class="custom-alert" role="alert">
             <h4 class="custom-alert-heading">Laporan Pinjaman</h4>
             <p class="mb-2">Di bawah ini adalah ringkasan total pinjaman berdasarkan data yang tersedia.</p>

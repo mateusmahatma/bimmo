@@ -48,6 +48,7 @@ class DashboardController extends Controller
 
         // Total nominal pemasukan bulan ini
         $totalPemasukanThisMonth = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $now->year)
             ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal_pemasukan');
@@ -130,6 +131,7 @@ class DashboardController extends Controller
             ->sum('nominal');
 
         $totalNominalBulanPemasukan = Transaksi::where('id_user', $userId)
+            ->where('status', '1')
             ->whereYear('tgl_transaksi', $now->year)
             ->whereMonth('tgl_transaksi', $now->month)
             ->sum('nominal_pemasukan');

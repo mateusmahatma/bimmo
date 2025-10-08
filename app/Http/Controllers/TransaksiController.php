@@ -93,7 +93,6 @@ class TransaksiController extends Controller
         ])->with('message', 'Pastikan format tanggal yang Anda kirimkan adalah YYYY-MM-DD.');
     }
 
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([

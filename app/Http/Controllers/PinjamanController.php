@@ -16,6 +16,17 @@ class PinjamanController extends Controller
             $userId = Auth::id();
             $data = Pinjaman::where('id_user', $userId);
             $totalPinjaman = $data->sum('jumlah_pinjaman');
+
+            // filter status
+            if ($request->has('filter_status') && !empty($request->filter_status)) {
+                // pastikan selalu array
+                $filterStatus = (array) $request->filter_status;
+                $data->whereIn('status', $filterStatus);
+            }
+
+            // total dihitung setelah filter diterapkan
+            $totalPinjaman = $data->sum('jumlah_pinjaman');
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('jumlah_pinjaman', function ($pinjaman) {
@@ -35,8 +46,16 @@ class PinjamanController extends Controller
                 ->rawColumns(['aksi'])
                 ->toJson();
         }
+
+        // Ambil data unik status pinjaman untuk dropdown filter
+        // $statusList = Pinjaman::select('status')
+        //     ->where('id_user', Auth::id())
+        //     ->distinct()
+        //     ->pluck('status');
+
         return view('pinjaman.index', [
             'pinjaman' => Pinjaman::where('id_user', Auth::id())->get(),
+            // 'statusList' => $statusList,
         ]);
     }
 

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#pinjamanTable").DataTable({
+    let table = $("#pinjamanTable").DataTable({
         paging: true,
         responsive: true,
         lengthChange: true,
@@ -18,6 +18,10 @@ $(document).ready(function () {
                 );
                 return json.data;
             },
+            data: function (d) {
+                // kirim filter ke controller
+                d.filter_status = $('#filter_status').val();
+            }
         },
         columns: [
             {
@@ -62,6 +66,11 @@ $(document).ready(function () {
                 searchable: false,
             },
         ],
+    });
+
+    // reload saat filter berubah
+    $('#filter_status').on('change', function () {
+        table.ajax.reload();
     });
 
     // Handle tombol edit & proses update
@@ -176,8 +185,6 @@ $(document).ready(function () {
         $(this).removeData('id'); // Hapus ID agar tidak terbawa ke input berikutnya
         $('#nama_pinjaman, #jumlah_pinjaman, #jangka_waktu, #start_date, #end_date, #status').val('');
     });
-
-
 
     // Global Setup
     $.ajaxSetup({
