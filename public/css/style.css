@@ -2618,13 +2618,13 @@ table.dashboardTable tbody tr:last-child td {
     width: 100%;
     border-collapse: collapse;
     color: #000 !important;
-    font-size: 13px;
-    line-height: 1.1;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .table-static td {
     border: 1px solid #ddd;
-    padding: 2px 4px;
+    padding: 0.4em 0.6em;
     vertical-align: top;
 }
 
