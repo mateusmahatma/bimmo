@@ -94,8 +94,10 @@ body {
 
 /* Biar posisinya pas di bawah header */
 #nprogress .bar {
-    background: #0d6efd !important; /* warna biru bootstrap */
-    height: 3px; /* ketebalan garis */
+    background: #0d6efd !important;
+    /* warna biru bootstrap */
+    height: 3px;
+    /* ketebalan garis */
 }
 
 .scroll-container {
@@ -2432,6 +2434,10 @@ table.dashboardTable tbody tr:last-child td {
 
 .table-danger {
     background-color: #DB504A !important;
+}
+
+.table-success {
+    background-color: #4CAF50 !important;
 }
 
 :root[data-bs-theme='dark'] .table-danger {

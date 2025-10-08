@@ -209,6 +209,8 @@ $(document).ready(function () {
         createdRow: function (row, data) {
             if (data.status == 0) {
                 $(row).addClass('table-danger');
+            } else if (data.status == 2) {
+                $(row).addClass('table-success');
             }
         }
     });
