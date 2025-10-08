@@ -85,30 +85,37 @@
             </div>
         </div>
         <div class="custom-alert" role="alert">
-            <h4 class="custom-alert-heading">Laporan Keuangan</h4>
-            <p class="mb-2">Di bawah ini adalah ringkasan total pendapatan dan pengeluaran berdasarkan data yang tersedia.</p>
-            <div class="mt-3 mb-3">
-                <table class="table table-noborder mb-0" style="width:auto">
-                    <tr>
-                        <td><strong>Total Pendapatan</strong></td>
-                        <td class="px-2">:</td>
-                        <td><span id="totalPemasukan">0</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total Pengeluaran</strong></td>
-                        <td class="px-2">:</td>
-                        <td><span id="totalPengeluaran">0</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Laba Bersih</strong></td>
-                        <td class="px-2">:</td>
-                        <td><span id="netIncome">0</span></td>
-                    </tr>
-                </table>
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="custom-alert-heading mb-0">Laporan Keuangan</h4>
+                <button id="toggleBtn" class="btn btn-sm btn-outline-secondary" type="button">
+                    <span id="toggleIcon">+</span>
+                </button>
             </div>
 
-            <hr>
-            <p class="mb-0">Harap tinjau data di bawah ini untuk memastikan keakuratan data Anda.</p>
+            <div id="laporanContent" class="mt-3">
+                <p class="mb-2">Di bawah ini adalah ringkasan total pendapatan dan pengeluaran berdasarkan data yang tersedia.</p>
+                <div class="mt-3 mb-3">
+                    <table class="table table-noborder mb-0" style="width:auto">
+                        <tr>
+                            <td><strong>Total Pendapatan</strong></td>
+                            <td class="px-2">:</td>
+                            <td><span id="totalPemasukan">0</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Pengeluaran</strong></td>
+                            <td class="px-2">:</td>
+                            <td><span id="totalPengeluaran">0</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Laba Bersih</strong></td>
+                            <td class="px-2">:</td>
+                            <td><span id="netIncome">0</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <hr>
+                <p class="mb-0">Harap tinjau data di bawah ini untuk memastikan keakuratan data Anda.</p>
+            </div>
         </div>
 
         <table id="transaksiTable" class="customTable">

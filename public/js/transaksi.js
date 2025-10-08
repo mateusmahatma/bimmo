@@ -968,3 +968,18 @@ document.getElementById('btn-download-template').addEventListener('click', funct
             spinner.classList.add('d-none');
         });
 });
+
+
+const toggleBtn = document.getElementById("toggleBtn");
+const toggleIcon = document.getElementById("toggleIcon");
+const laporanContent = document.getElementById("laporanContent");
+
+toggleBtn.addEventListener("click", () => {
+    const isHidden = laporanContent.style.display === "none";
+    laporanContent.style.display = isHidden ? "block" : "none";
+    toggleIcon.textContent = isHidden ? "−" : "+";
+});
+
+// default: tampilkan konten
+// bisa ubah ke "block" jika mau terbuka di awal
+laporanContent.style.display = "none";
