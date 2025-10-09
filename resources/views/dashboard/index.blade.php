@@ -80,34 +80,21 @@
                 <div id="columnChart"></div>
                 <div id="barChart"></div>
             </div>
-            <table class="table table-noborder mb-0" style="width:auto">
-                <tr>
-                    <td><strong>Rata-rata pemasukan</strong></td>
-                    <td class="px-2">:</td>
-                    <span id="rataPemasukan" data-value="{{ $avgPemasukan }}">
-                        {{ number_format($avgPemasukan, 0, ',', '.') }}
-                    </span>
-                    <span id="rataPengeluaran" data-value="{{ $avgPengeluaran }}">
-                        {{ number_format($avgPengeluaran, 0, ',', '.') }}
-                    </span>
-
-                </tr>
-            </table>
         </div>
 
         <!-- Today's Transaction -->
         <div class="card-dashboard">
-            <h3>Today's Transaction</h3>
+            <h3>Transaksi Hari Ini</h3>
             <div class="card-header">
                 <table id="todayTransactionsTable" class="dashboardTable">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Income Type</th>
-                            <th class="text-center">Income Nominal</th>
-                            <th class="text-center">Expenses Type</th>
-                            <th class="text-center">Expenses Nominal</th>
-                            <th class="text-center" style="width: 25%;">Description</th>
+                            <th class="text-center">Jenis Pendapatan</th>
+                            <th class="text-center">Nominal Pendapatan</th>
+                            <th class="text-center">Jenis Pengeluaran</th>
+                            <th class="text-center">Nominal Pengeluaran</th>
+                            <th class="text-center" style="width: 25%;">Keterangan</th>
                         </tr>
                     </thead>
                 </table>
@@ -116,10 +103,10 @@
 
         <!-- Expense Bar -->
         <div class="card-dashboard">
-            <h3>Expenses Bar</h3>
+            <h3>Bilah Pengeluaran</h3>
             <div class="filters-container">
                 <div class="filter-wrapper">
-                    <label class="filter-label" for="filterMonth">Select Month:</label>
+                    <label class="filter-label" for="filterMonth">Pilih Bulan:</label>
                     <select class="filter-dropdown" id="filterMonth">
                         @for ($i = 1; $i <= 12; $i++)
                             <option value="{{ $i }}" {{ $i == now()->month ? 'selected' : '' }}>
@@ -130,7 +117,7 @@
                 </div>
 
                 <div class="filter-wrapper">
-                    <label class="filter-label" for="filterYear">Select Year:</label>
+                    <label class="filter-label" for="filterYear">Pilih Tahun:</label>
                     <select class="filter-dropdown" id="filterYear">
                         @for ($y = now()->year - 5; $y <= now()->year; $y++)
                             <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
@@ -143,7 +130,7 @@
 
         <!-- Kompas -->
         <div class="card-dashboard">
-            <h3>Performance Ratio</h3>
+            <h3>Rasio Keuangan</h3>
             <div id="chartKompas"
                 data-rasio="{{ $rasio ?? 0 }}"
                 data-rasio-inflasi="{{ $rasio_inflasi ?? 0 }}"
@@ -154,15 +141,15 @@
 
         <!-- Saving Rate -->
         <div class="card-dashboard">
-            <h3>Saving Rate</h3>
+            <h3>Tingkat Tabungan</h3>
             <div class="filter-wrapper">
-                <label for="filterPeriodSavingRate" class="filter-label">Period:</label>
+                <label for="filterPeriodSavingRate" class="filter-label">Periode:</label>
                 <select id="filterPeriodSavingRate" class="filter-dropdown">
-                    <option value="2">Last 2 Months</option>
-                    <option value="4">Last 4 Months</option>
-                    <option value="6" selected>Last 6 Months</option>
-                    <option value="12">Last 1 Year</option>
-                    <option value="all">Show All</option>
+                    <option value="2">2 Bulan Terakhir</option>
+                    <option value="4">4 Bulan Terakhir</option>
+                    <option value="6" selected>6 Bulan Terakhir</option>
+                    <option value="12">1 Tahun Terakhir</option>
+                    <option value="all">Tampilkan Semua</option>
                 </select>
             </div>
             <div id="savingRateChart"></div>
@@ -187,11 +174,11 @@
                                 <td><span id="modalTarget"></span></td>
                             </tr>
                             <tr>
-                                <th>Actual</th>
+                                <th>Saat ini</th>
                                 <td><span id="modalNominal"></span></td>
                             </tr>
                             <tr>
-                                <th>Analysis</th>
+                                <th>Analisis</th>
                                 <td><span id="modalAnalisis"></span></td>
                             </tr>
                         </table>
@@ -205,20 +192,19 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Transaction Details</h5>
+                        <h5 class="modal-title" id="modalTitle">Detail Transaksi</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <table class="display">
                             <thead>
                                 <tr>
-                                    <th>Transaction Date</th>
-                                    <th>Description</th>
+                                    <th>Tanggal Transaksi</th>
+                                    <th>Deskripsi</th>
                                     <th>Nominal</th>
                                 </tr>
                             </thead>
                             <tbody id="modalBodyBarPengeluaran">
-                                <!-- Data transaksi akan diisi di sini melalui JS -->
                             </tbody>
                         </table>
                     </div>

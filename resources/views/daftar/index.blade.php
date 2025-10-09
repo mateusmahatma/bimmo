@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>BIMMO - Register</title>
+    <title>BIMMO - Daftar Akun</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -38,10 +38,10 @@
                                             <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
                                         </div>
                                         <h5 class="card-title text-center pb-0 fs-4">
-                                            Create an account
+                                            Membuat akun
                                         </h5>
                                         <p class="text-center small">
-                                            Enter your personal details to create an account
+                                            Masukkan detail pribadi Anda untuk membuat akun
                                         </p>
                                     </div>
                                     <!-- csrf agar tidak bisa di cross side -->
@@ -49,7 +49,7 @@
                                         @csrf
                                         <div class="form-floating">
                                             <input type="text" name="name" class="form-control rounded-bottom @error('name') is-invalid @enderror" id="yourName" placeholder="Nama" required />
-                                            <label for="yourName">Full Name</label>
+                                            <label for="yourName">Nama Lengkap</label>
                                             @error('name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -69,7 +69,7 @@
 
                                         <div class="form-floating">
                                             <input type="text" name="username" class="form-control rounded-bottom @error('username') is-invalid @enderror" id="yourUsername" placeholder="Username" required />
-                                            <label for="yourUsername">Username</label>
+                                            <label for="yourUsername">Nama pengguna</label>
                                             @error('username')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -79,7 +79,7 @@
 
                                         <div class="form-floating">
                                             <input type="password" name="password" class="form-control rounded-bottom @error('password') is-invalid @enderror" id="password" placeholder="Password" required />
-                                            <label for="password">Password</label>
+                                            <label for="password">Kata sandi</label>
                                             <span class="password-toggle-icon"><i class="fas fa-eye-slash"></i></span>
                                             @error('password')
                                             <div class="invalid-feedback">
@@ -91,22 +91,22 @@
                                         <div class="col-12">
                                             <div class="form-check">
                                                 <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required />
-                                                <label class="form-check-label" for="acceptTerms">I agree and accept
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">the terms and conditions</a></label>
+                                                <label class="form-check-label" for="acceptTerms">Saya setuju dan menerima
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">syarat dan ketentuan</a></label>
                                                 <div class="invalid-feedback">
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="col-12">
-                                            <button class="bg-gradient-info tombol-login" name="/create" type="submit">
-                                                Create an account
+                                            <button class="btn btn-primary tombol-login" name="/create" type="submit">
+                                                Membuat akun
                                             </button>
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">
-                                                Already have an account?
-                                                <a href="/bimmo">Log in</a>
+                                                Sudah memiliki akun?
+                                                <a href="/bimmo">Masuk</a>
                                             </p>
                                         </div>
                                     </form>
@@ -118,8 +118,6 @@
             </section>
         </div>
     </main>
-
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="/vendor/apexcharts/apexcharts.min.js"></script>

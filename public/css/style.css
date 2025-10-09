@@ -2632,3 +2632,54 @@ table.dashboardTable tbody tr:last-child td {
     text-align: center;
     width: 25px;
 }
+
+
+/* Header */
+/* Header styling */
+.header {
+    height: 56px;
+    background-color: var(--bs-body-bg);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    z-index: 1030;
+}
+
+[data-bs-theme="dark"] .header {
+    background-color: #121212;
+    color: #f1f1f1;
+}
+
+.nav-link {
+    color: inherit !important;
+    font-weight: 500;
+    padding: 6px 12px;
+}
+
+.nav-link.active {
+    color: var(--bs-primary) !important;
+    font-weight: 600;
+}
+
+.dropdown-menu {
+    min-width: 180px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsif */
+@media (max-width: 767.98px) {
+    #navbarMenu {
+        background-color: var(--bs-body-bg);
+        width: 100%;
+        position: absolute;
+        top: 56px;
+        left: 0;
+        z-index: 1000;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 10px;
+    }
+
+    [data-bs-theme="dark"] #navbarMenu {
+        background-color: #121212;
+    }
+}

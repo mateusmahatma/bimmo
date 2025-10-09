@@ -138,9 +138,6 @@ class DashboardController extends Controller
 
         $totalNominalSisa = $totalNominalBulanPemasukan - $totalNominalBulan;
 
-        $avgPemasukan = array_sum(['pemasukan']) / count(['pemasukan']);
-        $avgPengeluaran = array_sum(['pengeluaran']) / count(['pengeluaran']);
-
         // Kirim semua data ke view
         return view('dashboard.index', compact(
             'transaksi',
@@ -154,8 +151,6 @@ class DashboardController extends Controller
             'totalNominalBulan',
             'totalNominalBulanPemasukan',
             'totalNominalSisa',
-            'avgPemasukan',
-            'avgPengeluaran',
         ));
     }
 

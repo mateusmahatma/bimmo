@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Selamat datang di sistem Pointech. Dengan mengakses dan menggunakan layanan kami, Anda menyetujui syarat dan ketentuan berikut. Harap baca dengan seksama.</p>
+                <p>Selamat datang di sistem BIMMO. Dengan mengakses dan menggunakan layanan kami, Anda menyetujui syarat dan ketentuan berikut. Harap baca dengan seksama.</p>
 
                 <h3>1. Penggunaan Layanan</h3>
                 <p>1.1. Layanan ini hanya dapat digunakan oleh individu yang memiliki kapasitas hukum untuk membuat perjanjian yang mengikat di bawah hukum yang berlaku.</p>
@@ -40,10 +40,10 @@
                 <p>8.2. Segala perselisihan yang timbul dari penggunaan layanan ini akan diselesaikan di pengadilan yang berwenang.</p>
 
                 <h3>9. Kontak</h3>
-                <p>Jika Anda memiliki pertanyaan mengenai syarat dan ketentuan ini, Anda dapat menghubungi kami di [mateusbimahatma107@gmail.com].</p>
+                <p>Jika Anda memiliki pertanyaan mengenai syarat dan ketentuan ini, Anda dapat menghubungi kami di [mateusmahatma@gmail.com].</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-sm btn-color2" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                     <i class="fa fa-times"></i> Tutup</button>
             </div>
         </div>

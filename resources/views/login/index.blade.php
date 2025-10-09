@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Bimmo</title>
+    <title>BIMMO</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="/img/bimmo_icon.png" rel="icon" />

@@ -1,136 +1,83 @@
-<header id="header" class="header fixed-top d-flex align-items-center">
-    <img src="/img/bimmo_icon.png" style="height: 22px; width: 22px;" />
-    <ul class="nav justify-content-center">
-        <li class="nav-item">
-            <a class="nav-link {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">Dasbor</a>
-        </li>
+<header id="header" class="header fixed-top shadow-sm" data-bs-theme="auto">
+    <nav class="navbar navbar-expand-lg w-100">
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center px-3" href="/dashboard">
+            <img src="/img/bimmo_icon.png" alt="Logo" style="height: 26px; width: 26px;" class="me-2">
+            <span class="fw-bold">BIMMO</span>
+        </a>
 
-        <!-- Budgeting -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : 'collapsed' }}"
-                data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Penganggaran</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran" data-pjax>Anggaran</a>
+        <!-- Toggle (hamburger) -->
+        <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}" href="/dashboard">Dasbor</a></li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : '' }}"
+                        href="#" data-bs-toggle="dropdown">Penganggaran</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/anggaran" data-pjax>Anggaran</a></li>
+                        <li><a class="dropdown-item" href="{{ route('kalkulator.index') }}">Hasil Anggaran</a></li>
+                    </ul>
                 </li>
-                <li>
-                    <a data-pjax
-                        class="dropdown-item {{ Request::is('kalkulator') ? 'active' : '' }}"
-                        href="{{ route('kalkulator.index') }}">
-                        <span>Hasil Anggaran</span>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ Request::is('barang', 'dana-darurat') ? 'active' : '' }}"
+                        href="#" data-bs-toggle="dropdown">Investasi</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/barang">Daftar Aset</a></li>
+                        <li><a class="dropdown-item" href="/dana-darurat">Dana Darurat</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare') ? 'active' : '' }}"
+                        href="#" data-bs-toggle="dropdown">Pergerakan Uang</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/pemasukan">Jenis Pemasukan</a></li>
+                        <li><a class="dropdown-item" href="/pengeluaran">Jenis Pengeluaran</a></li>
+                        <li><a class="dropdown-item" href="/transaksi">Arus Kas</a></li>
+                        <li><a class="dropdown-item" href="/pinjaman">Pinjaman</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ Request::is('ubah-password') ? 'active' : '' }}"
+                        href="#" data-bs-toggle="dropdown">Pengaturan</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/ubah-password">Ubah Kata Sandi</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Kanan -->
+            <ul class="navbar-nav ms-auto d-flex align-items-center pe-3">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" data-bs-toggle="dropdown" title="Ganti Tema">
+                        <i class="bi bi-lightbulb-fill" style="color: orange; font-size: 1.3em;"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2"></i> Light</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon me-2"></i> Dark</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="bi bi-circle-half me-2"></i> Auto</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item d-flex align-items-center">
+                    <div class="vr mx-2" style="height: 24px;"></div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout" title="Keluar">
+                        <img src="/icon/logout.png" alt="Logout" style="height: 22px; width: 22px;">
                     </a>
                 </li>
             </ul>
-        </li>
-
-
-        <!-- Investment -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('barang', 'dana-darurat') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Investasi</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item {{ Request::is('barang') ? 'active' : '' }}" href="/barang">
-                        <span>Daftar Aset</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item {{ Request::is('dana-darurat') ? 'active' : '' }}" href="/dana-darurat">
-                        <span>Dana Darurat</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-        <!-- Transaksi -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Pergerakan Uang</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
-                        <span>Jenis Pemasukan</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran">
-                        <span>Jenis Pengeluaran</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item {{ Request::is('transaksi', 'compare') ? 'active' : '' }}" href="/transaksi">
-                        <span>Arus Kas</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
-                        <span>Pinjaman</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-        <!-- Pengaturan -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ Request::is('ubah-password') ? 'active' : 'collapsed' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <span>Pengaturan</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item {{ Request::is('ubah-password') ? 'active' : '' }}" href="/ubah-password">
-                        <span>Ubah Kata Sandi</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-
-    <!-- Log out  -->
-    <nav class="header-nav ms-auto extra-space">
-        <ul class="d-flex align-items-center">
-            <li class="nav-item d-block d-lg-none">
-                <a class="nav-link nav-icon search-bar-toggle" href="#">
-                    <i class="bi bi-search"></i>
-                </a>
-            </li>
-
-            <div class="search-bar center-search-bar">
-            </div>
-
-            <!-- Dropdown Tema -->
-            <li class="nav-item dropdown">
-                <a
-                    class="nav-link"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="bottom"
-                    title="Ganti Tema">
-                    <i class="bi bi-lightbulb-fill" style="color: orange; font-size: 1.5em;"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2"></i> Light</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon me-2"></i> Dark</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="bi bi-circle-half me-2"></i> Auto</a></li>
-                </ul>
-            </li>
-
-            <!-- Garis pemisah -->
-            <li class="nav-item d-flex align-items-center">
-                <div class="vr mx-2" style="height: 24px;"></div>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="/logout">
-                    <img src="/icon/logout.png" alt="Logout" style="height: 22px; width: 22px;">
-                </a>
-            </li>
-        </ul>
+        </div>
     </nav>
 </header>

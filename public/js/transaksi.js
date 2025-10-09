@@ -842,8 +842,6 @@ document.getElementById("importForm").addEventListener("submit", function (e) {
             const importBtn = document.getElementById("importBtn");
 
             importBtn.disabled = true;
-            importBtn.innerHTML =
-                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses Import...';
 
             const xhr = new XMLHttpRequest();
             xhr.open("POST", form.action, true);
