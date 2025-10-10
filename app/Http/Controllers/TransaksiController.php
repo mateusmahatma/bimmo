@@ -276,7 +276,8 @@ class TransaksiController extends Controller
         $formattedStartDate = Carbon::parse($start_date)->format('Y-m-d');
         $formattedEndDate = Carbon::parse($end_date)->format('Y-m-d');
 
-        $data = Transaksi::select('tgl_transaksi', 'pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan')
+        // $data = Transaksi::select('tgl_transaksi', 'pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan')
+        $data = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
             ->where('id_user', $userId)
             ->whereBetween('tgl_transaksi', [$formattedStartDate, $formattedEndDate])
             ->get();
