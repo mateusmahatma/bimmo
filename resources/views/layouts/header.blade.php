@@ -1,4 +1,4 @@
-<header id="header" class="header fixed-top shadow-sm" data-bs-theme="auto">
+<header id="header" class="header fixed-top" data-bs-theme="auto">
     <nav class="navbar navbar-expand-lg w-100">
         <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center px-3" href="/dashboard">
@@ -6,7 +6,7 @@
             <span class="fw-bold">BIMMO</span>
         </a>
 
-        <!-- Toggle (hamburger) -->
+        <!-- Toggle -->
         <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
             aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

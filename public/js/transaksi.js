@@ -528,10 +528,6 @@ $("body").on("submit", "#editTransaksiForm", function (e) {
     var formData = form.serialize();
     var submitButton = form.find("button[type='submit']");
 
-    submitButton.html(
-        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses...'
-    ).prop("disabled", true);
-
     $.ajax({
         url: url,
         type: "PUT",
@@ -549,7 +545,7 @@ $("body").on("submit", "#editTransaksiForm", function (e) {
             showToast("Gagal memperbarui data transaksi", "danger");
         },
         complete: function () {
-            submitButton.html("Update").prop("disabled", false);
+            submitButton.html("Simpan").prop("disabled", false);
         },
     });
 });

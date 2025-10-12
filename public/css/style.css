@@ -45,33 +45,13 @@
     box-sizing: border-box;
 }
 
-/* Debugging css */
-/* * {
-    outline: 1px solid red;
-} */
-
-@font-face {
-    font-family: 'Roboto';
-    src: url('../fonts/Roboto/Roboto-Medium.ttf') format('truetype');
-    font-weight: 200;
-    font-style: normal;
-}
-
-html,
 body {
-    font-family: Arial, sans-serif;
-    font-weight: 200;
-    line-height: 1.6;
-    font-size: 0.9rem;
-    background-color: var(--bs-main);
+    font: 200 0.9rem/1.6 Roboto, sans-serif;
+    background: var(--bs-main);
+    font-weight: 500;
     margin: 0;
-    padding: 0;
-    text-align: left;
-    height: 100%;
     overflow-x: hidden;
-    overflow-y: overlay;
     scroll-behavior: smooth;
-    scrollbar-width: none;
 }
 
 /* Layout */
@@ -82,7 +62,6 @@ body {
     padding: 0 20px;
     display: flex;
     align-items: center;
-    /* transition: box-shadow 0.3s ease; */
 }
 
 .main {
@@ -90,14 +69,6 @@ body {
     margin: 60px auto 0;
     background-color: var(--bs-main);
     box-sizing: border-box;
-}
-
-/* Biar posisinya pas di bawah header */
-#nprogress .bar {
-    background: #0d6efd !important;
-    /* warna biru bootstrap */
-    height: 3px;
-    /* ketebalan garis */
 }
 
 .scroll-container {
@@ -149,8 +120,6 @@ a.disabled span {
     color: grey !important;
 }
 
-
-
 @media (max-width: 1199px) {
     #main {
         padding: 20px;
@@ -196,10 +165,6 @@ a.disabled span {
 
 .breadcrumb-nav {
     font-size: 0.9rem;
-}
-
-.navbar {
-    background-color: var(--light);
 }
 
 .badge-red {
@@ -288,13 +253,6 @@ a.disabled span {
     color: #6c757d;
     transition: color 0.3s ease-in-out;
     margin-bottom: 10px;
-}
-
-/* Chart */
-@import url(https://fonts.googleapis.com/css?family=Roboto);
-
-body {
-    font-family: Roboto, sans-serif;
 }
 
 .chart {
@@ -550,6 +508,10 @@ td {
     margin-bottom: 10px;
 }
 
+.head .title {
+    font-weight: 500;
+}
+
 .pagetitle h1 {
     font-size: 1.5rem;
     margin-bottom: 0;
@@ -622,7 +584,6 @@ p {
 }
 
 .card2:nth-child(odd):hover {
-    box-shadow: 0px 4px 8px rgba(38, 38, 38, 0.2);
     top: -4px;
     border: 1px solid #cccccc;
     background-color: white;
@@ -787,7 +748,6 @@ p {
     }
 }
 
-
 .card-title {
     margin-bottom: 0.5rem;
     font-size: 1.2em;
@@ -829,13 +789,11 @@ p {
 
 .ps-3 {
     padding-left: 0.75rem;
-    /* Sesuaikan padding kiri sesuai kebutuhan */
 }
 
 @media screen and (max-width: 768px) {
     .right-section.payment--card {
         max-width: 100%;
-        /* Lebar penuh pada layar kecil */
     }
 }
 
@@ -1807,7 +1765,6 @@ footer {
     border-radius: 4px;
     overflow: hidden;
     border-color: #999;
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 
 .th,
@@ -2265,7 +2222,6 @@ table.dashboardTable {
     background-color: #ffffff;
     color: #333333;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 1rem;
 }
@@ -2635,41 +2591,41 @@ table.dashboardTable tbody tr:last-child td {
 
 
 /* Header */
-/* Header styling */
 .header {
-    height: 56px;
-    background-color: var(--bs-body-bg);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    height: 60px;
+    background-color: #FFFFFF;
     z-index: 1030;
 }
 
+.navbar {
+    background-color: #ffffff;
+}
+
 [data-bs-theme="dark"] .header {
-    background-color: #121212;
+    background-color: #282A2A;
     color: #f1f1f1;
 }
 
 .nav-link {
     color: inherit !important;
-    font-weight: 500;
+    font-weight: 250;
     padding: 6px 12px;
 }
 
 .nav-link.active {
     color: var(--bs-primary) !important;
-    font-weight: 600;
+    font-weight: 100;
 }
 
 .dropdown-menu {
     min-width: 180px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsif */
 @media (max-width: 767.98px) {
     #navbarMenu {
-        background-color: var(--bs-body-bg);
+        background-color: #FFFFFF;
         width: 100%;
         position: absolute;
         top: 56px;

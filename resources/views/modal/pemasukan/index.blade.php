@@ -14,8 +14,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="cssbuttons-io-button_2" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="cssbuttons-io-button tombol-simpan-pemasukan">Simpan</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-success tombol-simpan-pemasukan">Simpan</button>
             </div>
         </div>
     </div>

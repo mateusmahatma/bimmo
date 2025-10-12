@@ -27,7 +27,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Rp</span>
-                        <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control" placeholder="Input nominal">
+                        <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control" placeholder="Nominal Pemasukan">
                         <span class="input-group-text">.00</span>
                     </div>
                     <div class="mb-3">
@@ -41,7 +41,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Rp</span>
-                        <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Input nominal">
+                        <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Nominal Pengeluaran">
                         <span class="input-group-text">.00</span>
                     </div>
                     <div class="form-check mb-2">

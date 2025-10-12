@@ -16,7 +16,7 @@
     <ul class="nav nav-pills">
         <li class="nav-item">
             <a class="nav-link tombol-tambah-pengeluaran" href="#" data-bs-toggle="modal" data-bs-target="#pengeluaranModal">
-                <span class="badge-primary rounded-pill">Tambah Data</span>
+                <span class="btn btn-success">Tambah Data</span>
             </a>
         </li>
     </ul>
