@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     barChart = null;
                 }
 
-                const chartHeight = Math.min(800, Math.max(400, filteredData.length * 60));
+                const chartHeight = Math.min(600, Math.max(350, filteredData.length * 45));
                 const maxXValue = Math.max(...chartData) * 1.2;
                 const dark = isDarkMode();
 
@@ -361,9 +361,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     plotOptions: {
                         bar: {
-                            borderRadius: 4,
+                            borderRadius: 6,
                             horizontal: true,
-                            barHeight: "70%",
+                            barHeight: "45%",
                             distributed: false
                         }
                     },
@@ -384,6 +384,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         categories: chartLabels,
                         max: maxXValue,
                         labels: {
+                            show: false,
                             style: { fontSize: '12px', colors: dark ? '#bbb' : '#444' },
                             formatter: value => new Intl.NumberFormat('id-ID', {
                                 style: 'currency',
@@ -407,7 +408,21 @@ document.addEventListener("DOMContentLoaded", function () {
                                 minimumFractionDigits: 0
                             }).format(value)
                         }
-                    }
+                    },
+                    grid: {
+                        borderColor: dark ? '#444' : '#eee',
+                        xaxis: { lines: { show: true } },
+                        yaxis: { lines: { show: false } },
+                    },
+                    states: {
+                        hover: {
+                            filter: { type: 'lighten', value: 0.15 }
+                        },
+                        active: {
+                            filter: { type: 'darken', value: 0.2 }
+                        }
+                    },
+
                 };
 
                 barChart = new ApexCharts(chartElement, options);
@@ -801,7 +816,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // ==== THEME HANDLER ====
     const skin = window.userSkin || 'auto';
     const updateSkinUrl = window.updateSkinUrl;
     const csrfToken = window.csrfToken;

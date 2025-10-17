@@ -21,8 +21,8 @@
                     <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : '' }}"
                         href="#" data-bs-toggle="dropdown">Penganggaran</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/anggaran" data-pjax>Anggaran</a></li>
-                        <li><a class="dropdown-item" href="{{ route('kalkulator.index') }}">Hasil Anggaran</a></li>
+                        <li><a class="dropdown-item" href="/anggaran">Anggaran</a></li>
+                        <li><a class="dropdown-item" href="/kalkulator">Hasil Anggaran</a></li>
                     </ul>
                 </li>
 
