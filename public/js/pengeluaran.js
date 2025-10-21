@@ -86,7 +86,12 @@ $(document).ready(function () {
                     return;
                 }
 
-                $('.tombol-simpan-pengeluaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...');
+                // if (formData.nama.includes(',')) {
+                //     showToast('Nama tidak boleh mengandung tanda koma (,)', 'danger');
+                //     return;
+                // }
+
+                $('.tombol-simpan-pengeluaran').prop('disabled', true);
 
                 $.ajax({
                     url: url,
@@ -120,14 +125,12 @@ $(document).ready(function () {
 
     // Handle Create Pengeluaran
     $('body').on('click', '.tombol-tambah-pengeluaran', function (e) {
-        e.preventDefault();
         $('#pengeluaranModal').modal('show');
         simpanPengeluaran();
     });
 
     // Handle Edit Pengeluaran
     $('body').on('click', '.tombol-edit-pengeluaran', function (e) {
-        e.preventDefault();
         var id = $(this).data('id');
 
         $.ajax({
@@ -141,36 +144,38 @@ $(document).ready(function () {
         });
     });
 
-    // Handle Delete Pengeluaran
+    let deleteId = null;
+
+    // Saat tombol hapus diklik
     $('body').on('click', '.tombol-del-pengeluaran', function (e) {
         e.preventDefault();
-        Swal.fire({
-            title: 'Yakin mau hapus data ini?',
-            html: 'Data yang dihapus tidak dapat dikembalikan!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            customClass: {
-                popup: 'dark-mode'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var id = $(this).data('id');
-                $.ajax({
-                    url: '/pengeluaran/' + id,
-                    type: 'DELETE',
-                    success: function () {
-                        showToast('Data Berhasil dihapus', 'success');
-                        $('#pengeluaranTable').DataTable().ajax.reload();
-                    },
-                    error: function () {
-                        showToast('Data Gagal dihapus', 'danger');
-                        $('#pengeluaranTable').DataTable().ajax.reload();
-                    }
-                });
+
+        deleteId = $(this).data('id');
+
+        // tampilkan modal konfirmasi
+        $('#confirmDeleteModal').modal('show');
+    });
+
+    // Saat tombol konfirmasi hapus diklik
+    $('#btnConfirmDelete').on('click', function () {
+        if (!deleteId) return;
+
+        $.ajax({
+            url: '/pengeluaran/' + deleteId,
+            type: 'DELETE',
+            success: function () {
+                showToast('Data Berhasil dihapus', 'success');
+                $('#pengeluaranTable').DataTable().ajax.reload();
+            },
+            error: function () {
+                showToast('Data Gagal dihapus', 'danger');
+                $('#pengeluaranTable').DataTable().ajax.reload();
+            },
+            complete: function () {
+                // Tutup modal setelah selesai
+                $('#confirmDeleteModal').modal('hide');
+
+                deleteId = null; // reset ID
             }
         });
     });

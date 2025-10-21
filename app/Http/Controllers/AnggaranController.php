@@ -15,7 +15,6 @@ class AnggaranController extends Controller
     {
         $userId = Auth::id();
 
-        // 🔹 DataTables AJAX request (bukan PJAX)
         if ($request->ajax() && !$request->pjax()) {
             $query = Anggaran::where('id_user', $userId);
 
@@ -30,16 +29,20 @@ class AnggaranController extends Controller
 
             return DataTables::eloquent($query)
                 ->addIndexColumn()
-                ->addColumn('nama_anggaran', fn($row) => $row->nama_anggaran)   // 👈 ini wajib ada, karena di JS kamu minta `nama_anggaran`
+                ->addColumn('nama_anggaran', fn($row) => $row->nama_anggaran)
                 ->addColumn('persentase_anggaran', fn($row) => $row->persentase_anggaran)
-                ->addColumn('nama_pengeluaran', fn($row) => $row->nama_pengeluaran)
+                ->addColumn('list_pengeluaran', function ($row) {
+                    if (empty($row->id_pengeluaran)) return [];
+                    return Pengeluaran::whereIn('id', $row->id_pengeluaran)
+                        ->pluck('nama')
+                        ->toArray();
+                })
                 ->addColumn('aksi', fn($row) => view('anggaran.tombol', ['request' => $row])->render())
                 ->rawColumns(['aksi']) // biar tombol HTML tidak di-escape
                 ->with('totalPersentase', $totalPersentase)
                 ->with('exceedMessage', $exceedMessage)
                 ->toJson();
         }
-
 
         // 🔹 Ambil ID pengeluaran yang sudah dipakai
         $usedPengeluaranIds = Anggaran::where('id_user', $userId)
@@ -66,7 +69,6 @@ class AnggaranController extends Controller
 
         $anggaran = new Anggaran();
 
-        // 🔹 Kalau normal (refresh page) → balikin full view
         return view('anggaran.index', compact('anggaran', 'pengeluarans'));
     }
 

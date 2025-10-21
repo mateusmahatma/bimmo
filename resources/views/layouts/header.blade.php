@@ -19,10 +19,10 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : '' }}"
-                        href="#" data-bs-toggle="dropdown">Penganggaran</a>
+                        href="#" data-bs-toggle="dropdown">Anggaran</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/anggaran">Anggaran</a></li>
-                        <li><a class="dropdown-item" href="/kalkulator">Hasil Anggaran</a></li>
+                        <li><a class="dropdown-item" href="/anggaran">Kategori Anggaran</a></li>
+                        <li><a class="dropdown-item" href="/kalkulator">Proses Anggaran</a></li>
                     </ul>
                 </li>
 
@@ -39,8 +39,8 @@
                     <a class="nav-link dropdown-toggle {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare') ? 'active' : '' }}"
                         href="#" data-bs-toggle="dropdown">Pergerakan Uang</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/pemasukan">Jenis Pemasukan</a></li>
-                        <li><a class="dropdown-item" href="/pengeluaran">Jenis Pengeluaran</a></li>
+                        <li><a class="dropdown-item" href="/pemasukan">Kategori Pemasukan</a></li>
+                        <li><a class="dropdown-item" href="/pengeluaran">Kategori Pengeluaran</a></li>
                         <li><a class="dropdown-item" href="/transaksi">Arus Kas</a></li>
                         <li><a class="dropdown-item" href="/pinjaman">Pinjaman</a></li>
                     </ul>

@@ -21,10 +21,10 @@ class PengeluaranController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->format('Y-m-d H:i:s');
+                    return $row->created_at ? $row->created_at->format('d M Y H:i') : '-';
                 })
                 ->editColumn('updated_at', function ($row) {
-                    return $row->updated_at->format('Y-m-d H:i:s');
+                    return $row->updated_at ? $row->updated_at->format('d M Y H:i') : '-';
                 })
                 ->addColumn('aksi', function ($request) {
                     return view('pengeluaran.tombol')->with('request', $request);
@@ -38,6 +38,7 @@ class PengeluaranController extends Controller
     {
         //
     }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
