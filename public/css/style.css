@@ -1,5 +1,6 @@
 :root {
     scroll-behavior: smooth;
+    --default-font: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --bs-purple: #6f42c1;
     --bs-red: #F56565;
     --bs-orange: #fd7e14;
@@ -45,9 +46,11 @@
 }
 
 body {
-    font: 200 0.9rem/1.6 sans-serif;
-    background: var(--bs-main);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-family: var(--default-font);
     font-weight: 500;
+    background: var(--bs-main);
     margin: 0;
     overflow-x: hidden;
     scroll-behavior: smooth;
@@ -718,7 +721,7 @@ p {
 /* Alerts */
 .alert-heading {
     font-weight: 500;
-    font-family: sans-serif;
+    font-family: var(--default-font);
     font-size: 20px;
 }
 
@@ -739,7 +742,7 @@ p {
 /* Breadcrumbs */
 .breadcrumb {
     font-size: 1.0rem;
-    font-family: sans-serif;
+    font-family: var(--default-font);
     color: var(--bs-primary);
     font-weight: 600;
 }
@@ -799,7 +802,7 @@ p {
     font-size: 26px;
     font-weight: 700;
     color: #012970;
-    font-family: sans-serif;
+    font-family: var(--default-font);
 }
 
 .extra-space {
@@ -1293,7 +1296,7 @@ p {
 }
 
 .iconslist .label {
-    font-family: sans-serif;
+    font-family: var(--default-font);
     display: inline-block;
     width: 100%;
     overflow: hidden;
@@ -1419,7 +1422,7 @@ footer {
     color: #ecf0f1;
     padding: 20px 0;
     text-align: center;
-    font-family: sans-serif;
+    font-family: var(--default-font);
 }
 
 .footer-container {
@@ -1623,7 +1626,7 @@ footer {
 
 /* Tampilan Custom Range */
 .daterangepicker {
-    font-family: sans-serif;
+    font-family: var(--default-font);
 }
 
 .daterangepicker .ranges li {
@@ -1886,7 +1889,7 @@ table.dashboardTable {
     background-color: #ffffff;
     color: #333333;
     overflow: hidden;
-    font-family: sans-serif;
+    font-family: var(--default-font);
     font-size: 0.9rem;
 }
 

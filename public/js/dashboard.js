@@ -677,7 +677,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         } else if (idx === 3) {
                             title = "Rasio Pengeluaran terhadap Pendapatan";
                             rumus = "Pengeluaran / Pendapatan";
-                            target = '50%';
+                            target = '100%';
                             nominal = rasio_pengeluaran_pendapatan.toFixed(2) + '%';
                             analisis = AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan);
                         }
@@ -710,8 +710,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     {
                         x: ["Rasio Pengeluaran", "Terhadap Pendapatan"],
                         y: rasio_pengeluaran_pendapatan > 0 ? rasio_pengeluaran_pendapatan : 0.5,
-                        fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 50),
-                        goals: [{ name: "Target", value: 49, strokeWidth: 4, strokeColor: "#9B59B6" }]
+                        fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 100),
+                        goals: [{ name: "Target", value: 100, strokeWidth: 4, strokeColor: "#9B59B6" }]
                     }
                 ]
             }],
