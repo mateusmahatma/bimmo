@@ -217,7 +217,10 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Detail Transaksi</h5>
+                        <div>
+                            <h5 class="modal-title mb-0" id="modalTitle">Detail Transaksi</h5>
+                            <small id="modalSubTitle" class="text-muted"></small>
+                        </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

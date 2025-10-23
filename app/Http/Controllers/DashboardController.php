@@ -280,7 +280,7 @@ class DashboardController extends Controller
             ->where('transaksi.status', '1')
             ->whereYear('tgl_transaksi', $selectedYear)
             ->whereMonth('tgl_transaksi', $selectedMonth)
-            ->groupBy('pengeluaran.id', 'pengeluaran.nama')  // PERBAIKAN: Group by ID juga
+            ->groupBy('pengeluaran.id', 'pengeluaran.nama')
             ->orderByDesc('total')
             ->get();
 

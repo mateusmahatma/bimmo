@@ -440,20 +440,24 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-        if (modalBody) {
-            modalBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center">
-                        <div class="spinner-border spinner-border-sm" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        Loading...
-                    </td>
-                </tr>`;
-        }
 
-        const modal = new bootstrap.Modal(document.getElementById('detailModalBarPengeluaran'));
-        modal.show();
+        const modalEl = document.getElementById('detailModalBarPengeluaran');
+        if (modalEl) {
+            const dialog = modalEl.querySelector('.modal-dialog');
+            if (dialog) dialog.classList.add('modal-dialog-scrollable');
+
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            const closeBtn = modalEl.querySelector('.btn-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => modal.hide());
+            }
+
+            modalEl.addEventListener('click', (e) => {
+                if (e.target === modalEl) modal.hide();
+            });
+        }
 
         fetch(`/dashboard/transaksi?pengeluaran=${pengeluaranId}&month=${month}&year=${year}`)
             .then(response => {
@@ -515,7 +519,12 @@ document.addEventListener("DOMContentLoaded", function () {
             modalBody.innerHTML = html;
 
             if (modalTitle && data[0]) {
-                modalTitle.textContent = `Detail Transaksi - ${data[0].pengeluaran_nama}`;
+                modalTitle.textContent = "Detail Transaksi";
+                const modalSubTitle = document.querySelector("#modalSubTitle");
+                if (modalSubTitle) {
+                    modalSubTitle.textContent = `Pengeluaran: ${data[0].pengeluaran_nama}`;
+                    modalSubTitle.className = isDark ? "text-light opacity-75" : "text-muted";
+                }
             }
         }
     }
