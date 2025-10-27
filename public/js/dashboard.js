@@ -84,10 +84,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         renderChart("bar", "#columnChart", filteredData, {
-            colors: ["#28a745", "#dc3545"],
+            colors: ["var(--bs-green)", "var(--bs-red)"],
             plotOptions: {
                 bar: {
                     columnWidth: "30%",
+                    borderRadius: 4,
+                    dataLabels: {
+                        position: "top",
+                    },
+                    border: { color: 'var(--bs-gray)', width: 1 }
                 },
             },
             series: [
@@ -110,10 +115,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         renderChart("line", "#barChart", filteredData, {
-            colors: ["#28a745", "#dc3545"],
+            colors: ["var(--bs-green)", "var(--bs-red)"],
             stroke: {
                 curve: "smooth",
                 width: 2,
+                colors: ["var(--bs-green)", "var(--bs-red)"],
+                dashArray: [0, 4],
+                lineCap: "round",
             },
             markers: { size: 0 },
             series: [
@@ -309,15 +317,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (chartElement) {
                         const dark = isDarkMode();
                         chartElement.innerHTML = "";
-                        chartElement.style.height = "100px";
-                        chartElement.style.minHeight = "unset";
-                        chartElement.style.maxHeight = "unset";
-                        chartElement.style.padding = "0";
-                        chartElement.style.display = "flex";
-                        chartElement.style.justifyContent = "center";
-                        chartElement.style.alignItems = "center";
-                        chartElement.style.background = dark ? "#2c2f33" : "#c9c9c9";
-                        chartElement.innerHTML = `<span class="${dark ? 'text-light' : 'text-muted'}">No data available for this month/year.</span>`;
+                        chartElement.className = "empty-state-container";
+                        chartElement.style.cssText = `
+                            width: 100%;
+                            height: 200px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            background: ${dark ? '#2b2d31' : '#f8f9fa'};
+                            border-radius: 12px;
+                            transition: all 0.3s ease;
+                        `;
+
+                        chartElement.innerHTML = `
+                            <div class="empty-state">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${dark ? '#6c757d' : '#adb5bd'}" stroke-width="2">
+                                    <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 005.5 1"/>
+                                </svg>
+                                <p class="mt-3 ${dark ? 'text-light' : 'text-muted'}" style="font-size: 0.9rem;">
+                                    No data available for this period
+                                </p>
+                            </div>
+                        `;
                     }
                     return;
                 } else {
@@ -608,14 +631,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getColorByTarget = (value, target) => {
         if (value < 0) return "#800080";
-        if (value < target) return "#00E396";
-        if (value > target) return "#FF4560";
+        if (value < target) return "var(--bs-green)";
+        if (value > target) return "var(--bs-red)";
         return "#FFA500";
     };
 
     const getColorDanaDarurat = (value, target) => {
-        if (value < target) return "#FF4560";
-        return "#00E396";
+        if (value < target) return "var(--bs-red)";
+        return "var(--bs-green)";
     };
 
     const getColorInflasiGayaHidup = (value, target) => {
@@ -708,7 +731,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         x: "Rasio Inflasi Gaya Hidup",
                         y: rasio_inflasi > 0 ? rasio_inflasi : 0.5,
                         fillColor: getColorInflasiGayaHidup(rasio_inflasi, 0),
-                        goals: [{ name: "Target", value: 0, strokeWidth: 4, strokeColor: "#9B59B6" }]
+                        goals: [{ name: "Target", value: 0.5, strokeWidth: 4, strokeColor: "#9B59B6" }]
                     },
                     {
                         x: ["Rasio Dana", "Darurat"],

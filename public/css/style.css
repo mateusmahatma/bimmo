@@ -2,10 +2,10 @@
     scroll-behavior: smooth;
     --default-font: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --bs-purple: #6f42c1;
-    --bs-red: #F56565;
+    --bs-red: #E74C3C;
     --bs-orange: #fd7e14;
     --bs-yellow: #FBD38D;
-    --bs-green: #81E6D9;
+    --bs-green: #27AE60;
     --bs-teal: #20c997;
     --bs-cyan: #0dcaf0;
     --bs-white: #fff;
