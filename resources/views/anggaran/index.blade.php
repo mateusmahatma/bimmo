@@ -15,10 +15,9 @@
     <a class="navbar-brand" href="/anggaran">Daftar Anggaran</a>
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <button class="btn btn-warning tombol-tambah-anggaran"
-                data-bs-toggle="modal" data-bs-target="#pemasukanModal">
+            <a href="{{ route('anggaran.create') }}" class="btn btn-success">
                 Tambah Data
-            </button>
+            </a>
         </li>
     </ul>
 </nav>
@@ -69,7 +68,6 @@
             <tbody></tbody>
         </table>
     </div>
-</div>
 </div>
 @endsection
 

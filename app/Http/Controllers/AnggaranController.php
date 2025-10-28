@@ -75,17 +75,69 @@ class AnggaranController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nama_anggaran' => ['required', 'min:3', 'max:255'],
-            'persentase_anggaran' => ['required', 'numeric', 'between:0,100'],
-            'id_pengeluaran' => ['array'],
+            'nama_anggaran' => ['required', 'string', 'min:3', 'max:255'],
+            'persentase_anggaran' => ['required', 'numeric', 'min:0', 'max:100'],
+            'id_pengeluaran' => ['required', 'nullable', 'array', 'min:1'],
             'id_pengeluaran.*' => ['exists:pengeluaran,id'],
+        ], [
+            'persentase_anggaran.max' => 'Secara keseluruhan persentase anggaran sudah melebihi 100% mohon dicek kembali.',
+            'persentase_anggaran.min' => 'Persentase anggaran tidak boleh kurang dari 0%.',
+            'persentase_anggaran.required' => 'Field persentase anggaran wajib diisi.',
+            'id_pengeluaran.required' => 'Jenis pengeluaran harus dipilih.',
+            'id_pengeluaran.min' => 'Pilih minimal satu jenis pengeluaran.',
         ]);
 
-        $validatedData['id_user'] = Auth::id();
+        $userId = Auth::id();
+        $currentTotal = Anggaran::where('id_user', $userId)->sum('persentase_anggaran');
+        $newTotal = $currentTotal + $request->persentase_anggaran;
 
-        anggaran::create($validatedData);
+        // Validasi total melebihi 100%
+        if ($newTotal > 100) {
+            return back()
+                ->withErrors([
+                    'persentase_anggaran' => 'Persentase anggaran sudah melebihi 100% mohon dicek kembali.',
+                ])
+                ->withInput();
+        }
 
-        return redirect('/anggaran');
+        $validatedData['id_user'] = $userId;
+        Anggaran::create($validatedData);
+
+        return redirect()->route('anggaran.index')
+            ->with('success', 'Data berhasil disimpan!');
+    }
+
+
+
+    public function create()
+    {
+        $userId = Auth::id();
+
+        $usedIds = Anggaran::where('id_user', $userId)
+            ->pluck('id_pengeluaran')
+            ->flatMap(function ($item) {
+                // Jika sudah array → langsung return
+                if (is_array($item)) {
+                    return $item;
+                }
+                // Jika string JSON → decode
+                if (is_string($item)) {
+                    return json_decode($item, true) ?: [];
+                }
+                // Jika null → abaikan
+                return [];
+            })
+            ->unique()
+            ->toArray();
+
+        $pengeluarans = Pengeluaran::where('id_user', $userId)
+            ->when(!empty($usedIds), fn($q) => $q->whereNotIn('id', $usedIds))
+            ->get();
+
+        return view('anggaran.create', [
+            'anggaran' => new Anggaran(),
+            'pengeluarans' => $pengeluarans
+        ]);
     }
 
     public function edit($id)
@@ -108,8 +160,6 @@ class AnggaranController extends Controller
 
         return response()->json(['result' => $data]);
     }
-
-
 
     public function update(Request $request, $id)
     {

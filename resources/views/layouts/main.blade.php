@@ -84,6 +84,24 @@
         window.csrfToken = "{{ csrf_token() }}";
     </script>
 
+    @if (session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('successToast');
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        });
+    </script>
+
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+        <div id="successToast" class="toast text-white bg-success" role="alert">
+            <div class="toast-body">
+                {{ session('success') }}
+            </div>
+        </div>
+    </div>
+    @endif
+
 
 </body>
 
