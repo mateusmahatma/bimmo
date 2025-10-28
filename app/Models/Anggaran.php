@@ -12,6 +12,8 @@ class Anggaran extends Model
 
     protected $table = 'anggaran';
 
+    protected $primaryKey = 'id_anggaran';
+
     protected $fillable = [
         'nama_anggaran',
         'persentase_anggaran',

@@ -80,10 +80,11 @@ class AnggaranController extends Controller
             'id_pengeluaran' => ['required', 'nullable', 'array', 'min:1'],
             'id_pengeluaran.*' => ['exists:pengeluaran,id'],
         ], [
+            'nama_anggaran.required' => 'Nama Anggaran wajib diisi.',
             'persentase_anggaran.max' => 'Secara keseluruhan persentase anggaran sudah melebihi 100% mohon dicek kembali.',
             'persentase_anggaran.min' => 'Persentase anggaran tidak boleh kurang dari 0%.',
-            'persentase_anggaran.required' => 'Field persentase anggaran wajib diisi.',
-            'id_pengeluaran.required' => 'Jenis pengeluaran harus dipilih.',
+            'persentase_anggaran.required' => 'Persentase Anggaran wajib diisi.',
+            'id_pengeluaran.required' => 'Jenis Pengeluaran wajib diisi.',
             'id_pengeluaran.min' => 'Pilih minimal satu jenis pengeluaran.',
         ]);
 
@@ -142,45 +143,69 @@ class AnggaranController extends Controller
 
     public function edit($id)
     {
-        $data = Anggaran::where('id_anggaran', $id)->first();
+        $userId = Auth::id();
 
-        // Pastikan id_pengeluaran berupa array
-        $idPengeluaran = is_string($data->id_pengeluaran)
-            ? json_decode($data->id_pengeluaran, true)
-            : ($data->id_pengeluaran ?? []);
+        $anggaran = Anggaran::where('id_anggaran', $id)
+            ->where('id_user', $userId)
+            ->firstOrFail();
 
-        // Ambil nama pengeluaran dari tabel pengeluaran
-        $pengeluaranList = Pengeluaran::whereIn('id', $idPengeluaran)
-            ->get(['id', 'nama']);
+        // Decode id_pengeluaran agar menjadi array
+        $selectedIds = is_string($anggaran->id_pengeluaran)
+            ? json_decode($anggaran->id_pengeluaran, true)
+            : ($anggaran->id_pengeluaran ?? []);
 
-        // Buat array id => nama
-        $data->id_pengeluaran = $pengeluaranList->mapWithKeys(function ($item) {
-            return [$item->id => $item->nama];
-        })->toArray();
+        // Tampilkan semua pengeluaran user agar bisa diubah
+        $pengeluarans = Pengeluaran::where('id_user', $userId)->get();
 
-        return response()->json(['result' => $data]);
+        return view('anggaran.edit', compact('anggaran', 'pengeluarans', 'selectedIds'));
     }
+
 
     public function update(Request $request, $id)
     {
-        $validasi = Validator::make($request->all(), [
-            'nama_anggaran' => 'required',
+        $userId = Auth::id();
+
+        $request->validate([
+            'nama_anggaran' => ['required', 'string', 'min:3', 'max:255'],
+            'persentase_anggaran' => ['required', 'numeric', 'min:0', 'max:100'],
+            'id_pengeluaran' => ['nullable', 'array'],
+            'id_pengeluaran.*' => ['exists:pengeluaran,id'],
         ], [
-            'nama_anggaran.required' => 'Diperlukan nama anggaran',
+            'nama_anggaran.required' => 'Nama Anggaran wajib diisi.',
+            'persentase_anggaran.max' => 'Secara keseluruhan persentase anggaran sudah melebihi 100% mohon dicek kembali.',
+            'persentase_anggaran.min' => 'Persentase anggaran tidak boleh kurang dari 0%.',
+            'persentase_anggaran.required' => 'Persentase Anggaran wajib diisi.',
+            'id_pengeluaran.required' => 'Jenis Pengeluaran wajib diisi.',
+            'id_pengeluaran.min' => 'Pilih minimal satu jenis pengeluaran.',
         ]);
 
-        if ($validasi->fails()) {
-            return response()->json(['errors' => $validasi->errors()]);
+        $anggaran = Anggaran::where('id_anggaran', $id)
+            ->where('id_user', $userId)
+            ->firstOrFail();
+
+        $totalPersenTerpakai = Anggaran::where('id_user', $userId)
+            ->where('id_anggaran', '!=', $id)
+            ->sum('persentase_anggaran');
+
+        $totalBaru = $totalPersenTerpakai + $request->persentase_anggaran;
+
+        if ($totalBaru > 100) {
+            return back()
+                ->withErrors([
+                    'persentase_anggaran' =>
+                    'Persentase anggaran sudah melebihi 100% mohon dicek kembali'
+                ])
+                ->withInput();
         }
 
-        $data = [
+        $anggaran->update([
             'nama_anggaran' => $request->nama_anggaran,
             'persentase_anggaran' => $request->persentase_anggaran,
-            'id_pengeluaran' => $request->id_pengeluaran ? json_encode($request->id_pengeluaran) : null,
-        ];
+            'id_pengeluaran' => $request->id_pengeluaran,
+        ]);
 
-        Anggaran::where('id_anggaran', $id)->update($data);
-        return response()->json(['success' => "Berhasil melakukan update data"]);
+        return redirect()->route('anggaran.index')
+            ->with('success', 'Berhasil update anggaran!');
     }
 
     public function destroy($id)

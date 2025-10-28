@@ -83,7 +83,6 @@ Route::match(['get', 'post'], '/compare', [CompareController::class, 'index'])->
 Route::resource('/barang', BarangController::class)->middleware('auth');
 Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
 
-
 // Kalkulator
 Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
     Route::get('/', 'index')->name('kalkulator.index');
