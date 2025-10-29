@@ -45,9 +45,6 @@ $(document).ready(function () {
     highlightActiveSkin(skin);
     window.setTheme = setTheme;
 
-    // ========================= //
-    // ==== KALKULATOR INIT ==== //
-    // ========================= //
     const formKalkulator = $('#formKalkulator');
     const btnProses = $('#btnProses');
     const btnSpinner = $('#btnProsesSpinner');
@@ -149,7 +146,7 @@ $(document).ready(function () {
                         });
                         table += `</table>`;
                         if (hidden.length) {
-                            table += `<button type="button" class="btn btn-link toggle-btn" data-target="${tableId}">More Details</button>`;
+                            table += `<button type="button" class="btn btn-link toggle-btn" data-target="${tableId}">Show more</button>`;
                         }
                         return table;
                     }
@@ -221,7 +218,7 @@ $(document).ready(function () {
         const $hiddenRows = $table.find('.hidden-row');
         const isVisible = $hiddenRows.is(':visible');
         $hiddenRows.toggle(!isVisible);
-        $(this).text(isVisible ? 'More Details' : 'Show Less');
+        $(this).text(isVisible ? 'Show more' : 'Show less');
     });
 
     $('body').on('click', '.tombol-update-proses-anggaran', function (e) {
@@ -283,4 +280,71 @@ $(document).ready(function () {
     // Inisialisasi
     initDateRangePicker();
     initDataTable();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('toggleButton');
+    const hiddenItems = document.querySelectorAll('.hidden-item');
+    let isExpanded = false;
+
+    toggleBtn.addEventListener('click', function () {
+        isExpanded = !isExpanded;
+
+        hiddenItems.forEach(item => {
+            item.style.display = isExpanded ? 'list-item' : 'none';
+        });
+
+        toggleBtn.textContent = isExpanded ? 'Show less' : 'Show more';
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const kalkulatorId = document.getElementById("kalkulator-id").value;
+
+    $("#detailAnggaran").DataTable({
+        processing: true,
+        serverSide: true,
+        paging: true,
+        ajax: {
+            url: "/kalkulator/" + kalkulatorId,
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        },
+        columns: [
+            { data: "DT_RowIndex", orderable: false, searchable: false },
+            {
+                data: "tgl_transaksi",
+                render: function (data) {
+                    var date = new Date(data);
+                    return date.toLocaleDateString("id-ID", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    });
+                },
+            },
+            { data: "nama" },
+            {
+                data: "nominal",
+                render: data => "Rp " + Number(data).toLocaleString("id-ID")
+            },
+            {
+                data: "keterangan",
+                render: (data, type) => {
+                    if (type !== "display") return data || "-";
+                    if (!data?.trim()) return "-";
+
+                    const rows = data
+                        .split("\n")
+                        .map((line, i) => `<tr><td>${i + 1}</td><td>${line}</td></tr>`)
+                        .join("");
+
+                    return `<table class="table-static">${rows}</table>`;
+                }
+            },
+        ],
+    });
+
 });

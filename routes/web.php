@@ -83,16 +83,7 @@ Route::match(['get', 'post'], '/compare', [CompareController::class, 'index'])->
 Route::resource('/barang', BarangController::class)->middleware('auth');
 Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
 
-// Kalkulator
-Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
-    Route::get('/', 'index')->name('kalkulator.index');
-    Route::post('/', 'store')->name('kalkulator.store');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
-    Route::post('/calculate', 'calculate');
-    Route::get('/calculate', 'showResult')->name('showResult');
-    Route::get('/cetak_pdf', 'cetak_pdf');
-});
+
 
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
@@ -103,6 +94,18 @@ Route::middleware(['auth'])->group(function () {
 
 // Anggaran
 Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
+
+// Proses Anggaran
+Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
+    Route::get('/', 'index')->name('kalkulator.index');
+    Route::post('/', 'store')->name('kalkulator.store');
+    Route::get('/{id}', 'show')->name('kalkulator.show');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+    Route::post('/calculate', 'calculate');
+    Route::get('/calculate', 'showResult')->name('showResult');
+    Route::get('/cetak_pdf', 'cetak_pdf');
+});
 
 // Ubah Password
 Route::get('/ubah-password', [UbahPasswordController::class, 'index'])->middleware('auth');

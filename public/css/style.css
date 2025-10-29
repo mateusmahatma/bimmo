@@ -1866,6 +1866,15 @@ table.customTable {
     table-layout: fixed;
 }
 
+table.customTable2 {
+    border: hidden;
+}
+
+table.customTable2 th,
+table.customTable2 td {
+    border: none;
+}
+
 table.customTable thead {
     background-color: #fff;
     color: #333;
@@ -2526,4 +2535,8 @@ table.dashboardTable tbody tr:last-child td {
     [data-bs-theme="dark"] #navbarMenu {
         background-color: #121212;
     }
+}
+
+.hidden-item {
+    display: none;
 }

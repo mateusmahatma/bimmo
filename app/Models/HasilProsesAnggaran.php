@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 use App\Models\Pengeluaran;
 
 class HasilProsesAnggaran extends Model
 {
-    protected $table = 'hasil_proses_anggaran';
+    use HasFactory;
 
+    protected $table = 'hasil_proses_anggaran';
     protected $primaryKey = 'id_proses_anggaran';
 
     protected $casts = [
@@ -31,14 +33,23 @@ class HasilProsesAnggaran extends Model
 
     protected $appends = ['nama_jenis_pengeluaran'];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
+
+    public function pengeluaran()
+    {
+        return $this->belongsTo(Pengeluaran::class, 'id_pengeluaran');
+    }
+
     public function getNamaJenisPengeluaranAttribute()
     {
         if (empty($this->jenis_pengeluaran) || !is_array($this->jenis_pengeluaran)) {
             return '-';
         }
 
-        // Ambil nama pengeluaran berdasarkan ID
-        $namaList = \App\Models\Pengeluaran::whereIn('id', $this->jenis_pengeluaran)
+        $namaList = Pengeluaran::whereIn('id', $this->jenis_pengeluaran)
             ->pluck('nama')
             ->toArray();
 

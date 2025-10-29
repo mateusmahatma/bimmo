@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\HasilProsesAnggaran;
 use Yajra\DataTables\DataTables;
 use App\Models\Transaksi;
+use App\Models\Pengeluaran;
 
 class FinancialCalculatorController extends Controller
 {
@@ -34,6 +35,9 @@ class FinancialCalculatorController extends Controller
                     $nominal = floatval($row->nominal_anggaran);
                     $digunakan = floatval($row->anggaran_yang_digunakan);
                     $sisa = $nominal - $digunakan;
+
+                    $row->sisa_anggaran = $sisa;
+                    $row->save();
                     return number_format($sisa, 0, ',', '.');
                 })
                 ->addColumn('aksi', function ($request) {
@@ -147,7 +151,6 @@ class FinancialCalculatorController extends Controller
             ]);
         }
     }
-
 
     public function calculate(Request $request)
     {
@@ -265,5 +268,48 @@ class FinancialCalculatorController extends Controller
         }
 
         return response()->json(['message' => 'Data tidak ditemukan'], 404);
+    }
+
+    public function show(Request $request, $id)
+    {
+        // Ambil hasil proses anggaran
+        $HasilProsesAnggaran = HasilProsesAnggaran::with('user')->findOrFail($id);
+
+        // Ambil ID pengeluaran
+        $idPengeluaranList = $HasilProsesAnggaran->jenis_pengeluaran ?? [];
+
+        if ($request->ajax()) {
+            $query = Transaksi::with('pengeluaranRelation')
+                ->whereIn('pengeluaran', $idPengeluaranList)
+                ->where('id_user', $HasilProsesAnggaran->id_user)
+                ->whereDate('tgl_transaksi', '>=', $HasilProsesAnggaran->tanggal_mulai)
+                ->whereDate('tgl_transaksi', '<=', $HasilProsesAnggaran->tanggal_selesai)
+                ->orderBy('tgl_transaksi', 'asc');
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('nama', function ($trx) {
+                    return $trx->pengeluaranRelation->nama ?? '-';
+                })
+                ->editColumn('tgl_transaksi', function ($trx) {
+                    return $trx->tgl_transaksi; // JS yang format
+                })
+                ->editColumn('nominal', function ($trx) {
+                    return $trx->nominal;
+                })
+                ->editColumn('keterangan', function ($trx) {
+                    return $trx->keterangan ?? '-';
+                })
+                ->make(true);
+        }
+
+        // Untuk halaman awal (non-AJAX)
+        $namaPengeluaran = Pengeluaran::whereIn('id', $idPengeluaranList)
+            ->pluck('nama')
+            ->toArray();
+
+        $total = count($namaPengeluaran);
+
+        return view('kalkulator.show', compact('HasilProsesAnggaran', 'total', 'namaPengeluaran'));
     }
 }

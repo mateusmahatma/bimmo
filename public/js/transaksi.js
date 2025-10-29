@@ -156,7 +156,6 @@ $(document).ready(function () {
                     });
                 },
             },
-
             { data: 'pemasukan_nama', name: 'pemasukan_nama' },
             {
                 data: "nominal_pemasukan",

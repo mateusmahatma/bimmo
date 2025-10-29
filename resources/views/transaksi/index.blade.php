@@ -126,7 +126,7 @@
                     <th>Jenis Pendapatan</th>
                     <th>Jumlah Pendapatan</th>
                     <th>Jenis Pengeluaran</th>
-                    <th>Jumlah Pengeluaran</th>
+                    <th>Nominal</th>
                     <th style="width:20%">Keterangan</th>
                     <th>Dibuat</th>
                     <th>Diperbarui</th>
