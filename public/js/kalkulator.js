@@ -180,7 +180,7 @@ $(document).ready(function () {
                     className: "text-center",
                     render: function (data, type, row) {
                         let sisa = parseFloat(row.sisa_anggaran);
-                        let jumlah = parseFloat(row.nominal_anggaran);
+                        // let jumlah = parseFloat(row.nominal_anggaran);
 
                         let formattedNominal = new Intl.NumberFormat('id-ID', {
                             style: 'currency',

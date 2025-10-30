@@ -53,7 +53,27 @@
                         <tr>
                             <th>Sisa Anggaran</th>
                             <th>:</th>
-                            <td>Rp {{ number_format($HasilProsesAnggaran->sisa_anggaran, 2, ',', '.') }}</td>
+                            <td>
+                                Rp {{ number_format($HasilProsesAnggaran->sisa_anggaran, 2, ',', '.') }} <br>
+
+                                @php
+                                $sisa = $HasilProsesAnggaran->sisa_anggaran;
+                                @endphp
+
+                                @if ($sisa < 0)
+                                    <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small"
+                                    style="background-color:#f8d7da; color:#721c24; font-size:10px;">
+                                    <i class="bi bi-x-circle me-1" style="font-size:10px;"></i>
+                                    Melebihi Anggaran
+                                    </span>
+                                    @else
+                                    <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small"
+                                        style="background-color:#d4edda; color:#155724; font-size:10px;">
+                                        <i class="bi bi-check-circle me-1" style="font-size:10px;"></i>
+                                        Sesuai Anggaran
+                                    </span>
+                                    @endif
+                            </td>
                         </tr>
                     </tbody>
                 </table>
