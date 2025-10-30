@@ -12,6 +12,16 @@
     </nav>
 </div>
 
+<div class="alert alert-danger">
+    Peringatan Penting:
+    <ul class="mb-0">
+        <!-- @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach -->
+        <li>Pinjaman Anda jatuh tempo pada tanggal 20 Juni 2000</li>
+    </ul>
+</div>
+
 <section class="dashboard">
     <div class="row g-4">
 

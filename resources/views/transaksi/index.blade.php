@@ -123,10 +123,10 @@
                 <tr>
                     <th style="width: 1%;">No</th>
                     <th>Tanggal</th>
-                    <th>Jenis Pendapatan</th>
-                    <th>Jumlah Pendapatan</th>
+                    <th>Jenis Pemasukan</th>
+                    <th>Nominal Pemasukan</th>
                     <th>Jenis Pengeluaran</th>
-                    <th>Nominal</th>
+                    <th>Nominal Pengeluaran</th>
                     <th style="width:20%">Keterangan</th>
                     <th>Dibuat</th>
                     <th>Diperbarui</th>

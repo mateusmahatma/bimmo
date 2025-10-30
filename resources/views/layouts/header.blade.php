@@ -50,6 +50,7 @@
                     <a class="nav-link dropdown-toggle {{ Request::is('ubah-password') ? 'active' : '' }}"
                         href="#" data-bs-toggle="dropdown">Pengaturan</a>
                     <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="">Notifikasi</a></li>
                         <li><a class="dropdown-item" href="/ubah-password">Ubah Kata Sandi</a></li>
                     </ul>
                 </li>
