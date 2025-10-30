@@ -64,14 +64,14 @@
             <thead>
                 <tr>
                     <th style="width: 1%;">No</th>
-                    <th class="text-center">Tanggal Mulai</th>
-                    <th class="text-center">Tanggal Akhir</th>
-                    <th class="text-center">Nama Anggaran</th>
-                    <th class="text-center" style="width: 200px;">Jenis Pengeluaran</th>
-                    <th class="text-center">Persentase Anggaran</th>
-                    <th class="text-center">Jumlah Anggaran</th>
-                    <th class="text-center">Anggaran yang digunakan</th>
-                    <th class="text-center">Sisa Anggaran</th>
+                    <th>Tanggal Mulai</th>
+                    <th>Tanggal Akhir</th>
+                    <th>Nama Anggaran</th>
+                    <th style="width: 200px;">Jenis Pengeluaran</th>
+                    <th>Persentase Anggaran</th>
+                    <th>Jumlah Anggaran</th>
+                    <th>Anggaran yang digunakan</th>
+                    <th style="width: 8%">Sisa Anggaran</th>
                     <th style="width: 1%;"></th>
                 </tr>
             </thead>

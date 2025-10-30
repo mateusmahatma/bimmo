@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    // Theme Handler
+    // Theme management
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
     const skin = window.userSkin || 'auto';
     const updateSkinUrl = window.updateSkinUrl;
@@ -124,9 +124,30 @@ $(document).ready(function () {
             ajax: { url: '/kalkulator', type: 'GET' },
             columns: [
                 { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
-                { data: "tanggal_mulai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
-                { data: "tanggal_selesai", className: "text-center", render: d => moment(d).format("dddd, D MMMM YYYY") },
-                { data: "nama_anggaran", className: "text-center", render: d => d || "-" },
+                {
+                    data: "tanggal_mulai",
+                    render: function (data) {
+                        var date = new Date(data);
+                        return date.toLocaleDateString("id-ID", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        });
+                    },
+                },
+                {
+                    data: "tanggal_selesai",
+                    render: function (data) {
+                        var date = new Date(data);
+                        return date.toLocaleDateString("id-ID", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        });
+                    },
+                }, { data: "nama_anggaran", className: "text-center", render: d => d || "-" },
                 {
                     data: 'nama_jenis_pengeluaran', className: 'text-left', defaultContent: '-',
                     render: function (data, type, row) {
@@ -154,7 +175,36 @@ $(document).ready(function () {
                 { data: "persentase_anggaran", className: "text-center", render: d => d ? `${d}%` : "0%" },
                 { data: "nominal_anggaran", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
                 { data: "anggaran_yang_digunakan", className: "text-center", render: d => parseFloat(d).toLocaleString("id-ID") || "0" },
-                { data: "sisa_anggaran", className: "text-center" },
+                {
+                    data: "sisa_anggaran",
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        let sisa = parseFloat(row.sisa_anggaran);
+                        let jumlah = parseFloat(row.nominal_anggaran);
+
+                        let formattedNominal = new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR'
+                        }).format(sisa);
+
+                        if (sisa < 0) {
+                            return `
+                            <small>${formattedNominal}</small><br>
+                            <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small" style="background-color:#f8d7da; color:#721c24; font-size:10px;">
+                                <i class="bi bi-x-circle me-1" style="font-size:10px;"></i> Melebihi Anggaran
+                            </span>
+                        `;
+                        } else {
+                            return `
+                            <small>${formattedNominal}</small><br>
+                            <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small" style="background-color:#d4edda; color:#155724; font-size:10px;">
+                                <i class="bi bi-check-circle me-1" style="font-size:10px;"></i> Sesuai Anggaran
+                            </span>
+                        `;
+                        }
+                    }
+                },
+
                 { data: "aksi", orderable: false, searchable: false, className: "text-center" },
             ],
         });

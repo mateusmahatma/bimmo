@@ -20,7 +20,6 @@ class FinancialCalculatorController extends Controller
 
             $userId = Auth::id();
 
-            // Ambil data hasil proses anggaran untuk user yg sedang login, urutkan terbaru
             $data = HasilProsesAnggaran::where('id_user', $userId)
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -29,7 +28,7 @@ class FinancialCalculatorController extends Controller
                 ->addIndexColumn()
                 ->addColumn('nama_pengeluaran', function ($row) {
                     // Pastikan kolom ini benar ada
-                    return $row->nama_anggaran; // atau relasi jika ada
+                    return $row->nama_anggaran;
                 })
                 ->addColumn('sisa_anggaran', function ($row) {
                     $nominal = floatval($row->nominal_anggaran);

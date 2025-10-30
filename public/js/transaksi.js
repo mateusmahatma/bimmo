@@ -65,24 +65,25 @@ $(document).ready(function () {
             startDate: start_date,
             endDate: end_date,
             ranges: {
-                Today: [moment(), moment()],
-                Yesterday: [
+                "Hari Ini": [moment(), moment()],
+                "Kemarin": [
                     moment().subtract(1, "days"),
                     moment().subtract(1, "days"),
                 ],
-                "This Month": [
+                "Bulan Ini": [
                     moment().startOf("month"),
                     moment().endOf("month"),
                 ],
-                "Last Month": [
+                "Bulan Lalu": [
                     moment().subtract(1, "month").startOf("month"),
                     moment().subtract(1, "month").endOf("month"),
                 ],
-                "This Year": [moment().startOf("year"), moment().endOf("year")],
-                "Last Year": [
+                "Tahun Ini": [moment().startOf("year"), moment().endOf("year")],
+                "Tahun Lalu": [
                     moment().subtract(1, "year").startOf("year"),
                     moment().subtract(1, "year").endOf("year"),
                 ],
+                "Semua Data": [moment("2000-01-01"), moment()],
             },
             containerClass: document.documentElement.getAttribute("data-bs-theme") === "dark" ? "dark-mode" : ""
         },
