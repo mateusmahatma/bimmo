@@ -179,24 +179,20 @@ $(document).ready(function () {
                     data: "sisa_anggaran",
                     className: "text-center",
                     render: function (data, type, row) {
-                        let sisa = parseFloat(row.sisa_anggaran);
-                        // let jumlah = parseFloat(row.nominal_anggaran);
+                        const raw = (data ?? row.sisa_anggaran);
 
-                        let formattedNominal = new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR'
-                        }).format(sisa);
+                        const numeric = parseNumber(raw);
 
-                        if (sisa < 0) {
+                        if (numeric < 0) {
                             return `
-                            <small>${formattedNominal}</small><br>
+                            <small>${raw}</small><br>
                             <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small" style="background-color:#f8d7da; color:#721c24; font-size:10px;">
                                 <i class="bi bi-x-circle me-1" style="font-size:10px;"></i> Melebihi Anggaran
                             </span>
                         `;
                         } else {
                             return `
-                            <small>${formattedNominal}</small><br>
+                            <small>${raw}</small><br>
                             <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small" style="background-color:#d4edda; color:#155724; font-size:10px;">
                                 <i class="bi bi-check-circle me-1" style="font-size:10px;"></i> Sesuai Anggaran
                             </span>
@@ -208,6 +204,23 @@ $(document).ready(function () {
                 { data: "aksi", orderable: false, searchable: false, className: "text-center" },
             ],
         });
+    }
+
+    // helper function
+    function parseNumber(val) {
+        if (val === null || val === undefined || val === '') return 0;
+        if (typeof val === 'number') return val;
+
+        let s = String(val).trim();
+
+        // Hilangkan semua karakter selain angka, minus, titik, dan koma
+        s = s.replace(/[^\d\-,.]/g, '');
+
+        // Format Indonesia "825.614,13" -> "825614.13"
+        s = s.replace(/\./g, '').replace(',', '.');
+
+        const n = parseFloat(s);
+        return isNaN(n) ? 0 : n;
     }
 
     function validateForm() {
@@ -398,3 +411,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+const toggleBtn = document.getElementById("toggleBtn");
+const toggleIcon = document.getElementById("toggleIcon");
+const laporanContent = document.getElementById("detailContent");
+
+toggleBtn.addEventListener("click", () => {
+    const isHidden = laporanContent.style.display === "none";
+    detailContent.style.display = isHidden ? "block" : "none";
+    toggleIcon.textContent = isHidden ? "−" : "+";
+});
+
+// default: tampilkan konten
+// bisa ubah ke "block" jika mau terbuka di awal
+detailContent.style.display = "none";
