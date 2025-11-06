@@ -18,8 +18,13 @@
 <div class="card-header">
     <div class="card-body">
         <div class="custom-alert" role="alert">
-            <h4 class="custom-alert-heading">Langkah-langkah untuk memproses anggaran:</h4>
-            <ol class="mb-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="custom-alert-heading mb-0">Langkah-langkah untuk memproses anggaran:</h4>
+                <button id="toggleBtn" class="btn btn-sm btn-outline-secondary" type="button">
+                    <span id="toggleIcon">+</span>
+                </button>
+            </div>
+            <ol id="detailContent" class="mt-3">
                 <li>Isi kolom "Input Pendapatan Bulanan".</li>
                 <li>Isi kolom "Masukan Penghasilan Tambahan", kolom ini bersifat opsional.</li>
                 <li>Pilih rentang tanggal untuk mengatur periode anggaran.</li>
