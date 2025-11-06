@@ -19,7 +19,7 @@
                 Pilih Opsi
             </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#barangModal">Tambah Data</a></li>
+                <li><a class="dropdown-item" href="{{ route('barang.create') }}">Tambah Data</a></li>
                 <li><a class="dropdown-item" href="#" onclick="downloadPDFbarang()">Unduh PDF</a></li>
                 <li><a class="dropdown-item" href="#" onclick="downloadExcel()">Unduh Excel</a></li>
             </ul>
