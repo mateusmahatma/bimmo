@@ -22,7 +22,7 @@
                         href="#" data-bs-toggle="dropdown">Anggaran</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/anggaran">Kategori Anggaran</a></li>
-                        <li><a class="dropdown-item" href="/kalkulator">Proses Anggaran</a></li>
+                        <li><a class="dropdown-item" href="/kalkulator">Monitoring Anggaran</a></li>
                     </ul>
                 </li>
 
