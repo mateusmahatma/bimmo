@@ -79,11 +79,6 @@ Route::middleware(['auth'])->group(function () {
 // Compare
 Route::match(['get', 'post'], '/compare', [CompareController::class, 'index'])->middleware('auth');
 
-// Barang
-Route::resource('/barang', BarangController::class)->middleware('auth');
-Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
-
-
 
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
@@ -106,6 +101,10 @@ Route::middleware('auth')->controller(FinancialCalculatorController::class)->pre
     Route::get('/calculate', 'showResult')->name('showResult');
     Route::get('/cetak_pdf', 'cetak_pdf');
 });
+
+// Barang
+Route::resource('/barang', BarangController::class)->middleware('auth');
+Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
 
 // Ubah Password
 Route::get('/ubah-password', [UbahPasswordController::class, 'index'])->middleware('auth');
