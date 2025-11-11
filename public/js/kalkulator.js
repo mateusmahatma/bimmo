@@ -224,19 +224,32 @@ $(document).ready(function () {
     }
 
     function validateForm() {
-        if (!daterangeSpan.text().includes(' - ')) {
-            showToast('Silakan pilih rentang tanggal terlebih dahulu!', 'danger');
+        const startDate = document.querySelector('[name="tanggal_mulai"]').value;
+        const endDate = document.querySelector('[name="tanggal_selesai"]').value;
+
+        if (!startDate || !endDate) {
+            showToast('Silakan isi kedua tanggal terlebih dahulu!', 'danger');
             return false;
         }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showToast('Tanggal mulai tidak boleh lebih besar dari tanggal akhir!', 'danger');
+            return false;
+        }
+
         return true;
     }
 
     function submitForm() {
         if (!validateForm()) return;
 
-        const [start, end] = daterangeSpan.text().split(' - ');
-        tanggalMulaiInput.val(start.trim());
-        tanggalSelesaiInput.val(end.trim());
+        const tanggalMulaiInput = $('#tanggal_mulai');
+        const tanggalSelesaiInput = $('#tanggal_selesai');
+
+        const formKalkulator = $('#formKalkulator');
+        const btnSpinner = $('#btnProsesSpinner');
+        const btnProses = $('#btnProses');
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
         btnSpinner.removeClass('d-none');
         btnProses.prop('disabled', true);
@@ -412,16 +425,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+// --- Toggle untuk bagian pertama ---
 const toggleBtn = document.getElementById("toggleBtn");
 const toggleIcon = document.getElementById("toggleIcon");
-const laporanContent = document.getElementById("detailContent");
+const detailContent = document.getElementById("detailContent");
 
 toggleBtn.addEventListener("click", () => {
-    const isHidden = laporanContent.style.display === "none";
+    const isHidden = detailContent.style.display === "none";
     detailContent.style.display = isHidden ? "block" : "none";
     toggleIcon.textContent = isHidden ? "−" : "+";
 });
 
-// default: tampilkan konten
-// bisa ubah ke "block" jika mau terbuka di awal
+// default: sembunyikan konten
 detailContent.style.display = "none";
+
+
+// --- Toggle untuk bagian anggaran ---
+const toggleBtnAnggaran = document.getElementById("toggleBtnAnggaran");
+const toggleIconAnggaran = document.getElementById("toggleIconAnggaran");
+const detailContentAnggaran = document.getElementById("detailContentAnggaran");
+
+toggleBtnAnggaran.addEventListener("click", () => {
+    const isHidden = detailContentAnggaran.style.display === "none";
+    detailContentAnggaran.style.display = isHidden ? "block" : "none";
+    toggleIconAnggaran.textContent = isHidden ? "−" : "+";
+});
+
+// default: sembunyikan konten anggaran
+detailContentAnggaran.style.display = "none";
