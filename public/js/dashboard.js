@@ -75,6 +75,39 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // old
+    // function renderCashFlowChart(data, months = "all") {
+    //     const filteredData = filterData(data, months);
+
+    //     if (!Array.isArray(filteredData.pemasukan) || !Array.isArray(filteredData.pengeluaran)) {
+    //         console.warn("Data cash flow tidak lengkap:", filteredData);
+    //         return;
+    //     }
+
+    //     renderChart("bar", "#columnChart", filteredData, {
+    //         colors: ["var(--bs-green)", "var(--bs-red)"],
+    //         plotOptions: {
+    //             bar: {
+    //                 columnWidth: "30%",
+    //                 borderRadius: 4,
+    //                 dataLabels: {
+    //                     position: "top",
+    //                 },
+    //                 border: { color: 'var(--bs-gray)', width: 1 }
+    //             },
+    //         },
+    //         series: [
+    //             { name: "Income", data: filteredData.pemasukan },
+    //             { name: "Expense", data: filteredData.pengeluaran },
+    //         ],
+    //         legend: {
+    //             position: "top",
+    //             horizontalAlign: "center",
+    //         },
+    //     });
+    // }
+
+    // new
     function renderCashFlowChart(data, months = "all") {
         const filteredData = filterData(data, months);
 
@@ -83,28 +116,81 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        renderChart("bar", "#columnChart", filteredData, {
-            colors: ["var(--bs-green)", "var(--bs-red)"],
+        renderChart("line", "#columnChart", filteredData, {
+            series: [
+                {
+                    name: "Income",
+                    type: "column",
+                    data: filteredData.pemasukan
+                },
+                {
+                    name: "Expense",
+                    type: "column",
+                    data: filteredData.pengeluaran
+                },
+                {
+                    name: "Net Flow",
+                    type: "line",
+                    data: filteredData.pemasukan.map((v, i) => v - (filteredData.pengeluaran[i] || 0))
+                },
+            ],
+            colors: ["#008FFB", "#00E396", "#FEB019"],
+            stroke: {
+                width: [1, 1, 3],
+            },
             plotOptions: {
                 bar: {
-                    columnWidth: "30%",
+                    columnWidth: "35%",
                     borderRadius: 4,
-                    dataLabels: {
-                        position: "top",
-                    },
-                    border: { color: 'var(--bs-gray)', width: 1 }
                 },
             },
-            series: [
-                { name: "Income", data: filteredData.pemasukan },
-                { name: "Expense", data: filteredData.pengeluaran },
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: filteredData.labels,
+            },
+            yaxis: [
+                {
+                    seriesName: "Income",
+                    axisTicks: { show: true },
+                    axisBorder: { show: true, color: "#008FFB" },
+                    labels: { style: { colors: "#008FFB" } },
+                    title: {
+                        text: "Income",
+                        style: { color: "#008FFB" },
+                    },
+                },
+                {
+                    seriesName: "Expense",
+                    opposite: true,
+                    axisTicks: { show: true },
+                    axisBorder: { show: true, color: "#00E396" },
+                    labels: { style: { colors: "#00E396" } },
+                    title: {
+                        text: "Expense",
+                        style: { color: "#00E396" },
+                    },
+                },
+                {
+                    seriesName: "Net Flow",
+                    opposite: true,
+                    show: false,
+                },
             ],
+            tooltip: {
+                fixed: {
+                    enabled: true,
+                    position: "topLeft",
+                    offsetY: 30,
+                    offsetX: 60,
+                },
+            },
             legend: {
-                position: "top",
-                horizontalAlign: "center",
+                horizontalAlign: "left",
+                offsetX: 40,
             },
         });
     }
+
 
     function renderIncomeExpenseChart(data, months = "all") {
         const filteredData = filterData(data, months);
