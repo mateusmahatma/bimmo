@@ -2,7 +2,7 @@
 <html lang="id">
 
 <head>
-    <title>Hasil Anggaran</title>
+    <title>Monitoring Anggaran</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -12,58 +12,86 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar px-3">
-    <a class="navbar-brand" href="/anggaran">Hasil Anggaran</a>
+    <a class="navbar-brand" href="/anggaran">Monitoring Anggaran</a>
 </nav>
 
 <div class="card-header">
     <div class="card-body">
-        <div class="custom-alert" role="alert">
+        <div class="alert alert-info p-4 rounded-3 shadow-sm">
             <div class="d-flex justify-content-between align-items-center">
-                <h4 class="custom-alert-heading mb-0">Langkah-langkah untuk memproses anggaran:</h4>
-                <button id="toggleBtn" class="btn btn-sm btn-outline-secondary" type="button">
+                <h5 class="mb-0 fw-semibold">Langkah-langkah untuk memproses anggaran</h5>
+                <button id="toggleBtn" class="btn btn-sm btn-outline-secondary">
                     <span id="toggleIcon">+</span>
                 </button>
             </div>
-            <ol id="detailContent" class="mt-3">
-                <li>Isi kolom "Input Pendapatan Bulanan".</li>
-                <li>Isi kolom "Masukan Penghasilan Tambahan", kolom ini bersifat opsional.</li>
-                <li>Pilih rentang tanggal untuk mengatur periode anggaran.</li>
-                <li>Klik tombol "Proses"</li>
+            <ol id="detailContent" class="mt-3 ps-3">
+                <li>Isi kolom <strong>Input Pendapatan Bulanan</strong>.</li>
+                <li>Isi kolom <strong>Pendapatan Tambahan</strong> (opsional).</li>
+                <li>Pilih rentang tanggal periode anggaran.</li>
+                <li>Klik tombol <strong>Proses</strong>.</li>
             </ol>
         </div>
-        <form method="post" action="/kalkulator" id="formKalkulator" autocomplete="off">
-            @csrf
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <p for="monthly_income" class="filter required">Input Pendapatan Bulanan:</p>
-                    <input type="number" name="monthly_income" class="form-control" placeholder="Enter here monthly income" required>
-                </div>
 
-                <div class="col-md-4">
-                    <p for="additional_income" class="filter">Masukan Pendapatan Tambahan:</p>
-                    <input type="number" name="additional_income" class="form-control" placeholder="Enter here additional income">
-                </div>
+        <div class="card shadow-sm border-0">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Input Data Anggaran</h5>
+                <button class="btn btn-light btn-sm">
+                    <i class="bi bi-info-circle me-1"></i> Bantuan
+                </button>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/kalkulator" id="formKalkulator" autocomplete="off">
+                    @csrf
+                    <div class="row g-4">
+                        <!-- Bagian Pendapatan -->
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3">
+                                <h6 class="text-secondary mb-3">
+                                    <i class="bi bi-cash-stack me-1"></i> Pendapatan
+                                </h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Pendapatan Tetap Bulanan (Wajib)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" class="form-control" name="monthly_income" placeholder="5.000.000" required>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Pendapatan Lain (Opsional)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" class="form-control" name="additional_income" placeholder="1.000.000">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="col-md-4">
-                    <p for="daterange" class="filter">Pilih Tanggal Periode Anggaran:</p>
-                    <div id="daterange" class="daterange" style="cursor: pointer;">
-                        <i class="fa fa-calendar"></i>
-                        <span></span>
-                        <i class="fa fa-caret-down"></i>
+                        <!-- Bagian Periode -->
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3">
+                                <h6 class="text-secondary mb-3">
+                                    <i class="bi bi-calendar3 me-1"></i> Periode
+                                </h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Tanggal Mulai Anggaran</label>
+                                    <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Tanggal Akhir Anggaran</label>
+                                    <input type="date" class="form-control" id="tanggal_selesai" name="tanggal_selesai">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
-                    <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
-                </div>
-
-                <div class="button-group">
-                    <button type="submit" class="btn btn-warning" id="btnProses">
-                        <span id="btnProsesSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        <span id="btnProsesText"><i class="fa fa-sync-alt"></i> Proses</span>
-                    </button>
-                </div>
+                    <div class="text-center mt-4">
+                        <button type="reset" class="btn btn-outline-secondary px-4 me-2">Bersihkan</button>
+                        <button type="submit" class="btn btn-success px-4" id="btnProses">Hitung Anggaran</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+
 
         <table id="hasilAnggaranTable" class="customTable">
             <thead>
