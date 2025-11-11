@@ -2053,9 +2053,17 @@ table.dashboardTable tbody tr:last-child td {
 
 /* Alert */
 .custom-alert {
-    background-color: #f9f9f9;
+    background-color: #6CA0DC;
     padding: 1.5rem;
     margin-bottom: 1rem;
+    border-radius: 5px;
+}
+
+.custom-alert-success {
+    background-color: #00B894;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
 }
 
 .custom-alert-heading {
@@ -2539,4 +2547,20 @@ table.dashboardTable tbody tr:last-child td {
 
 .hidden-item {
     display: none;
+}
+
+/* .dashboard-banner img {
+    transition: transform 0.4s ease;
+}
+
+.dashboard-banner img:hover {
+    transform: scale(1.02);
+} */
+
+.dashboard-banner img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 1rem;
 }
