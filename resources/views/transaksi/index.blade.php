@@ -40,7 +40,7 @@
 
 <div class="card-header">
     <div class="card-body">
-        <div class="row mb-3">
+        <div class="row mb-4">
             <div class="col-md-4">
                 <p class="filter">Tanggal Transaksi</p>
                 <div id="daterange" class="daterange">
@@ -74,7 +74,8 @@
                         style="font-size: 14px; cursor: pointer;"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        title="Filter dapat dilakukan lebih dari satu jenis pengeluaran"></i>
+                        title="Filter dapat dilakukan lebih dari satu jenis pengeluaran">
+                    </i>
                 </p>
                 <select class="form-select" id="filter_pengeluaran" name="filter_pengeluaran" multiple>
                     <option value="">- Pilih -</option>
