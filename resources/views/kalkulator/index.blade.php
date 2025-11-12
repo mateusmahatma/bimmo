@@ -17,7 +17,7 @@
 
 <div class="card-header">
     <div class="card-body">
-        <div class="alert alert-info p-4 rounded-3 shadow-sm">
+        <div class="custom-alert">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-semibold">Langkah-langkah untuk memproses anggaran</h5>
                 <button id="toggleBtn" class="btn btn-sm btn-outline-secondary">

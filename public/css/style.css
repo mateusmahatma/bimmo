@@ -2053,14 +2053,14 @@ table.dashboardTable tbody tr:last-child td {
 
 /* Alert */
 .custom-alert {
-    background-color: #6CA0DC;
+    background-color: #F7FAFC;
     padding: 1.5rem;
     margin-bottom: 1rem;
     border-radius: 5px;
 }
 
-.custom-alert-success {
-    background-color: #00B894;
+.custom-alert-danger {
+    background-color: #FCDFC4;
     padding: 1.5rem;
     margin-bottom: 1rem;
     border-radius: 5px;
