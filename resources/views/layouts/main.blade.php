@@ -146,7 +146,31 @@
                 window.location.href = '/login';
             });
         });
+
+        // 🧩 Tambahan proteksi untuk axios atau fetch
+        if (window.axios) {
+            window.axios.interceptors.response.use(
+                response => response,
+                error => {
+                    if (error.response && (error.response.status === 401 || error.response.status === 419)) {
+                        $('#sessionExpiredModal').modal('show');
+                    }
+                    return Promise.reject(error);
+                }
+            );
+        }
+
+        // Kalau kamu juga pakai fetch:
+        const originalFetch = window.fetch;
+        window.fetch = async (...args) => {
+            const response = await originalFetch(...args);
+            if (response.status === 401 || response.status === 419) {
+                $('#sessionExpiredModal').modal('show');
+            }
+            return response;
+        };
     </script>
+
 
 
 
