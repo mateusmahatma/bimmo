@@ -1729,6 +1729,7 @@ footer {
     margin: 0px 0;
     padding: 20px;
     background-color: #fff;
+    border-radius: 10px;
 }
 
 .mb-4 {
@@ -2563,4 +2564,9 @@ table.dashboardTable tbody tr:last-child td {
     max-height: 200px;
     object-fit: cover;
     border-radius: 1rem;
+}
+
+#sessionExpiredModal .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
