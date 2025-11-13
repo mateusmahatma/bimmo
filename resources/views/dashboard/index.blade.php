@@ -164,18 +164,20 @@
         <div class="col-12">
             <div class="card-dashboard">
                 <h3>Transaksi Hari Ini</h3>
-                <table id="todayTransactionsTable" class="customTable">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Jenis Pendapatan</th>
-                            <th>Nominal Pendapatan</th>
-                            <th>Jenis Pengeluaran</th>
-                            <th>Nominal Pengeluaran</th>
-                            <th style="width: 25%;">Keterangan</th>
-                        </tr>
-                    </thead>
-                </table>
+                <div class="table-responsive-wrapper">
+                    <table id="todayTransactionsTable" class="dashboardTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Jenis Pendapatan</th>
+                                <th>Nominal Pendapatan</th>
+                                <th>Jenis Pengeluaran</th>
+                                <th>Nominal Pengeluaran</th>
+                                <th style="width: 25%;">Keterangan</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

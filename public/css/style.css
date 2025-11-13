@@ -1917,10 +1917,9 @@ table.customTable td {
     border-bottom: 1px solid #ddd;
 }
 
-/* Tabel Dashboard */
+/* Tabel Dashboard (Desktop Default) */
 table.dashboardTable {
     width: 100%;
-    border-spacing: 0;
     border-collapse: separate !important;
     border-spacing: 0 !important;
     background-color: #ffffff;
@@ -1933,7 +1932,7 @@ table.dashboardTable {
 table.dashboardTable thead {
     background-color: #f8f9fa;
     color: #212529;
-    font-weight: 200;
+    font-weight: 500;
     letter-spacing: 0.5px;
 }
 
@@ -1952,6 +1951,84 @@ table.dashboardTable tbody tr:hover {
 
 table.dashboardTable tbody tr:last-child td {
     border-bottom: none;
+}
+
+/* ===================== */
+/* RESPONSIVE VERSION 💡 */
+/* ===================== */
+@media (max-width: 768px) {
+
+    /* Bungkus tabel agar bisa di-scroll horizontal */
+    .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* agar scroll halus di iOS */
+        border-radius: 0.75rem;
+    }
+
+    table.dashboardTable {
+        width: 100%;
+        min-width: 600px;
+        /* agar kolom tidak terlalu sempit */
+        font-size: 0.85rem;
+    }
+
+    table.dashboardTable th,
+    table.dashboardTable td {
+        padding: 10px 12px;
+    }
+}
+
+/* Versi extra kecil (mobile portrait) */
+@media (max-width: 480px) {
+
+    /* Ubah tabel menjadi format kartu */
+    table.dashboardTable,
+    table.dashboardTable thead,
+    table.dashboardTable tbody,
+    table.dashboardTable th,
+    table.dashboardTable td,
+    table.dashboardTable tr {
+        display: block;
+        width: 100%;
+    }
+
+    table.dashboardTable thead {
+        display: none;
+        /* sembunyikan header */
+    }
+
+    table.dashboardTable tr {
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.75rem;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    table.dashboardTable td {
+        text-align: right;
+        padding: 10px 12px;
+        border-bottom: 1px solid #f1f3f5;
+        position: relative;
+    }
+
+    table.dashboardTable td::before {
+        content: attr(data-label);
+        /* ambil label dari atribut HTML */
+        position: absolute;
+        left: 12px;
+        top: 10px;
+        font-weight: 600;
+        color: #495057;
+        text-transform: capitalize;
+    }
+
+    table.dashboardTable td:last-child {
+        border-bottom: none;
+    }
 }
 
 /* Modal */
