@@ -58,8 +58,8 @@ body {
 
 /* Layout */
 .header {
-    z-index: 997;
-    height: 50px;
+    z-index: 1030;
+    height: 60px;
     background-color: var(--bs-white);
     padding: 0 20px;
     display: flex;
@@ -2285,14 +2285,6 @@ table.dashboardTable tbody tr:last-child td {
 .table-static td:first-child {
     text-align: center;
     width: 25px;
-}
-
-
-/* Header */
-.header {
-    height: 60px;
-    background-color: #FFFFFF;
-    z-index: 1030;
 }
 
 .navbar {

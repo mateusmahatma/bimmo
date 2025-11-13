@@ -164,7 +164,7 @@
         <div class="col-12">
             <div class="card-dashboard">
                 <h3>Transaksi Hari Ini</h3>
-                <table id="todayTransactionsTable" class="dashboardTable w-100">
+                <table id="todayTransactionsTable" class="customTable">
                     <thead>
                         <tr>
                             <th>No</th>

@@ -330,7 +330,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function populateTodayTransactionsTable(data) {
-        var table = $("#todayTransactionsTable");
+        const table = $("#todayTransactionsTable").DataTable({
+            responsive: true,
+            autoWidth: false,
+            paging: true,
+            lengthChange: true,
+        });
+
 
         // Hapus semua <tr> kecuali baris pertama (header)
         table.find("tr:gt(0)").remove();
