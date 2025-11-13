@@ -64,14 +64,6 @@ body {
     padding: 0 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    /* Biar isi header rata kiri-kanan */
-    position: sticky;
-    /* Supaya header tetap di atas saat scroll */
-    top: 0;
-    width: 100%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    /* Tambahan efek lembut */
 }
 
 /* Tablet */
