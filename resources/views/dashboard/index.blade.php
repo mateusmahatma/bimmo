@@ -34,8 +34,6 @@
     </button>
 </div>
 
-
-
 <!-- <div class="alert alert-danger">
     Peringatan Penting:
     <ul class="mb-0">
@@ -52,7 +50,6 @@
         <!-- Kolom Kiri -->
         <div class="col-12 col-lg-8 d-flex flex-column gap-4">
 
-            {{-- Ikhtisar Keuangan --}}
             <div class="card-dashboard">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3>Ikhtisar Keuangan</h3>
