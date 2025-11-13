@@ -2566,6 +2566,31 @@ table.dashboardTable tbody tr:last-child td {
     border-radius: 1rem;
 }
 
+/* Tablet */
+@media (max-width: 992px) {
+    .dashboard-banner img {
+        max-height: 180px;
+        border-radius: 0.75rem;
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 768px) {
+    .dashboard-banner img {
+        max-height: 150px;
+        border-radius: 0.5rem;
+    }
+}
+
+/* Mobile portrait */
+@media (max-width: 480px) {
+    .dashboard-banner img {
+        max-height: 120px;
+        border-radius: 0.5rem;
+    }
+}
+
+
 .sessionExpiredModal .modal-content {
     border-radius: 1rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
