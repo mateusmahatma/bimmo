@@ -102,6 +102,53 @@
     </div>
     @endif
 
+    <!-- Modal: Session Expired -->
+    <div class="modal fade" id="sessionExpiredModal" tabindex="-1" aria-labelledby="sessionExpiredLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title w-100" id="sessionExpiredLabel">Sesi Habis</h5>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Mohon maaf, sesi log in di aplikasi <strong>BIMMO</strong> sudah habis.<br>
+                        Silakan log in kembali untuk melanjutkan.
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" id="btnSessionExpired">Oke</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Nonaktifkan notifikasi error default DataTables
+            $.fn.dataTable.ext.errMode = 'none';
+
+            // Handler untuk error khusus DataTables
+            $(document).on('error.dt', function(e, settings, techNote, message) {
+                if (message.includes('Unauthorized') || message.includes('419') || message.includes('expired')) {
+                    $('#sessionExpiredModal').modal('show');
+                }
+            });
+
+            // Handler global untuk semua AJAX (selain DataTables)
+            $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+                if (jqxhr.status === 401 || jqxhr.status === 419) {
+                    $('#sessionExpiredModal').modal('show');
+                }
+            });
+
+            // Ketika tombol OK ditekan → arahkan ke halaman login
+            $('#btnSessionExpired').on('click', function() {
+                window.location.href = '/login';
+            });
+        });
+    </script>
+
+
 
 </body>
 
