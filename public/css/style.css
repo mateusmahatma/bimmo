@@ -2710,3 +2710,7 @@ table.dashboardTable tbody tr:nth-child(even) {
     border-radius: 1rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+
+.modal-header {
+    background-color: var(--bs-primary);
+}
