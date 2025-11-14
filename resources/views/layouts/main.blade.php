@@ -106,7 +106,7 @@
     <div class="modal fade" id="sessionExpiredModal" tabindex="-1" aria-labelledby="sessionExpiredLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-center">
-                <div class="modal-header bg-warning text-dark">
+                <div class="modal-header">
                     <h5 class="modal-title w-100" id="sessionExpiredLabel">Sesi Habis</h5>
                 </div>
                 <div class="modal-body">
@@ -143,7 +143,7 @@
 
             // Ketika tombol OK ditekan → arahkan ke halaman login
             $('#btnSessionExpired').on('click', function() {
-                window.location.href = '/login';
+                window.location.href = '/bimmo';
             });
         });
 
