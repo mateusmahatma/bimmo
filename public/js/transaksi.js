@@ -557,10 +557,9 @@ $("body").on("click", ".tombol-del-transaksi", function (e) {
     Swal.fire({
         title: "Yakin mau hapus data ini?",
         html: `Data yang dihapus tidak dapat dikembalikan!`,
-        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
+        confirmButtonColor: "var(--bs-danger)",
+        cancelButtonColor: "var(--bs-primary)",
         confirmButtonText: "Ya, hapus!",
         cancelButtonText: "Batal",
     }).then((result) => {
