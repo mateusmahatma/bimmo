@@ -136,7 +136,7 @@
 
             // Handler global untuk semua AJAX (selain DataTables)
             $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
-                if (jqxhr.status === 401 || jqxhr.status === 419) {
+                if (jqxhr.status === 401 || jqxhr.status === 419 || jqxhr.status === 403) {
                     $('#sessionExpiredModal').modal('show');
                 }
             });
