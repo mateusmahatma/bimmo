@@ -68,6 +68,49 @@ $(document).ready(function () {
         ],
     });
 
+    // Fungsi untuk menampilkan toast notification
+    function showToast(message, type) {
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastId = 'toast-' + Date.now();
+        const colors = {
+            success: '#012970',  // Biru
+            danger: '#dc3545',   // Merah
+            warning: '#ffc107',  // Kuning
+            info: '#17a2b8',     // Biru muda
+            primary: '#007bff',  // Biru
+        };
+
+        const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        // Tambahkan toast ke container
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+        toast.show();
+
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
+
     // reload saat filter berubah
     $('#filter_status').on('change', function () {
         table.ajax.reload();
@@ -211,58 +254,27 @@ $(document).ready(function () {
     $("body").on("click", ".tombol-del-pinjaman", function (e) {
         e.preventDefault();
 
-        var id = $(this).data("id");
-
-        var toastMixin = Swal.mixin({
-            toast: true,
-            icon: "success",
-            title: "General Title",
-            animation: false,
-            position: "top",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-            didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-        });
-
-        // SweetAlert2 untuk konfirmasi
         Swal.fire({
             title: "Yakin mau hapus data ini?",
             text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
+            confirmButtonColor: "var(--bs-danger)",
+            cancelButtonColor: "var(--bs-primary)",
             confirmButtonText: "Ya, hapus!",
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
+                var id = $(this).data("id");
+
                 $.ajax({
                     url: "/pinjaman/" + id,
                     type: "DELETE",
-                    success: function (response) {
-                        toastMixin.fire({
-                            animation: true,
-                            title: response.message, // Menampilkan pesan sukses dari server
-                            icon: "success",
-                            iconColor: "#ffffff",
-                        });
-
+                    success: function () {
+                        showToast("Data berhasil dihapus", "success");
                         $("#pinjamanTable").DataTable().ajax.reload();
                     },
-                    error: function (xhr) {
-                        var errorMsg =
-                            xhr.responseJSON?.message || "Data Gagal dihapus";
-
-                        Swal.fire({
-                            title: "Gagal!",
-                            text: errorMsg,
-                            icon: "error",
-                        });
-
+                    error: function () {
+                        showToast("Data gagal dihapus", "danger");
                         $("#pinjamanTable").DataTable().ajax.reload();
                     },
                 });
