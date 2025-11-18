@@ -15,7 +15,16 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (!$request->expectsJson()) {
-            return route('pointech');
+            return route('bimmo');
         }
+    }
+
+    protected function unauthenticated($request, array $guards)
+    {
+        if ($request->expectsJson()) {
+            abort(401, 'Unauthenticated');
+        }
+
+        return redirect()->guest(route('bimmo'));
     }
 }

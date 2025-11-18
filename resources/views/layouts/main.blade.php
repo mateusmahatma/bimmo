@@ -103,10 +103,10 @@
     @endif
 
     <!-- Modal: Session Expired -->
-    <div class="modal fade" id="sessionExpiredModal" tabindex="-1" aria-labelledby="sessionExpiredLabel" aria-hidden="true">
+    <div class="modal fade" id="sessionExpiredModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="sessionExpiredLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-center">
-                <div class="modal-header bg-warning text-dark">
+                <div class="modal-header bg-white text-dark">
                     <h5 class="modal-title w-100" id="sessionExpiredLabel">Sesi Habis</h5>
                 </div>
                 <div class="modal-body">
@@ -124,52 +124,73 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Nonaktifkan notifikasi error default DataTables
-            $.fn.dataTable.ext.errMode = 'none';
 
-            // Handler untuk error khusus DataTables
+
+            $.fn.dataTable.ext.errMode = 'none';
             $(document).on('error.dt', function(e, settings, techNote, message) {
                 if (message.includes('Unauthorized') || message.includes('419') || message.includes('expired')) {
-                    $('#sessionExpiredModal').modal('show');
+                    showSessionExpiredModal();
                 }
             });
 
-            // Handler global untuk semua AJAX (selain DataTables)
-            $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
-                if (jqxhr.status === 401 || jqxhr.status === 419 || jqxhr.status === 403) {
-                    $('#sessionExpiredModal').modal('show');
+            $(document).ajaxError(function(event, jqxhr) {
+                if ([401, 403, 419].includes(jqxhr.status)) {
+                    showSessionExpiredModal();
                 }
             });
 
-            // Ketika tombol OK ditekan → arahkan ke halaman login
+
+            if (window.axios) {
+                window.axios.interceptors.response.use(
+                    response => response,
+                    error => {
+                        if (error.response && [401, 403, 419].includes(error.response.status)) {
+                            showSessionExpiredModal();
+                        }
+                        return Promise.reject(error);
+                    }
+                );
+            }
+
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const response = await originalFetch(...args);
+                if ([401, 403, 419].includes(response.status)) {
+                    showSessionExpiredModal();
+                }
+                return response;
+            };
+
+
+            setInterval(() => {
+                fetch('/check-session', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if ([401, 403, 419].includes(response.status)) {
+                            showSessionExpiredModal();
+                        }
+                    })
+                    .catch(() => {});
+            }, 2 * 60 * 1000); // 2 menit
+
             $('#btnSessionExpired').on('click', function() {
                 window.location.href = '/bimmo';
             });
         });
 
-        // 🧩 Tambahan proteksi untuk axios atau fetch
-        if (window.axios) {
-            window.axios.interceptors.response.use(
-                response => response,
-                error => {
-                    if (error.response && (error.response.status === 401 || error.response.status === 419)) {
-                        $('#sessionExpiredModal').modal('show');
-                    }
-                    return Promise.reject(error);
-                }
-            );
-        }
 
-        // Kalau kamu juga pakai fetch:
-        const originalFetch = window.fetch;
-        window.fetch = async (...args) => {
-            const response = await originalFetch(...args);
-            if (response.status === 401 || response.status === 419) {
+        function showSessionExpiredModal() {
+            if (!window.__sessionModalShown) {
+                window.__sessionModalShown = true;
                 $('#sessionExpiredModal').modal('show');
             }
-            return response;
-        };
+        }
     </script>
+
 
 
 

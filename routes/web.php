@@ -127,3 +127,7 @@ Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)-
 
 // Update skin
 Route::middleware(['auth'])->post('/user/skin', [UserController::class, 'updateSkin'])->name('user.update.skin');
+
+Route::get('/check-session', function () {
+    return response()->json(['alive' => true]);
+})->middleware('auth');
