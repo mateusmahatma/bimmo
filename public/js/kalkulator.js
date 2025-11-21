@@ -149,26 +149,60 @@ $(document).ready(function () {
                     },
                 }, { data: "nama_anggaran", className: "text-center", render: d => d || "-" },
                 {
-                    data: 'nama_jenis_pengeluaran', className: 'text-left', defaultContent: '-',
+                    data: 'nama_jenis_pengeluaran',
+                    name: 'nama_jenis_pengeluaran',
+                    className: 'text-left',
                     render: function (data, type, row) {
-                        if (type !== "display" || !data || typeof data !== "string") return data || "-";
-                        const lines = data.split(",");
+
+                        // Jika bukan untuk display atau data kosong → tampilkan "-"
+                        if (type !== "display" || !Array.isArray(data) || data.length === 0) {
+                            return "-";
+                        }
+
                         const showLimit = 3;
-                        const visible = lines.slice(0, showLimit);
-                        const hidden = lines.slice(showLimit);
+                        const visible = data.slice(0, showLimit);
+                        const hidden = data.slice(showLimit);
+                        const hasMore = hidden.length > 0;
+
                         const tableId = `detail-table-${row.id || Math.random().toString(36).substring(7)}`;
 
-                        let table = `<table style="width:100%;border-collapse:collapse;" id="${tableId}"><colgroup><col style="width:30px;"><col></colgroup>`;
-                        visible.forEach((line, i) => {
-                            table += `<tr><td style="border:1px solid #ddd;padding:4px;text-align:center;">${i + 1}</td><td style="border:1px solid #ddd;padding:4px;">${line.trim()}</td></tr>`;
-                        });
-                        hidden.forEach((line, i) => {
-                            table += `<tr class="hidden-row" style="display:none;"><td style="border:1px solid #ddd;padding:4px;text-align:center;">${showLimit + i + 1}</td><td style="border:1px solid #ddd;padding:4px;">${line.trim()}</td></tr>`;
-                        });
-                        table += `</table>`;
-                        if (hidden.length) {
-                            table += `<button type="button" class="btn btn-link toggle-btn" data-target="${tableId}">Show more</button>`;
+                        let table = `
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #dee2e6; font-size: 13px;" id="${tableId}">
+                <colgroup>
+                    <col style="width: 40px;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tbody>
+                    ${visible.map((name, i) => `
+                        <tr>
+                            <td style="border: 1px solid #dee2e6; padding: 4px; text-align: center;">${i + 1}</td>
+                            <td style="border: 1px solid #dee2e6; padding: 4px;">${name}</td>
+                        </tr>
+                    `).join('')}
+        `;
+
+                        if (hasMore) {
+                            table += hidden.map((name, i) => `
+                <tr class="hidden-row" style="display: none;">
+                    <td style="border: 1px solid #dee2e6; padding: 4px; text-align: center;">${showLimit + i + 1}</td>
+                    <td style="border: 1px solid #dee2e6; padding: 4px;">${name}</td>
+                </tr>
+            `).join('');
                         }
+
+                        table += `
+                </tbody>
+            </table>
+        `;
+
+                        if (hasMore) {
+                            table += `
+                <button type="button" class="btn btn-sm btn-link p-0 mt-1 toggle-btn" data-target="${tableId}">
+                    More Details
+                </button>
+            `;
+                        }
+
                         return table;
                     }
                 },

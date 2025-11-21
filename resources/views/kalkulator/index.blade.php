@@ -108,6 +108,7 @@
                     <th style="width: 1%;"></th>
                 </tr>
             </thead>
+            <tbody></tbody>
         </table>
     </div>
 </div>

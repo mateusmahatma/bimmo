@@ -26,10 +26,14 @@ class FinancialCalculatorController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('nama_pengeluaran', function ($row) {
-                    // Pastikan kolom ini benar ada
-                    return $row->nama_anggaran;
+                ->addColumn('nama_jenis_pengeluaran', function ($row) {
+                    $ids = $row->jenis_pengeluaran ?? [];
+
+                    return Pengeluaran::whereIn('id', $ids)
+                        ->pluck('nama')
+                        ->toArray();
                 })
+
                 ->addColumn('sisa_anggaran', function ($row) {
                     $nominal = floatval($row->nominal_anggaran);
                     $digunakan = floatval($row->anggaran_yang_digunakan);
