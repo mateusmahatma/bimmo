@@ -11,10 +11,15 @@
 @extends('layouts.main')
 @section('container')
 
-<nav id="navbar-example2" class="navbar px-3">
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
     <a class="navbar-brand" href="/barang">Daftar Aset</a>
     <ul class="nav nav-pills">
-        <div class="btn-group dropstart">
+        <li class="nav-item">
+            <a href="{{ route('barang.create') }}" class="btn btn-success">
+                Tambah Data
+            </a>
+        </li>
+        <!-- <div class="btn-group dropstart">
             <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 Pilih Opsi
             </button>
@@ -23,11 +28,9 @@
                 <li><a class="dropdown-item" href="#" onclick="downloadPDFbarang()">Unduh PDF</a></li>
                 <li><a class="dropdown-item" href="#" onclick="downloadExcel()">Unduh Excel</a></li>
             </ul>
-        </div>
+        </div> -->
     </ul>
 </nav>
-
-@include('modal.barang.index')
 
 <div class="card-header">
     <div class="card-body">

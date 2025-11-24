@@ -3,7 +3,11 @@
         &#8943;
     </button>
     <ul class="dropdown-menu">
-        <li><a class="dropdown-item tombol-edit-barang" href="#" data-id="{{ $request->id }}">Edit</a></li>
+        <li>
+            <a class="dropdown-item" href="{{ route('barang.edit', $request->id) }}">
+                Edit
+            </a>
+        </li>
         <li><a class="dropdown-item tombol-del-barang" href="#" data-id="{{ $request->id }}">Delete</a></li>
     </ul>
 </div>
