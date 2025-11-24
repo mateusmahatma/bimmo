@@ -94,12 +94,12 @@ class HasilProsesAnggaranController extends Controller
     }
 
     // Hapus data
-    public function destroy($id)
-    {
-        $data = HasilProsesAnggaran::findOrFail($id);
-        $data->delete();
+    // public function destroy($id)
+    // {
+    //     $data = HasilProsesAnggaran::findOrFail($id);
+    //     $data->delete();
 
-        return redirect()->route('hasil_proses_anggaran.index')
-            ->with('success', 'Data berhasil dihapus.');
-    }
+    //     return redirect()->route('hasil_proses_anggaran.index')
+    //         ->with('success', 'Data berhasil dihapus.');
+    // }
 }
