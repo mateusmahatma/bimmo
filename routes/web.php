@@ -49,7 +49,28 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/saving-rate-data', [DashboardController::class, 'getSavingRateData']);
 });
 
-Route::get('/logout', [DashboardController::class, 'logout']);
+// Anggaran
+Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
+
+// Proses Anggaran
+Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
+    Route::get('/', 'index')->name('kalkulator.index');
+    Route::post('/', 'store')->name('kalkulator.store');
+    Route::get('/{id}', 'show')->name('kalkulator.show');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+    Route::post('/calculate', 'calculate');
+    Route::get('/calculate', 'showResult')->name('showResult');
+    Route::get('/cetak_pdf', 'cetak_pdf');
+});
+
+// Aset
+Route::resource('/barang', BarangController::class)->middleware('auth');
+Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
+
+// Dana Darurat
+Route::resource('/dana-darurat', DanaDaruratController::class)->middleware('auth');
+
 
 // Pemasukan
 Route::middleware(['auth'])->group(function () {
@@ -79,7 +100,6 @@ Route::middleware(['auth'])->group(function () {
 // Compare
 Route::match(['get', 'post'], '/compare', [CompareController::class, 'index'])->middleware('auth');
 
-
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
     Route::resource('pinjaman', PinjamanController::class);
@@ -87,24 +107,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/bayar_pinjaman/{id}', [BayarPinjamanController::class, 'destroy'])->name('bayar_pinjaman.destroy');
 });
 
-// Anggaran
-Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
 
-// Proses Anggaran
-Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
-    Route::get('/', 'index')->name('kalkulator.index');
-    Route::post('/', 'store')->name('kalkulator.store');
-    Route::get('/{id}', 'show')->name('kalkulator.show');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
-    Route::post('/calculate', 'calculate');
-    Route::get('/calculate', 'showResult')->name('showResult');
-    Route::get('/cetak_pdf', 'cetak_pdf');
-});
-
-// Barang
-Route::resource('/barang', BarangController::class)->middleware('auth');
-Route::get('/api/barang', [BarangController::class, 'getList'])->middleware('auth');
 
 // Ubah Password
 Route::get('/ubah-password', [UbahPasswordController::class, 'index'])->middleware('auth');
@@ -112,15 +115,6 @@ Route::post('/ubah-password', [UbahPasswordController::class, 'store'])->middlew
 
 // Lupa Password
 Route::resource('/lupa-password', LupaPasswordController::class);
-
-// Dana Darurat
-Route::middleware('auth')->prefix('dana-darurat')->group(function () {
-    Route::get('/', [DanaDaruratController::class, 'index']);
-    Route::post('/', [DanaDaruratController::class, 'store']);
-    Route::get('/{id}/edit', [DanaDaruratController::class, 'edit']);
-    Route::put('/{id}', [DanaDaruratController::class, 'update']);
-    Route::delete('/{id}', [DanaDaruratController::class, 'destroy']);
-});
 
 // Hasil Proses Anggaran
 Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)->middleware('auth');
@@ -131,3 +125,5 @@ Route::middleware(['auth'])->post('/user/skin', [UserController::class, 'updateS
 Route::get('/check-session', function () {
     return response()->json(['alive' => true]);
 })->middleware('auth');
+
+Route::get('/logout', [DashboardController::class, 'logout']);

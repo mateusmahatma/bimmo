@@ -52,7 +52,10 @@ class DanaDaruratController extends Controller
      */
     public function create()
     {
-        //
+        $dana = new DanaDarurat();
+        $dana->id_user = Auth::id();
+
+        return view('dana_darurat.create', compact('dana'));
     }
 
     /**
@@ -63,8 +66,8 @@ class DanaDaruratController extends Controller
         $validatedData = $request->validate([
             'tgl_transaksi_dana_darurat'    => 'required|date',
             'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
-            'nominal_dana_darurat'          => 'decimal:2',
-            'keterangan' => ['nullable', 'string'],
+            'nominal_dana_darurat'          => 'nullable|numeric',
+            'keterangan'                    => 'nullable|string',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -86,8 +89,9 @@ class DanaDaruratController extends Controller
      */
     public function edit($id)
     {
-        $data = DanaDarurat::where('id_dana_darurat', $id)->first();
-        return response()->json(['result' => $data]);
+        $dana = DanaDarurat::where('id_dana_darurat', $id)->first();
+
+        return view('dana_darurat.edit', compact('dana'));
     }
 
     /**
@@ -98,12 +102,14 @@ class DanaDaruratController extends Controller
         $validatedData = $request->validate([
             'tgl_transaksi_dana_darurat'    => 'required|date',
             'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
-            'nominal_dana_darurat'          => 'decimal:2',
-            'keterangan' => ['nullable', 'string'],
+            'nominal_dana_darurat'          => 'nullable|numeric',
+            'keterangan'                    => 'nullable|string',
         ]);
 
         DanaDarurat::where('id_dana_darurat', $id)->update($validatedData);
-        return response()->json(['success' => "Berhasil melakukan update data"]);
+
+        return redirect()->route('dana-darurat.index')
+            ->with('success', 'Berhasil update Dana Darurat!');
     }
 
     /**
