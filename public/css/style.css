@@ -1928,53 +1928,6 @@ table.customTable td {
     padding: 0;
 }
 
-/* Tabel utama */
-table.dashboardTable {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--default-font, 'Inter', sans-serif);
-    font-size: 0.9rem;
-    color: #333;
-}
-
-/* Header */
-table.dashboardTable thead {
-    background: #f8f9fa;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
-
-table.dashboardTable th {
-    text-align: left;
-    padding: 14px 16px;
-    font-weight: 600;
-    color: #495057;
-    border-bottom: 2px solid #e9ecef;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 0.5px;
-}
-
-/* Isi tabel */
-table.dashboardTable td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f3f5;
-    vertical-align: middle;
-    background-color: #fff;
-}
-
-/* Hover baris */
-table.dashboardTable tbody tr:hover {
-    background-color: #f8f9fc;
-    transition: background-color 0.2s ease;
-}
-
-/* Zebra row */
-table.dashboardTable tbody tr:nth-child(even) {
-    background-color: #fafbfc;
-}
-
 /* Tombol aksi */
 .action-btn {
     display: inline-flex;

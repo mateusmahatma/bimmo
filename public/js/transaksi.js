@@ -972,7 +972,5 @@ toggleBtn.addEventListener("click", () => {
     laporanContent.style.display = isHidden ? "block" : "none";
     toggleIcon.textContent = isHidden ? "−" : "+";
 });
-
-// default: tampilkan konten
-// bisa ubah ke "block" jika mau terbuka di awal
+// block terbuka di awal, none tertutup
 laporanContent.style.display = "none";

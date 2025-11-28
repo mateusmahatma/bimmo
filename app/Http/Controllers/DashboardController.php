@@ -9,6 +9,8 @@ use App\Models\Transaksi;
 use App\Models\Pinjaman;
 use App\Models\Barang;
 use App\Models\DanaDarurat;
+use App\Models\Anggaran;
+use App\Models\HasilProsesAnggaran;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -138,6 +140,15 @@ class DashboardController extends Controller
 
         $totalNominalSisa = $totalNominalBulanPemasukan - $totalNominalBulan;
 
+
+        // Ambil kombinasi tanggal unik untuk dropdown filter
+        $filterOptions = HasilProsesAnggaran::where('id_user', $userId)
+            ->select('tanggal_mulai', 'tanggal_selesai')
+            ->orderBy('tanggal_mulai', 'asc')
+            ->get()
+            ->unique(fn($row) => $row->tanggal_mulai . '_' . $row->tanggal_selesai)
+            ->values();
+
         // Kirim semua data ke view
         return view('dashboard.index', compact(
             'transaksi',
@@ -151,6 +162,7 @@ class DashboardController extends Controller
             'totalNominalBulan',
             'totalNominalBulanPemasukan',
             'totalNominalSisa',
+            'filterOptions'
         ));
     }
 
@@ -363,6 +375,42 @@ class DashboardController extends Controller
         return response()->json([
             'labels' => array_keys($data),
             'data' => array_values($data),
+        ]);
+    }
+
+    public function AnggaranChart(Request $request)
+    {
+        $userId = Auth::id();
+
+        $query = HasilProsesAnggaran::where('id_user', $userId);
+
+        // Jika filter aktif
+        if ($request->filter) {
+            [$mulai, $selesai] = explode('_', $request->filter);
+            $query->where('tanggal_mulai', $mulai)
+                ->where('tanggal_selesai', $selesai);
+        }
+
+        $anggarans = $query->get();
+
+        return response()->json([
+            'labels' => $anggarans->pluck('nama_anggaran')->values(),
+            'ids' => $anggarans->pluck('id_proses_anggaran'),
+            'datasets' => [
+                [
+                    'name' => 'Anggaran',
+                    'data' => $anggarans->pluck('nominal_anggaran')->map(fn($v) => (float)$v)->values()
+                ],
+                [
+                    'name' => 'Realisasi',
+                    'data' => $anggarans->pluck('anggaran_yang_digunakan')->map(fn($v) => (float)$v)->values()
+                ],
+                [
+                    'name' => 'Sisa',
+                    'data' => $anggarans->pluck('sisa_anggaran')->map(fn($v) => (float)$v)->values()
+                ]
+            ],
+            'table' => $anggarans // kirim data untuk tampil dalam list
         ]);
     }
 

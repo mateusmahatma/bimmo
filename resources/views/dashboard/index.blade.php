@@ -34,16 +34,6 @@
     </button>
 </div>
 
-<!-- <div class="alert alert-danger">
-    Peringatan Penting:
-    <ul class="mb-0">
-        @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-        @endforeach
-        <li>Pinjaman Anda jatuh tempo pada tanggal 20 Juni 2000</li>
-    </ul>
-</div> -->
-
 <section class="dashboard">
     <div class="row g-4">
 
@@ -52,7 +42,7 @@
 
             <div class="card-dashboard">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3>Ikhtisar Keuangan</h3>
+                    <h3>Ringkasan Keuangan</h3>
                     <img src="/icon/eye.png" style="height:22px;width:22px;cursor:pointer" onclick="toggleNominal()">
                 </div>
                 <ul class="box-info">
@@ -110,7 +100,7 @@
 
             <div class="card-dashboard">
                 <div class="card-header d-flex justify-content-between align-items-center mb-3">
-                    <h3>Tingkat Tabungan</h3>
+                    <h3>Rasio Tabungan</h3>
                     <select id="filterPeriodSavingRate" class="filter-dropdown">
                         <option value="2">2 Bulan</option>
                         <option value="4">4 Bulan</option>
@@ -164,26 +154,22 @@
         <div class="col-12">
             <div class="card-dashboard">
                 <h3>Transaksi Hari Ini</h3>
-                <div class="table-responsive-wrapper">
-                    <table id="todayTransactionsTable" class="dashboardTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Jenis Pendapatan</th>
-                                <th>Nominal Pendapatan</th>
-                                <th>Jenis Pengeluaran</th>
-                                <th>Nominal Pengeluaran</th>
-                                <th style="width: 25%;">Keterangan</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+                @include('dashboard.transaksi-hari-ini')
+                @stack('transaksi-css')
             </div>
         </div>
-    </div>
 
-    @include('modal.dashboard.detail')
-    @include('modal.dashboard.rasio')
+        <div class="col-12">
+            <div class="card-dashboard">
+                <h3 class="fw-bold mb-4">Kinerja Anggaran</h3>
+                @include('dashboard.anggaran')
+                @stack('anggaran-css')
+                @stack('anggaran.scripts')
+            </div>
+        </div>
+
+        @include('modal.dashboard.detail')
+        @include('modal.dashboard.rasio')
 </section>
 @endsection
 

@@ -17,11 +17,11 @@ return new class extends Migration
             $table->date('tanggal_selesai');
             $table->string('nama_anggaran');
             $table->json('jenis_pengeluaran');
-            $table->decimal('persentase_anggaran', 5, 2); // Misalnya 25.50 (%)
-            $table->decimal('nominal_anggaran', 15, 2); // Misalnya 1.000.000,00
+            $table->decimal('persentase_anggaran', 5, 2);
+            $table->decimal('nominal_anggaran', 15, 2);
             $table->decimal('anggaran_yang_digunakan', 15, 2);
             $table->decimal('sisa_anggaran', 15, 2);
-            $table->timestamps(); // created_at dan updated_at
+            $table->timestamps();
         });
     }
 

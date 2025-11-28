@@ -296,87 +296,6 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 });
 
-// Today's Transaction
-document.addEventListener("DOMContentLoaded", function () {
-    function getTodayTransactions() {
-        $.ajax({
-            url: "/dashboard/todayTransactions",
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                populateTodayTransactionsTable(data);
-            },
-            error: function (error) {
-                console.error("Error fetching today transactions:", error);
-            },
-        });
-    }
-
-    function formatNumberWithSeparator(number) {
-        if (!number) return "0";
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
-    function formatKeterangan(keterangan) {
-        if (!keterangan) return "-";
-        if (typeof keterangan !== "string") return keterangan;
-
-        var lines = keterangan.split("\n");
-        var renderedText = "";
-        lines.forEach(function (line, index) {
-            renderedText += index + 1 + ". " + line + "<br>";
-        });
-        return renderedText;
-    }
-
-    function populateTodayTransactionsTable(data) {
-        var table = $("#todayTransactionsTable");
-
-        // Hapus semua <tr> kecuali baris pertama (header)
-        table.find("tr:gt(0)").remove();
-
-        var cardTitle = $(".card-transaksi h3");
-
-        if (data.length === 0) {
-            var noDataRow = `
-            <tr>
-                <td class="text-center" colspan="6">No data available in table</td>
-            </tr>
-        `;
-            table.append(noDataRow);
-        } else {
-            $.each(data, function (key, transaction) {
-                var row = `
-                <tr>
-                    <td class="text-center">${key + 1}</td>
-                    <td class="text-center">
-                        ${transaction.pemasukan && transaction.pemasukan_relation?.nama
-                        ? transaction.pemasukan_relation?.nama
-                        : "-"}
-                    </td>
-                    <td class="text-center">
-                        ${transaction.nominal_pemasukan ? formatNumberWithSeparator(transaction.nominal_pemasukan) : "0"}
-                    </td>
-                    <td class="text-center">
-                        ${transaction.pengeluaran && transaction.pengeluaran_relation?.nama
-                        ? transaction.pengeluaran_relation.nama
-                        : "-"}
-                    </td>
-                    <td class="text-center">
-                        ${transaction.nominal ? formatNumberWithSeparator(transaction.nominal) : "0"}
-                    </td>
-                    <td class="text-left">
-                        ${transaction.keterangan ? formatKeterangan(transaction.keterangan) : "-"}
-                    </td>
-                </tr>
-            `;
-                table.append(row);
-            });
-        }
-    }
-    getTodayTransactions();
-});
-
 // Expenses Bar
 document.addEventListener("DOMContentLoaded", function () {
     let barChart = null;
@@ -1160,4 +1079,43 @@ document.addEventListener("DOMContentLoaded", function () {
     const avgPengeluaran = parseFloat(document.getElementById("rataPengeluaran").dataset.value);
 
     console.log("Pemasukan:", avgPemasukan, "Pengeluaran:", avgPengeluaran);
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Hapus chart lama jika stack reload
+    let chartContainer = document.querySelector("#chart");
+    if (chartContainer.innerHTML.trim() !== "") {
+        chartContainer.innerHTML = "";
+    }
+
+    var options = {
+        series: [{
+            data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
+        }],
+        chart: {
+            type: 'bar',
+            height: 350
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                borderRadiusApplication: 'end',
+                horizontal: true,
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        xaxis: {
+            categories: [
+                'South Korea', 'Canada', 'United Kingdom', 'Netherlands',
+                'Italy', 'France', 'Japan', 'United States', 'China', 'Germany'
+            ],
+        }
+    };
+
+    var chart = new ApexCharts(chartContainer, options);
+    chart.render();
+
 });

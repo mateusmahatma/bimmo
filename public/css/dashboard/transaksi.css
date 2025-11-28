@@ -1,0 +1,59 @@
+@import url('style.css');
+
+/* ======= Table Base Style ======= */
+table.dashboardTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: var(--default-font, 'Inter', sans-serif);
+    font-size: 0.9rem;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+/* ======= Header ======= */
+table.dashboardTable thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--bs-primary);
+}
+
+table.dashboardTable th {
+    padding: 14px 16px;
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ======= Table Body Style ======= */
+table.dashboardTable td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f3f5;
+    vertical-align: middle;
+    color: #333;
+    transition: transform 0.2s ease;
+}
+
+/* Zebra row */
+table.dashboardTable tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* Responsive text ellipsis (optional) */
+table.dashboardTable td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ======= Small Animation ======= */
+@media (prefers-reduced-motion: no-preference) {
+    table.dashboardTable tbody tr {
+        transition: background-color 0.2s ease, transform 0.15s ease;
+    }
+}

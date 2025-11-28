@@ -47,6 +47,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/jenis-pengeluaran', [DashboardController::class, 'getJenisPengeluaran']);
     Route::get('/transaksi', [DashboardController::class, 'getTransaksiByPengeluaran']);
     Route::get('/saving-rate-data', [DashboardController::class, 'getSavingRateData']);
+    Route::get('/anggaran/chart', [DashboardController::class, 'AnggaranChart'])->name('anggaran.chart');
 });
 
 // Anggaran
