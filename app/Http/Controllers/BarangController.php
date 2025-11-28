@@ -62,7 +62,6 @@ class BarangController extends Controller
     public function edit($id)
     {
         $barang = Barang::where('id', $id)->first();
-        // return response()->json(['result' => $data]);
 
         return view('barang.edit', compact('barang'));
     }
@@ -77,6 +76,7 @@ class BarangController extends Controller
         ]);
 
         Barang::where('id', $id)->update($validatedData);
+
         return redirect()->route('barang.index')
             ->with('success', 'Berhasil update Aset!');
     }
