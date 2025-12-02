@@ -35,50 +35,44 @@ class PemasukanController extends Controller
         return view('pemasukan.index');
     }
 
-    public function create()
-    {
-        //
-    }
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'nama' => ['required', 'min:3', 'max:255'],
         ]);
 
-        // Tambahkan id_user ke data yang akan disimpan
         $validatedData['id_user'] = Auth::id();
 
-        pemasukan::create($validatedData);
-        return redirect('/pemasukan');
+        Pemasukan::create($validatedData);
+        return redirect('/pemasukan')->with('success', 'Kategori Pemasukan Berhasil Ditambahkan.');
+    }
+
+    public function create()
+    {
+        return view('pemasukan.create', [
+            'pemasukan' => new Pemasukan(),
+        ]);
     }
 
     public function show() {}
 
     public function edit($id)
     {
-        $data = pemasukan::where('id', $id)->first();
-        return response()->json(['result' => $data]);
+        $pemasukan = Pemasukan::where('id', $id)->first();
+
+        return view('pemasukan.edit', compact('pemasukan'));
     }
 
     public function update(Request $request, $id)
     {
-        $validasi = Validator::make($request->all(), [
-            'nama' => 'required',
-        ], [
-            'nama.required' => 'Nama wajib diisi',
+        $validatedData = $request->validate([
+            'nama' => 'required | string',
         ]);
 
-        if ($validasi->fails()) {
-            return response()->json(['errors' => $validasi->errors()]);
-        }
+        Pemasukan::where('id', $id)->update($validatedData);
 
-        $data = [
-            'nama' => $request->nama,
-        ];
-
-        Pemasukan::where('id', $id)->update($data);
-        return response()->json(['success' => "Berhasil melakukan update data"]);
+        return redirect()->route('pemasukan.index')
+            ->with('success', 'Berhasil update anggaran!');
     }
 
     public function destroy($id)

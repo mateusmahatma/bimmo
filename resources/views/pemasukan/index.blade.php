@@ -15,8 +15,8 @@
     <a class="navbar-brand" href="/pemasukan">Jenis Pemasukan</a>
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <a class="nav-link tombol-tambah-pemasukan" href="#" data-bs-toggle="modal" data-bs-target="#pemasukanModal">
-                <button class="btn btn-success">Tambah Data</button>
+            <a href="{{ route('pemasukan.create') }}" class="btn btn-success">
+                Tambah Data
             </a>
         </li>
     </ul>
