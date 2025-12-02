@@ -52,8 +52,6 @@ class BarangController extends Controller
 
     public function create()
     {
-        $userId = Auth::id();
-
         return view('barang.create', [
             'barang' => new Barang(),
         ]);
