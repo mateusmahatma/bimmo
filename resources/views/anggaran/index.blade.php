@@ -22,8 +22,6 @@
     </ul>
 </nav>
 
-@include('modal.anggaran.index')
-
 <div class="card-header">
     <div class="card-body">
         <div class="custom-alert" role="alert">
