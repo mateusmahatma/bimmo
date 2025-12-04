@@ -36,7 +36,9 @@ class PengeluaranController extends Controller
 
     public function create()
     {
-        //
+        return view('pengeluaran.create', [
+            'pengeluaran' => new Pengeluaran(),
+        ]);
     }
 
     public function store(Request $request)
@@ -48,7 +50,7 @@ class PengeluaranController extends Controller
         $validatedData['id_user'] = Auth::id();
 
         pengeluaran::create($validatedData);
-        return redirect('/pengeluaran');
+        return redirect('/pengeluaran')->with('success', 'Kategori Pengeluaran Berhasil Ditambahkan.');
     }
 
     public function show()
@@ -58,28 +60,21 @@ class PengeluaranController extends Controller
 
     public function edit($id)
     {
-        $data = Pengeluaran::where('id', $id)->first();
-        return response()->json(['result' => $data]);
+        $pengeluaran = Pengeluaran::where('id', $id)->first();
+
+        return view('pengeluaran.edit', compact('pengeluaran'));
     }
 
     public function update(Request $request, $id)
     {
-        $validasi = Validator::make($request->all(), [
-            'nama' => 'required',
-        ], [
-            'nama.required' => 'Nama wajib diisi',
+        $validatedData = $request->validate([
+            'nama' => 'required | string',
         ]);
 
-        if ($validasi->fails()) {
-            return response()->json(['errors' => $validasi->errors()]);
-        }
+        Pengeluaran::where('id', $id)->update($validatedData);
 
-        $data = [
-            'nama' => $request->nama,
-        ];
-
-        Pengeluaran::where('id', $id)->update($data);
-        return response()->json(['success' => "Berhasil melakukan update data"]);
+        return redirect()->route('pengeluaran.index')
+            ->with('success', 'Berhasil Update Kategori Pengeluaran!');
     }
 
     public function destroy($id)

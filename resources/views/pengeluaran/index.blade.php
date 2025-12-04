@@ -15,8 +15,8 @@
     <a class="navbar-brand" href="/pengeluaran">Kategori Pengeluaran</a>
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <a class="nav-link tombol-tambah-pengeluaran" href="#" data-bs-toggle="modal" data-bs-target="#pengeluaranModal">
-                <span class="btn btn-success">Tambah Data</span>
+            <a href="{{ route('pengeluaran.create') }}" class="btn btn-success">
+                Tambah Data
             </a>
         </li>
     </ul>
