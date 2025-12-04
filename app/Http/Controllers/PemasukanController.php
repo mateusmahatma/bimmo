@@ -54,7 +54,10 @@ class PemasukanController extends Controller
         ]);
     }
 
-    public function show() {}
+    public function show()
+    {
+        // 
+    }
 
     public function edit($id)
     {
@@ -72,7 +75,7 @@ class PemasukanController extends Controller
         Pemasukan::where('id', $id)->update($validatedData);
 
         return redirect()->route('pemasukan.index')
-            ->with('success', 'Berhasil update anggaran!');
+            ->with('success', 'Berhasil Update Kategori Pemasukan!');
     }
 
     public function destroy($id)
