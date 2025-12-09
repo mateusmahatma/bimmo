@@ -168,6 +168,28 @@
 
     // default: sembunyikan konten
     detailContent.style.display = "none";
+
+    // Filter Tomselect
+    document.addEventListener('DOMContentLoaded', function() {
+
+        function initTomSelect(selector) {
+            new TomSelect(selector, {
+                allowEmptyOption: true,
+                placeholder: '- Pilih -',
+                create: false,
+                onInitialize: function() {
+                    if (!this.getValue()) {
+                        this.setTextboxValue('');
+                    }
+                }
+            });
+        }
+
+        // Inisialisasi semua TomSelect
+        initTomSelect('#pemasukan');
+        initTomSelect('#pengeluaran');
+        initTomSelect('#barang_id');
+    });
 </script>
 @endsection
 
