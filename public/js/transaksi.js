@@ -214,32 +214,24 @@ $(document).ready(function () {
 
 // Filter Tomselect
 document.addEventListener('DOMContentLoaded', function () {
-    new TomSelect('#pemasukan', '#filter_pemasukan', {
-        allowEmptyOption: true,
-        placeholder: '- Pilih -',
-        create: false,
-        onInitialize: function () {
-            // Jika tidak ada nilai terpilih, pakai placeholder
-            if (!this.getValue()) {
-                this.setTextboxValue('');
-            }
-        }
-    });
-});
 
-// Filter Tomselect
-document.addEventListener('DOMContentLoaded', function () {
-    new TomSelect('#pengeluaran', '#filter_pengeluaran', {
-        allowEmptyOption: true,
-        placeholder: '- Pilih -',
-        create: false,
-        onInitialize: function () {
-            // Jika tidak ada nilai terpilih, pakai placeholder
-            if (!this.getValue()) {
-                this.setTextboxValue('');
+    function initTomSelect(selector) {
+        new TomSelect(selector, {
+            allowEmptyOption: true,
+            placeholder: '- Pilih -',
+            create: false,
+            onInitialize: function () {
+                if (!this.getValue()) {
+                    this.setTextboxValue('');
+                }
             }
-        }
-    });
+        });
+    }
+
+    // Inisialisasi semua TomSelect
+    initTomSelect('#pemasukan');
+    initTomSelect('#pengeluaran');
+    initTomSelect('#barang_id');
 });
 
 // JS

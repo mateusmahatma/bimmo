@@ -20,6 +20,7 @@ use App\Models\HasilProsesAnggaran;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Barang;
+use App\Models\DanaDarurat;
 
 class TransaksiController extends Controller
 {
@@ -93,6 +94,24 @@ class TransaksiController extends Controller
         ])->with('message', 'Pastikan format tanggal yang Anda kirimkan adalah YYYY-MM-DD.');
     }
 
+    public function create()
+    {
+        $userId = Auth::id();
+
+        $pemasukan = Pemasukan::where('id_user', $userId)->get();
+
+        $pengeluaran = Pengeluaran::where('id_user', $userId)->get();
+
+        $barang = Barang::where('id_user', $userId)->get();
+
+        return view('transaksi.create', [
+            'transaksi' => new Transaksi(),
+            'pemasukan' => $pemasukan,
+            'pengeluaran' => $pengeluaran,
+            'barang' => $barang
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -108,53 +127,75 @@ class TransaksiController extends Controller
         $validatedData['id_user'] = Auth::id();
 
         try {
-            // Mapping nama pengeluaran menjadi ID
+
+            /** ======================================
+             *  MAPPING PENGELUARAN (nama → id)
+             * ====================================== */
             if (!empty($validatedData['pengeluaran'])) {
-                $pengeluaran = Pengeluaran::where('nama', $validatedData['pengeluaran'])->first();
+                $peng = Pengeluaran::where('nama', $validatedData['pengeluaran'])->first();
 
-                if (!$pengeluaran) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Jenis pengeluaran tidak ditemukan.',
-                    ]);
+                if (!$peng) {
+                    return back()->with('error', 'Jenis pengeluaran tidak ditemukan.');
                 }
 
-                $validatedData['pengeluaran'] = $pengeluaran->id;
+                $validatedData['pengeluaran'] = $peng->id;
             }
 
-            // Mapping nama pemasukan menjadi ID
+            /** ======================================
+             *  MAPPING PEMASUKAN (nama → id)
+             * ====================================== */
             if (!empty($validatedData['pemasukan'])) {
-                $pemasukan = Pemasukan::where('nama', $validatedData['pemasukan'])->first();
+                $pem = Pemasukan::where('nama', $validatedData['pemasukan'])->first();
 
-                if (!$pemasukan) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Jenis pemasukan tidak ditemukan.',
-                    ]);
+                if (!$pem) {
+                    return back()->with('error', 'Jenis pemasukan tidak ditemukan.');
                 }
 
-                $validatedData['pemasukan'] = $pemasukan->id;
+                $validatedData['pemasukan'] = $pem->id;
             }
 
-            // Tambahkan status 2 jika asset list dicentang
+            /** ======================================
+             * SET STATUS = 2 jika kategori berisi asset_list
+             * ====================================== */
             if (in_array('asset_list', $request->kategori ?? [])) {
                 $validatedData['status'] = 2;
             }
 
-            // Simpan transaksi
+            /** ======================================
+             * SIMPAN TRANSAKSI (HANYA SEKALI)
+             * ====================================== */
             $transaksi = Transaksi::create($validatedData);
 
-            // Tambahkan nominal ke kolom harga barang (jika ada barang_id dan nominal)
+            /** ======================================
+             * UPDATE HARGA BARANG (kalau ada barang_id)
+             * ====================================== */
             if (!empty($validatedData['barang_id']) && $transaksi->nominal > 0) {
                 Barang::where('id', $validatedData['barang_id'])
                     ->increment('harga', $transaksi->nominal);
             }
 
-            // Proses anggaran jika ada pengeluaran dan nominal
-            if (!empty($transaksi->pengeluaran) && $transaksi->nominal > 0) {
-                $pengeluaranId = (string) $transaksi->pengeluaran;
+            /** ======================================
+             * UPDATE DANA DARURAT
+             * ====================================== */
+            if (in_array('emergency_fund', $request->kategori ?? []) && $transaksi->nominal > 0) {
 
-                $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+                $dana = DanaDarurat::firstOrCreate(
+                    ['id_user' => Auth::id()],
+                    ['total' => 0]
+                );
+
+                $dana->increment('total', $transaksi->nominal);
+            }
+
+            /** ======================================
+             * UPDATE PROSES ANGGARAN (jika ada pengeluaran)
+             * ====================================== */
+            if (!empty($transaksi->pengeluaran) && $transaksi->nominal > 0) {
+
+                $hasil = HasilProsesAnggaran::whereJsonContains(
+                    'jenis_pengeluaran',
+                    (string) $transaksi->pengeluaran
+                )
                     ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
                     ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
                     ->first();
@@ -164,24 +205,25 @@ class TransaksiController extends Controller
                 }
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Data transaksi berhasil disimpan.',
-                'redirect' => url('/transaksi')
-            ]);
+            /** ======================================
+             * REDIRECT
+             * ====================================== */
+            return redirect()->route('transaksi.index')
+                ->with('success', 'Data Transaksi Berhasil Disimpan!');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data.',
-                'error' => $e->getMessage(),
-            ]);
+
+            return back()->with('error', 'Terjadi error: ' . $e->getMessage());
         }
     }
 
+
     public function edit($id)
     {
-        $data = transaksi::where('id', $id)->first();
-        return response()->json(['result' => $data]);
+        // $data = transaksi::where('id', $id)->first();
+        // return response()->json(['result' => $data]);
+        $transaksi = Transaksi::where('id', $id)->first();
+
+        return view('transaksi.edit', compact('transaksi'));
     }
 
     public function update(Request $request, $id)
@@ -247,6 +289,25 @@ class TransaksiController extends Controller
                         // Kurangi anggaran_yang_digunakan, pastikan tidak negatif
                         $hasil->decrement('anggaran_yang_digunakan', $nominal);
                     }
+                }
+            }
+
+            // Pengurangan ke tabel barang
+            if (!empty($transaksi->barang_id) && $nominal > 0) {
+
+                $barang = Barang::find($transaksi->barang_id);
+
+                if ($barang) {
+
+                    $hargaBaru = $barang->harga - $nominal;
+
+                    if ($hargaBaru < 0) {
+                        $hargaBaru = 0;
+                    }
+
+                    $barang->update([
+                        'harga' => $hargaBaru
+                    ]);
                 }
             }
 

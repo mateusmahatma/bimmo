@@ -20,7 +20,7 @@
                     Pilih Opsi
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#transaksiModal">Tambah Data</a></li>
+                    <li><a class="dropdown-item" href="{{ route('transaksi.create') }}">Tambah Data</a></li>
                     <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#importExcelModal">Impor Data</a></li>
                     <li><a class="dropdown-item" href="#" onclick="downloadPDFTransaksi()">Unduh PDF</a></li>
                     <li><a class="dropdown-item" href="#" onclick="downloadExcel()">Unduh Excel</a></li>
