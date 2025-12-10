@@ -2,22 +2,25 @@
     <button class="icon-elipsis" data-bs-toggle="dropdown" aria-expanded="false">
         &#8943;
     </button>
-    <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton{{ $request->id }}">
-        <button class="dropdown-item tombol-edit-transaksi" data-id="{{ $request->id }}">
+    <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton{{ $item->id }}">
+        <a class="dropdown-item" href="{{ route('transaksi.edit', $item->hash) }}">
             Edit
-        </button>
-        <button class="dropdown-item tombol-del-transaksi" data-id="{{ $request->id }}">
+        </a>
+
+        <button class="dropdown-item tombol-del-transaksi" data-id="{{ $item->id }}">
             Hapus
         </button>
-        <button class="dropdown-item tombol-toggle-status" data-id="{{ $request->id }}" data-status="{{ $request->status }}">
-            {{ $request->status == 1 ? 'Non Aktif' : 'Aktifkan' }}
+
+        <button class="dropdown-item tombol-toggle-status" data-id="{{ $item->id }}" data-status="{{ $item->status }}">
+            {{ $item->status == 1 ? 'Non Aktif' : 'Aktifkan' }}
         </button>
-        <button class="dropdown-item tombol-upload-file" data-id="{{ $request->id }}">
+
+        <button class="dropdown-item tombol-upload-file" data-id="{{ $item->id }}">
             Upload
         </button>
 
-        @if (!is_null($request->file) && Storage::disk('public')->exists('uploads/' . $request->file))
-        <a href="{{ asset('storage/uploads/' . $request->file) }}"
+        @if (!is_null($item->file) && Storage::disk('public')->exists('uploads/' . $item->file))
+        <a href="{{ asset('storage/uploads/' . $item->file) }}"
             class="dropdown-item"
             target="_blank"
             rel="noopener">

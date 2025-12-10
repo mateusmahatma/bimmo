@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Vinkla\Hashids\Facades\Hashids;
 
 class Transaksi extends Model
 {
@@ -30,5 +31,10 @@ class Transaksi extends Model
     public function pemasukanRelation()
     {
         return $this->belongsTo(Pemasukan::class, 'pemasukan', 'id');
+    }
+
+    public function getHashAttribute()
+    {
+        return Hashids::encode($this->id);
     }
 }

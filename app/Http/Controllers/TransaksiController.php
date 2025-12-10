@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Barang;
 use App\Models\DanaDarurat;
+use Vinkla\Hashids\Facades\Hashids;
 
 class TransaksiController extends Controller
 {
@@ -77,7 +78,7 @@ class TransaksiController extends Controller
                 })
 
                 ->addColumn('aksi', function ($row) {
-                    return view('transaksi.tombol', ['request' => $row]);
+                    return view('transaksi.tombol', ['item' => $row]);
                 })
 
                 ->with('totalPemasukan', $totalPemasukan)
@@ -217,13 +218,24 @@ class TransaksiController extends Controller
     }
 
 
-    public function edit($id)
+    public function edit($hash)
     {
-        // $data = transaksi::where('id', $id)->first();
-        // return response()->json(['result' => $data]);
-        $transaksi = Transaksi::where('id', $id)->first();
 
-        return view('transaksi.edit', compact('transaksi'));
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
+        $userId = Auth::id();
+
+        // Pastikan transaksi milik user
+        $transaksi = Transaksi::where('id', $id)
+            ->where('id_user', $userId)
+            ->firstOrFail();
+
+        $pemasukan = Pemasukan::where('id_user', $userId)->get();
+        $pengeluaran = Pengeluaran::where('id_user', $userId)->get();
+        $barang = Barang::where('id_user', $userId)->get();
+
+        return view('transaksi.edit', compact('transaksi', 'pemasukan', 'pengeluaran', 'barang'));
     }
 
     public function update(Request $request, $id)
@@ -254,7 +266,8 @@ class TransaksiController extends Controller
                 }
             }
 
-            return response()->json(['success' => "Berhasil melakukan update data"]);
+            return redirect()->route('transaksi.index')
+                ->with('success', 'Berhasil Update Data Transaksi!');
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

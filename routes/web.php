@@ -95,7 +95,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/toggle-status', [TransaksiController::class, 'toggleStatus'])->name('transaksi.toggleStatus');
     });
 
-    Route::resource('transaksi', TransaksiController::class);
+    Route::resource('transaksi', TransaksiController::class)
+        ->parameters(['transaksi' => 'hash']);
 });
 
 // Compare
