@@ -55,19 +55,23 @@
                     value="{{ old('nominal_pemasukan', $transaksi->nominal_pemasukan) }}">
                 <span class="input-group-text">.00</span>
             </div>
+
             <div class="mb-3">
                 <label for="pengeluaran" class="col-form-label">Pengeluaran</label>
                 <select class="form-select" id="pengeluaran" name="pengeluaran">
                     <option value="">- Pilih -</option>
                     @foreach ($pengeluaran as $item)
-                    <option value="{{ $item->nama }}"></option>
-                    @endforeach
+                    <option value="{{ $item->id }}"
+                        {{ old('pengeluaran', $transaksi->pengeluaran) == $item->id ? 'selected' : '' }}>
+                        {{ $item->nama }}
+                    </option> @endforeach
                 </select>
             </div>
 
             <div class="input-group mb-3">
                 <span class="input-group-text">Rp</span>
-                <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Nominal Pengeluaran">
+                <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Nominal Pengeluaran"
+                    value="{{ old('nominal', $transaksi->nominal) }}">
                 <span class="input-group-text">.00</span>
             </div>
 
@@ -142,7 +146,7 @@
 
             <div class="mb-3">
                 <label for="keterangan" class="col-form-label">Keterangan</label>
-                <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Keterangan"></textarea>
+                <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Keterangan">{{ old('keterangan', $transaksi->keterangan) }}</textarea>
             </div>
             <button type="submit" class="btn btn-success">Simpan</button>
         </form>
