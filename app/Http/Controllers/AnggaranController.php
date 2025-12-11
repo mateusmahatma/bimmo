@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
-use App\Models\Anggaran;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Anggaran;
 use App\Models\Pengeluaran;
 
 class AnggaranController extends Controller
@@ -44,7 +43,7 @@ class AnggaranController extends Controller
                 ->toJson();
         }
 
-        // 🔹 Ambil ID pengeluaran yang sudah dipakai
+        // ambil id pengeluaran yang sudah dipakai
         $usedPengeluaranIds = Anggaran::where('id_user', $userId)
             ->whereNotNull('id_pengeluaran')
             ->pluck('id_pengeluaran')

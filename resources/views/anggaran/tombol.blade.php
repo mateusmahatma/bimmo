@@ -8,6 +8,10 @@
                 Edit
             </a>
         </li>
-        <li><a class="dropdown-item tombol-del-anggaran" href="#" data-id="{{ $request->id_anggaran }}">Delete</a></li>
+        <li>
+            <a class="dropdown-item tombol-del-anggaran" href="#" data-id="{{ $request->id_anggaran }}">
+                Delete
+            </a>
+        </li>
     </ul>
 </div>

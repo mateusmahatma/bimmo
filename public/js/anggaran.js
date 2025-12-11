@@ -32,7 +32,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 "X-CSRF-TOKEN": csrfToken,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ skin: mode })
+            body: JSON.stringify({
+                skin: mode
+            })
         })
             .then(res => res.json())
             .then(data => {
@@ -77,22 +79,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
         const toastElement = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+        const toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 5000
+        });
         toast.show();
 
         toastElement.addEventListener('hidden.bs.toast', function () {
             toastElement.remove();
         });
     }
-
-    // Inisialisasi Select
-    new TomSelect("#id_pengeluaran", {
-        plugins: ['remove_button'],
-        persist: false,
-        create: false,
-        maxItems: null,
-        placeholder: 'Pilih Jenis Pengeluaran',
-    });
 
     // DataTable
     const anggaranTable = $('#anggaranTable').DataTable({
@@ -115,27 +111,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 return json.data;
             }
         },
-        columns: [
-            { data: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-            { data: 'nama_anggaran', className: 'text-center', render: d => d || '-' },
-            { data: 'persentase_anggaran', className: 'text-center' },
-            {
-                data: 'list_pengeluaran',
-                name: 'list_pengeluaran',
-                className: 'text-left',
-                defaultContent: '-',
-                render: function (data, type, row) {
-                    if (type !== "display" || !Array.isArray(data) || data.length === 0) {
-                        return "-";
-                    }
+        columns: [{
+            data: 'DT_RowIndex',
+            className: 'text-center',
+            orderable: false,
+            searchable: false
+        },
+        {
+            data: 'nama_anggaran',
+            className: 'text-center',
+            render: d => d || '-'
+        },
+        {
+            data: 'persentase_anggaran',
+            className: 'text-center'
+        },
+        {
+            data: 'list_pengeluaran',
+            name: 'list_pengeluaran',
+            className: 'text-left',
+            defaultContent: '-',
+            render: function (data, type, row) {
+                if (type !== "display" || !Array.isArray(data) || data.length === 0) {
+                    return "-";
+                }
 
-                    const showLimit = 3;
-                    const hasMore = data.length > showLimit;
-                    const visible = data.slice(0, showLimit);
-                    const hidden = data.slice(showLimit);
-                    const tableId = `detail-table-${row.id_anggaran}`;
+                const showLimit = 3;
+                const hasMore = data.length > showLimit;
+                const visible = data.slice(0, showLimit);
+                const hidden = data.slice(showLimit);
+                const tableId = `detail-table-${row.id_anggaran}`;
 
-                    let table = `
+                let table = `
                         <table style="width: 100%; border-collapse: collapse; border: 1px solid #dee2e6; font-size: 13px;" id="${tableId}">
                             <colgroup>
                                 <col style="width: 40px;"> <!-- 🔹 kolom nomor dibuat tetap -->
@@ -150,33 +157,46 @@ document.addEventListener("DOMContentLoaded", function () {
                                 `).join('')}
                     `;
 
-                    if (hasMore) {
-                        table += hidden.map((name, i) => `
+                if (hasMore) {
+                    table += hidden.map((name, i) => `
                             <tr class="hidden-row" style="display: none;">
                                 <td style="border: 1px solid #dee2e6; padding: 4px; text-align: center;">${showLimit + i + 1}</td>
                                 <td style="border: 1px solid #dee2e6; padding: 4px;">${name}</td>
                             </tr>
                         `).join('');
-                    }
+                }
 
-                    table += `
+                table += `
                             </tbody>
                         </table>
                     `;
 
-                    if (hasMore) {
-                        table += `
+                if (hasMore) {
+                    table += `
                             <button type="button" class="btn btn-sm btn-link p-0 mt-1 toggle-btn" data-target="${tableId}">
                                 More Details
                             </button>
                         `;
-                    }
-                    return table;
                 }
-            },
-            { data: 'created_at', render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'updated_at', render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                return table;
+            }
+        },
+        {
+            data: 'created_at',
+            render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'),
+            className: 'text-center'
+        },
+        {
+            data: 'updated_at',
+            render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'),
+            className: 'text-center'
+        },
+        {
+            data: 'aksi',
+            className: 'text-center',
+            orderable: false,
+            searchable: false
+        }
         ]
     });
 
@@ -290,7 +310,10 @@ document.addEventListener("DOMContentLoaded", function () {
             // Tambahkan opsi id => nama
             Object.entries(anggaran.id_pengeluaran).forEach(([id, nama]) => {
                 if (!selectInstance.options[id]) {
-                    selectInstance.addOption({ value: id, text: nama });
+                    selectInstance.addOption({
+                        value: id,
+                        text: nama
+                    });
                 }
             });
 
