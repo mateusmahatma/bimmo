@@ -109,8 +109,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/bayar_pinjaman/{id}', [BayarPinjamanController::class, 'destroy'])->name('bayar_pinjaman.destroy');
 });
 
-
-
 // Ubah Password
 Route::get('/ubah-password', [UbahPasswordController::class, 'index'])->middleware('auth');
 Route::post('/ubah-password', [UbahPasswordController::class, 'store'])->middleware('auth');
