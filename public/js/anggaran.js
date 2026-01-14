@@ -4,17 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const updateSkinUrl = window.updateSkinUrl;
     const csrfToken = window.csrfToken;
 
-    $(document).ready(function () {
-        // Inisialisasi TomSelect
-        const tomSelect = new TomSelect('#id_pengeluaran', {
-            plugins: ['remove_button'],
-            create: false,
-            maxItems: null,
-            hideSelected: true,
-            closeAfterSelect: false
-        });
-    });
-
     function applyTheme(mode) {
         if (mode === 'light' || mode === 'dark') {
             document.documentElement.setAttribute('data-bs-theme', mode);
@@ -100,6 +89,17 @@ document.addEventListener("DOMContentLoaded", function () {
             toastElement.remove();
         });
     }
+
+    $(document).ready(function () {
+        // Inisialisasi TomSelect
+        const tomSelect = new TomSelect('#id_pengeluaran', {
+            plugins: ['remove_button'],
+            create: false,
+            maxItems: null,
+            hideSelected: true,
+            closeAfterSelect: false
+        });
+    });
 
     // DataTable
     const anggaranTable = $('#anggaranTable').DataTable({
