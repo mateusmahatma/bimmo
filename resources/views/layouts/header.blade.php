@@ -65,7 +65,7 @@
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2"></i> Light</a></li>
                         <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon me-2"></i> Dark</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="bi bi-circle-half me-2"></i> Auto</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="bi bi-circle-half me-2"></i> Auto (System)</a></li>
                     </ul>
                 </li>
 

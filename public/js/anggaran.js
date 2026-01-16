@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // ==== THEME HANDLER ====
+    // Theme Switcher
     const skin = window.userSkin || 'auto';
     const updateSkinUrl = window.updateSkinUrl;
     const csrfToken = window.csrfToken;
@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (mode === 'light' || mode === 'dark') {
             document.documentElement.setAttribute('data-bs-theme', mode);
         } else {
-            document.documentElement.removeAttribute('data-bs-theme'); // auto
+            // Auto mode: deteksi prefers-color-scheme
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const autoTheme = prefersDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', autoTheme);
         }
         document.dispatchEvent(new Event("themeChanged"));
     }
@@ -20,6 +23,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 el.classList.add('active');
             }
         });
+
+        // Highlight active skin in dropdown
+        if (mode === 'auto') {
+            const autoItem = document.querySelector('.dropdown-item[data-skin="auto"]');
+            if (autoItem) autoItem.classList.add('active');
+        }
     }
 
     function setTheme(mode) {
