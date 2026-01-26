@@ -66,6 +66,16 @@ body {
     align-items: center;
 }
 
+.navbar .nav-link {
+    color: var(--bs-primary);
+    font-weight: 500;
+}
+
+.navbar .nav-link.active {
+    color: var(--bs-red) !important;
+    font-weight: 600;
+}
+
 /* Tablet */
 @media (max-width: 992px) {
     .header {
