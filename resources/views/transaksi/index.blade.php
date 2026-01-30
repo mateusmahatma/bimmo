@@ -250,7 +250,19 @@
                     <td class="text-end">
                         {{ number_format($row->nominal,0,',','.') }}
                     </td>
-                    <td>{{ $row->keterangan }}</td>
+                    <td>
+                        @if($row->keterangan)
+                        <ol class="mb-0 ps-3">
+                            @foreach(preg_split("/\r\n|\n|\r/", $row->keterangan) as $item)
+                            @if(trim($item) !== '')
+                            <li>{{ $item }}</li>
+                            @endif
+                            @endforeach
+                        </ol>
+                        @else
+                        <span class="text-muted">-</span>
+                        @endif
+                    </td>
 
                     <td>@include('transaksi._aksi',['row'=>$row])</td>
                 </tr>

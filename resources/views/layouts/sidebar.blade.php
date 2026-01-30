@@ -76,14 +76,14 @@
             <div class="collapse {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'show' : '' }}" id="menuMoneyMovement">
                 <ul class="nav flex-column ms-4">
                     <li class="nav-item">
-                        <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
-                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                        <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }} disabled" href="/pemasukan">
+                            <i class="bi bi-arrow-right-circle-fill me-2 disabled"></i>
                             Income Category
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran">
-                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                        <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }} disabled" href="/pengeluaran">
+                            <i class="bi bi-arrow-right-circle-fill me-2 disabled"></i>
                             Outcome Category
                         </a>
                     </li>
@@ -94,8 +94,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
-                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                        <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }} disabled" href="/pinjaman">
+                            <i class="bi bi-arrow-right-circle-fill me-2 disabled"></i>
                             Loan
                         </a>
                     </li>
