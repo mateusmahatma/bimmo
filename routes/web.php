@@ -48,6 +48,10 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/transaksi', [DashboardController::class, 'getTransaksiByPengeluaran']);
     Route::get('/saving-rate-data', [DashboardController::class, 'getSavingRateData']);
     Route::get('/anggaran/chart', [DashboardController::class, 'AnggaranChart'])->name('anggaran.chart');
+    Route::post(
+        '/dashboard/toggle-nominal-ajax',
+        [DashboardController::class, 'toggleNominalAjax']
+    )->name('dashboard.toggle-nominal.ajax');
 });
 
 // Anggaran
@@ -86,11 +90,25 @@ Route::middleware(['auth'])->group(function () {
 // Transaksi
 Route::middleware(['auth'])->group(function () {
     Route::prefix('transaksi')->group(function () {
-        Route::get('/cetak_pdf', [TransaksiController::class, 'cetak_pdf']);
-        Route::get('/download-excel', [TransaksiController::class, 'downloadExcel']);
-        Route::post('/importExcel', [TransaksiController::class, 'importExcel'])->name('transaksi.importExcel');
+        // web.php
+        Route::get('/transaksi/export/pdf', [TransaksiController::class, 'exportPdf'])
+            ->name('transaksi.export.pdf');
+
+        Route::get('/transaksi/export/excel', [TransaksiController::class, 'exportExcel'])
+            ->name('transaksi.export.excel');
+
+        // Route::post('/importExcel', [TransaksiController::class, 'importExcel'])->name('transaksi.importExcel');
+
+        Route::post('/transaksi/import-excel', [TransaksiController::class, 'importExcel'])
+            ->name('transaksi.import.excel');
+
         Route::post('/import', [TransaksiController::class, 'import'])->name('import-transaksi');
-        Route::get('/download-template', [TransaksiController::class, 'downloadTemplate'])->name('download-template');
+        // Route::get('/download-template', [TransaksiController::class, 'downloadTemplate'])->name('download-template');
+
+        Route::get('/transaksi/template', [TransaksiController::class, 'downloadTemplate'])
+            ->name('transaksi.download.template');
+
+
         Route::post('/upload', [TransaksiController::class, 'upload'])->name('upload');
         Route::post('/{id}/toggle-status', [TransaksiController::class, 'toggleStatus'])->name('transaksi.toggleStatus');
     });

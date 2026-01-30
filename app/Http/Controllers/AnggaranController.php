@@ -14,7 +14,7 @@ class AnggaranController extends Controller
     {
         $userId = Auth::id();
 
-        if ($request->ajax() && !$request->pjax()) {
+        if ($request->ajax()) {
             $query = Anggaran::where('id_user', $userId);
 
             $totalPersentase = (clone $query)->sum('persentase_anggaran');
@@ -37,7 +37,7 @@ class AnggaranController extends Controller
                         ->toArray();
                 })
                 ->addColumn('aksi', fn($row) => view('anggaran.tombol', ['request' => $row])->render())
-                ->rawColumns(['aksi']) // biar tombol HTML tidak di-escape
+                ->rawColumns(['aksi'])
                 ->with('totalPersentase', $totalPersentase)
                 ->with('exceedMessage', $exceedMessage)
                 ->toJson();

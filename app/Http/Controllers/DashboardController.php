@@ -16,9 +16,167 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    protected function getDashboardNumbers()
+    {
+        $userId = Auth::id();
+
+        $pemasukanBulanIni = Transaksi::where('id_user', $userId)
+            ->whereMonth('tgl_transaksi', now()->month)
+            ->whereYear('tgl_transaksi', now()->year)
+            ->sum('nominal_pemasukan');
+
+        $pengeluaranBulanIni = Transaksi::where('id_user', $userId)
+            ->whereMonth('tgl_transaksi', now()->month)
+            ->whereYear('tgl_transaksi', now()->year)
+            ->sum('nominal');
+
+        $pengeluaranHariIni = Transaksi::where('id_user', $userId)
+            ->whereDate('tgl_transaksi', now())
+            ->sum('nominal');
+
+        $saldo = $pemasukanBulanIni - $pengeluaranBulanIni;
+
+        return [
+            'saldo' => $saldo,
+            'pemasukan' => $pemasukanBulanIni,
+            'pengeluaran' => $pengeluaranBulanIni,
+            'hari_ini' => $pengeluaranHariIni,
+        ];
+    }
+
+    public function toggleNominalAjax()
+    {
+        $show = session('show_nominal', false);
+        $newState = !$show;
+        session(['show_nominal' => $newState]);
+
+        $numbers = session('dashboard_numbers');
+
+        if (!$numbers) {
+            return response()->json(['error' => 'Dashboard numbers not found'], 422);
+        }
+
+        return response()->json([
+            'show' => $newState,
+            'data' => [
+                'saldo' => $this->maskNominal($numbers['saldo'], $newState),
+                'pemasukan' => $this->maskNominal($numbers['pemasukan'], $newState),
+                'pengeluaran' => $this->maskNominal($numbers['pengeluaran'], $newState),
+                'hari_ini' => $this->maskNominal($numbers['hari_ini'], $newState),
+            ]
+        ]);
+    }
+
+
+    protected function maskNominal($value, $show)
+    {
+        return $show
+            ? 'Rp ' . number_format($value, 0, ',', '.')
+            : 'Rp ••••••••';
+    }
+
+    private function ratioStatus($value, $type)
+    {
+        return match ($type) {
+            'expense' => $value < 70
+                ? ['label' => 'Sehat', 'class' => 'success']
+                : ($value <= 90
+                    ? ['label' => 'Waspada', 'class' => 'warning']
+                    : ['label' => 'Bahaya', 'class' => 'danger']),
+
+            'saving' => $value > 20
+                ? ['label' => 'Sangat Sehat', 'class' => 'success']
+                : ($value >= 10
+                    ? ['label' => 'Sehat', 'class' => 'primary']
+                    : ($value >= 0
+                        ? ['label' => 'Waspada', 'class' => 'warning']
+                        : ['label' => 'Defisit', 'class' => 'danger'])),
+
+            'emergency' => $value >= 6
+                ? ['label' => 'Aman', 'class' => 'success']
+                : ($value >= 3
+                    ? ['label' => 'Cukup', 'class' => 'warning']
+                    : ['label' => 'Bahaya', 'class' => 'danger']),
+        };
+    }
+
     public function index(Request $request)
     {
         $userId = Auth::id();
+
+
+
+        $periode = (int) request('periode', 6);
+
+        // Guard biar aman
+        if (!in_array($periode, [2, 6, 12])) {
+            $periode = 6;
+        }
+
+        $cashflow = DB::table('transaksi')
+            ->selectRaw("
+        DATE_FORMAT(tgl_transaksi, '%Y-%m') as bulan,
+        SUM(nominal_pemasukan) as total_pemasukan,
+        SUM(nominal) as total_pengeluaran
+            ")
+            ->where('id_user', Auth::id())
+            ->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get()
+            ->map(function ($row) {
+                $row->selisih = $row->total_pemasukan - $row->total_pengeluaran;
+                return $row;
+            });
+
+        function savingRateStatus($rate)
+        {
+            if ($rate > 20) return ['label' => 'Sangat Sehat', 'class' => 'success'];
+            if ($rate >= 10) return ['label' => 'Sehat', 'class' => 'primary'];
+            if ($rate >= 0) return ['label' => 'Waspada', 'class' => 'warning'];
+            return ['label' => 'Defisit', 'class' => 'danger'];
+        }
+
+        $savingRate = $cashflow->map(function ($row) {
+            $pendapatan = (float) $row->total_pemasukan;
+            $pengeluaran = (float) $row->total_pengeluaran;
+
+            $rate = $pendapatan > 0
+                ? round((($pendapatan - $pengeluaran) / $pendapatan) * 100, 2)
+                : 0;
+
+            $status = savingRateStatus($rate);
+
+            $row->saving_rate = $rate;
+            $row->saving_label = $status['label'];
+            $row->saving_class = $status['class'];
+
+            return $row;
+        });
+
+        $totalPendapatan = $cashflow->sum('total_pemasukan');
+        $totalPengeluaran = $cashflow->sum('total_pengeluaran');
+
+        // Expense Ratio
+        $expenseRatio = $totalPendapatan > 0
+            ? round(($totalPengeluaran / $totalPendapatan) * 100, 2)
+            : 0;
+
+        // Saving Rate (ambil dari bulan terakhir)
+        $latest = $cashflow->last();
+        $savingRateLatest = $latest && $latest->total_pemasukan > 0
+            ? round((($latest->total_pemasukan - $latest->total_pengeluaran) / $latest->total_pemasukan) * 100, 2)
+            : 0;
+
+        // Dana Darurat
+        $danaDarurat = \App\Models\DanaDarurat::where('id_user', Auth::id())->value('nominal_dana_darurat') ?? 0;
+        $rataPengeluaran = $cashflow->count() > 0
+            ? $cashflow->avg('total_pengeluaran')
+            : 0;
+
+        $danaDaruratBulan = $rataPengeluaran > 0
+            ? round($danaDarurat / $rataPengeluaran, 1)
+            : 0;
 
         // Ambil transaksi
         $transaksi = Transaksi::where('id_user', $userId)->get();
@@ -149,6 +307,89 @@ class DashboardController extends Controller
             ->unique(fn($row) => $row->tanggal_mulai . '_' . $row->tanggal_selesai)
             ->values();
 
+
+        $expenseStatus   = $this->ratioStatus($expenseRatio, 'expense');
+        $savingStatus    = $this->ratioStatus($savingRateLatest, 'saving');
+        $emergencyStatus = $this->ratioStatus($danaDaruratBulan, 'emergency');
+
+
+        // Bilah Pengeluaran
+        $bulan = (int) request('bulan', now()->month);
+        $tahun = (int) request('tahun', now()->year);
+
+        $pengeluaranKategori = DB::table('transaksi')
+            ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
+            ->selectRaw('
+        pengeluaran.nama as kategori,
+        SUM(transaksi.nominal) as total
+    ')
+            ->where('transaksi.id_user', Auth::id())
+            ->whereMonth('transaksi.tgl_transaksi', $bulan)
+            ->whereYear('transaksi.tgl_transaksi', $tahun)
+            ->groupBy('pengeluaran.nama')
+            ->orderByDesc('total')
+            ->get();
+
+        $totalPengeluaranBulan = $pengeluaranKategori->sum('total');
+
+        $pengeluaranKategori = $pengeluaranKategori->map(function ($row) use ($totalPengeluaranBulan) {
+            $row->persen = $totalPengeluaranBulan > 0
+                ? round(($row->total / $totalPengeluaranBulan) * 100, 1)
+                : 0;
+
+            return $row;
+        });
+
+        // Transaksi Hari ini
+        $rawTransaksi = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
+            ->where('id_user', Auth::id())
+            ->whereDate('tgl_transaksi', now())
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+
+        $transaksiHariIni = collect();
+
+        foreach ($rawTransaksi as $row) {
+
+            // 🔹 PEMASUKAN
+            if ($row->nominal_pemasukan > 0) {
+                $transaksiHariIni->push((object)[
+                    'waktu'    => $row->created_at,
+                    'jenis'    => 'pemasukan',
+                    'kategori' => $row->pemasukanRelation->nama ?? '-',
+                    'keterangan' => $row->keterangan,
+                    'nominal'  => $row->nominal_pemasukan,
+                ]);
+            }
+
+            // 🔹 PENGELUARAN
+            if ($row->nominal > 0) {
+                $transaksiHariIni->push((object)[
+                    'waktu'    => $row->created_at,
+                    'jenis'    => 'pengeluaran',
+                    'kategori' => $row->pengeluaranRelation->nama ?? '-',
+                    'keterangan' => $row->keterangan,
+                    'nominal'  => $row->nominal,
+                ]);
+            }
+        }
+
+        // hitung total
+        $totalMasukHariIni  = $transaksiHariIni->where('jenis', 'pemasukan')->sum('nominal');
+        $totalKeluarHariIni = $transaksiHariIni->where('jenis', 'pengeluaran')->sum('nominal');
+
+        // Cek session untuk menampilkan nominal atau tidak
+        $showNominal = session('show_nominal', false);
+
+        // Simpan angka dashboard di session untuk keperluan AJAX
+        $numbers = $this->getDashboardNumbers();
+        session(['dashboard_numbers' => $numbers]);
+        $saldoView       = $this->maskNominal($numbers['saldo'], $showNominal);
+        $pemasukanView   = $this->maskNominal($numbers['pemasukan'], $showNominal);
+        $pengeluaranView = $this->maskNominal($numbers['pengeluaran'], $showNominal);
+        $pengeluaranHariIni = $this->maskNominal($numbers['hari_ini'], $showNominal);
+
         // Kirim semua data ke view
         return view('dashboard.index', compact(
             'transaksi',
@@ -162,7 +403,27 @@ class DashboardController extends Controller
             'totalNominalBulan',
             'totalNominalBulanPemasukan',
             'totalNominalSisa',
-            'filterOptions'
+            'filterOptions',
+            'cashflow',
+            'savingRate',
+            'expenseRatio',
+            'savingRateLatest',
+            'danaDaruratBulan',
+            'expenseStatus',
+            'savingStatus',
+            'emergencyStatus',
+            'pengeluaranKategori',
+            'bulan',
+            'tahun',
+            'totalPengeluaranBulan',
+            'transaksiHariIni',
+            'totalMasukHariIni',
+            'totalKeluarHariIni',
+            'saldoView',
+            'pemasukanView',
+            'pengeluaranView',
+            'showNominal',
+            'pengeluaranHariIni'
         ));
     }
 
@@ -276,28 +537,28 @@ class DashboardController extends Controller
     }
 
     // Expenses Bar
-    public function getJenisPengeluaran(Request $request)
-    {
-        $userId = Auth::id();
-        $selectedMonth = $request->input('month', Carbon::now()->month);
-        $selectedYear = $request->input('year', Carbon::now()->year);
+    // public function getJenisPengeluaran(Request $request)
+    // {
+    //     $userId = Auth::id();
+    //     $selectedMonth = $request->input('month', Carbon::now()->month);
+    //     $selectedYear = $request->input('year', Carbon::now()->year);
 
-        $jenisPengeluaran = Transaksi::select(
-            'pengeluaran.id as pengeluaran_id',
-            'pengeluaran.nama as pengeluaran_nama',
-            DB::raw('SUM(nominal) as total')
-        )
-            ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
-            ->where('transaksi.id_user', $userId)
-            ->where('transaksi.status', '1')
-            ->whereYear('tgl_transaksi', $selectedYear)
-            ->whereMonth('tgl_transaksi', $selectedMonth)
-            ->groupBy('pengeluaran.id', 'pengeluaran.nama')
-            ->orderByDesc('total')
-            ->get();
+    //     $jenisPengeluaran = Transaksi::select(
+    //         'pengeluaran.id as pengeluaran_id',
+    //         'pengeluaran.nama as pengeluaran_nama',
+    //         DB::raw('SUM(nominal) as total')
+    //     )
+    //         ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
+    //         ->where('transaksi.id_user', $userId)
+    //         ->where('transaksi.status', '1')
+    //         ->whereYear('tgl_transaksi', $selectedYear)
+    //         ->whereMonth('tgl_transaksi', $selectedMonth)
+    //         ->groupBy('pengeluaran.id', 'pengeluaran.nama')
+    //         ->orderByDesc('total')
+    //         ->get();
 
-        return response()->json($jenisPengeluaran);
-    }
+    //     return response()->json($jenisPengeluaran);
+    // }
 
     // Detail Modal Expense Bar - Tetap sama
     public function getTransaksiByPengeluaran(Request $request)

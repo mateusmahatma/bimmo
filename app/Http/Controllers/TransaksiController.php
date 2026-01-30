@@ -22,78 +22,133 @@ use Illuminate\Support\Str;
 use App\Models\Barang;
 use App\Models\DanaDarurat;
 use Vinkla\Hashids\Facades\Hashids;
+use App\Exports\TransaksiExport;
 
 class TransaksiController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $userId = Auth::id();
+        $userId = Auth::id();
 
-            $data = Transaksi::with(['pengeluaranRelation', 'pemasukanRelation'])
-                ->where('id_user', $userId);
+        $baseQuery = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
+            ->where('id_user', $userId);
 
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-                $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
-                $data = $data->whereBetween('tgl_transaksi', [$startDate, $endDate]);
-            }
-
-            if ($request->filled('filter_pemasukan')) {
-                $data = $data->whereIn('pemasukan', $request->filter_pemasukan);
-            }
-
-            if ($request->filled('filter_pengeluaran')) {
-                $data = $data->whereIn('pengeluaran', $request->filter_pengeluaran);
-            }
-
-
-            $totalPemasukan = (clone $data)->where('status', 1)->sum('nominal_pemasukan');
-            $totalPengeluaran = (clone $data)->where('status', 1)->sum('nominal');
-            $netIncome = number_format($totalPemasukan - $totalPengeluaran, 2, '.', '');
-
-            $data = $data->get();
-
-            foreach ($data as $item) {
-                $item->file_exists = !is_null($item->file) && Storage::disk('public')->exists('uploads/' . $item->file);
-            }
-
-            return DataTables::of($data)
-                ->addIndexColumn()
-
-                ->addColumn('pemasukan_nama', function ($row) {
-                    return $row->pemasukanRelation?->nama ?? '-';
-                })
-
-                ->addColumn('pengeluaran_nama', function ($row) {
-                    return $row->pengeluaranRelation?->nama ?? '-';
-                })
-
-                ->editColumn('created_at', function ($row) {
-                    return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '-';
-                })
-
-                ->editColumn('updated_at', function ($row) {
-                    return $row->updated_at ? $row->updated_at->format('Y-m-d H:i:s') : '-';
-                })
-
-                ->addColumn('aksi', function ($row) {
-                    return view('transaksi.tombol', ['item' => $row]);
-                })
-
-                ->with('totalPemasukan', $totalPemasukan)
-                ->with('totalPengeluaran', $totalPengeluaran)
-                ->with('netIncome', $netIncome)
-
-                ->toJson();
+        // =====================
+        // FILTER
+        // =====================
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $baseQuery->whereBetween('tgl_transaksi', [
+                $request->start_date,
+                $request->end_date
+            ]);
         }
 
+        if ($request->filled('pemasukan')) {
+            $baseQuery->where('pemasukan', $request->pemasukan);
+        }
+
+        if ($request->filled('pengeluaran')) {
+            $baseQuery->where('pengeluaran', $request->pengeluaran);
+        }
+
+        // =====================
+        // SUMMARY UTAMA
+        // =====================
+        $totalPemasukan = (clone $baseQuery)->sum('nominal_pemasukan');
+        $totalPengeluaran = (clone $baseQuery)->sum('nominal');
+        $netIncome = $totalPemasukan - $totalPengeluaran;
+
+        // =====================
+        // SUMMARY DETAIL
+        // =====================
+        $summaryPemasukan = (clone $baseQuery)
+            ->whereNotNull('pemasukan')
+            ->selectRaw('pemasukan, SUM(nominal_pemasukan) as total')
+            ->groupBy('pemasukan')
+            ->with('pemasukanRelation')
+            ->get();
+
+        $summaryPengeluaran = (clone $baseQuery)
+            ->whereNotNull('pengeluaran')
+            ->selectRaw('pengeluaran, SUM(nominal) as total')
+            ->groupBy('pengeluaran')
+            ->with('pengeluaranRelation')
+            ->get();
+
+        // =====================
+        // SORTING
+        // =====================
+        $allowedSorts = [
+            'tgl_transaksi',
+            'nominal_pemasukan',
+            'nominal'
+        ];
+
+        $sort = $request->get('sort', 'tgl_transaksi');
+        $direction = $request->get('direction', 'desc');
+
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'tgl_transaksi';
+        }
+
+        if (!in_array($direction, ['asc', 'desc'])) {
+            $direction = 'desc';
+        }
+
+        // =====================
+        // PAGINATION
+        // =====================
+        $transaksi = (clone $baseQuery)
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
+
         return view('transaksi.index', [
-            'transaksi' => Transaksi::where('id_user', Auth::id())->get(),
-            'pemasukan' => Pemasukan::where('id_user', Auth::id())->get(),
-            'pengeluaran' => Pengeluaran::where('id_user', Auth::id())->get(),
-        ])->with('message', 'Pastikan format tanggal yang Anda kirimkan adalah YYYY-MM-DD.');
+            'transaksi' => $transaksi,
+
+            'totalPemasukan' => $totalPemasukan,
+            'totalPengeluaran' => $totalPengeluaran,
+            'netIncome' => $netIncome,
+
+            'summaryPemasukan' => $summaryPemasukan,
+            'summaryPengeluaran' => $summaryPengeluaran,
+
+            // 🔽 WAJIB UNTUK FILTER
+            'listPemasukan' => Pemasukan::where('id_user', $userId)->get(),
+            'listPengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
+        ]);
     }
+
+    private function buildFilteredQuery(Request $request)
+    {
+        $userId = Auth::id();
+
+        $query = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
+            ->where('id_user', $userId);
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('tgl_transaksi', [
+                $request->start_date,
+                $request->end_date
+            ]);
+        }
+
+        if ($request->filled('pemasukan')) {
+            $query->where('pemasukan', $request->pemasukan);
+        }
+
+        if ($request->filled('pengeluaran')) {
+            $query->where('pengeluaran', $request->pengeluaran);
+        }
+
+        // sorting (whitelist)
+        $allowedSorts = ['tgl_transaksi', 'nominal_pemasukan', 'nominal'];
+        $sort = in_array($request->sort, $allowedSorts) ? $request->sort : 'tgl_transaksi';
+        $direction = in_array($request->direction, ['asc', 'desc']) ? $request->direction : 'desc';
+
+        return $query->orderBy($sort, $direction);
+    }
+
 
     public function create()
     {
@@ -218,15 +273,33 @@ class TransaksiController extends Controller
     }
 
 
+    // public function edit($hash)
+    // {
+
+    //     $id = Hashids::decode($hash)[0] ?? null;
+    //     abort_if(!$id, 404);
+
+    //     $userId = Auth::id();
+
+    //     // Pastikan transaksi milik user
+    //     $transaksi = Transaksi::where('id', $id)
+    //         ->where('id_user', $userId)
+    //         ->firstOrFail();
+
+    //     $pemasukan = Pemasukan::where('id_user', $userId)->get();
+    //     $pengeluaran = Pengeluaran::where('id_user', $userId)->get();
+    //     $barang = Barang::where('id_user', $userId)->get();
+
+    //     return view('transaksi.edit', compact('transaksi', 'pemasukan', 'pengeluaran', 'barang'));
+    // }
+
     public function edit($hash)
     {
-
         $id = Hashids::decode($hash)[0] ?? null;
         abort_if(!$id, 404);
 
         $userId = Auth::id();
 
-        // Pastikan transaksi milik user
         $transaksi = Transaksi::where('id', $id)
             ->where('id_user', $userId)
             ->firstOrFail();
@@ -235,156 +308,241 @@ class TransaksiController extends Controller
         $pengeluaran = Pengeluaran::where('id_user', $userId)->get();
         $barang = Barang::where('id_user', $userId)->get();
 
-        return view('transaksi.edit', compact('transaksi', 'pemasukan', 'pengeluaran', 'barang'));
+        return view('transaksi.edit', compact(
+            'transaksi',
+            'pemasukan',
+            'pengeluaran',
+            'barang'
+        ));
     }
 
-    public function update(Request $request, $id)
+    // public function update(Request $request, $id)
+    // {
+    //     $validatedData = $request->validate([
+    //         'tgl_transaksi'      => 'required|date',
+    //         'pemasukan'          => 'nullable|numeric',
+    //         'nominal_pemasukan'  => 'nullable|numeric',
+    //         'pengeluaran'        => 'nullable|numeric',
+    //         'nominal'            => 'nullable|numeric',
+    //         'keterangan'         => 'nullable|string|max:255',
+    //     ]);
+
+    //     try {
+    //         // Update transaksi
+    //         transaksi::where('id', $id)->update($validatedData);
+
+    //         // Proses anggaran jika pengeluaran dan nominal ada
+    //         if (!empty($validatedData['pengeluaran']) && $validatedData['nominal'] > 0) {
+    //             $pengeluaranId = (string) $validatedData['pengeluaran'];
+    //             $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+    //                 ->where('tanggal_mulai', '<=', $validatedData['tgl_transaksi'])
+    //                 ->where('tanggal_selesai', '>=', $validatedData['tgl_transaksi'])
+    //                 ->first();
+
+    //             if ($hasil) {
+    //                 $hasil->increment('anggaran_yang_digunakan', floatval($validatedData['nominal']));
+    //             }
+    //         }
+
+    //         return redirect()->route('transaksi.index')
+    //             ->with('success', 'Berhasil Update Data Transaksi!');
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan saat update.',
+    //             'error' => $e->getMessage(),
+    //         ]);
+    //     }
+    // }
+
+    public function update(Request $request, $hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         $validatedData = $request->validate([
-            'tgl_transaksi'      => 'required|date',
-            'pemasukan'          => 'nullable|numeric',
-            'nominal_pemasukan'  => 'nullable|numeric',
-            'pengeluaran'        => 'nullable|numeric',
-            'nominal'            => 'nullable|numeric',
-            'keterangan'         => 'nullable|string|max:255',
+            'tgl_transaksi' => 'required|date',
+            'pemasukan' => 'nullable|numeric',
+            'nominal_pemasukan' => 'nullable|numeric',
+            'pengeluaran' => 'nullable|numeric',
+            'nominal' => 'nullable|numeric',
+            'keterangan' => 'nullable|string|max:255',
         ]);
 
-        try {
-            // Update transaksi
-            transaksi::where('id', $id)->update($validatedData);
+        Transaksi::where('id', $id)
+            ->where('id_user', Auth::id())
+            ->update($validatedData);
 
-            // Proses anggaran jika pengeluaran dan nominal ada
-            if (!empty($validatedData['pengeluaran']) && $validatedData['nominal'] > 0) {
-                $pengeluaranId = (string) $validatedData['pengeluaran'];
-                $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
-                    ->where('tanggal_mulai', '<=', $validatedData['tgl_transaksi'])
-                    ->where('tanggal_selesai', '>=', $validatedData['tgl_transaksi'])
-                    ->first();
-
-                if ($hasil) {
-                    $hasil->increment('anggaran_yang_digunakan', floatval($validatedData['nominal']));
-                }
-            }
-
-            return redirect()->route('transaksi.index')
-                ->with('success', 'Berhasil Update Data Transaksi!');
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat update.',
-                'error' => $e->getMessage(),
-            ]);
-        }
+        return redirect()
+            ->route('transaksi.index')
+            ->with('success', 'Berhasil update transaksi');
     }
+
 
     public function show() {}
 
-    public function destroy($id)
+    // public function destroy($id)
+    // {
+    //     try {
+    //         $transaksi = Transaksi::findOrFail($id);
+
+    //         // Cast nominal untuk operasi pengurangan
+    //         $nominal = floatval($transaksi->nominal);
+
+    //         if ($nominal > 0 && !empty($transaksi->pengeluaran)) {
+    //             $pengeluaran = Pengeluaran::where('nama', $transaksi->pengeluaran)->first();
+
+    //             if ($pengeluaran) {
+    //                 $pengeluaranId = (string) $pengeluaran->id;
+
+    //                 $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
+    //                     ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
+    //                     ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
+    //                     ->first();
+
+    //                 if ($hasil) {
+    //                     // Kurangi anggaran_yang_digunakan, pastikan tidak negatif
+    //                     $hasil->decrement('anggaran_yang_digunakan', $nominal);
+    //                 }
+    //             }
+    //         }
+
+    //         // Pengurangan ke tabel barang
+    //         if (!empty($transaksi->barang_id) && $nominal > 0) {
+
+    //             $barang = Barang::find($transaksi->barang_id);
+
+    //             if ($barang) {
+
+    //                 $hargaBaru = $barang->harga - $nominal;
+
+    //                 if ($hargaBaru < 0) {
+    //                     $hargaBaru = 0;
+    //                 }
+
+    //                 $barang->update([
+    //                     'harga' => $hargaBaru
+    //                 ]);
+    //             }
+    //         }
+
+    //         // Hapus transaksi setelah update anggaran
+    //         $transaksi->delete();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Transaksi berhasil dihapus.'
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Gagal menghapus transaksi.',
+    //             'error' => $e->getMessage()
+    //         ]);
+    //     }
+    // }
+
+    public function destroy($hash)
     {
-        try {
-            $transaksi = Transaksi::findOrFail($id);
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
 
-            // Cast nominal untuk operasi pengurangan
-            $nominal = floatval($transaksi->nominal);
+        $transaksi = Transaksi::where('id', $id)
+            ->where('id_user', Auth::id())
+            ->firstOrFail();
 
-            if ($nominal > 0 && !empty($transaksi->pengeluaran)) {
-                $pengeluaran = Pengeluaran::where('nama', $transaksi->pengeluaran)->first();
+        // logic lama kamu (update anggaran, barang, dll)
+        $transaksi->delete();
 
-                if ($pengeluaran) {
-                    $pengeluaranId = (string) $pengeluaran->id;
-
-                    $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', $pengeluaranId)
-                        ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
-                        ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
-                        ->first();
-
-                    if ($hasil) {
-                        // Kurangi anggaran_yang_digunakan, pastikan tidak negatif
-                        $hasil->decrement('anggaran_yang_digunakan', $nominal);
-                    }
-                }
-            }
-
-            // Pengurangan ke tabel barang
-            if (!empty($transaksi->barang_id) && $nominal > 0) {
-
-                $barang = Barang::find($transaksi->barang_id);
-
-                if ($barang) {
-
-                    $hargaBaru = $barang->harga - $nominal;
-
-                    if ($hargaBaru < 0) {
-                        $hargaBaru = 0;
-                    }
-
-                    $barang->update([
-                        'harga' => $hargaBaru
-                    ]);
-                }
-            }
-
-            // Hapus transaksi setelah update anggaran
-            $transaksi->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Transaksi berhasil dihapus.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus transaksi.',
-                'error' => $e->getMessage()
-            ]);
-        }
+        return redirect()
+            ->route('transaksi.index')
+            ->with('success', 'Transaksi berhasil dihapus');
     }
 
-    public function cetak_pdf(Request $request)
+
+    // public function cetak_pdf(Request $request)
+    // {
+    //     $userId = Auth::id();
+
+    //     $start_date = $request->input('start_date');
+    //     $end_date = $request->input('end_date');
+
+    //     $formattedStartDate = Carbon::parse($start_date)->format('Y-m-d');
+    //     $formattedEndDate = Carbon::parse($end_date)->format('Y-m-d');
+
+    //     // $data = Transaksi::select('tgl_transaksi', 'pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan')
+    //     $data = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
+    //         ->where('id_user', $userId)
+    //         ->whereBetween('tgl_transaksi', [$formattedStartDate, $formattedEndDate])
+    //         ->get();
+
+    //     $pdf = PDF::loadView('Transaksi.pdf', [
+    //         'transaksi' => $data,
+    //         'start_date' => $formattedStartDate,
+    //         'end_date' => $formattedEndDate
+    //     ]);
+
+    //     return $pdf->stream('Transaksi_Report.pdf');
+    // }
+
+    public function exportPdf(Request $request)
     {
-        $userId = Auth::id();
+        $query = $this->buildFilteredQuery($request);
 
-        $start_date = $request->input('start_date');
-        $end_date = $request->input('end_date');
+        $data = $query->get();
 
-        $formattedStartDate = Carbon::parse($start_date)->format('Y-m-d');
-        $formattedEndDate = Carbon::parse($end_date)->format('Y-m-d');
+        $totalPemasukan = $data->sum('nominal_pemasukan');
+        $totalPengeluaran = $data->sum('nominal');
+        $netIncome = $totalPemasukan - $totalPengeluaran;
 
-        // $data = Transaksi::select('tgl_transaksi', 'pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan')
-        $data = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
-            ->where('id_user', $userId)
-            ->whereBetween('tgl_transaksi', [$formattedStartDate, $formattedEndDate])
-            ->get();
-
-        $pdf = PDF::loadView('Transaksi.pdf', [
+        $pdf = PDF::loadView('transaksi.export_pdf', [
             'transaksi' => $data,
-            'start_date' => $formattedStartDate,
-            'end_date' => $formattedEndDate
+            'totalPemasukan' => $totalPemasukan,
+            'totalPengeluaran' => $totalPengeluaran,
+            'netIncome' => $netIncome,
+            'filter' => $request->all(),
         ]);
 
-        return $pdf->stream('Transaksi_Report.pdf');
+        return $pdf->download('arus_kas.pdf');
     }
 
-    public function downloadExcel(Request $request)
+    // public function downloadExcel(Request $request)
+    // {
+    //     $userId = Auth::id();
+
+    //     $request->validate([
+    //         'start_date' => 'required|date',
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+    //     ]);
+
+    //     $start_date = $request->input('start_date');
+    //     $end_date = $request->input('end_date');
+
+    //     $start_date_formatted = Carbon::parse($start_date)->format('Y-m-d');
+    //     $end_date_formatted = Carbon::parse($end_date)->format('Y-m-d');
+
+    //     $data = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
+    //         ->where('id_user', $userId)
+    //         ->whereBetween('tgl_transaksi', [$start_date, $end_date])
+    //         ->get();
+    //     return Excel::download(new ExportExcel($data), 'Data_Transaksi_' . time() . '.xlsx');
+    // }
+
+    public function exportExcel(Request $request)
     {
-        $userId = Auth::id();
+        $query = $this->buildFilteredQuery($request);
 
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
+        $data = $query->get();
 
-        $start_date = $request->input('start_date');
-        $end_date = $request->input('end_date');
-
-        $start_date_formatted = Carbon::parse($start_date)->format('Y-m-d');
-        $end_date_formatted = Carbon::parse($end_date)->format('Y-m-d');
-
-        $data = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
-            ->where('id_user', $userId)
-            ->whereBetween('tgl_transaksi', [$start_date, $end_date])
-            ->get();
-        return Excel::download(new ExportExcel($data), 'Data_Transaksi_' . time() . '.xlsx');
+        return Excel::download(
+            new TransaksiExport(
+                $data,
+                $data->sum('nominal_pemasukan'),
+                $data->sum('nominal'),
+                $data->sum('nominal_pemasukan') - $data->sum('nominal')
+            ),
+            'arus_kas.xlsx'
+        );
     }
 
     public function importExcel(Request $request)

@@ -1,0 +1,69 @@
+.py-3 {
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+}
+
+.finance-summary {
+    margin-bottom: 0rem;
+    border: #6c757d20 1px solid;
+    border-radius: 5px;
+    padding: 1.5rem;
+}
+
+/* Kartu umum */
+.summary-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1.1rem;
+    border: 1px solid #f0f0f0;
+    height: 100%;
+    transition: box-shadow .2s ease;
+}
+
+.summary-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+/* Kartu utama */
+.summary-card.primary {
+    border-left: 4px solid #198754;
+    background: linear-gradient(180deg, #ffffff, #f9fbfa);
+}
+
+/* Label kecil */
+.summary-card .label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: .4rem;
+}
+
+/* Angka besar */
+.summary-card .value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Status kecil */
+.summary-card .status {
+    font-size: 0.75rem;
+    margin-top: .3rem;
+    color: #6c757d;
+}
+
+.financial-ratio {
+    margin-bottom: 2rem;
+    border: #6c757d20 1px solid;
+    border-radius: 5px;
+    padding: 1.5rem;
+}
+
+.cash-flow {
+    margin-top: 0rem;
+    margin-bottom: 2rem;
+    border: #6c757d20 1px solid;
+    border-radius: 5px;
+    padding: 1.5rem;
+}

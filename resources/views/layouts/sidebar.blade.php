@@ -1,71 +1,112 @@
-<aside id="sidebar" class="sidebar">
-    <ul class="sidebar-nav" id="sidebar-nav">
+<aside class="sidebar">
+    <div class="p-3 fw-bold fs-5 d-flex align-items-center">
+        <img src="{{ asset('img/bimmo_2.png') }}" class="me-2" style="height: 25px; width: 110px;" alt="BIMMO Logo">
+    </div>
+
+    <ul class="nav flex-column">
         <li class="nav-item">
-            <!-- Request untuk mengaktifkan halaman secara otomatis di side bar -->
-            <a class="nav-link  {{ Request::is('dashboard') ? 'active' : 'collapsed' }}" href="/dashboard">
-                <i class="bi bi-activity"></i>
+            <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
+                href="{{ url('dashboard') }}">
+                <i class="bi bi-speedometer me-2"></i>
                 <span>Dashboard</span>
             </a>
         </li>
 
-        <!-- Menu Pengelolaan Keuangan-->
+        <!-- Anggaran -->
         <li class="nav-item">
-            <a class="nav-link {{ Request::is('pemasukan', 'pengeluaran', 'anggaran', 'transaksi', 'compare','anggaran', 'kalkulator') ? 'active' : 'collapsed' }}" data-bs-target="#master" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-server"></i><span>Pengelolaan Keuangan</span><i class="bi bi-chevron-down ms-auto"></i>
+            <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }} disabled"
+                data-bs-toggle="collapse" href="#menuAnggaran" role="button">
+                <i class="bi bi-wallet2 me-2 disabled"></i>
+                <span>Anggaran</span>
+                <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
-            <ul id="master" class="nav-content {{ Request::is('pemasukan', 'pengeluaran', 'transaksi', 'compare', 'anggaran','pinjaman','kalkulator') ? 'show' : 'collapse' }}" data-bs-parent="#sidebar-nav">
-                <li>
-                    <a class="{{ Request::is('pemasukan') ? 'active' : 'collapsed' }}" href="/pemasukan">
-                        <i class="bi bi-circle"></i><span>Jenis Pemasukan</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::is('pengeluaran') ? 'active' : 'collapsed' }}" href="/pengeluaran">
-                        <i class="bi bi-circle"></i><span>Jenis Pengeluaran</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::is('transaksi', 'compare') ? 'active' : 'collapsed' }}" href="/transaksi">
-                        <i class="bi bi-circle"></i><span>Data Transaksi</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::is('anggaran') ? 'active' : 'collapsed' }}" href="/anggaran">
-                        <i class="bi bi-circle"></i><span>Anggaran</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::is('kalkulator') ? 'active' : 'collapsed' }}" href="/kalkulator">
-                        <i class="bi bi-circle"></i><span>Kalkulator Anggaran</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::is('pinjaman') ? 'active' : 'collapsed' }}" href="/pinjaman">
-                        <i class="bi bi-circle"></i><span>Data Pinjaman</span>
-                    </a>
-                </li>
-            </ul>
+
+            <div class="collapse {{ Request::is('anggaran*','kalkulator*') ? 'show' : '' }}" id="menuAnggaran">
+                <ul class="nav flex-column ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran" class="disabled">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Kategori Anggaran
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator" class="disabled">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Monitoring Anggaran
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
-        <!-- Menu Pengelolaan Stok Barang -->
         <li class="nav-item">
-            <a class="nav-link {{ Request::is('barang') ? 'active' : 'collapsed' }}" data-bs-target="#data" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-clipboard2-data"></i><span>Pengelolaan Stok Barang</span><i class="bi bi-chevron-down ms-auto"></i>
+            <a class="nav-link d-flex align-items-center {{ Request::is('barang*','dana-darurat*') ? 'active' : '' }} disabled"
+                data-bs-toggle="collapse" href="#menuInvestasi" role="button">
+                <i class="bi bi-clipboard-data-fill me-2 disabled">
+                </i> <span>Investment</span>
+                <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
-            <ul id="data" class="nav-content {{ Request::is('barang', '') ? 'show' : 'collapse' }}" data-bs-parent="#sidebar-nav">
-                <li>
-                    <a class="{{ Request::is('barang') ? 'active' : 'collapsed' }}" href="/barang">
-                        <i class="bi bi-circle"></i><span>Barang</span>
-                    </a>
-                </li>
-            </ul>
+
+            <div class="collapse {{ Request::is('barang*','dana-darurat*') ? 'show' : '' }}" id="menuInvestasi">
+                <ul class="nav flex-column ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('barang') ? 'active' : '' }}" href="/barang" class="disabled">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Aset
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('dana-darurat') ? 'active' : '' }}" href="/dana-darurat" class="disabled">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Emergency Fund
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
-        <!-- Log Out -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="/logout">
-                <i class="bi bi-power" style="color: red"></i>
-                <span style="color: red">Keluar</span>
+            <a class="nav-link d-flex align-items-center {{ Request::is('barang*','dana-darurat*') ? 'active' : '' }}"
+                data-bs-toggle="collapse" href="#menuMoneyMovement" role="button">
+                <i class="bi bi-arrow-down-up me-2"></i>
+                <span>Money Movement</span>
+                <i class="bi bi-chevron-down ms-auto small"></i>
+            </a>
+
+            <div class="collapse {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'show' : '' }}" id="menuMoneyMovement">
+                <ul class="nav flex-column ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Income Category
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Outcome Category
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('transaksi') ? 'active' : '' }}" href="/transaksi">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Cash Flow
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
+                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                            Loan
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="/logout">
+                <i class="bi bi-box-arrow-left me-2 text-danger"></i>
+                Log Out
             </a>
         </li>
     </ul>

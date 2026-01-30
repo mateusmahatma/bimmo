@@ -1,4 +1,62 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Theme Switcher
+    const skin = window.userSkin || 'auto';
+    const updateSkinUrl = window.updateSkinUrl;
+    const csrfToken = window.csrfToken;
+
+    function applyTheme(mode) {
+        if (mode === 'light' || mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', mode);
+        } else {
+            // Auto mode: deteksi prefers-color-scheme
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const autoTheme = prefersDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', autoTheme);
+        }
+        document.dispatchEvent(new Event("themeChanged"));
+    }
+
+    function highlightActiveSkin(mode) {
+        document.querySelectorAll('.dropdown-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
+                el.classList.add('active');
+            }
+        });
+
+        // Highlight active skin in dropdown
+        if (mode === 'auto') {
+            const autoItem = document.querySelector('.dropdown-item[data-skin="auto"]');
+            if (autoItem) autoItem.classList.add('active');
+        }
+    }
+
+    function setTheme(mode) {
+        applyTheme(mode);
+        highlightActiveSkin(mode);
+
+        fetch(updateSkinUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                skin: mode
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) alert("Gagal menyimpan tema.");
+            })
+            .catch(err => console.error("Gagal update tema:", err));
+    }
+
+    // Eksekusi awal tema
+    applyTheme(skin);
+    highlightActiveSkin(skin);
+    window.setTheme = setTheme;
+
     const charts = {};
     const chartData = {};
 
@@ -245,13 +303,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Theme switching
-    document.addEventListener("themeChanged", () => {
-        const filter = document.getElementById("filterPeriod");
-        const months = filter?.value === "all" ? "all" : parseInt(filter?.value || "6");
+    // document.addEventListener("themeChanged", () => {
+    //     const filter = document.getElementById("filterPeriod");
+    //     const months = filter?.value === "all" ? "all" : parseInt(filter?.value || "6");
 
-        renderCashFlowChart(chartData["cashFlow"], months);
-        renderIncomeExpenseChart(chartData["incomeExpense"], months);
-    });
+    //     renderCashFlowChart(chartData["cashFlow"], months);
+    //     renderIncomeExpenseChart(chartData["incomeExpense"], months);
+    // });
 
     // Chart switch toggle
     document.getElementById("chartType")?.addEventListener("change", () => {
@@ -294,6 +352,43 @@ document.addEventListener("DOMContentLoaded", function () {
             columnChart.style.display = "none";
         }
     };
+});
+
+// Toggle Nominal Visibility
+document.addEventListener('DOMContentLoaded', function () {
+
+    const btn = document.getElementById('toggleNominalBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+
+        btn.disabled = true;
+
+        const response = await fetch(btn.dataset.url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document
+                    .querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        });
+
+        const res = await response.json();
+
+        // update angka
+        document.getElementById('summary-saldo').textContent = res.data.saldo;
+        document.getElementById('summary-pemasukan').textContent = res.data.pemasukan;
+        document.getElementById('summary-pengeluaran').textContent = res.data.pengeluaran;
+        document.getElementById('summary-hari-ini').textContent = res.data.hari_ini;
+
+        // update icon
+        btn.innerHTML = res.show
+            ? '<i class="bi bi-eye-slash"></i>'
+            : '<i class="bi bi-eye"></i>';
+
+        btn.disabled = false;
+    });
+
 });
 
 // Expenses Bar
@@ -1119,3 +1214,4 @@ document.addEventListener("DOMContentLoaded", function () {
     chart.render();
 
 });
+

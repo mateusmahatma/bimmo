@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <title>Edit Anggaran</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-
 @extends('layouts.main')
+
+@section('title', 'Edit Anggaran')
+
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
@@ -65,6 +58,20 @@
 </div>
 @endsection
 
-@section('scripts')
-<script src="{{ asset('js/anggaran.js') }}?v={{ filemtime(public_path('js/anggaran.js')) }}"></script>
-@endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const el = document.querySelector('#id_pengeluaran');
+
+        if (el && !el.tomselect) {
+            new TomSelect(el, {
+                plugins: ['remove_button'],
+                maxItems: null,
+                hideSelected: true,
+                closeAfterSelect: false,
+                placeholder: 'Pilih jenis pengeluaran'
+            });
+        }
+    });
+</script>
+@endpush

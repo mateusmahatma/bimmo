@@ -21,30 +21,36 @@
             @csrf
             <div class="mt-3 mb-3">
                 <label for="nama_pinjaman" class="form-label">Nama Pinjaman</label>
-                <input name="nama_pinjaman" id="nama_pinjaman" class="form-control" step="0.01" required>
+                <input name="nama_pinjaman" id="nama_pinjaman" class="form-control" step="0.01" placeholder="Contoh : Pinjaman Koperasi" required>
             </div>
             <div class="mb-3">
-                <label for="jumlah_pinjaman" class="form-label">Jumlah Pinjaman</label>
-                <input type="number" name="jumlah_pinjaman" id="jumlah_pinjaman" class="form-control" step="0.01" required>
+                <label for="jumlah_pinjaman" class="form-label">Nominal Pinjaman</label>
+                <input type="number" name="jumlah_pinjaman" id="jumlah_pinjaman" class="form-control" step="0.01" placeholder="2000000" required>
             </div>
             <div class="mb-3">
-                <label for="jangka_waktu" class="form-label">Jangka Waktu (bulan)</label>
-                <input type="number" name="jangka_waktu" id="jangka_waktu" class="form-control" required>
+                <label for="nominal_awal" class="form-label">Nominal Cicilan</label>
+                <input type="number" name="nominal_awal" id="nominal_awal" class="form-control" step="0.01" required>
             </div>
             <div class="mb-3">
-                <label for="start_date" class="form-label">Tanggal Mulai</label>
-                <input type="date" name="start_date" id="start_date" class="form-control" required>
+                <label for="jumlah_angsuran" class="form-label">Jumlah Angsuran</label>
+                <input type="number" name="jumlah_angsuran" id="jumlah_angsuran" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="end_date" class="form-label">Tanggal Berakhir</label>
-                <input type="date" name="end_date" id="end_date" class="form-control" required>
+                <label for="angsuran_ke" class="form-label">Angsuran Ke</label>
+                <input type="number" name="angsuran_ke" id="angsuran_ke" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select name="status" id="status" class="form-select" required>
-                    <option value="lunas">Lunas</option>
-                    <option value="belum_lunas">Belum Lunas</option>
-                </select>
+                <label for="nominal_sisa" class="form-label">Nominal Sisa Pinjaman</label>
+                <input type="number" name="nominal_sisa" id="nominal_sisa" class="form-control" step="0.01" disabled required>
+            </div>
+            <div class="mb-3">
+                <label for="sisa_angsuran" class="form-label">Sisa Angsuran</label>
+                <input type="number" name="sisa_angsuran" id="sisa_angsuran" class="form-control" disabled required>
+            </div>
+            <div class="mb-3">
+                <label for="keterangan" class="form-label">Keterangan</label>
+                <textarea type="text" name="keterangan" id="keterangan" class="form-control" required>
+                </textarea>
             </div>
             <button type="submit" class="btn btn-success">Simpan</button>
         </form>

@@ -110,116 +110,91 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // DataTable
-    const anggaranTable = $('#anggaranTable').DataTable({
-        paging: true,
-        responsive: true,
-        serverSide: true,
-        processing: true,
-        lengthChange: true,
-        autoWidth: false,
-        ajax: {
-            url: '/anggaran',
-            type: 'GET',
-            dataSrc: function (json) {
-                $('#totalPersentase').text(json.totalPersentase.toLocaleString('id-ID') + '%');
-                if (json.exceedMessage) {
-                    $('#exceedMessage').text(json.exceedMessage).show();
-                } else {
-                    $('#exceedMessage').hide();
-                }
-                return json.data;
-            }
-        },
-        columns: [{
-            data: 'DT_RowIndex',
-            className: 'text-center',
-            orderable: false,
-            searchable: false
-        },
-        {
-            data: 'nama_anggaran',
-            className: 'text-center',
-            render: d => d || '-'
-        },
-        {
-            data: 'persentase_anggaran',
-            className: 'text-center'
-        },
-        {
-            data: 'list_pengeluaran',
-            name: 'list_pengeluaran',
-            className: 'text-left',
-            defaultContent: '-',
-            render: function (data, type, row) {
-                if (type !== "display" || !Array.isArray(data) || data.length === 0) {
-                    return "-";
-                }
+    // Datatable Anggaran
+    $(document).ready(function () {
+        function formatTanggalJamIndo(dateString) {
+            if (!dateString) return '-';
 
-                const showLimit = 3;
-                const hasMore = data.length > showLimit;
-                const visible = data.slice(0, showLimit);
-                const hidden = data.slice(showLimit);
-                const tableId = `detail-table-${row.id_anggaran}`;
+            const date = new Date(dateString);
 
-                let table = `
-                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #dee2e6; font-size: 13px;" id="${tableId}">
-                            <colgroup>
-                                <col style="width: 40px;"> <!-- 🔹 kolom nomor dibuat tetap -->
-                                <col style="width: auto;">
-                            </colgroup>
-                            <tbody>
-                                ${visible.map((name, i) => `
-                                    <tr>
-                                        <td style="border: 1px solid #dee2e6; padding: 4px; text-align: center;">${i + 1}</td>
-                                        <td style="border: 1px solid #dee2e6; padding: 4px;">${name}</td>
-                                    </tr>
-                                `).join('')}
-                    `;
+            const tanggal = date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
 
-                if (hasMore) {
-                    table += hidden.map((name, i) => `
-                            <tr class="hidden-row" style="display: none;">
-                                <td style="border: 1px solid #dee2e6; padding: 4px; text-align: center;">${showLimit + i + 1}</td>
-                                <td style="border: 1px solid #dee2e6; padding: 4px;">${name}</td>
-                            </tr>
-                        `).join('');
-                }
+            const jam = date.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
 
-                table += `
-                            </tbody>
-                        </table>
-                    `;
-
-                if (hasMore) {
-                    table += `
-                            <button type="button" class="btn btn-sm btn-link p-0 mt-1 toggle-btn" data-target="${tableId}">
-                                More Details
-                            </button>
-                        `;
-                }
-                return table;
-            }
-        },
-        {
-            data: 'created_at',
-            render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'),
-            className: 'text-center'
-        },
-        {
-            data: 'updated_at',
-            render: d => moment(d).format('YYYY-MM-DD HH:mm:ss'),
-            className: 'text-center'
-        },
-        {
-            data: 'aksi',
-            className: 'text-center',
-            orderable: false,
-            searchable: false
+            return `${tanggal} ${jam}`;
         }
-        ]
+
+
+        $('#anggaranTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/anggaran',
+                type: 'GET'
+            },
+            columns: [
+                { data: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'nama_anggaran' },
+                { data: 'persentase_anggaran' },
+                {
+                    data: 'list_pengeluaran',
+                    orderable: false,
+                    render: function (data) {
+                        if (!data || data.length === 0) {
+                            return '-';
+                        }
+
+                        // pastikan array
+                        if (!Array.isArray(data)) {
+                            return data;
+                        }
+
+                        let html = `
+            <table class="table table-sm table-borderless mb-0">
+                <tbody>
+        `;
+
+                        data.forEach((item, index) => {
+                            html += `
+                <tr>
+                    <td style="width:20px;">${index + 1}.</td>
+                    <td>${item}</td>
+                </tr>
+            `;
+                        });
+
+                        html += `
+                </tbody>
+            </table>
+        `;
+
+                        return html;
+                    }
+                },
+                {
+                    data: 'created_at', render: function (data) {
+                        return formatTanggalJamIndo(data);
+                    }
+                },
+                {
+                    data: 'updated_at', render: function (data) {
+                        return formatTanggalJamIndo(data);
+                    }
+                },
+                { data: 'aksi', orderable: false, searchable: false }
+            ]
+        });
     });
 
+    // Toggle More Details
     $(document).on('click', '.toggle-btn', function () {
         const tableId = $(this).data('target');
         const $table = $('#' + tableId);
