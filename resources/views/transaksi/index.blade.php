@@ -181,8 +181,18 @@
     </div>
 </div>
 
+<div class="row mb-3">
+    <div class="col-md-4">
+        <input
+            type="text"
+            id="searchTransaksi"
+            class="form-control"
+            placeholder="Search for transactions..."
+            autocomplete="off">
+    </div>
+</div>
 
-{{-- TABLE --}}
+<!-- Table -->
 <div class="card">
     <div class="card-body table-responsive">
         @php
@@ -197,7 +207,7 @@
         ]);
         }
         @endphp
-        <table class="table table-bordered table-striped">
+        <table id="transaksiTable" class="table table-bordered table-striped">
             <thead class="table-light">
                 <tr>
                     <th>No</th>
@@ -322,3 +332,28 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchTransaksi');
+        const table = document.getElementById('transaksiTable');
+        if (!searchInput || !table) return;
+
+        const rows = table.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('keyup', function() {
+            const keyword = this.value.toLowerCase().trim();
+
+            rows.forEach(row => {
+                // ambil seluruh text dalam row (termasuk <li>)
+                const rowText = row.innerText.toLowerCase();
+
+                row.style.display = rowText.includes(keyword) ?
+                    '' :
+                    'none';
+            });
+        });
+    });
+</script>
+@endpush
