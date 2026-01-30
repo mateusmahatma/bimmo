@@ -5,7 +5,7 @@ $hash = Hashids::encode($row->id);
 
 <a href="{{ route('transaksi.edit', $hash) }}"
     class="btn btn-sm btn-warning">
-    Edit
+    <i class="bi bi-pencil-square"></i>
 </a>
 
 <form action="{{ route('transaksi.destroy', $hash) }}"
@@ -15,6 +15,6 @@ $hash = Hashids::encode($row->id);
     @csrf
     @method('DELETE')
     <button class="btn btn-sm btn-danger">
-        Hapus
+        <i class="bi bi-trash-fill"></i>
     </button>
 </form>
