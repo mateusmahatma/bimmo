@@ -1,16 +1,16 @@
 @extends('layouts.main')
 
-@section('title','Arus Kas')
+@section('title','Cash Flow')
 
 @section('container')
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Arus Kas</h4>
+    <h4>Cash Flow</h4>
 
     <div class="d-flex gap-2">
         <a href="{{ route('transaksi.create') }}"
             class="btn btn-primary btn-sm">
-            + Tambah Transaksi
+            + Add Transaction
         </a>
 
         {{-- IMPORT EXCEL --}}
@@ -46,19 +46,19 @@
 <form method="GET" class="card mb-3">
     <div class="card-body row g-3">
         <div class="col-md-3">
-            <label class="form-label">Tanggal Mulai</label>
+            <label class="form-label">Start Date</label>
             <input type="date" name="start_date" class="form-control"
                 value="{{ request('start_date') }}">
         </div>
 
         <div class="col-md-3">
-            <label class="form-label">Tanggal Akhir</label>
+            <label class="form-label">End Date</label>
             <input type="date" name="end_date" class="form-control"
                 value="{{ request('end_date') }}">
         </div>
 
         <div class="col-md-3">
-            <label class="form-label">Jenis Pemasukan</label>
+            <label class="form-label">Income Category</label>
             <select name="pemasukan" class="form-select">
                 <option value="">Semua</option>
                 @foreach ($listPemasukan as $item)
@@ -71,7 +71,7 @@
         </div>
 
         <div class="col-md-3">
-            <label class="form-label">Jenis Pengeluaran</label>
+            <label class="form-label">Expense Categories</label>
             <select name="pengeluaran" class="form-select">
                 <option value="">Semua</option>
                 @foreach ($listPengeluaran as $item)
@@ -84,7 +84,7 @@
         </div>
 
         <div class="col-12 d-flex gap-2">
-            <button class="btn btn-primary">Terapkan Filter</button>
+            <button class="btn btn-primary">Apply Filter</button>
             <a href="{{ route('transaksi.index') }}" class="btn btn-outline-secondary">
                 Reset
             </a>
@@ -305,14 +305,14 @@
                 </div>
 
                 <div class="alert alert-info small mb-0">
-                    Format file harus sesuai template.
+                    The file format must match the template.
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button class="btn btn-secondary"
                     data-bs-dismiss="modal">
-                    Batal
+                    Cancel
                 </button>
                 <button class="btn btn-success">
                     Import
