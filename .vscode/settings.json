@@ -1,0 +1,11 @@
+{
+    "emmet.includeLanguages": {
+        "blade": "html"
+    },
+    "files.associations": {
+        "*.blade.php": "blade"
+    },
+    "html.validate.scripts": false,
+    "javascript.validate.enable": false,
+    "typescript.validate.enable": false
+}
