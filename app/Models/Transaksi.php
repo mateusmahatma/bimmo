@@ -12,7 +12,6 @@ class Transaksi extends Model
     protected $table = 'transaksi';
     protected $dates = ['tgl_transaksi'];
     protected $fillable = [
-        'id',
         'tgl_transaksi',
         'pemasukan',
         'nominal_pemasukan',
