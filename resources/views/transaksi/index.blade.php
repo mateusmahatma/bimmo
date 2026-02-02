@@ -93,6 +93,10 @@
 </form>
 
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
 {{-- SUMMARY --}}
 <div class="card mb-3">
     <div class="card-body">
@@ -292,36 +296,36 @@
 
 <div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="{{ route('transaksi.import.excel') }}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="modal-content">
+            <form action="{{ route('transaksi.importTest') }}"
+              method="POST"
+              enctype="multipart/form-data"
+              class="modal-content">
             @csrf
 
             <div class="modal-header">
-                <h5 class="modal-title">Import Transaksi (Excel)</h5>
+                <h5 class="modal-title">Import Transaksi (Test)</h5>
                 <button type="button" class="btn-close"
-                    data-bs-dismiss="modal"></button>
+                        data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label">File Excel</label>
                     <input type="file"
-                        name="file"
-                        class="form-control"
-                        accept=".xlsx,.xls,.csv"
-                        required>
+                           name="file"
+                           class="form-control"
+                           accept=".xlsx,.xls,.csv"
+                           required>
                 </div>
 
                 <div class="alert alert-info small mb-0">
-                    The file format must match the template.
+                    Gunakan template test (1 sheet, ID langsung).
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button class="btn btn-secondary"
-                    data-bs-dismiss="modal">
+                        data-bs-dismiss="modal">
                     Cancel
                 </button>
                 <button class="btn btn-success">
@@ -331,6 +335,7 @@
         </form>
     </div>
 </div>
+
 @endsection
 
 @push('scripts')

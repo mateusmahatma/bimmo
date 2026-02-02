@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportExcel;
 use Illuminate\Support\Facades\Auth;
-use App\Imports\TransaksiImport;
 use App\Exports\TransaksiTemplateExport;
 use App\Models\HasilProsesAnggaran;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +22,7 @@ use App\Models\Barang;
 use App\Models\DanaDarurat;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Exports\TransaksiExport;
+use App\Imports\TransaksiImportTest;
 
 class TransaksiController extends Controller
 {
@@ -618,19 +618,43 @@ class TransaksiController extends Controller
         return Excel::download(new TransaksiTemplateExport, 'template_transaksi.xlsx');
     }
 
-    public function import(Request $request)
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx',
+    //     ]);
+
+    //     try {
+    //         $importClass = 'App\\Imports\\TransaksiImport';
+
+    //         if (!class_exists($importClass)) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => "Import class not found: {$importClass}"
+    //             ], 500);
+    //         }
+
+    //         $importInstance = app($importClass);
+    //         Excel::import($importInstance, $request->file('file')->store('temp'));
+
+    //         return response()->json(['success' => true], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['success' => false], 500);
+    //     }
+    // }
+
+
+    public function importTest(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx',
+            'file' => 'required|mimes:xlsx,xls'
         ]);
 
-        try {
-            Excel::import(new TransaksiImport, $request->file('file')->store('temp'));
-            return response()->json(['success' => true], 200);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false], 500);
-        }
+        Excel::import(new TransaksiImportTest, $request->file('file'));
+
+        return back()->with('success', 'Import berhasil');
     }
+
 
     public function toggleStatus($id)
     {

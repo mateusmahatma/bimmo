@@ -1070,23 +1070,3 @@ document.addEventListener('DOMContentLoaded', function () {
     TomSelectHandler.initAll();
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchTransaksi');
-    const table = document.getElementById('transaksiTable');
-    if (!searchInput || !table) return;
-
-    const rows = table.querySelectorAll('tbody tr');
-
-    searchInput.addEventListener('keyup', function () {
-        const keyword = this.value.toLowerCase().trim();
-
-        rows.forEach(row => {
-            // ambil seluruh text dalam row (termasuk <li>)
-            const rowText = row.innerText.toLowerCase();
-
-            row.style.display = rowText.includes(keyword)
-                ? ''
-                : 'none';
-        });
-    });
-});

@@ -97,13 +97,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/transaksi/export/excel', [TransaksiController::class, 'exportExcel'])
             ->name('transaksi.export.excel');
 
-        // Route::post('/importExcel', [TransaksiController::class, 'importExcel'])->name('transaksi.importExcel');
 
-        Route::post('/transaksi/import-excel', [TransaksiController::class, 'importExcel'])
-            ->name('transaksi.import.excel');
+        Route::post(
+            '/transaksi/import-test',
+            [TransaksiController::class, 'importTest']
+        )->name('transaksi.importTest');
 
-        Route::post('/import', [TransaksiController::class, 'import'])->name('import-transaksi');
-        // Route::get('/download-template', [TransaksiController::class, 'downloadTemplate'])->name('download-template');
 
         Route::get('/transaksi/template', [TransaksiController::class, 'downloadTemplate'])
             ->name('transaksi.download.template');
