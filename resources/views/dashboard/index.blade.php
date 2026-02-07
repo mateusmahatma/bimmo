@@ -48,7 +48,7 @@
                         Financial Summary
                         @if($totalNominalSisa > 0)
                         <span class="badge bg-success">Surplus</span>
-                        @else
+                        @elseif($totalNominalSisa < 0)
                         <span class="badge bg-danger">Defisit</span>
                         @endif
                     </h3>
