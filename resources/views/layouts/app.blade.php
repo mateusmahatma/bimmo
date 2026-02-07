@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title','BIMMO')</title>
+
+    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
