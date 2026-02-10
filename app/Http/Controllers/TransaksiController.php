@@ -36,19 +36,30 @@ class TransaksiController extends Controller
         // =====================
         // FILTER
         // =====================
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $baseQuery->whereBetween('tgl_transaksi', [
-                $request->start_date,
-                $request->end_date
-            ]);
+        if ($request->filled('start_date')) {
+            $baseQuery->whereDate('tgl_transaksi', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $baseQuery->whereDate('tgl_transaksi', '<=', $request->end_date);
         }
 
         if ($request->filled('pemasukan')) {
-            $baseQuery->where('pemasukan', $request->pemasukan);
+            if (is_array($request->pemasukan)) {
+                $baseQuery->whereIn('pemasukan', $request->pemasukan);
+            }
+            else {
+                $baseQuery->where('pemasukan', $request->pemasukan);
+            }
         }
 
         if ($request->filled('pengeluaran')) {
-            $baseQuery->where('pengeluaran', $request->pengeluaran);
+            if (is_array($request->pengeluaran)) {
+                $baseQuery->whereIn('pengeluaran', $request->pengeluaran);
+            }
+            else {
+                $baseQuery->where('pengeluaran', $request->pengeluaran);
+            }
         }
 
         // =====================
@@ -126,19 +137,30 @@ class TransaksiController extends Controller
         $query = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
             ->where('id_user', $userId);
 
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('tgl_transaksi', [
-                $request->start_date,
-                $request->end_date
-            ]);
+        if ($request->filled('start_date')) {
+            $query->whereDate('tgl_transaksi', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('tgl_transaksi', '<=', $request->end_date);
         }
 
         if ($request->filled('pemasukan')) {
-            $query->where('pemasukan', $request->pemasukan);
+            if (is_array($request->pemasukan)) {
+                $query->whereIn('pemasukan', $request->pemasukan);
+            }
+            else {
+                $query->where('pemasukan', $request->pemasukan);
+            }
         }
 
         if ($request->filled('pengeluaran')) {
-            $query->where('pengeluaran', $request->pengeluaran);
+            if (is_array($request->pengeluaran)) {
+                $query->whereIn('pengeluaran', $request->pengeluaran);
+            }
+            else {
+                $query->where('pengeluaran', $request->pengeluaran);
+            }
         }
 
         // sorting (whitelist)
@@ -171,13 +193,13 @@ class TransaksiController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'tgl_transaksi'      => 'required|date',
-            'pemasukan'          => 'nullable|string',
-            'nominal_pemasukan'  => 'nullable|numeric',
-            'pengeluaran'        => 'nullable|string',
-            'nominal'            => 'nullable|numeric',
-            'keterangan'         => 'nullable|string',
-            'barang_id'          => 'nullable|exists:barang,id',
+            'tgl_transaksi' => 'required|date',
+            'pemasukan' => 'nullable|string',
+            'nominal_pemasukan' => 'nullable|numeric',
+            'pengeluaran' => 'nullable|string',
+            'nominal' => 'nullable|numeric',
+            'keterangan' => 'nullable|string',
+            'barang_id' => 'nullable|exists:barang,id',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -236,8 +258,8 @@ class TransaksiController extends Controller
             if (in_array('emergency_fund', $request->kategori ?? []) && $transaksi->nominal > 0) {
 
                 $dana = DanaDarurat::firstOrCreate(
-                    ['id_user' => Auth::id()],
-                    ['total' => 0]
+                ['id_user' => Auth::id()],
+                ['total' => 0]
                 );
 
                 $dana->increment('total', $transaksi->nominal);
@@ -250,7 +272,7 @@ class TransaksiController extends Controller
 
                 $hasil = HasilProsesAnggaran::whereJsonContains(
                     'jenis_pengeluaran',
-                    (string) $transaksi->pengeluaran
+                    (string)$transaksi->pengeluaran
                 )
                     ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
                     ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
@@ -266,7 +288,8 @@ class TransaksiController extends Controller
              * ====================================== */
             return redirect()->route('transaksi.index')
                 ->with('success', 'Data Transaksi Berhasil Disimpan!');
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
 
             return back()->with('error', 'Terjadi error: ' . $e->getMessage());
         }
@@ -379,7 +402,9 @@ class TransaksiController extends Controller
     }
 
 
-    public function show() {}
+    public function show()
+    {
+    }
 
     // public function destroy($id)
     // {
@@ -536,10 +561,10 @@ class TransaksiController extends Controller
 
         return Excel::download(
             new TransaksiExport(
-                $data,
-                $data->sum('nominal_pemasukan'),
-                $data->sum('nominal'),
-                $data->sum('nominal_pemasukan') - $data->sum('nominal')
+            $data,
+            $data->sum('nominal_pemasukan'),
+            $data->sum('nominal'),
+            $data->sum('nominal_pemasukan') - $data->sum('nominal')
             ),
             'arus_kas.xlsx'
         );
@@ -663,5 +688,25 @@ class TransaksiController extends Controller
         $transaksi->save();
 
         return response()->json(['success' => true, 'new_status' => $transaksi->status]);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $userId = Auth::id();
+        $ids = $request->ids;
+
+        if (!is_array($ids) || count($ids) === 0) {
+            return response()->json(['message' => 'No items selected'], 400);
+        }
+
+        // Validate and delete ensuring ownership
+        $deleted = Transaksi::where('id_user', $userId)
+            ->whereIn('id', $ids)
+            ->delete();
+
+        return response()->json([
+            'message' => $deleted . ' transactions deleted successfully',
+            'deleted_count' => $deleted
+        ]);
     }
 }

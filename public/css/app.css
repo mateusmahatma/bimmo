@@ -54,7 +54,7 @@
 }
 
 .financial-ratio {
-    margin-bottom: 2rem;
+    margin-bottom: 0rem;
     border: #6c757d20 1px solid;
     border-radius: 5px;
     padding: 1.5rem;
@@ -66,4 +66,18 @@
     border: #6c757d20 1px solid;
     border-radius: 5px;
     padding: 1.5rem;
+}
+
+.card-expense-bar {
+    margin-top: 0rem;
+    border-radius: 5px;
+    padding: 1.5rem;
+    border: #6c757d20 1px solid;
+}
+
+.saving-rate {
+    margin-top: 0rem;
+    border-radius: 5px;
+    padding: 1.5rem;
+    border: #6c757d20 1px solid;
 }
