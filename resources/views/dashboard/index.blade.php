@@ -14,28 +14,6 @@
     </nav>
 </div>
 
-<!-- <div id="dashboardCarousel" class="carousel slide mb-4 rounded-4 shadow-sm overflow-hidden" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="{{ asset('img/gambar1.png') }}" class="d-block w-100"
-                alt="Banner 1" style="object-fit: cover; height: 250px;">
-        </div>
-        <div class="carousel-item">
-            <img src="{{ asset('img/gambar2.png') }}" class="d-block w-100"
-                alt="Banner 2" style="object-fit: cover; height: 250px;">
-        </div>
-    </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#dashboardCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Sebelumnya</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#dashboardCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Selanjutnya</span>
-    </button>
-</div> -->
-
 <section class="dashboard">
     <div class="row g-4">
 
@@ -62,7 +40,6 @@
 
                     <div class="row g-3">
 
-                        {{-- SALDO (PRIMARY CARD) --}}
                         <div class="col-12 col-md-6 col-xl-3">
                             <div class="summary-card primary">
                                 <div class="label">This Month's Balance</div>
@@ -72,7 +49,6 @@
                             </div>
                         </div>
 
-                        {{-- PEMASUKAN --}}
                         <div class="col-12 col-md-6 col-xl-3">
                             <div class="summary-card">
                                 <div class="label">Income This Month</div>
@@ -82,7 +58,6 @@
                             </div>
                         </div>
 
-                        {{-- PENGELUARAN --}}
                         <div class="col-12 col-md-6 col-xl-3">
                             <div class="summary-card">
                                 <div class="label">Expense This Month</div>
@@ -92,7 +67,6 @@
                             </div>
                         </div>
 
-                        {{-- HARI INI --}}
                         <div class="col-12 col-md-6 col-xl-3">
                             <div class="summary-card">
                                 <div class="label">Expense Today</div>
@@ -132,7 +106,6 @@
                     </h3>
                 </div>
 
-                {{-- CHART --}}
                 <div id="cashflowChart" style="height: 300px;"></div>
 
                 <div class="table-responsive mt-3">
@@ -278,7 +251,7 @@
             </div>
 
 
-            <div class="card-dashboard">
+            <div class="card-expense-bar">
                 <div class="card-header d-flex justify-content-between align-items-center mb-3">
                     <h3>Expense Bar</h3>
 
@@ -404,7 +377,7 @@
 
         <div class="col-12">
             <div class="card-dashboard">
-                <h3 class="fw-bold mb-4">Budget Performance</h3>
+                <h3>Budget Performance</h3>
                 @include('dashboard.anggaran')
                 @stack('anggaran-css')
                 @stack('anggaran.scripts')
