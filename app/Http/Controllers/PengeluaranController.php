@@ -21,14 +21,14 @@ class PengeluaranController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at ? $row->created_at->format('d M Y H:i') : '-';
-                })
+                return $row->created_at ? $row->created_at->format('d M Y H:i') : '-';
+            })
                 ->editColumn('updated_at', function ($row) {
-                    return $row->updated_at ? $row->updated_at->format('d M Y H:i') : '-';
-                })
+                return $row->updated_at ? $row->updated_at->format('d M Y H:i') : '-';
+            })
                 ->addColumn('aksi', function ($request) {
-                    return view('pengeluaran.tombol')->with('request', $request);
-                })
+                return view('pengeluaran.tombol')->with('request', $request);
+            })
                 ->toJson();
         }
         return view('pengeluaran.index');
@@ -55,7 +55,7 @@ class PengeluaranController extends Controller
 
     public function show()
     {
-        //
+    //
     }
 
     public function edit($id)
@@ -80,5 +80,26 @@ class PengeluaranController extends Controller
     public function destroy($id)
     {
         $id = Pengeluaran::where('id', $id)->delete();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pengeluaran,id'
+        ]);
+
+        $ids = $validated['ids'];
+
+        // Ensure user owns these records
+        $deleted = Pengeluaran::whereIn('id', $ids)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => "$deleted categories deleted successfully."]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No categories found or authorized to delete.'], 404);
     }
 }
