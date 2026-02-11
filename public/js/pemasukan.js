@@ -26,19 +26,21 @@ $(document).ready(function () {
         applyTheme(mode);
         highlightActiveSkin(mode);
 
-        fetch(updateSkinUrl, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ skin: mode })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) alert("Gagal menyimpan tema.");
+        if (updateSkinUrl) {
+            fetch(updateSkinUrl, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ skin: mode })
             })
-            .catch(err => console.error("Gagal update tema:", err));
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) alert("Gagal menyimpan tema.");
+                })
+                .catch(err => console.error("Gagal update tema:", err));
+        }
     }
 
     // Eksekusi awal tema
@@ -58,6 +60,15 @@ $(document).ready(function () {
             type: 'GET',
         },
         columns: [
+            {
+                data: 'id',
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
+                }
+            },
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama', className: 'text-center' },
             { data: 'created_at', className: 'text-center' },
@@ -142,6 +153,7 @@ $(document).ready(function () {
         $('#nama').val('');
         $('#pemasukanModal').modal('show');
 
+        // Note: Removing previous event handlers to prevent duplicates
         $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan')
             .on('click', '.tombol-simpan-pemasukan', () => simpanPemasukan());
     });
@@ -160,7 +172,7 @@ $(document).ready(function () {
         });
     });
 
-    // Hapus
+    // Hapus Single
     $('body').on('click', '.tombol-del-pemasukan', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
@@ -191,6 +203,88 @@ $(document).ready(function () {
                 });
             }
         });
+    });
+
+    // ----------------------------------------------------------------
+    // BULK DELETE LOGIC
+    // ----------------------------------------------------------------
+
+    // Check All
+    $(document).on('change', '#checkAll', function () {
+        const isChecked = $(this).is(':checked');
+        $('.check-item').prop('checked', isChecked);
+        updateBulkButton();
+    });
+
+    // Check Item
+    $(document).on('change', '.check-item', function () {
+        var total = $('.check-item').length;
+        var checked = $('.check-item:checked').length;
+
+        $('#checkAll').prop('checked', total === checked);
+        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
+        updateBulkButton();
+    });
+
+    // Update Button Visibility
+    function updateBulkButton() {
+        const checkedCount = $('.check-item:checked').length;
+        $('#countSelected').text(checkedCount);
+        if (checkedCount > 0) {
+            $('#btnBulkDelete').removeClass('d-none');
+        } else {
+            $('#btnBulkDelete').addClass('d-none');
+        }
+    }
+
+    // Handle Bulk Delete Click
+    $('#btnBulkDelete').on('click', function () {
+        const ids = [];
+        $('.check-item:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        Swal.fire({
+            title: `Delete ${ids.length} categories?`,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete selected!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading on button
+                const OriginalBtnText = $(this).html();
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/pemasukan/bulk-delete',
+                    type: 'DELETE',
+                    data: { ids: ids },
+                    success: function (response) {
+                        showToast(response.message, 'success');
+                        table.ajax.reload();
+                        $('#checkAll').prop('checked', false);
+                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                    },
+                    error: function (xhr) {
+                        showToast('Failed to delete selected categories.', 'danger');
+                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                    }
+                });
+            }
+        });
+    });
+
+    // Reset check all on page change
+    table.on('draw', function () {
+        $('#checkAll').prop('checked', false);
+        $('#checkAll').prop('indeterminate', false);
+        updateBulkButton();
     });
 
     // CSRF Setup
