@@ -76,6 +76,7 @@ class TransaksiController extends Controller
             ->whereNotNull('pemasukan')
             ->selectRaw('pemasukan, SUM(nominal_pemasukan) as total')
             ->groupBy('pemasukan')
+            ->orderBy('total', 'desc')
             ->with('pemasukanRelation')
             ->get();
 
@@ -83,6 +84,7 @@ class TransaksiController extends Controller
             ->whereNotNull('pengeluaran')
             ->selectRaw('pengeluaran, SUM(nominal) as total')
             ->groupBy('pengeluaran')
+            ->orderBy('total', 'desc')
             ->with('pengeluaranRelation')
             ->get();
 
