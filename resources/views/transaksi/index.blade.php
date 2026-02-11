@@ -20,7 +20,7 @@
         <!-- SUMMARY CARDS -->
         <div class="col-md-4 mb-4">
             <div class="card-dashboard h-100 d-flex flex-column justify-content-center">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center mb-2">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light text-success me-3" style="width: 48px; height: 48px; background: rgba(25, 135, 84, 0.1);">
                         <i class="bi bi-arrow-down-circle fs-3"></i>
                     </div>
@@ -29,12 +29,17 @@
                         <h4 class="mb-0 fw-bold text-success">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</h4>
                     </div>
                 </div>
+                <div class="text-end">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#incomeDetailsModal" class="small text-decoration-none text-success fw-bold">
+                        View Details <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
             </div>
         </div>
 
         <div class="col-md-4 mb-4">
              <div class="card-dashboard h-100 d-flex flex-column justify-content-center">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center mb-2">
                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light text-danger me-3" style="width: 48px; height: 48px; background: rgba(220, 53, 69, 0.1);">
                         <i class="bi bi-arrow-up-circle fs-3"></i>
                     </div>
@@ -42,6 +47,11 @@
                         <h6 class="text-muted small text-uppercase mb-1">Total Expense</h6>
                         <h4 class="mb-0 fw-bold text-danger">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</h4>
                     </div>
+                </div>
+                <div class="text-end">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#expenseDetailsModal" class="small text-decoration-none text-danger fw-bold">
+                        View Details <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -326,6 +336,71 @@
         </div>
     </div>
 </section>
+
+<!-- Details Modals -->
+<div class="modal fade" id="incomeDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-success">Income Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                 <ul class="list-group list-group-flush">
+                    @forelse($summaryPemasukan as $row)
+                        @php
+                            $percentage = $totalPemasukan > 0 ? ($row->total / $totalPemasukan) * 100 : 0;
+                        @endphp
+                        <li class="list-group-item border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-medium text-dark">{{ $row->pemasukanRelation->nama ?? 'Uncategorized' }}</span>
+                                <span class="fw-bold text-success small">Rp {{ number_format($row->total, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="text-end text-muted" style="font-size: 10px;">{{ number_format($percentage, 1) }}%</div>
+                        </li>
+                    @empty
+                        <li class="list-group-item text-center text-muted py-3">No data available</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="expenseDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title text-danger fw-bold">Expense Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
+                    @forelse($summaryPengeluaran as $row)
+                         @php
+                            $percentage = $totalPengeluaran > 0 ? ($row->total / $totalPengeluaran) * 100 : 0;
+                        @endphp
+                        <li class="list-group-item border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-medium text-dark">{{ $row->pengeluaranRelation->nama ?? 'Uncategorized' }}</span>
+                                <span class="fw-bold text-danger small">Rp {{ number_format($row->total, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                             <div class="text-end text-muted" style="font-size: 10px;">{{ number_format($percentage, 1) }}%</div>
+                        </li>
+                    @empty
+                         <li class="list-group-item text-center text-muted py-3">No data available</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Import Modal -->
 <div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
