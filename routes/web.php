@@ -79,11 +79,13 @@ Route::resource('/dana-darurat', DanaDaruratController::class)->middleware('auth
 
 // Pemasukan
 Route::middleware(['auth'])->group(function () {
+    Route::delete('/pemasukan/bulk-delete', [PemasukanController::class , 'bulkDelete'])->name('pemasukan.bulkDelete');
     Route::resource('pemasukan', PemasukanController::class);
 });
 
 // Pengeluaran
 Route::middleware(['auth'])->group(function () {
+    Route::delete('/pengeluaran/bulk-delete', [PengeluaranController::class , 'bulkDelete'])->name('pengeluaran.bulkDelete');
     Route::resource('pengeluaran', PengeluaranController::class);
 });
 
@@ -123,6 +125,7 @@ Route::match (['get', 'post'], '/compare', [CompareController::class , 'index'])
 
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
+    Route::delete('/pinjaman/bulk-delete', [PinjamanController::class , 'bulkDelete'])->name('pinjaman.bulkDelete');
     Route::resource('pinjaman', PinjamanController::class);
     Route::post('/pinjaman/{id}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
     Route::delete('/bayar_pinjaman/{id}', [BayarPinjamanController::class , 'destroy'])->name('bayar_pinjaman.destroy');
