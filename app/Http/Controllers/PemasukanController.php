@@ -22,14 +22,14 @@ class PemasukanController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->format('Y-m-d H:i:s');
-                })
+                return $row->created_at->format('Y-m-d H:i:s');
+            })
                 ->editColumn('updated_at', function ($row) {
-                    return $row->updated_at->format('Y-m-d H:i:s');
-                })
+                return $row->updated_at->format('Y-m-d H:i:s');
+            })
                 ->addColumn('aksi', function ($pemasukan) {
-                    return view('pemasukan.tombol')->with('request', $pemasukan);
-                })
+                return view('pemasukan.tombol')->with('request', $pemasukan);
+            })
                 ->toJson();
         }
         return view('pemasukan.index');
@@ -56,7 +56,7 @@ class PemasukanController extends Controller
 
     public function show()
     {
-        // 
+    // 
     }
 
     public function edit($id)
@@ -82,5 +82,26 @@ class PemasukanController extends Controller
     {
         $pemasukan = Pemasukan::findOrFail($id);
         $pemasukan->delete();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pemasukan,id'
+        ]);
+
+        $ids = $validated['ids'];
+
+        // Ensure user owns these records (security)
+        $deleted = Pemasukan::whereIn('id', $ids)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => "$deleted categories deleted successfully."]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No categories found or authorized to delete.'], 404);
     }
 }
