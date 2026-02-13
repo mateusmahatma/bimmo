@@ -1,5 +1,63 @@
 $(document).ready(function () {
-    let table = $("#pinjamanTable").DataTable({
+    // Theme Handler
+    const skin = window.userSkin || 'auto';
+    const updateSkinUrl = window.updateSkinUrl;
+    const csrfToken = window.csrfToken;
+
+    function applyTheme(mode) {
+        if (mode === 'light' || mode === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', mode);
+        } else {
+            document.documentElement.removeAttribute('data-bs-theme'); // auto
+        }
+        document.dispatchEvent(new Event("themeChanged"));
+    }
+
+    // Set Active Theme in Dropdown
+    function highlightActiveSkin(mode) {
+        document.querySelectorAll('.dropdown-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
+                el.classList.add('active');
+            }
+        });
+    }
+
+    function setTheme(mode) {
+        applyTheme(mode);
+        highlightActiveSkin(mode);
+
+        if (updateSkinUrl) {
+            fetch(updateSkinUrl, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ skin: mode })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) alert("Gagal menyimpan tema.");
+                })
+                .catch(err => console.error("Gagal update tema:", err));
+        }
+    }
+
+    // Global Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Eksekusi awal tema
+    applyTheme(skin);
+    highlightActiveSkin(skin);
+    window.setTheme = setTheme;
+
+    // DataTable Initialization
+    const table = $("#pinjamanTable").DataTable({
         paging: true,
         responsive: true,
         lengthChange: true,
@@ -9,66 +67,58 @@ $(document).ready(function () {
         ajax: {
             url: "/pinjaman",
             type: "GET",
-            dataSrc: function (json) {
-                return json.data;
-            },
-            dataSrc: function (json) {
-                $("#totalPinjaman").text(
-                    json.totalPinjaman.toLocaleString("id-ID")
-                );
-                return json.data;
-            },
             data: function (d) {
-                // kirim filter ke controller
                 d.filter_status = $('#filter_status').val();
+            },
+            dataSrc: function (json) {
+                // Update Total Summary
+                if (json.totalPinjaman) {
+                    $("#totalPinjaman").text(json.totalPinjaman);
+                }
+                return json.data;
             }
         },
         columns: [
             {
-                data: "DT_RowIndex",
-                name: "DT_RowIndex",
+                data: 'id',
                 orderable: false,
                 searchable: false,
-                className: "text-center",
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
+                }
             },
-            {
-                data: "nama_pinjaman",
-                name: "nama_pinjaman",
-            },
-            {
-                data: "jumlah_pinjaman",
-                name: "jumlah_pinjaman",
-            },
+            { data: "DT_RowIndex", name: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
+            { data: "nama_pinjaman", name: "nama_pinjaman" },
+            { data: "jumlah_pinjaman", name: "jumlah_pinjaman", className: "text-end" },
             {
                 data: "status",
                 name: "status",
                 className: "text-center",
                 render: function (data) {
                     if (data === "belum_lunas") {
-                        return `
-                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small" style="background-color:#f8d7da; color:#721c24;">
-                            <i class="bi bi-x-circle me-1"></i> Belum Lunas
-                        </span>
-                    `;
+                        return `<span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i> Unpaid</span>`;
                     } else if (data === "lunas") {
-                        return `
-                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small" style="background-color:#d4edda; color:#155724;">
-                            <i class="bi bi-check-circle me-1"></i> Lunas
-                        </span>
-                    `;
+                        return `<span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i> Paid</span>`;
                     }
-                    return data ? data : '<span class="text-muted">-</span>';
+                    return data ? data : '-';
                 }
             },
             {
                 data: "aksi",
                 orderable: false,
                 searchable: false,
+                className: "text-center"
             },
         ],
     });
 
-    // Fungsi untuk menampilkan toast notification
+    // Reload Table on Filter Change
+    $('#filter_status').on('change', function () {
+        table.ajax.reload();
+    });
+
+    // Toast Notification
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
         if (!toastContainer) {
@@ -79,98 +129,35 @@ $(document).ready(function () {
 
         const toastId = 'toast-' + Date.now();
         const colors = {
-            success: '#012970',  // Biru
-            danger: '#dc3545',   // Merah
-            warning: '#ffc107',  // Kuning
-            info: '#17a2b8',     // Biru muda
-            primary: '#007bff',  // Biru
+            success: '#012970',
+            danger: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8',
+            primary: '#007bff',
         };
-
-        const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+        const bgColor = colors[type] || '#6c757d';
 
         const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert">
                 <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
-            </div>
-        `;
+            </div>`;
 
-        // Tambahkan toast ke container
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-
         const toastElement = document.getElementById(toastId);
         const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
         toast.show();
-
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            toastElement.remove();
-        });
+        toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
     }
 
-    // reload saat filter berubah
-    $('#filter_status').on('change', function () {
-        table.ajax.reload();
-    });
+    // Function to handle Save
+    function simpanPinjaman(id = '') {
+        const url = id ? '/pinjaman/' + id : '/pinjaman';
+        const type = id ? 'PUT' : 'POST';
 
-    // Handle tombol edit & proses update
-    $('body').on('click', '.tombol-edit-pinjaman', function (e) {
-        e.preventDefault();
-        var id = $(this).data('id');
-
-        $.ajax({
-            url: '/pinjaman/' + id + '/edit',
-            type: 'GET',
-            success: function (response) {
-                console.log(response); // Debugging
-                $('#pinjamanModal').modal('show'); // Tampilkan modal
-
-                // Isi form dengan data yang diambil
-                $('#nama_pinjaman').val(response.result.nama_pinjaman);
-                $('#jumlah_pinjaman').val(response.result.jumlah_pinjaman);
-                $('#jangka_waktu').val(response.result.jangka_waktu);
-                $('#start_date').val(response.result.start_date);
-                $('#end_date').val(response.result.end_date);
-                $('#status').val(response.result.status);
-
-                // Simpan ID dalam modal untuk digunakan saat menyimpan
-                $('#pinjamanModal').data('id', id);
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
-            }
-        });
-    });
-
-    // Handle tombol simpan pinjaman
-    $('body').on('click', '.tombol-simpan-pinjaman', function () {
-        var id = $('#pinjamanModal').data('id'); // Ambil ID dari modal
-        var url = id ? '/pinjaman/' + id : '/pinjaman'; // Jika ada ID -> Edit, jika tidak -> Tambah
-        var type = id ? 'PUT' : 'POST';
-        var toastMixin = Swal.mixin({
-            toast: true,
-            icon: 'success',
-            title: 'General Title',
-            animation: false,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            },
-            customClass: {
-                title: 'swal2-title-create',
-                popup: 'swal2-popup-create',
-                icon: 'swal2-icon-success'
-            }
-        });
-
-        var formData = {
+        const formData = {
             nama_pinjaman: $('#nama_pinjaman').val().trim(),
             jumlah_pinjaman: $('#jumlah_pinjaman').val().trim(),
             jangka_waktu: $('#jangka_waktu').val().trim(),
@@ -180,105 +167,196 @@ $(document).ready(function () {
         };
 
         if (formData.nama_pinjaman === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Nama Pinjaman Harus Diisi!'
-            });
+            showToast('Nama Pinjaman Harus Diisi!', 'danger');
             return;
         }
 
-        // Tombol loading
-        $('.tombol-simpan-pinjaman').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...');
+        $('.tombol-simpan-pinjaman').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Proses ...');
 
         $.ajax({
             url: url,
             type: type,
             data: formData,
             success: function () {
-                toastMixin.fire({
-                    animation: true,
-                    title: 'Data Berhasil disimpan',
-                    iconColor: '#012970',
-                    customClass: {
-                        title: 'swal2-title-create',
-                        icon: 'swal2-icon-success',
-                    }
-                });
-
-                $('#pinjamanModal').modal('hide'); // Tutup modal
-                $('#pinjamanTable').DataTable().ajax.reload(); // Reload tabel
+                showToast('Data Berhasil disimpan', 'success');
+                $('#pinjamanModal').modal('hide');
+                table.ajax.reload();
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Terjadi kesalahan, coba lagi!'
-                });
+                console.error(xhr.responseText);
+                showToast('Gagal menyimpan data!', 'danger');
             },
             complete: function () {
                 $('.tombol-simpan-pinjaman').prop('disabled', false).html('Simpan');
             }
         });
+    }
+
+    // Handle Add Button
+    $('body').on('click', '.tombol-tambah-pinjaman', function (e) {
+        e.preventDefault();
+        $('#pinjamanModal').find('form')[0].reset(); // Reset form
+        $('#pinjamanModal').modal('show');
+
+        // Remove previous handlers to avoid duplicates
+        $('#pinjamanModal').off('click', '.tombol-simpan-pinjaman')
+            .on('click', '.tombol-simpan-pinjaman', () => simpanPinjaman());
     });
 
-    // Reset modal saat ditutup agar data lama tidak tertinggal
-    $('#pinjamanModal').on('hidden.bs.modal', function () {
-        $(this).removeData('id'); // Hapus ID agar tidak terbawa ke input berikutnya
-        $('#nama_pinjaman, #jumlah_pinjaman, #jangka_waktu, #start_date, #end_date, #status').val('');
-    });
+    // Handle Edit Button
+    $('body').on('click', '.tombol-edit-pinjaman', function (e) {
+        e.preventDefault();
+        const id = $(this).data('id');
 
-    // Global Setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+        $.ajax({
+            url: '/pinjaman/' + id + '/edit',
+            type: 'GET',
+            success: function (response) {
+                $('#pinjamanModal').modal('show');
 
-    let isRequesting = false;
+                // Populate Form
+                $('#nama_pinjaman').val(response.result.nama_pinjaman);
+                $('#jumlah_pinjaman').val(response.result.jumlah_pinjaman);
+                $('#jangka_waktu').val(response.result.jangka_waktu);
+                $('#start_date').val(response.result.start_date);
+                $('#end_date').val(response.result.end_date);
+                $('#status').val(response.result.status);
 
-    // Handle Detail
-    $(document).ready(function () {
-        $("#bayarModal").on("show.bs.modal", function (event) {
-            var button = $(event.relatedTarget);
-            var pinjamanId = button.data("pinjaman-id");
-            var modal = $(this);
-            var form = modal.find("#bayarForm");
-            form.attr("action", "/pinjaman/" + pinjamanId + "/bayar");
-            modal.find("#pinjamanId").val(pinjamanId);
+                $('#pinjamanModal').off('click', '.tombol-simpan-pinjaman')
+                    .on('click', '.tombol-simpan-pinjaman', () => simpanPinjaman(id));
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+            }
         });
     });
 
-    // Handle Delete
-    $("body").on("click", ".tombol-del-pinjaman", function (e) {
+    // Handle Single Delete Button
+    $('body').on('click', '.tombol-del-pinjaman', function (e) {
         e.preventDefault();
+        const id = $(this).data('id');
 
         Swal.fire({
-            title: "Yakin mau hapus data ini?",
+            title: 'Yakin mau hapus data ini?',
             text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: "var(--bs-danger)",
-            cancelButtonColor: "var(--bs-primary)",
-            confirmButtonText: "Ya, hapus!",
-            cancelButtonText: "Batal",
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                var id = $(this).data("id");
-
                 $.ajax({
-                    url: "/pinjaman/" + id,
-                    type: "DELETE",
+                    url: '/pinjaman/' + id,
+                    type: 'DELETE',
                     success: function () {
-                        showToast("Data berhasil dihapus", "success");
-                        $("#pinjamanTable").DataTable().ajax.reload();
+                        showToast('Data Berhasil dihapus', 'success');
+                        table.ajax.reload();
                     },
                     error: function () {
-                        showToast("Data gagal dihapus", "danger");
-                        $("#pinjamanTable").DataTable().ajax.reload();
-                    },
+                        showToast('Gagal menghapus data', 'danger');
+                        table.ajax.reload();
+                    }
                 });
             }
         });
     });
+
+    // ----------------------------------------------------------------
+    // BULK DELETE LOGIC
+    // ----------------------------------------------------------------
+
+    // Check All
+    $(document).on('change', '#checkAll', function () {
+        const isChecked = $(this).is(':checked');
+        $('.check-item').prop('checked', isChecked);
+        updateBulkButton();
+    });
+
+    // Check Item
+    $(document).on('change', '.check-item', function () {
+        var total = $('.check-item').length;
+        var checked = $('.check-item:checked').length;
+
+        $('#checkAll').prop('checked', total === checked);
+        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
+        updateBulkButton();
+    });
+
+    // Update Button Visibility
+    function updateBulkButton() {
+        const checkedCount = $('.check-item:checked').length;
+        $('#countSelected').text(checkedCount);
+        if (checkedCount > 0) {
+            $('#btnBulkDelete').removeClass('d-none');
+        } else {
+            $('#btnBulkDelete').addClass('d-none');
+        }
+    }
+
+    // Handle Bulk Delete Click
+    $('#btnBulkDelete').on('click', function () {
+        const ids = [];
+        $('.check-item:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        Swal.fire({
+            title: `Delete ${ids.length} loans?`,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete selected!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const OriginalBtnText = $(this).html();
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/pinjaman/bulk-delete',
+                    type: 'DELETE',
+                    data: { ids: ids },
+                    success: function (response) {
+                        showToast(response.message, 'success');
+                        table.ajax.reload();
+                        $('#checkAll').prop('checked', false);
+                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                    },
+                    error: function (xhr) {
+                        showToast('Failed to delete selected loans.', 'danger');
+                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                    }
+                });
+            }
+        });
+    });
+
+    // Reset check all on page change
+    table.on('draw', function () {
+        $('#checkAll').prop('checked', false);
+        $('#checkAll').prop('indeterminate', false);
+        updateBulkButton();
+    });
+
+    // Handle Payment Modal (if applicable)
+    $('body').on("click", "[data-bs-target='#bayarModal']", function () {
+        var button = $(this);
+        var pinjamanId = button.data("pinjaman-id");
+        var modal = $("#bayarModal");
+        var form = modal.find("#bayarForm");
+        form.attr("action", "/pinjaman/" + pinjamanId + "/bayar");
+        modal.find("#pinjamanId").val(pinjamanId);
+    });
+
+    // Reset modal on close
+    $('#pinjamanModal').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+
 });
