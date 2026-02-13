@@ -20,7 +20,7 @@ class PinjamanController extends Controller
             // filter status
             if ($request->has('filter_status') && !empty($request->filter_status)) {
                 // pastikan selalu array
-                $filterStatus = (array) $request->filter_status;
+                $filterStatus = (array)$request->filter_status;
                 $data->whereIn('status', $filterStatus);
             }
 
@@ -30,17 +30,17 @@ class PinjamanController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('jumlah_pinjaman', function ($pinjaman) {
-                    return 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
-                })
+                return 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
+            })
                 ->editColumn('jangka_waktu', function ($pinjaman) {
-                    return $pinjaman->jangka_waktu . ' bulan';
-                })
+                return $pinjaman->jangka_waktu . ' bulan';
+            })
                 ->editColumn('status', function ($pinjaman) {
-                    return $pinjaman->status;
-                })
+                return $pinjaman->status;
+            })
                 ->addColumn('aksi', function ($pinjaman) {
-                    return view('pinjaman.tombol', ['pinjaman' => $pinjaman])->with('request', $pinjaman);
-                })
+                return view('pinjaman.tombol', ['pinjaman' => $pinjaman])->with('request', $pinjaman);
+            })
 
                 ->with('totalPinjaman', 'Rp ' . number_format($totalPinjaman, 0, ',', '.'))
                 ->rawColumns(['aksi'])
@@ -135,5 +135,26 @@ class PinjamanController extends Controller
             'success' => true,
             'message' => 'Pinjaman dan semua pembayaran terkait telah dihapus.'
         ]);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pinjaman,id'
+        ]);
+
+        $ids = $validated['ids'];
+
+        // Ensure user owns these records
+        $deleted = Pinjaman::whereIn('id', $ids)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => "$deleted loans deleted successfully."]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No loans found or authorized to delete.'], 404);
     }
 }
