@@ -1,104 +1,132 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <title>Detail Pinjaman</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-
 @extends('layouts.main')
+
+@section('title', 'Loan Details')
+
 @section('container')
-@include('modal.pinjaman.bayar')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Detail Pinjaman</a>
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-        </li>
-    </ul>
-</nav>
+<div class="pagetitle mb-4">
+    <h1>Loan Details</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">Loans</a></li>
+            <li class="breadcrumb-item active">Details</li>
+        </ol>
+    </nav>
+</div>
 
-<div class="card-header">
-    <div class="card-body">
-        <div class="custom-alert" role="alert">
-            <!-- Detail Pinjaman -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    Nama Pinjaman:
-                    <p class="mb-0">{{ $pinjaman->nama_pinjaman }}</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    Jumlah Pinjaman:
-                    <p class="mb-0">Rp {{ number_format($pinjaman->jumlah_pinjaman, 2, ',', '.') }}</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    Jangka Waktu:
-                    <p class="mb-0">{{ $pinjaman->jangka_waktu }} bulan</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    Tanggal Mulai:
-                    <p class="mb-0">{{ $pinjaman->start_date }}</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    Tanggal Berakhir:
-                    <p class="mb-0">{{ $pinjaman->end_date }}</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    Status:
-                    <p class="mb-0 text-capitalize">
-                        @if ($pinjaman->status === 'belum_lunas')
-                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small fw-semibold" style="background-color:#f8d7da; color:#721c24;">Belum Lunas</span>
-                        @elseif ($pinjaman->status === 'lunas')
-                        <span class="d-inline-flex align-items-center px-2 py-1 rounded small fw-semibold" style="background-color:#d4edda; color:#155724;">Lunas</span>
-                        @endif
-                    </p>
+<section class="section">
+    <div class="row">
+        <!-- Loan Information Card -->
+        <div class="col-lg-12 mb-4">
+            <div class="card-dashboard h-100">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold mb-4">Loan Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="small text-muted text-uppercase fw-bold">Loan Name</label>
+                            <p class="fs-5 fw-semibold text-dark">{{ $pinjaman->nama_pinjaman }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted text-uppercase fw-bold">Amount</label>
+                            <p class="fs-5 fw-semibold text-primary">Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted text-uppercase fw-bold">Duration</label>
+                            <p class="mb-0">{{ $pinjaman->jangka_waktu }} Months</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted text-uppercase fw-bold">Start Date</label>
+                            <p class="mb-0">{{ \Carbon\Carbon::parse($pinjaman->start_date)->format('d M Y') }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted text-uppercase fw-bold">End Date</label>
+                            <p class="mb-0">{{ \Carbon\Carbon::parse($pinjaman->end_date)->format('d M Y') }}</p>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="small text-muted text-uppercase fw-bold d-block mb-1">Status</label>
+                            @if ($pinjaman->status === 'belum_lunas')
+                                <span class="badge bg-danger-light text-danger fs-6 px-3 py-2">
+                                    <i class="bi bi-x-circle me-1"></i> Unpaid
+                                </span>
+                            @elseif ($pinjaman->status === 'lunas')
+                                <span class="badge bg-success-light text-success fs-6 px-3 py-2">
+                                    <i class="bi bi-check-circle me-1"></i> Paid
+                                </span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <hr>
-            <p class="mb-0">Harap tinjau kembali nilai-nilai di atas untuk memastikan keakuratan data Anda.</p>
         </div>
 
-        <div class="card-header mb-3 d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Riwayat Pembayaran Pinjaman</h5>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bayarModal" data-pinjaman-id="{{ $pinjaman->id }}">
-                Bayar Pinjaman
-            </button>
-        </div>
+        <!-- Payment History Card -->
+        <div class="col-lg-12">
+            <div class="card-dashboard">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0 fw-bold">Payment History</h5>
+                        @if ($pinjaman->status === 'belum_lunas')
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bayarModal" data-pinjaman-id="{{ $pinjaman->id }}">
+                            <i class="bi bi-wallet2 me-1"></i> Pay Loan
+                        </button>
+                        @endif
+                    </div>
 
-        <table class="customTable">
-            <thead>
-                <tr>
-                    <th style="width: 3%;">No</th>
-                    <th>Jumlah Angsuran</th>
-                    <th>Tanggal Pembayaran</th>
-                    <th style="width: 8%;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $no = 1; @endphp
-                @foreach ($pinjaman->bayar_pinjaman as $bayar_pinjaman)
-                <tr>
-                    <td>{{ $no++ }}</td>
-                    <td>Rp {{ number_format($bayar_pinjaman->jumlah_bayar, 2, ',', '.') }}</td>
-                    <td>{{ $bayar_pinjaman->tgl_bayar }}</td>
-                    <td>
-                        <form action="{{ route('bayar_pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Anda yakin ingin menghapus?')">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-borderless align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 5%;">No</th>
+                                    <th>Amount</th>
+                                    <th>Payment Date</th>
+                                    <th style="width: 10%;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($pinjaman->bayar_pinjaman as $index => $bayar_pinjaman)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td class="fw-bold text-success">Rp {{ number_format($bayar_pinjaman->jumlah_bayar, 0, ',', '.') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($bayar_pinjaman->tgl_bayar)->format('d M Y') }}</td>
+                                    <td>
+                                        <form action="{{ route('bayar_pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this payment record?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" title="Delete Payment">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <i class="bi bi-info-circle me-2"></i> No payment history found.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
+@include('modal.pinjaman.bayar')
+
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
-@endsection
+<script>
+    // Since pinjaman.js handles the modal trigger logic, we ensure it's loaded.
+    // Also, initializing tooltips if any
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+@endpush
