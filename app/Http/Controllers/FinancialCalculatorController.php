@@ -27,25 +27,25 @@ class FinancialCalculatorController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('nama_jenis_pengeluaran', function ($row) {
-                    $ids = $row->jenis_pengeluaran ?? [];
+                $ids = $row->jenis_pengeluaran ?? [];
 
-                    return Pengeluaran::whereIn('id', $ids)
-                        ->pluck('nama')
-                        ->toArray();
-                })
+                return Pengeluaran::whereIn('id', $ids)
+                    ->pluck('nama')
+                    ->toArray();
+            })
 
                 ->addColumn('sisa_anggaran', function ($row) {
-                    $nominal = floatval($row->nominal_anggaran);
-                    $digunakan = floatval($row->anggaran_yang_digunakan);
-                    $sisa = $nominal - $digunakan;
+                $nominal = floatval($row->nominal_anggaran);
+                $digunakan = floatval($row->anggaran_yang_digunakan);
+                $sisa = $nominal - $digunakan;
 
-                    $row->sisa_anggaran = $sisa;
-                    $row->save();
-                    return number_format($sisa, 0, ',', '.');
-                })
+                $row->sisa_anggaran = $sisa;
+                $row->save();
+                return number_format($sisa, 0, ',', '.');
+            })
                 ->addColumn('aksi', function ($request) {
-                    return view('kalkulator.tombol')->with('request', $request);
-                })
+                return view('kalkulator.tombol')->with('request', $request);
+            })
                 ->rawColumns(['aksi'])
                 ->toJson();
         }
@@ -129,10 +129,12 @@ class FinancialCalculatorController extends Controller
                 $decoded = json_decode($jenisPengeluaran, true);
                 if (is_array($decoded)) {
                     $jenisPengeluaran = $decoded;
-                } else {
+                }
+                else {
                     $jenisPengeluaran = [$jenisPengeluaran];
                 }
-            } elseif (is_int($jenisPengeluaran)) {
+            }
+            elseif (is_int($jenisPengeluaran)) {
                 $jenisPengeluaran = [$jenisPengeluaran];
             }
 
@@ -281,6 +283,18 @@ class FinancialCalculatorController extends Controller
         // Ambil ID pengeluaran
         $idPengeluaranList = $HasilProsesAnggaran->jenis_pengeluaran ?? [];
 
+        // Ensure array
+        if (!is_array($idPengeluaranList)) {
+            // Check if it's a JSON string that missed casting or double encoded
+            if (is_string($idPengeluaranList)) {
+                $decoded = json_decode($idPengeluaranList, true);
+                $idPengeluaranList = is_array($decoded) ? $decoded : [$idPengeluaranList];
+            }
+            else {
+                $idPengeluaranList = [$idPengeluaranList];
+            }
+        }
+
         if ($request->ajax()) {
             $query = Transaksi::with('pengeluaranRelation')
                 ->whereIn('pengeluaran', $idPengeluaranList)
@@ -292,17 +306,17 @@ class FinancialCalculatorController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->addColumn('nama', function ($trx) {
-                    return $trx->pengeluaranRelation->nama ?? '-';
-                })
+                return $trx->pengeluaranRelation->nama ?? '-';
+            })
                 ->editColumn('tgl_transaksi', function ($trx) {
-                    return $trx->tgl_transaksi; // JS yang format
-                })
+                return $trx->tgl_transaksi; // JS yang format
+            })
                 ->editColumn('nominal', function ($trx) {
-                    return $trx->nominal;
-                })
+                return $trx->nominal;
+            })
                 ->editColumn('keterangan', function ($trx) {
-                    return $trx->keterangan ?? '-';
-                })
+                return $trx->keterangan ?? '-';
+            })
                 ->make(true);
         }
 
