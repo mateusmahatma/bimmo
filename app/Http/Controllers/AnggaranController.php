@@ -22,7 +22,8 @@ class AnggaranController extends Controller
             $exceedMessage = null;
             if ($totalPersentase > 100) {
                 $exceedMessage = 'Persentase anggaran melebihi 100%!';
-            } elseif ($totalPersentase < 100) {
+            }
+            elseif ($totalPersentase < 100) {
                 $exceedMessage = 'Persentase anggaran kurang dari 100%!';
             }
 
@@ -31,11 +32,18 @@ class AnggaranController extends Controller
                 ->addColumn('nama_anggaran', fn($row) => $row->nama_anggaran)
                 ->addColumn('persentase_anggaran', fn($row) => $row->persentase_anggaran)
                 ->addColumn('list_pengeluaran', function ($row) {
-                    if (empty($row->id_pengeluaran)) return [];
-                    return Pengeluaran::whereIn('id', $row->id_pengeluaran)
-                        ->pluck('nama')
-                        ->toArray();
-                })
+                if (empty($row->id_pengeluaran))
+                    return [];
+                return Pengeluaran::whereIn('id', $row->id_pengeluaran)
+                    ->pluck('nama')
+                    ->toArray();
+            })
+                ->editColumn('created_at', function ($row) {
+                return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '-';
+            })
+                ->editColumn('updated_at', function ($row) {
+                return $row->updated_at ? $row->updated_at->format('Y-m-d H:i:s') : '-';
+            })
                 ->addColumn('aksi', fn($row) => view('anggaran.tombol', ['request' => $row])->render())
                 ->rawColumns(['aksi'])
                 ->with('totalPersentase', $totalPersentase)
@@ -48,13 +56,13 @@ class AnggaranController extends Controller
             ->whereNotNull('id_pengeluaran')
             ->pluck('id_pengeluaran')
             ->map(function ($val) {
-                // kalau tersimpan JSON array → decode dulu
-                if (is_string($val) && str_starts_with($val, '[')) {
-                    return json_decode($val, true);
-                }
-                return $val;
-            })
-            ->flatten()                        // ratakan nested array
+            // kalau tersimpan JSON array → decode dulu
+            if (is_string($val) && str_starts_with($val, '[')) {
+                return json_decode($val, true);
+            }
+            return $val;
+        })
+            ->flatten() // ratakan nested array
             ->filter(fn($id) => is_numeric($id)) // hanya angka
             ->unique()
             ->values()
@@ -62,8 +70,8 @@ class AnggaranController extends Controller
 
         $pengeluarans = Pengeluaran::where('id_user', $userId)
             ->when(!empty($usedPengeluaranIds), function ($q) use ($usedPengeluaranIds) {
-                $q->whereNotIn('id', $usedPengeluaranIds);
-            })
+            $q->whereNotIn('id', $usedPengeluaranIds);
+        })
             ->get();
 
         $anggaran = new Anggaran();
@@ -93,20 +101,28 @@ class AnggaranController extends Controller
 
         // Validasi total melebihi 100%
         if ($newTotal > 100) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => ['persentase_anggaran' => ['Persentase anggaran sudah melebihi 100% mohon dicek kembali.']]], 422);
+            }
             return back()
                 ->withErrors([
-                    'persentase_anggaran' => 'Persentase anggaran sudah melebihi 100% mohon dicek kembali.',
-                ])
+                'persentase_anggaran' => 'Persentase anggaran sudah melebihi 100% mohon dicek kembali.',
+            ])
                 ->withInput();
         }
 
         $validatedData['id_user'] = $userId;
         Anggaran::create($validatedData);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Data berhasil disimpan!']);
+        }
+
         return redirect()->route('anggaran.index')
             ->with('success', 'Data berhasil disimpan!');
     }
 
+    // ... create, edit methods remain same (view based) ...
     public function create()
     {
         $userId = Auth::id();
@@ -114,17 +130,12 @@ class AnggaranController extends Controller
         $usedIds = Anggaran::where('id_user', $userId)
             ->pluck('id_pengeluaran')
             ->flatMap(function ($item) {
-                // Jika sudah array → langsung return
-                if (is_array($item)) {
-                    return $item;
-                }
-                // Jika string JSON → decode
-                if (is_string($item)) {
-                    return json_decode($item, true) ?: [];
-                }
-                // Jika null → abaikan
-                return [];
-            })
+            if (is_array($item))
+                return $item;
+            if (is_string($item))
+                return json_decode($item, true) ?: [];
+            return [];
+        })
             ->unique()
             ->toArray();
 
@@ -157,7 +168,6 @@ class AnggaranController extends Controller
         return view('anggaran.edit', compact('anggaran', 'pengeluarans', 'selectedIds'));
     }
 
-
     public function update(Request $request, $id)
     {
         $userId = Auth::id();
@@ -187,11 +197,14 @@ class AnggaranController extends Controller
         $totalBaru = $totalPersenTerpakai + $request->persentase_anggaran;
 
         if ($totalBaru > 100) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => ['persentase_anggaran' => ['Persentase anggaran sudah melebihi 100% mohon dicek kembali']]], 422);
+            }
             return back()
                 ->withErrors([
-                    'persentase_anggaran' =>
-                    'Persentase anggaran sudah melebihi 100% mohon dicek kembali'
-                ])
+                'persentase_anggaran' =>
+                'Persentase anggaran sudah melebihi 100% mohon dicek kembali'
+            ])
                 ->withInput();
         }
 
@@ -201,6 +214,10 @@ class AnggaranController extends Controller
             'id_pengeluaran' => $request->id_pengeluaran,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Berhasil update anggaran!']);
+        }
+
         return redirect()->route('anggaran.index')
             ->with('success', 'Berhasil update anggaran!');
     }
@@ -208,5 +225,31 @@ class AnggaranController extends Controller
     public function destroy($id)
     {
         $id = Anggaran::where('id_anggaran', $id)->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Data deleted successfully']);
+        }
+        return redirect()->back();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:anggaran,id_anggaran' // Adjusted to id_anggaran based on destroy method usage
+        ]);
+
+        $ids = $validated['ids'];
+
+        // Ensure user owns these records
+        $deleted = Anggaran::whereIn('id_anggaran', $ids)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => "$deleted budgets deleted successfully."]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No budgets found or authorized to delete.'], 404);
     }
 }
