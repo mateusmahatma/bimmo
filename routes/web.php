@@ -52,6 +52,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
         '/dashboard/toggle-nominal-ajax',
     [DashboardController::class , 'toggleNominalAjax']
     )->name('dashboard.toggle-nominal.ajax');
+    Route::get('/filter', [DashboardController::class , 'filter'])->name('dashboard.filter');
 });
 
 // Anggaran
