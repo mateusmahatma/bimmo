@@ -64,20 +64,38 @@ $(document).ready(function () {
                 data: 'id',
                 orderable: false,
                 searchable: false,
-                className: 'text-center',
+                className: 'align-middle text-center',
                 render: function (data, type, row) {
-                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
+                    return `<div class="form-check d-flex justify-content-center"><input class="form-check-input check-item" type="checkbox" value="${data}" style="cursor: pointer;"></div>`;
                 }
             },
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
-            { data: 'nama', className: 'text-center' },
-            { data: 'created_at', className: 'text-center' },
-            { data: 'updated_at', className: 'text-center' },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'align-middle text-center text-secondary fw-medium' },
+            {
+                data: 'nama',
+                className: 'align-middle fw-semibold text-dark',
+                render: function (data) {
+                    return `<span style="font-size: 0.95rem;">${data}</span>`;
+                }
+            },
+            {
+                data: 'created_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
+                }
+            },
+            {
+                data: 'updated_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
+                }
+            },
             {
                 data: 'aksi',
                 orderable: false,
                 searchable: false,
-                className: "text-center",
+                className: "align-middle text-center",
                 render: function (data) {
                     return data;
                 },
@@ -126,23 +144,23 @@ $(document).ready(function () {
         const nama = $('#nama').val().trim();
 
         if (nama === '') {
-            showToast('Nama Harus Diisi!', 'danger');
+            showToast('Name is required!', 'danger');
             return;
         }
 
-        $('.tombol-simpan-pemasukan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Proses ...');
+        $('.tombol-simpan-pemasukan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing ...');
 
         $.ajax({
             url,
             type: method,
             data: { nama },
             success: () => {
-                showToast('Data Berhasil disimpan', 'success');
+                showToast('Data saved successfully', 'success');
                 $('#pemasukanModal').modal('hide');
                 table.ajax.reload();
             },
             complete: () => {
-                $('.tombol-simpan-pemasukan').prop('disabled', false).html('Simpan');
+                $('.tombol-simpan-pemasukan').prop('disabled', false).html('Save');
             }
         });
     }
@@ -178,14 +196,14 @@ $(document).ready(function () {
         const id = $(this).data('id');
 
         Swal.fire({
-            title: 'Yakin mau hapus data ini?',
-            html: 'Data yang dihapus tidak dapat dikembalikan!',
+            title: 'Are you sure?',
+            html: 'You will not be able to recover this data!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
             customClass: { popup: 'dark-mode' }
         }).then((result) => {
             if (result.isConfirmed) {
@@ -193,11 +211,11 @@ $(document).ready(function () {
                     url: `/pemasukan/${id}`,
                     type: 'DELETE',
                     success: () => {
-                        showToast('Data Berhasil dihapus', 'success');
+                        showToast('Data deleted successfully', 'success');
                         table.ajax.reload();
                     },
                     error: () => {
-                        showToast('Delete failed, data in cash flow', 'danger');
+                        showToast('Delete failed, data might be in use', 'danger');
                         table.ajax.reload();
                     }
                 });
