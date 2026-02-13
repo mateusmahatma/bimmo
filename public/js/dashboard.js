@@ -296,8 +296,36 @@ document.addEventListener("DOMContentLoaded", function () {
         renderCashFlowChart(cashFlowData, 6);
         renderIncomeExpenseChart(incomeExpenseData, 6);
 
-        const filter = document.getElementById("filterPeriod");
-        if (filter) filter.addEventListener("change", handleFilterChange);
+
+        const filterPeriode = document.getElementById("filterPeriode");
+        if (filterPeriode) {
+            filterPeriode.addEventListener("change", function () {
+                const periode = this.value;
+
+                // Update Label
+                const cashFlowLabel = document.getElementById("cashFlowPeriodeLabel");
+                const savingRateLabel = document.getElementById("savingRatePeriodeLabel");
+                if (cashFlowLabel) cashFlowLabel.textContent = `(${periode} months ago)`;
+                if (savingRateLabel) savingRateLabel.textContent = `(${periode} bulan terakhir)`;
+
+                // AJAX Update Table & Charts
+                fetch(`${window.dashboardFilterUrl}?periode=${periode}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("cashflowTableContainer").innerHTML = data.cashflow;
+                        document.getElementById("savingRateTableContainer").innerHTML = data.savingRate;
+
+                        // Update Charts
+                        if (window.renderCashflowChart && data.chartData && data.chartData.cashflow) {
+                            window.renderCashflowChart(data.chartData.cashflow);
+                        }
+                        if (window.renderSavingRateChart && data.chartData && data.chartData.savingRate) {
+                            window.renderSavingRateChart(data.chartData.savingRate);
+                        }
+                    })
+                    .catch(err => console.error("Error fetching filtered data:", err));
+            });
+        }
     }).catch(err => {
         console.error("Gagal memuat data chart:", err);
     });
@@ -695,18 +723,34 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Inisialisasi
-    const filterMonth = document.getElementById("filterMonth");
-    const filterYear = document.getElementById("filterYear");
+    const filterBulan = document.getElementById("filterBulan");
+    const filterTahun = document.getElementById("filterTahun");
 
-    if (filterMonth && filterYear) {
-        fetchDataAndRenderChart(filterMonth.value, filterYear.value);
+    function updateExpenseTable(month, year) {
+        if (!month || !year) return;
+        fetch(`${window.dashboardFilterUrl}?bulan=${month}&tahun=${year}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("expenseBarTableContainer").innerHTML = data.expenseBar;
+                document.getElementById("totalPengeluaranValue").textContent = "Rp " + data.totalPengeluaran;
+            })
+            .catch(err => console.error("Error fetching expense bar table:", err));
+    }
 
-        filterMonth.addEventListener("change", () => {
-            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-        });
-        filterYear.addEventListener("change", () => {
-            fetchDataAndRenderChart(filterMonth.value, filterYear.value);
-        });
+    if (filterBulan && filterTahun) {
+        // Initial load
+        fetchDataAndRenderChart(filterBulan.value, filterTahun.value);
+        // Table is already loaded by blade, but we could reload it to be safe, or just leave it.
+
+        const updateAll = () => {
+            const m = filterBulan.value;
+            const y = filterTahun.value;
+            fetchDataAndRenderChart(m, y);
+            updateExpenseTable(m, y);
+        };
+
+        filterBulan.addEventListener("change", updateAll);
+        filterTahun.addEventListener("change", updateAll);
     } else {
         console.error("Filter elements tidak ditemukan!");
     }
