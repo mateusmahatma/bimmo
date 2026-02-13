@@ -14,25 +14,25 @@
 
         <!-- Anggaran -->
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }} disabled"
+            <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }}"
                 data-bs-toggle="collapse" href="#menuAnggaran" role="button">
-                <i class="bi bi-wallet2 me-2 disabled"></i>
-                <span>Anggaran</span>
+                <i class="bi bi-wallet2 me-2"></i>
+                <span>Budget</span>
                 <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
 
             <div class="collapse {{ Request::is('anggaran*','kalkulator*') ? 'show' : '' }}" id="menuAnggaran">
                 <ul class="nav flex-column ms-4">
                     <li class="nav-item">
-                        <a class="nav-link sub-link {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran" class="disabled">
+                        <a class="nav-link sub-link {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
                             <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                            Kategori Anggaran
+                            Budget Categories
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link sub-link {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator" class="disabled">
+                        <a class="nav-link sub-link {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator">
                             <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                            Monitoring Anggaran
+                            Budget Monitoring
                         </a>
                     </li>
                 </ul>
@@ -52,7 +52,7 @@
                     <li class="nav-item">
                         <a class="nav-link sub-link {{ Request::is('barang') ? 'active' : '' }}" href="/barang" class="disabled">
                             <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                            Aset
+                            Assets
                         </a>
                     </li>
                     <li class="nav-item">
