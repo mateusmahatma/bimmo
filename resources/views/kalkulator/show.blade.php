@@ -1,129 +1,139 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <title>Detail Anggaran</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-
 @extends('layouts.main')
+
+@section('title', 'Detail Kalkulasi Anggaran')
+
+@push('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+@endpush
+
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Detail Anggaran</a>
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-        </li>
-    </ul>
-</nav>
+<div class="pagetitle mb-4">
+    <h1>Detail Kalkulasi Anggaran</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('kalkulator.index') }}">Kalkulator Anggaran</a></li>
+            <li class="breadcrumb-item active">Detail</li>
+        </ol>
+    </nav>
+</div>
 
-<div class="card-header">
-    <div class="card-body">
-        <div class="custom-alert" role="alert">
-            <div style="display: flex; gap: 30px; align-items: flex-start;">
-                <table class="customTable2">
-                    <tbody>
-                        <tr>
-                            <th>Nama Anggaran</th>
-                            <th>:</th>
-                            <td>{{ $HasilProsesAnggaran->nama_anggaran }}</td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal Mulai Anggaran</th>
-                            <th>:</th>
-                            <td>{{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_mulai)->locale('id')->isoFormat('D MMMM Y') }}</td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal Akhir Anggaran</th>
-                            <th>:</th>
-                            <td>{{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_selesai)->locale('id')->isoFormat('D MMMM Y') }}</td>
-                        </tr>
-                        <tr>
-                            <th>Persentase Anggaran</th>
-                            <th>:</th>
-                            <td>{{ $HasilProsesAnggaran->persentase_anggaran }}%</td>
-                        </tr>
-                        <tr>
-                            <th>Nominal Anggaran</th>
-                            <th>:</th>
-                            <td>Rp {{ number_format($HasilProsesAnggaran->nominal_anggaran, 2, ',', '.') }}</td>
-                        </tr>
-                        <tr>
-                            <th>Sisa Anggaran</th>
-                            <th>:</th>
-                            <td>
-                                Rp {{ number_format($HasilProsesAnggaran->sisa_anggaran, 2, ',', '.') }} <br>
+<section class="section">
+    <div class="row">
+        <!-- Overview Card -->
+        <div class="col-lg-12">
+            <div class="card-dashboard mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title fw-bold mb-0">Informasi Anggaran</h5>
+                        <a href="{{ route('kalkulator.index') }}" class="btn btn-light btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i> Kembali
+                        </a>
+                    </div>
 
-                                @php
-                                $sisa = $HasilProsesAnggaran->sisa_anggaran;
-                                @endphp
-
-                                @if ($sisa < 0)
-                                    <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small"
-                                    style="background-color:#f8d7da; color:#721c24; font-size:10px;">
-                                    <i class="bi bi-x-circle me-1" style="font-size:10px;"></i>
-                                    Melebihi Anggaran
-                                    </span>
-                                    @else
-                                    <span class="d-inline-flex align-items-center px-1 py-0.5 rounded small"
-                                        style="background-color:#d4edda; color:#155724; font-size:10px;">
-                                        <i class="bi bi-check-circle me-1" style="font-size:10px;"></i>
-                                        Sesuai Anggaran
-                                    </span>
-                                    @endif
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Tabel Jenis Pengeluaran di kanan -->
-                <table class="customTable2">
-                    <tbody>
-                        <tr>
-                            <th class="align-top">Jenis Pengeluaran</th>
-                            <th class="align-top">:</th>
-                            <td>
-                                <ol id="list-pengeluaran" class="mb-0">
-                                    @foreach ($namaPengeluaran as $index => $nama)
-                                    <li class="{{ $index >= 3 ? 'hidden-item' : '' }}">{{ $nama }}</li>
-                                    @endforeach
-                                </ol>
-
-                                @if ($total > 3)
-                                <button id="toggleButton" type="button" class="btn btn-sm btn-primary mt-2">
-                                    Show more
-                                </button>
-                                @endif
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted small text-uppercase fw-bold" style="width: 140px;">Nama Anggaran</td>
+                                        <td class="fw-medium">: {{ $HasilProsesAnggaran->nama_anggaran }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted small text-uppercase fw-bold">Periode</td>
+                                        <td class="fw-medium">: 
+                                            {{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_mulai)->locale('id')->isoFormat('D MMM Y') }} 
+                                            s/d 
+                                            {{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted small text-uppercase fw-bold">Jenis Pengeluaran</td>
+                                        <td>
+                                            <ul class="list-unstyled mb-0">
+                                                @foreach ($namaPengeluaran as $index => $nama)
+                                                    @if($index < 5)
+                                                        <li><i class="bi bi-dot text-secondary"></i> {{ $nama }}</li>
+                                                    @endif
+                                                @endforeach
+                                                @if(count($namaPengeluaran) > 5)
+                                                    <li class="text-muted fst-italic ms-3 small">+{{ count($namaPengeluaran) - 5 }} lainnya</li>
+                                                @endif
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light border-0 h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted small text-uppercase fw-bold mb-3">Ringkasan Keuangan</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Nominal Anggaran:</span>
+                                        <span class="fw-bold">Rp {{ number_format($HasilProsesAnggaran->nominal_anggaran, 0, ',', '.') }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Terpakai:</span>
+                                        <span class="fw-bold text-danger">Rp {{ number_format($HasilProsesAnggaran->anggaran_yang_digunakan, 0, ',', '.') }}</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Sisa Anggaran:</span>
+                                        <div class="text-end">
+                                            @php $sisa = $HasilProsesAnggaran->sisa_anggaran; @endphp
+                                            <h5 class="mb-0 fw-bold {{ $sisa < 0 ? 'text-danger' : 'text-success' }}">
+                                                Rp {{ number_format($sisa, 0, ',', '.') }}
+                                            </h5>
+                                            @if ($sisa < 0)
+                                                <span class="badge bg-danger-subtle text-danger small">Over Budget</span>
+                                            @else
+                                                <span class="badge bg-success-subtle text-success small">Sesuai Anggaran</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <input type="hidden" id="kalkulator-id" value="{{ $HasilProsesAnggaran->id_proses_anggaran }}">
+        <!-- Detail Table -->
+        <div class="col-lg-12">
+            <div class="card-dashboard">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold mb-4">Rincian Transaksi Terkait</h5>
+                    
+                    <input type="hidden" id="kalkulator-id" value="{{ $HasilProsesAnggaran->id_proses_anggaran }}">
 
-        <table id="detailAnggaran" class="customTable">
-            <thead>
-                <tr>
-                    <th style="width: 1%;">No</th>
-                    <th>Tanggal Transaksi</th>
-                    <th>Jenis Pengeluaran</th>
-                    <th>Nominal</th>
-                    <th style="width:35%">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-
-
+                    <div class="table-responsive">
+                        <table id="detailAnggaran" class="table table-hover table-borderless align-middle" style="width:100%">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 5%;">No</th>
+                                    <th>Tanggal</th>
+                                    <th>Kategori Pengeluaran</th>
+                                    <th class="text-end">Nominal</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
 @endsection
 
-@section('scripts')
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="{{ asset('js/kalkulator.js') }}?v={{ filemtime(public_path('js/kalkulator.js')) }}"></script>
-@endsection
+@endpush
