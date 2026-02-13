@@ -83,6 +83,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pemasukan', PemasukanController::class);
 });
 
+// Anggaran
+Route::middleware(['auth'])->group(function () {
+    Route::delete('/anggaran/bulk-delete', [AnggaranController::class , 'bulkDelete'])->name('anggaran.bulkDelete');
+    Route::resource('anggaran', AnggaranController::class);
+});
+
 // Pengeluaran
 Route::middleware(['auth'])->group(function () {
     Route::delete('/pengeluaran/bulk-delete', [PengeluaranController::class , 'bulkDelete'])->name('pengeluaran.bulkDelete');
