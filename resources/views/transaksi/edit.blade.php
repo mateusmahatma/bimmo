@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 
 <head>
-    <title>Transaksi</title>
+    <title>Edit Transaction</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -12,7 +12,7 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Edit Data Transaksi</a>
+    <a class="navbar-brand" href="#">Edit Transaction</a>
 </nav>
 
 <div class="card-header">
@@ -31,15 +31,15 @@
             @method('PUT')
 
             <div class="mt-3 mb-3">
-                <label for="tgl_transaksi" class="form-label required">Tanggal Transaksi</label>
+                <label for="tgl_transaksi" class="form-label required">Transaction Date</label>
                 <input name="tgl_transaksi" class="form-control" type="date"
                     value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi) }}">
             </div>
 
             <div class="mb-3">
-                <label for="pemasukan" class="col-form-label">Pemasukan</label>
+                <label for="pemasukan" class="col-form-label">Income</label>
                 <select class="form-select" id="pemasukan" name="pemasukan">
-                    <option value="">- Pilih -</option>
+                    <option value="">- Select -</option>
                     @foreach ($pemasukan as $item)
                     <option value="{{ $item->id }}"
                         {{ old('pemasukan', $transaksi->pemasukan) == $item->id ? 'selected' : '' }}>
@@ -51,15 +51,15 @@
 
             <div class="input-group mb-3">
                 <span class="input-group-text">Rp</span>
-                <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control" placeholder="Nominal Pemasukan"
+                <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control" placeholder="Income Amount"
                     value="{{ old('nominal_pemasukan', $transaksi->nominal_pemasukan) }}">
                 <span class="input-group-text">.00</span>
             </div>
 
             <div class="mb-3">
-                <label for="pengeluaran" class="col-form-label">Pengeluaran</label>
+                <label for="pengeluaran" class="col-form-label">Expense</label>
                 <select class="form-select" id="pengeluaran" name="pengeluaran">
-                    <option value="">- Pilih -</option>
+                    <option value="">- Select -</option>
                     @foreach ($pengeluaran as $item)
                     <option value="{{ $item->id }}"
                         {{ old('pengeluaran', $transaksi->pengeluaran) == $item->id ? 'selected' : '' }}>
@@ -70,14 +70,14 @@
 
             <div class="input-group mb-3">
                 <span class="input-group-text">Rp</span>
-                <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Nominal Pengeluaran"
+                <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Expense Amount"
                     value="{{ old('nominal', $transaksi->nominal) }}">
                 <span class="input-group-text">.00</span>
             </div>
 
             <div class="custom-alert">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold">Masukkan nominal ke Aset/Dana Darurat</h5>
+                    <h5 class="mb-0 fw-semibold">Add amount to Assets/Emergency Fund</h5>
                     <button id="toggleBtn" type="button" class="btn btn-sm btn-outline-secondary">
                         <span id="toggleIcon">+</span>
                     </button>
@@ -88,17 +88,17 @@
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" value="asset_list" id="checkAssetList" name="kategori[]">
                             <label class="form-check-label" for="checkAssetList">
-                                Masukkan ke Daftar Aset
+                                Add to Asset List
                                 <small class="text-muted d-block">
-                                    Jika Anda mencentang opsi ini, transaksi akan ditambahkan ke daftar aset.
+                                    If checked, this transaction will be recorded in the asset list.
                                 </small>
                             </label>
                         </div>
 
                         <div class="mb-3" id="selectBarangContainer" style="display: none;">
-                            <label for="barang_id" class="form-label">Pilih Aset</label>
+                            <label for="barang_id" class="form-label">Select Asset</label>
                             <select class="form-select" id="barang_id" name="barang_id">
-                                <option value="">- Pilih -</option>
+                                <option value="">- Select -</option>
                                 @foreach ($barang as $barang)
                                 <option value="{{ $barang->id }}">{{ $barang->nama_barang }}</option>
                                 @endforeach
@@ -111,9 +111,9 @@
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" value="emergency_fund" id="checkEmergencyFund" name="kategori[]">
                             <label class="form-check-label" for="checkEmergencyFund">
-                                Masukkan ke Dana Darurat
+                                Add to Emergency Fund
                                 <small class="text-muted d-block">
-                                    Jika Anda mencentang opsi ini, transaksi akan ditambahkan ke dana darurat.
+                                    If checked, this transaction will be recorded in the emergency fund.
                                 </small>
                             </label>
                         </div>
@@ -122,21 +122,21 @@
                         <div id="danaDaruratContainer" style="display: none;">
 
                             <div class="mb-3">
-                                <label class="form-label">Jenis Transaksi Dana Darurat</label>
+                                <label class="form-label">Emergency Fund Transaction Type</label>
                                 <select name="jenis_transaksi_dana_darurat" class="form-select">
-                                    <option value="">-- Pilih Jenis --</option>
-                                    <option value="1">Dana Masuk</option>
-                                    <option value="2">Dana Keluar</option>
+                                    <option value="">-- Select Type --</option>
+                                    <option value="1">Fund In</option>
+                                    <option value="2">Fund Out</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Nominal Dana Darurat</label>
-                                <input type="number" name="nominal_dana_darurat" class="form-control" placeholder="Nominal">
+                                <label class="form-label">Emergency Fund Amount</label>
+                                <input type="number" name="nominal_dana_darurat" class="form-control" placeholder="Amount">
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Keterangan Dana Darurat</label>
+                                <label class="form-label">Emergency Fund Note</label>
                                 <textarea name="keterangan_dana_darurat" class="form-control" rows="2"></textarea>
                             </div>
                         </div>
@@ -145,10 +145,10 @@
             </div>
 
             <div class="mb-3">
-                <label for="keterangan" class="col-form-label">Keterangan</label>
-                <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Keterangan">{{ old('keterangan', $transaksi->keterangan) }}</textarea>
+                <label for="keterangan" class="col-form-label">Description</label>
+                <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Description">{{ old('keterangan', $transaksi->keterangan) }}</textarea>
             </div>
-            <button type="submit" class="btn btn-success">Simpan</button>
+            <button type="submit" class="btn btn-success">Save</button>
         </form>
     </div>
 </div>
@@ -184,7 +184,7 @@
         function initTomSelect(selector) {
             new TomSelect(selector, {
                 allowEmptyOption: true,
-                placeholder: '- Pilih -',
+                placeholder: '- Select -',
                 create: false,
                 onInitialize: function() {
                     if (!this.getValue()) {
