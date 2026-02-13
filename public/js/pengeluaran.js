@@ -64,20 +64,41 @@ $(document).ready(function () {
                 data: 'id',
                 orderable: false,
                 searchable: false,
-                className: 'text-center',
+                className: 'align-middle text-center',
                 render: function (data, type, row) {
-                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
+                    return `<div class="form-check d-flex justify-content-center"><input class="form-check-input check-item" type="checkbox" value="${data}" style="cursor: pointer;"></div>`;
                 }
             },
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
-            { data: 'nama', className: 'text-center' },
-            { data: 'created_at', className: 'text-center' },
-            { data: 'updated_at', className: 'text-center' },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'align-middle text-center text-secondary fw-medium' },
+            {
+                data: 'nama',
+                className: 'align-middle fw-semibold text-dark',
+                render: function (data) {
+                    return `<span style="font-size: 0.95rem;">${data}</span>`;
+                }
+            },
+            {
+                data: 'created_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
+                }
+            },
+            {
+                data: 'updated_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
+                }
+            },
             {
                 data: 'aksi',
                 orderable: false,
                 searchable: false,
-                className: "text-center",
+                className: "align-middle text-center",
+                render: function (data) {
+                    return data;
+                },
             }
         ]
     });
@@ -93,14 +114,14 @@ $(document).ready(function () {
 
         const toastId = 'toast-' + Date.now();
         const colors = {
-            success: '#012970',  // Biru
-            danger: '#dc3545',   // Merah
-            warning: '#ffc107',  // Kuning
-            info: '#17a2b8',     // Biru muda
-            primary: '#007bff',  // Biru
+            success: '#012970',
+            danger: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8',
+            primary: '#007bff',
         };
 
-        const bgColor = colors[type] || '#6c757d'; // Default ke abu-abu jika tipe tidak ada
+        const bgColor = colors[type] || '#6c757d';
 
         const toastHtml = `
             <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
@@ -113,7 +134,6 @@ $(document).ready(function () {
             </div>
         `;
 
-        // Tambahkan toast ke container
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
 
         const toastElement = document.getElementById(toastId);
@@ -130,41 +150,28 @@ $(document).ready(function () {
         var url = id ? '/pengeluaran/' + id : '/pengeluaran';
         var type = id ? 'PUT' : 'POST';
 
-        isRequesting = true;
-
-        if (id !== '') {
-            // For Edit, we handle inside the edit click event primarily, but this is used if we extract it.
-        }
-
-        // Note: The logic here was a bit nested in the original code (modal event inside simpan function). 
-        // I'll clean it up to match the improved Pemasukan pattern but maintain original ID handling if possible.
-        // Actually, let's stick to the cleaner pattern used in pemasukan.js 
-        // BUT wait, pengeluaran.js had: $('#pengeluaranModal').on('shown.bs.modal', function () { ...
-        // This causes multiple bindings if not handled. Pemasukan.js uses .off().on().
-        // I will implement the cleaner Pemasukan.js pattern here for consistency.
-
         var formData = {
             nama: $('#nama').val().trim()
         };
 
         if (formData.nama === '') {
-            showToast('Nama Harus Diisi!', 'danger');
+            showToast('Category name is required!', 'danger');
             return;
         }
 
-        $('.tombol-simpan-pengeluaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Proses ...');
+        $('.tombol-simpan-pengeluaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing ...');
 
         $.ajax({
             url: url,
             type: type,
             data: formData,
             success: function () {
-                showToast('Data Berhasil disimpan', 'success');
+                showToast('Data saved successfully', 'success');
                 $('#pengeluaranModal').modal('hide');
                 table.ajax.reload();
             },
             complete: function () {
-                $('.tombol-simpan-pengeluaran').prop('disabled', false).html('Simpan');
+                $('.tombol-simpan-pengeluaran').prop('disabled', false).html('Save');
             }
         });
     }
@@ -196,50 +203,46 @@ $(document).ready(function () {
         });
     });
 
-    let deleteId = null;
-
-    // Saat tombol hapus diklik (Single Delete)
+    // Single Delete (using SweetAlert now)
     $('body').on('click', '.tombol-del-pengeluaran', function (e) {
         e.preventDefault();
-        deleteId = $(this).data('id');
-        // tampilkan modal konfirmasi
-        $('#confirmDeleteModal').modal('show');
-    });
+        const id = $(this).data('id');
 
-    // Saat tombol konfirmasi hapus diklik
-    $('#btnConfirmDelete').on('click', function () {
-        if (!deleteId) return;
-
-        $.ajax({
-            url: '/pengeluaran/' + deleteId,
-            type: 'DELETE',
-            success: function () {
-                showToast('Data Berhasil dihapus', 'success');
-                $('#pengeluaranTable').DataTable().ajax.reload();
-            },
-            error: function () {
-                showToast('Data Gagal dihapus', 'danger');
-                $('#pengeluaranTable').DataTable().ajax.reload(); // Still reload
-            },
-            complete: function () {
-                $('#confirmDeleteModal').modal('hide');
-                deleteId = null;
+        Swal.fire({
+            title: 'Are you sure?',
+            html: 'You will not be able to recover this data!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: { popup: 'dark-mode' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/pengeluaran/${id}`,
+                    type: 'DELETE',
+                    success: () => {
+                        showToast('Data deleted successfully', 'success');
+                        table.ajax.reload();
+                    },
+                    error: () => {
+                        showToast('Delete failed, data might be in use', 'danger');
+                        table.ajax.reload();
+                    }
+                });
             }
         });
     });
 
-    // ----------------------------------------------------------------
-    // BULK DELETE LOGIC
-    // ----------------------------------------------------------------
-
-    // Check All
+    // Bulk Delete Logic
     $(document).on('change', '#checkAll', function () {
         const isChecked = $(this).is(':checked');
         $('.check-item').prop('checked', isChecked);
         updateBulkButton();
     });
 
-    // Check Item
     $(document).on('change', '.check-item', function () {
         var total = $('.check-item').length;
         var checked = $('.check-item:checked').length;
@@ -249,7 +252,6 @@ $(document).ready(function () {
         updateBulkButton();
     });
 
-    // Update Button Visibility
     function updateBulkButton() {
         const checkedCount = $('.check-item:checked').length;
         $('#countSelected').text(checkedCount);
@@ -260,7 +262,6 @@ $(document).ready(function () {
         }
     }
 
-    // Handle Bulk Delete Click
     $('#btnBulkDelete').on('click', function () {
         const ids = [];
         $('.check-item:checked').each(function () {
@@ -268,13 +269,6 @@ $(document).ready(function () {
         });
 
         if (ids.length === 0) return;
-
-        // Use SweetAlert for bulk delete confirmation for consistency with new UI, 
-        // or use the existing modal? 
-        // Existing modal is designed for single delete (confirmDeleteModal).
-        // Let's use SweetAlert to match Pemasukan behavior, assuming SweetAlert is available.
-        // If not, we fall back to standard confirm or reused modal.
-        // Based on pemasukan.index we loaded SweetAlert. We should ensure it's loaded here too.
 
         Swal.fire({
             title: `Delete ${ids.length} categories?`,
