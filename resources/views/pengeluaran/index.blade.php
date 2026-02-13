@@ -21,43 +21,42 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
-            <div class="card-dashboard">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div>
-                                <h5 class="card-title mb-0 fw-bold">List of Expense Categories</h5>
-                                <p class="text-muted small mb-0">Manage your expense types here.</p>
-                            </div>
-                            <button id="btnBulkDelete" class="btn btn-danger btn-sm d-none">
-                                <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
-                            </button>
-                        </div>
-                        <button type="button" class="btn btn-success tombol-tambah-pengeluaran">
-                            <i class="bi bi-plus-lg me-1"></i> Add New Category
+            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">List of Expense Categories</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage your expense classification and types efficiently.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
+                            <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 tombol-tambah-pengeluaran shadow-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Category
                         </button>
                     </div>
+                </div>
 
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table id="pengeluaranTable" class="table table-hover table-borderless align-middle" style="width:100%">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 5%;" class="text-center">
-                                        <input class="form-check-input" type="checkbox" id="checkAll">
+                        <table id="pengeluaranTable" class="table table-hover align-middle mb-0" style="width:100%">
+                            <thead class="bg-light">
+                                <tr style="border-bottom: 2px solid #edf2f9;">
+                                    <th style="width: 5%;" class="text-center py-3">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" id="checkAll" style="cursor: pointer;">
+                                        </div>
                                     </th>
-                                    <th style="width: 5%;">No</th>
-                                    <th>Name</th>
-                                    <th class="text-center">Created At</th>
-                                    <th class="text-center">Last Updated</th>
-                                    <th style="width: 10%;">Action</th>
+                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">No</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Category Name</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Created At</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Last Updated</th>
+                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {{-- DataTables will populate this --}}
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
