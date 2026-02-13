@@ -45,7 +45,7 @@
                             <!-- Income Section -->
                             <div class="col-md-6">
                                 <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #198754 !important;">
-                                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> Income (Pemasukan)</h6>
+                                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> Income</h6>
                                     
                                     <div class="mb-3">
                                         <label for="pemasukan" class="form-label small text-muted">Category</label>
@@ -70,7 +70,7 @@
                             <!-- Expense Section -->
                             <div class="col-md-6">
                                 <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #dc3545 !important;">
-                                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> Expense (Pengeluaran)</h6>
+                                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> Expense</h6>
                                     
                                     <div class="mb-3">
                                         <label for="pengeluaran" class="form-label small text-muted">Category</label>
@@ -136,8 +136,8 @@
                                                 <label class="form-label small text-muted">Type</label>
                                                 <select name="jenis_transaksi_dana_darurat" class="form-select">
                                                     <option value="">-- Select Type --</option>
-                                                    <option value="1">Fund In (Masuk)</option>
-                                                    <option value="2">Fund Out (Keluar)</option>
+                                                    <option value="1">Fund In</option>
+                                                    <option value="2">Fund Out</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
