@@ -19,31 +19,54 @@ class DashboardController extends Controller
     protected function getDashboardNumbers()
     {
         $userId = Auth::id();
+        $now = now();
+        $lastMonth = now()->subMonth();
 
+        // THIS MONTH
         $pemasukanBulanIni = Transaksi::where('id_user', $userId)
-            ->whereMonth('tgl_transaksi', now()->month)
-            ->whereYear('tgl_transaksi', now()->year)
+            ->whereMonth('tgl_transaksi', $now->month)
+            ->whereYear('tgl_transaksi', $now->year)
             ->sum('nominal_pemasukan');
 
         $pengeluaranBulanIni = Transaksi::where('id_user', $userId)
-            ->whereMonth('tgl_transaksi', now()->month)
-            ->whereYear('tgl_transaksi', now()->year)
+            ->whereMonth('tgl_transaksi', $now->month)
+            ->whereYear('tgl_transaksi', $now->year)
             ->sum('nominal');
 
         $pengeluaranHariIni = Transaksi::where('id_user', $userId)
-            ->whereDate('tgl_transaksi', now())
+            ->whereDate('tgl_transaksi', $now)
             ->sum('nominal');
 
         $saldo = $pemasukanBulanIni - $pengeluaranBulanIni;
+
+        // LAST MONTH
+        $pemasukanBulanLalu = Transaksi::where('id_user', $userId)
+            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->sum('nominal_pemasukan');
+
+        $pengeluaranBulanLalu = Transaksi::where('id_user', $userId)
+            ->whereMonth('tgl_transaksi', $lastMonth->month)
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->sum('nominal');
+
+        $saldoBulanLalu = $pemasukanBulanLalu - $pengeluaranBulanLalu;
+
+        // PERCENTAGE CALCULATIONS
+        $persenPemasukan = $pemasukanBulanLalu > 0 ? (($pemasukanBulanIni - $pemasukanBulanLalu) / $pemasukanBulanLalu) * 100 : 0;
+        $persenPengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : 0;
+        $persenSaldo = $saldoBulanLalu != 0 ? (($saldo - $saldoBulanLalu) / abs($saldoBulanLalu)) * 100 : 0;
 
         return [
             'saldo' => $saldo,
             'pemasukan' => $pemasukanBulanIni,
             'pengeluaran' => $pengeluaranBulanIni,
             'hari_ini' => $pengeluaranHariIni,
+            'persen_saldo' => round($persenSaldo, 1),
+            'persen_pemasukan' => round($persenPemasukan, 1),
+            'persen_pengeluaran' => round($persenPengeluaran, 1),
         ];
     }
-
     public function toggleNominalAjax()
     {
         $show = session('show_nominal', false);
@@ -104,8 +127,6 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
 
-
-
         $periode = (int) request('periode', 6);
 
         // Guard biar aman
@@ -115,9 +136,9 @@ class DashboardController extends Controller
 
         $cashflow = DB::table('transaksi')
             ->selectRaw("
-        DATE_FORMAT(tgl_transaksi, '%Y-%m') as bulan,
-        SUM(nominal_pemasukan) as total_pemasukan,
-        SUM(nominal) as total_pengeluaran
+                DATE_FORMAT(tgl_transaksi, '%Y-%m') as bulan,
+                SUM(nominal_pemasukan) as total_pemasukan,
+                SUM(nominal) as total_pengeluaran
             ")
             ->where('id_user', Auth::id())
             ->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())
@@ -129,15 +150,14 @@ class DashboardController extends Controller
                 return $row;
             });
 
-        function savingRateStatus($rate)
-        {
+        $savingRateStatus = function ($rate) {
             if ($rate > 20) return ['label' => 'Sangat Sehat', 'class' => 'success'];
             if ($rate >= 10) return ['label' => 'Sehat', 'class' => 'primary'];
             if ($rate >= 0) return ['label' => 'Waspada', 'class' => 'warning'];
             return ['label' => 'Defisit', 'class' => 'danger'];
-        }
+        };
 
-        $savingRate = $cashflow->map(function ($row) {
+        $savingRate = $cashflow->map(function ($row) use ($savingRateStatus) {
             $pendapatan = (float) $row->total_pemasukan;
             $pengeluaran = (float) $row->total_pengeluaran;
 
@@ -145,7 +165,7 @@ class DashboardController extends Controller
                 ? round((($pendapatan - $pengeluaran) / $pendapatan) * 100, 2)
                 : 0;
 
-            $status = savingRateStatus($rate);
+            $status = $savingRateStatus($rate);
 
             $row->saving_rate = $rate;
             $row->saving_label = $status['label'];
@@ -205,19 +225,6 @@ class DashboardController extends Controller
             ->whereYear('tgl_transaksi', $lastMonth->year)
             ->whereMonth('tgl_transaksi', $lastMonth->month)
             ->sum('nominal');
-
-        // Total nominal pemasukan bulan ini
-        $totalPemasukanThisMonth = Transaksi::where('id_user', $userId)
-            ->where('status', '1')
-            ->whereYear('tgl_transaksi', $now->year)
-            ->whereMonth('tgl_transaksi', $now->month)
-            ->sum('nominal_pemasukan');
-
-        // Total nominal pemasukan bulan lalu
-        $totalPemasukanLastMonth = Transaksi::where('id_user', $userId)
-            ->whereYear('tgl_transaksi', $lastMonth->year)
-            ->whereMonth('tgl_transaksi', $lastMonth->month)
-            ->sum('nominal_pemasukan');
 
         // Hitung rasio inflasi gaya hidup
         if ($totalLastMonth != 0) {
@@ -390,6 +397,10 @@ class DashboardController extends Controller
         $pengeluaranView = $this->maskNominal($numbers['pengeluaran'], $showNominal);
         $pengeluaranHariIni = $this->maskNominal($numbers['hari_ini'], $showNominal);
 
+        $persenSaldo = $numbers['persen_saldo'];
+        $persenPemasukan = $numbers['persen_pemasukan'];
+        $persenPengeluaran = $numbers['persen_pengeluaran'];
+
         // Kirim semua data ke view
         return view('dashboard.index', compact(
             'transaksi',
@@ -423,7 +434,9 @@ class DashboardController extends Controller
             'pemasukanView',
             'pengeluaranView',
             'showNominal',
-            'pengeluaranHariIni'
+            'pengeluaranHariIni',            'persenSaldo',
+            'persenPemasukan',
+            'persenPengeluaran'
         ));
     }
 
@@ -535,30 +548,6 @@ class DashboardController extends Controller
 
         return response()->json($todayTransactions);
     }
-
-    // Expenses Bar
-    // public function getJenisPengeluaran(Request $request)
-    // {
-    //     $userId = Auth::id();
-    //     $selectedMonth = $request->input('month', Carbon::now()->month);
-    //     $selectedYear = $request->input('year', Carbon::now()->year);
-
-    //     $jenisPengeluaran = Transaksi::select(
-    //         'pengeluaran.id as pengeluaran_id',
-    //         'pengeluaran.nama as pengeluaran_nama',
-    //         DB::raw('SUM(nominal) as total')
-    //     )
-    //         ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
-    //         ->where('transaksi.id_user', $userId)
-    //         ->where('transaksi.status', '1')
-    //         ->whereYear('tgl_transaksi', $selectedYear)
-    //         ->whereMonth('tgl_transaksi', $selectedMonth)
-    //         ->groupBy('pengeluaran.id', 'pengeluaran.nama')
-    //         ->orderByDesc('total')
-    //         ->get();
-
-    //     return response()->json($jenisPengeluaran);
-    // }
 
     // Detail Modal Expense Bar - Tetap sama
     public function getTransaksiByPengeluaran(Request $request)
@@ -679,5 +668,119 @@ class DashboardController extends Controller
     {
         Auth::logout();
         return redirect('/bimmo')->with('success', 'Successful Log out');
+    }
+
+    public function filter(Request $request)
+    {
+        $userId = Auth::id();
+
+        if ($request->has('periode')) {
+            $periode = (int) $request->periode;
+             if (!in_array($periode, [2, 6, 12])) {
+                $periode = 6;
+            }
+
+            $cashflow = DB::table('transaksi')
+                ->selectRaw("
+            DATE_FORMAT(tgl_transaksi, '%Y-%m') as bulan,
+            SUM(nominal_pemasukan) as total_pemasukan,
+            SUM(nominal) as total_pengeluaran
+                ")
+                ->where('id_user', Auth::id())
+                ->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())
+                ->groupBy('bulan')
+                ->orderBy('bulan')
+                ->get()
+                ->map(function ($row) {
+                    $row->selisih = $row->total_pemasukan - $row->total_pengeluaran;
+                    return $row;
+                });
+
+            // Re-calculate Saving Rate for the table
+            if (!function_exists('savingRateStatusAjax')) {
+                function savingRateStatusAjax($rate)
+                {
+                    if ($rate > 20) return ['label' => 'Sangat Sehat', 'class' => 'success'];
+                    if ($rate >= 10) return ['label' => 'Sehat', 'class' => 'primary'];
+                    if ($rate >= 0) return ['label' => 'Waspada', 'class' => 'warning'];
+                    return ['label' => 'Defisit', 'class' => 'danger'];
+                }
+            }
+
+            $savingRate = $cashflow->map(function ($row) {
+                $pendapatan = (float) $row->total_pemasukan;
+                $pengeluaran = (float) $row->total_pengeluaran;
+
+                $rate = $pendapatan > 0
+                    ? round((($pendapatan - $pengeluaran) / $pendapatan) * 100, 2)
+                    : 0;
+
+                $status = savingRateStatusAjax($rate);
+
+                $row->saving_rate = $rate;
+                $row->saving_label = $status['label'];
+                $row->saving_class = $status['class'];
+
+                return $row;
+            });
+
+             // Prepare Chart Data
+            $chartData = [
+                'cashflow' => $cashflow->map(function ($row) {
+                    return [
+                        'bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
+                        'total_pemasukan' => $row->total_pemasukan,
+                        'total_pengeluaran' => $row->total_pengeluaran
+                    ];
+                }),
+                'savingRate' => $savingRate->map(function ($row) {
+                    return [
+                        'bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
+                        'saving_rate' => $row->saving_rate
+                    ];
+                })
+            ];
+
+            return response()->json([
+                'cashflow' => view('dashboard.partials.cashflow-table', compact('cashflow'))->render(),
+                'savingRate' => view('dashboard.partials.saving-rate-table', compact('savingRate'))->render(),
+                'chartData' => $chartData
+            ]);
+        }
+
+        if ($request->has('bulan') && $request->has('tahun')) {
+            $bulan = (int) $request->bulan;
+            $tahun = (int) $request->tahun;
+
+            $pengeluaranKategori = DB::table('transaksi')
+            ->join('pengeluaran', 'transaksi.pengeluaran', '=', 'pengeluaran.id')
+            ->selectRaw('
+        pengeluaran.nama as kategori,
+        SUM(transaksi.nominal) as total
+    ')
+            ->where('transaksi.id_user', Auth::id())
+            ->whereMonth('transaksi.tgl_transaksi', $bulan)
+            ->whereYear('transaksi.tgl_transaksi', $tahun)
+            ->groupBy('pengeluaran.nama')
+            ->orderByDesc('total')
+            ->get();
+
+            $totalPengeluaranBulan = $pengeluaranKategori->sum('total');
+
+            $pengeluaranKategori = $pengeluaranKategori->map(function ($row) use ($totalPengeluaranBulan) {
+                $row->persen = $totalPengeluaranBulan > 0
+                    ? round(($row->total / $totalPengeluaranBulan) * 100, 1)
+                    : 0;
+
+                return $row;
+            });
+
+            return response()->json([
+                'expenseBar' => view('dashboard.partials.expense-bar-table', compact('pengeluaranKategori', 'totalPengeluaranBulan'))->render(),
+                'totalPengeluaran' => number_format($totalPengeluaranBulan, 0, ',', '.')
+            ]);
+        }
+
+        return response()->json(['error' => 'Invalid request'], 400);
     }
 }
