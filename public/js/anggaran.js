@@ -1,5 +1,5 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Theme Switcher
+$(document).ready(function () {
+    // Theme Handler
     const skin = window.userSkin || 'auto';
     const updateSkinUrl = window.updateSkinUrl;
     const csrfToken = window.csrfToken;
@@ -8,14 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (mode === 'light' || mode === 'dark') {
             document.documentElement.setAttribute('data-bs-theme', mode);
         } else {
-            // Auto mode: deteksi prefers-color-scheme
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const autoTheme = prefersDark ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-bs-theme', autoTheme);
+            document.documentElement.removeAttribute('data-bs-theme'); // auto
         }
         document.dispatchEvent(new Event("themeChanged"));
     }
 
+    // Set Active Theme in Dropdown
     function highlightActiveSkin(mode) {
         document.querySelectorAll('.dropdown-item').forEach(el => {
             el.classList.remove('active');
@@ -23,41 +21,42 @@ document.addEventListener("DOMContentLoaded", function () {
                 el.classList.add('active');
             }
         });
-
-        // Highlight active skin in dropdown
-        if (mode === 'auto') {
-            const autoItem = document.querySelector('.dropdown-item[data-skin="auto"]');
-            if (autoItem) autoItem.classList.add('active');
-        }
     }
 
     function setTheme(mode) {
         applyTheme(mode);
         highlightActiveSkin(mode);
 
-        fetch(updateSkinUrl, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                skin: mode
+        if (updateSkinUrl) {
+            fetch(updateSkinUrl, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ skin: mode })
             })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) alert("Gagal menyimpan tema.");
-            })
-            .catch(err => console.error("Gagal update tema:", err));
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) alert("Gagal menyimpan tema.");
+                })
+                .catch(err => console.error("Gagal update tema:", err));
+        }
     }
+
+    // Global Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
 
     // Eksekusi awal tema
     applyTheme(skin);
     highlightActiveSkin(skin);
     window.setTheme = setTheme;
 
-    // Fungsi Toast
+    // Toast Notification
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
         if (!toastContainer) {
@@ -74,143 +73,134 @@ document.addEventListener("DOMContentLoaded", function () {
             info: '#17a2b8',
             primary: '#007bff',
         };
-
         const bgColor = colors[type] || '#6c757d';
 
         const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert">
                 <div class="d-flex">
                     <div class="toast-body">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
-            </div>
-        `;
+            </div>`;
 
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
         const toastElement = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastElement, {
-            autohide: true,
-            delay: 5000
-        });
+        const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
         toast.show();
-
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            toastElement.remove();
-        });
+        toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
     }
 
-    $(document).ready(function () {
-        // Inisialisasi TomSelect
-        const tomSelect = new TomSelect('#id_pengeluaran', {
+    // Initialize TomSelect
+    let tomSelectInstance;
+    if ($('#id_pengeluaran').length) {
+        tomSelectInstance = new TomSelect('#id_pengeluaran', {
             plugins: ['remove_button'],
             create: false,
             maxItems: null,
             hideSelected: true,
-            closeAfterSelect: false
+            closeAfterSelect: false,
+            persist: false
         });
-    });
+    }
 
-    // Datatable Anggaran
-    $(document).ready(function () {
-        function formatTanggalJamIndo(dateString) {
-            if (!dateString) return '-';
+    // DataTable Initialization
+    const table = $('#anggaranTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '/anggaran',
+            type: 'GET',
+            dataSrc: function (json) {
+                // Update Summary Card
+                if (json.totalPersentase !== undefined) {
+                    $('#totalPersentase').text(json.totalPersentase + '%');
 
-            const date = new Date(dateString);
-
-            const tanggal = date.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            const jam = date.toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-
-            return `${tanggal} ${jam}`;
-        }
-
-
-        $('#anggaranTable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '/anggaran',
-                type: 'GET'
+                    // Handle Exceed Message
+                    const exceedMsg = $('#exceedMessage');
+                    if (json.totalPersentase > 100) {
+                        exceedMsg.text('Exceeds 100%!').removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
+                    } else if (json.totalPersentase < 100 && json.totalPersentase > 0) {
+                        if (json.exceedMessage) {
+                            exceedMsg.text(json.exceedMessage);
+                            if (json.totalPersentase > 100) {
+                                exceedMsg.removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
+                            } else {
+                                exceedMsg.removeClass('d-none bg-danger text-white').addClass('bg-warning text-dark');
+                            }
+                        } else {
+                            exceedMsg.addClass('d-none');
+                        }
+                    } else {
+                        exceedMsg.addClass('d-none');
+                    }
+                }
+                return json.data;
+            }
+        },
+        columns: [
+            {
+                data: 'id_anggaran', // Use id_anggaran !!
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
+                }
             },
-            columns: [
-                { data: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'nama_anggaran' },
-                { data: 'persentase_anggaran' },
-                {
-                    data: 'list_pengeluaran',
-                    orderable: false,
-                    render: function (data) {
-                        if (!data || data.length === 0) {
-                            return '-';
-                        }
+            { data: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
+            { data: 'nama_anggaran' },
+            {
+                data: 'persentase_anggaran',
+                className: 'text-center',
+                render: function (data) {
+                    return data + '%';
+                }
+            },
+            {
+                data: 'list_pengeluaran',
+                orderable: false,
+                render: function (data) {
+                    if (!data || data.length === 0) return '<span class="text-muted">-</span>';
+                    if (!Array.isArray(data)) return data;
 
-                        // pastikan array
-                        if (!Array.isArray(data)) {
-                            return data;
-                        }
+                    let display = data.slice(0, 3).map((item, i) =>
+                        `<span class="badge bg-light text-dark border me-1 mb-1">${item}</span>`
+                    ).join('');
 
-                        let html = `
-            <table class="table table-sm table-borderless mb-0">
-                <tbody>
-        `;
-
-                        data.forEach((item, index) => {
-                            html += `
-                <tr>
-                    <td style="width:20px;">${index + 1}.</td>
-                    <td>${item}</td>
-                </tr>
-            `;
-                        });
-
-                        html += `
-                </tbody>
-            </table>
-        `;
-
-                        return html;
+                    if (data.length > 3) {
+                        display += `<span class="badge bg-light text-muted border mb-1">+${data.length - 3} more</span>`;
                     }
-                },
-                {
-                    data: 'created_at', render: function (data) {
-                        return formatTanggalJamIndo(data);
-                    }
-                },
-                {
-                    data: 'updated_at', render: function (data) {
-                        return formatTanggalJamIndo(data);
-                    }
-                },
-                { data: 'aksi', orderable: false, searchable: false }
-            ]
-        });
+                    return display;
+                }
+            },
+            {
+                data: 'created_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
+                }
+            },
+            {
+                data: 'updated_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
+                }
+            },
+            {
+                data: 'aksi',
+                orderable: false,
+                searchable: false,
+                className: 'align-middle text-center',
+                render: function (data) {
+                    return data;
+                }
+            }
+        ]
     });
 
-    // Toggle More Details
-    $(document).on('click', '.toggle-btn', function () {
-        const tableId = $(this).data('target');
-        const $table = $('#' + tableId);
-        const $hiddenRows = $table.find('.hidden-row');
-
-        if ($hiddenRows.is(':visible')) {
-            $hiddenRows.hide();
-            $(this).text('More Details');
-        } else {
-            $hiddenRows.show();
-            $(this).text('Show Less');
-        }
-    });
-
-    // Utility Functions
-    function ambilFormDataAnggaran() {
+    // CRUD Functions
+    function getFormData() {
         return {
             nama_anggaran: $('#nama_anggaran').val().trim(),
             persentase_anggaran: $('#persentase_anggaran').val().trim(),
@@ -218,70 +208,71 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
-    function validasiFormAnggaran(data) {
+    function validateForm(data) {
         if (!data.nama_anggaran) {
-            showToast('Nama anggaran harus diisi!', 'danger');
+            showToast('Budget Name is required!', 'danger');
             return false;
         }
         if (!data.persentase_anggaran) {
-            showToast('Persentase harus diisi!', 'danger');
+            showToast('Percentage is required!', 'danger');
+            return false;
+        }
+        if (!data.id_pengeluaran || data.id_pengeluaran.length === 0) {
+            showToast('Please select at least one Expense Type!', 'danger');
             return false;
         }
         return true;
     }
 
-    function resetFormAnggaran() {
+    function resetForm() {
         $('#nama_anggaran').val('');
         $('#persentase_anggaran').val('');
-        $('#id_pengeluaran')[0].tomselect.clear();
+        if (tomSelectInstance) tomSelectInstance.clear();
         $('#anggaranModal').removeData('id');
-        $('#anggaranModalLabel');
-        $('.tombol-simpan-anggaran');
+        $('#anggaranModalLabel').text('Add New Budget');
+        $('.tombol-simpan-anggaran').html('Save').prop('disabled', false);
     }
 
-    function spinnerButton() {
-        return '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-    }
+    function saveBudget(isUpdate = false, id = null) {
+        const data = getFormData();
+        if (!validateForm(data)) return;
 
-    function resetTombolSimpanAnggaran() {
-        $('.tombol-simpan-anggaran').prop('disabled', false).html('Simpan');
-    }
+        const url = isUpdate ? '/anggaran/' + id : '/anggaran';
+        const type = isUpdate ? 'PUT' : 'POST';
 
-    function onSuccessSimpanAnggaran() {
-        showToast('Data saved successfully', 'success');
-        $('#anggaranModal').modal('hide');
-        $('#anggaranTable').DataTable().ajax.reload();
-    }
-
-    function simpanAnggaranBaru() {
-        const data = ambilFormDataAnggaran();
-        if (!validasiFormAnggaran(data)) return;
-
-        $('.tombol-simpan-anggaran').prop('disabled', true).html(spinnerButton());
-
-        $.post('/anggaran', data)
-            .done(onSuccessSimpanAnggaran)
-            .always(resetTombolSimpanAnggaran);
-    }
-
-    function updateAnggaran(id) {
-        const data = ambilFormDataAnggaran();
-        if (!validasiFormAnggaran(data)) return;
-
-        $('.tombol-simpan-anggaran').prop('disabled', true).html(spinnerButton());
+        $('.tombol-simpan-anggaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
 
         $.ajax({
-            url: '/anggaran/' + id,
-            type: 'PUT',
-            data,
-            success: onSuccessSimpanAnggaran,
-            complete: resetTombolSimpanAnggaran
+            url: url,
+            type: type,
+            data: data,
+            success: function (response) {
+                showToast(response.message || 'Data saved successfully', 'success');
+                $('#anggaranModal').modal('hide');
+                table.ajax.reload();
+            },
+            error: function (xhr) {
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    const errors = xhr.responseJSON.errors;
+                    let msg = 'Validation Error';
+                    const firstKey = Object.keys(errors)[0];
+                    if (firstKey) msg = errors[firstKey][0];
+
+                    showToast(msg, 'danger');
+                } else {
+                    showToast('Failed to save data.', 'danger');
+                }
+            },
+            complete: function () {
+                $('.tombol-simpan-anggaran').prop('disabled', false).html('Save');
+            }
         });
     }
 
-    // Event Handlers
+    // Event Listeners
     $('body').on('click', '.tombol-tambah-anggaran', function (e) {
         e.preventDefault();
+        resetForm();
         $('#anggaranModal').modal('show');
     });
 
@@ -292,85 +283,146 @@ document.addEventListener("DOMContentLoaded", function () {
         $.get('/anggaran/' + id + '/edit', function (res) {
             const anggaran = res.result;
 
-            $('#anggaranModal').modal('show');
-            $('#anggaranModalLabel').text('Edit Anggaran');
-            $('.tombol-simpan-anggaran').html('Memperbarui');
+            $('#anggaranModalLabel').text('Edit Budget');
+            $('.tombol-simpan-anggaran').html('Update');
 
             $('#nama_anggaran').val(anggaran.nama_anggaran);
             $('#persentase_anggaran').val(anggaran.persentase_anggaran);
 
-            const selectInstance = $('#id_pengeluaran')[0].tomselect;
-            selectInstance.clear();
-
-            // Tambahkan opsi id => nama
-            Object.entries(anggaran.id_pengeluaran).forEach(([id, nama]) => {
-                if (!selectInstance.options[id]) {
-                    selectInstance.addOption({
-                        value: id,
-                        text: nama
-                    });
-                }
-            });
-
-            // Set value hanya id
-            selectInstance.setValue(Object.keys(anggaran.id_pengeluaran));
+            if (tomSelectInstance) {
+                tomSelectInstance.clear();
+                // Add and select options
+                Object.entries(anggaran.id_pengeluaran).forEach(([key, val]) => {
+                    if (!tomSelectInstance.options[key]) {
+                        tomSelectInstance.addOption({ value: key, text: val });
+                    }
+                });
+                tomSelectInstance.setValue(Object.keys(anggaran.id_pengeluaran));
+            }
 
             $('#anggaranModal').data('id', id);
+            $('#anggaranModal').modal('show');
+        }).fail(function () {
+            showToast('Failed to fetch data', 'danger');
         });
     });
-
-
 
     $('body').on('click', '.tombol-simpan-anggaran', function (e) {
         e.preventDefault();
         const id = $('#anggaranModal').data('id');
-        id ? updateAnggaran(id) : simpanAnggaranBaru();
+        saveBudget(!!id, id);
     });
 
-    $('#anggaranModal').on('hidden.bs.modal', resetFormAnggaran);
+    $('#anggaranModal').on('hidden.bs.modal', resetForm);
 
     $('body').on('click', '.tombol-del-anggaran', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
 
-        const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-
         Swal.fire({
-            title: 'Apakah Anda yakin ingin menghapus data ini?',
-            html: 'Data yang dihapus tidak dapat dipulihkan!',
+            title: 'Delete this budget?',
+            text: "This action cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: isDarkMode ? '#6f42c1' : '#012970',
-            cancelButtonColor: '#dc3545',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            background: isDarkMode ? '#2c2c3c' : '#ffffff',
-            color: isDarkMode ? '#ffffff' : '#000000',
-            customClass: {
-                popup: isDarkMode ? 'swal2-dark' : ''
-            }
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete!',
+            cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
                     url: '/anggaran/' + id,
                     type: 'DELETE',
                     success: function () {
-                        showToast('Data berhasil dihapus', 'success');
-                        $('#anggaranTable').DataTable().ajax.reload();
+                        showToast('Data deleted successfully', 'success');
+                        table.ajax.reload();
                     },
                     error: function () {
-                        showToast('Data gagal dihapus', 'danger');
-                        $('#anggaranTable').DataTable().ajax.reload();
+                        showToast('Failed to delete data', 'danger');
                     }
                 });
             }
         });
     });
 
-    // Setup CSRF
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    // ----------------------------------------------------------------
+    // BULK DELETE LOGIC
+    // ----------------------------------------------------------------
+
+    // Check All
+    $(document).on('change', '#checkAll', function () {
+        const isChecked = $(this).is(':checked');
+        $('.check-item').prop('checked', isChecked);
+        updateBulkButton();
+    });
+
+    // Check Item
+    $(document).on('change', '.check-item', function () {
+        var total = $('.check-item').length;
+        var checked = $('.check-item:checked').length;
+
+        $('#checkAll').prop('checked', total === checked);
+        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
+        updateBulkButton();
+    });
+
+    // Update Button Visibility
+    function updateBulkButton() {
+        const checkedCount = $('.check-item:checked').length;
+        $('#countSelected').text(checkedCount);
+        if (checkedCount > 0) {
+            $('#btnBulkDelete').removeClass('d-none');
+        } else {
+            $('#btnBulkDelete').addClass('d-none');
         }
+    }
+
+    // Handle Bulk Delete Click
+    $('#btnBulkDelete').on('click', function () {
+        const ids = [];
+        $('.check-item:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        Swal.fire({
+            title: `Delete ${ids.length} budgets?`,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete selected!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const OriginalBtnText = $(this).html();
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/anggaran/bulk-delete',
+                    type: 'DELETE',
+                    data: { ids: ids },
+                    success: function (response) {
+                        showToast(response.message, 'success');
+                        table.ajax.reload();
+                        $('#checkAll').prop('checked', false);
+                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                    },
+                    error: function (xhr) {
+                        showToast('Failed to delete selected budgets.', 'danger');
+                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                    }
+                });
+            }
+        });
+    });
+
+    // Reset check all on page change
+    table.on('draw', function () {
+        $('#checkAll').prop('checked', false);
+        $('#checkAll').prop('indeterminate', false);
+        updateBulkButton();
     });
 });
