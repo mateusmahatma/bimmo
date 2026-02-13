@@ -18,12 +18,10 @@ class TransaksiImportTest implements ToCollection, WithHeadingRow
 
         foreach ($rows as $row) {
 
-            // ⛔ skip baris kosong
             if (empty($row['tgl_transaksi'])) {
                 continue;
             }
 
-            // 🗓️ konversi tanggal
             try {
                 if (is_numeric($row['tgl_transaksi'])) {
                     $tgl = Carbon::instance(
@@ -50,12 +48,10 @@ class TransaksiImportTest implements ToCollection, WithHeadingRow
             ];
         }
 
-        // ⛔ kalau kosong, STOP
         if (count($data) === 0) {
             throw new \Exception('Tidak ada data valid untuk diimport');
         }
 
-        // ✅ INSERT SEKALI (PASTI MASUK)
         Transaksi::insert($data);
     }
 }
