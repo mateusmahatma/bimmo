@@ -159,6 +159,13 @@ Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)-
 // Update skin
 Route::middleware(['auth'])->post('/user/skin', [UserController::class , 'updateSkin'])->name('user.update.skin');
 
+// Profil
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profil', [UserController::class , 'index'])->name('profil.index');
+    Route::put('/profil/password', [UserController::class , 'updatePassword'])->name('profil.updatePassword');
+    Route::put('/profil/email', [UserController::class , 'updateEmail'])->name('profil.updateEmail');
+});
+
 Route::get('/check-session', function () {
     return response()->json(['alive' => true]);
 })->middleware('auth');
