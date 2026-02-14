@@ -5,7 +5,9 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>BIMMO - Daftar Akun</title>
+    <title>Register Account - BIMMO</title>
+    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
+
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -38,18 +40,18 @@
                                             <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
                                         </div>
                                         <h5 class="card-title text-center pb-0 fs-4">
-                                            Membuat akun
+                                            Create an account
                                         </h5>
                                         <p class="text-center small">
-                                            Masukkan detail pribadi Anda untuk membuat akun
+                                            Enter your personal details to create an account
                                         </p>
                                     </div>
                                     <!-- csrf agar tidak bisa di cross side -->
                                     <form class="row g-3 needs-validation" action="/daftar" method="post">
                                         @csrf
                                         <div class="form-floating">
-                                            <input type="text" name="name" class="form-control rounded-bottom @error('name') is-invalid @enderror" id="yourName" placeholder="Nama" required />
-                                            <label for="yourName">Nama Lengkap</label>
+                                            <input type="text" name="name" class="form-control rounded-bottom @error('name') is-invalid @enderror" id="yourName" placeholder="Full Name" required />
+                                            <label for="yourName">Full Name</label>
                                             @error('name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -69,7 +71,7 @@
 
                                         <div class="form-floating">
                                             <input type="text" name="username" class="form-control rounded-bottom @error('username') is-invalid @enderror" id="yourUsername" placeholder="Username" required />
-                                            <label for="yourUsername">Nama pengguna</label>
+                                            <label for="yourUsername">Username</label>
                                             @error('username')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -79,7 +81,7 @@
 
                                         <div class="form-floating">
                                             <input type="password" name="password" class="form-control rounded-bottom @error('password') is-invalid @enderror" id="password" placeholder="Password" required />
-                                            <label for="password">Kata sandi</label>
+                                            <label for="password">Password</label>
                                             <span class="password-toggle-icon"><i class="fas fa-eye-slash"></i></span>
                                             @error('password')
                                             <div class="invalid-feedback">
@@ -91,8 +93,8 @@
                                         <div class="col-12">
                                             <div class="form-check">
                                                 <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required />
-                                                <label class="form-check-label" for="acceptTerms">Saya setuju dan menerima
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">syarat dan ketentuan</a></label>
+                                                <label class="form-check-label" for="acceptTerms">I agree and accept the
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">terms and conditions</a></label>
                                                 <div class="invalid-feedback">
                                                 </div>
                                             </div>
@@ -100,13 +102,13 @@
 
                                         <div class="col-12">
                                             <button class="btn btn-primary tombol-login" name="/create" type="submit">
-                                                Membuat akun
+                                                Create an account
                                             </button>
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">
-                                                Sudah memiliki akun?
-                                                <a href="/bimmo">Masuk</a>
+                                                Already have an account?
+                                                <a href="/bimmo">Login</a>
                                             </p>
                                         </div>
                                     </form>
