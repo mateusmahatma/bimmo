@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>BIMMO</title>
+    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="/img/bimmo_icon.png" rel="icon" />
@@ -26,8 +27,8 @@
                                         <div class="text-center">
                                             <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
                                         </div>
-                                        <h5 class="card-title text-center pb-0 fs-4">Selamat datang kembali</h5>
-                                        <p class="text-center small">Masukkan nama pengguna & kata sandi Anda untuk masuk</p>
+                                        <h5 class="card-title text-center pb-0 fs-4">Welcome back</h5>
+                                        <p class="text-center small">Enter your username and password to log in.</p>
                                     </div>
                                     @if (session('success'))
                                     <div class="alert alert-success">
@@ -37,22 +38,22 @@
                                     <form class="row g-3 needs-validation" action="/login" method="post">
                                         @csrf
                                         <div class="form-floating">
-                                            <input type="text" name="username" class="form-control" id="username" placeholder="Nama pengguna" autocomplete="off" required />
-                                            <label for="username">Nama pengguna</label>
+                                            <input type="text" name="username" class="form-control" id="username" placeholder="Username" autocomplete="off" required />
+                                            <label for="username">Username</label>
                                         </div>
                                         <div class="form-floating">
-                                            <input type="password" name="password" class="form-control" id="password" placeholder="Kata sandi" autocomplete="off" required />
-                                            <label for="password">Kata sandi</label>
+                                            <input type="password" name="password" class="form-control" id="password" placeholder="Password" autocomplete="off" required />
+                                            <label for="password">Password</label>
                                             <span class="password-toggle-icon"><i class="fas fa-eye-slash"></i></span>
                                         </div>
                                         <div class="text-end mt-0 small-text">
-                                            <a href="/lupa-password"><small>Lupa Kata Sandi?</small></a>
+                                            <a href="/lupa-password"><small>Forgot Password?</small></a>
                                         </div>
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary tombol-login">Masuk</button>
+                                            <button type="submit" class="btn btn-primary tombol-login">Login</button>
                                         </div>
                                         <div class="col-12">
-                                            <p class="small mb-0">Tidak memiliki akun? <a href="/daftar">Buat Akun</a></p>
+                                            <p class="small mb-0">Don't have an account? <a href="/daftar">Create Account</a></p>
                                         </div>
                                     </form>
                                 </div>
