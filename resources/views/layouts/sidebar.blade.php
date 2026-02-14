@@ -1,6 +1,9 @@
 <aside class="sidebar">
-    <div class="p-3 fw-bold fs-5 d-flex align-items-center">
+    <div class="p-3 fw-bold fs-5 d-flex align-items-center justify-content-between">
         <img src="{{ asset('img/bimmo_2.png') }}" class="me-2" style="height: 25px; width: 110px;" alt="BIMMO Logo">
+        <a href="{{ route('profil.index') }}" class="text-decoration-none text-dark" title="Profil">
+            <i class="bi bi-person-circle fs-5"></i>
+        </a>
     </div>
 
     <ul class="nav flex-column">
@@ -15,13 +18,13 @@
         <!-- Anggaran -->
         <li class="nav-item">
             <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }}"
-                data-bs-toggle="collapse" href="#menuAnggaran" role="button">
+                data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAnggaran" role="button">
                 <i class="bi bi-wallet2 me-2"></i>
                 <span>Budget</span>
                 <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
 
-            <div class="collapse {{ Request::is('anggaran*','kalkulator*') ? 'show' : '' }}" id="menuAnggaran">
+            <div class="collapse {{ Request::is('anggaran*','kalkulator*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAnggaran">
                 <ul class="nav flex-column ms-4">
                     <li class="nav-item">
                         <a class="nav-link sub-link {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
@@ -41,13 +44,13 @@
 
         <li class="nav-item">
             <a class="nav-link d-flex align-items-center {{ Request::is('barang*') ? 'active' : '' }} disabled"
-                data-bs-toggle="collapse" href="#menuInvestasi" role="button">
+                data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuInvestasi" role="button">
                 <i class="bi bi-clipboard-data-fill me-2 disabled">
                 </i> <span>Investment</span>
                 <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
 
-            <div class="collapse {{ Request::is('barang*') ? 'show' : '' }}" id="menuInvestasi">
+            <div class="collapse {{ Request::is('barang*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuInvestasi">
                 <ul class="nav flex-column ms-4">
                     <li class="nav-item">
                         <a class="nav-link sub-link {{ Request::is('barang') ? 'active' : '' }}" href="/barang" class="disabled">
@@ -68,13 +71,13 @@
 
         <li class="nav-item">
             <a class="nav-link d-flex align-items-center {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'active' : '' }}"
-                data-bs-toggle="collapse" href="#menuMoneyMovement" role="button">
+                data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuMoneyMovement" role="button">
                 <i class="bi bi-arrow-down-up me-2"></i>
                 <span>Money Movement</span>
                 <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
 
-            <div class="collapse {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'show' : '' }}" id="menuMoneyMovement">
+            <div class="collapse {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuMoneyMovement">
                 <ul class="nav flex-column ms-4">
                     <li class="nav-item">
                         <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
