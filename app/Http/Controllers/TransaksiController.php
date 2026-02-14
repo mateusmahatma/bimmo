@@ -23,6 +23,8 @@ use App\Models\DanaDarurat;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Exports\TransaksiExport;
 use App\Imports\TransaksiImportTest;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TransactionExportMail;
 
 class TransaksiController extends Controller
 {
@@ -570,6 +572,26 @@ class TransaksiController extends Controller
             ),
             'arus_kas.xlsx'
         );
+    }
+
+    public function emailExcel(Request $request)
+    {
+        $query = $this->buildFilteredQuery($request);
+        $data = $query->get();
+
+        $excelData = Excel::raw(
+            new TransaksiExport(
+            $data,
+            $data->sum('nominal_pemasukan'),
+            $data->sum('nominal'),
+            $data->sum('nominal_pemasukan') - $data->sum('nominal')
+            ),
+            \Maatwebsite\Excel\Excel::XLSX
+        );
+
+        Mail::to(Auth::user()->email)->send(new TransactionExportMail($excelData, 'Arus_Kas_BIMMO.xlsx'));
+
+        return back()->with('success', 'Data transaksi berhasil dikirim ke email Anda (' . Auth::user()->email . ')');
     }
 
     public function importExcel(Request $request)
