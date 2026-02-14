@@ -6,36 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use App\Models\User;
+use App\Mail\NewPasswordMail;
 
 class LupaPasswordController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('login.lupa-password');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -45,63 +27,76 @@ class LupaPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return response()->json(['error' => 'Email tidak terdaftar.'], 404);
+            return response()->json(['error' => 'unregistered email'], 404);
         }
 
-        $newPassword = Str::random(8);
+        $token = Str::random(60);
 
-        $user->password = Hash::make($newPassword);
+        // Delete existing tokens for this email
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
-        $user->save();
+        // Insert new token
+        DB::table('password_reset_tokens')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
 
-        return response()->json([
-            'success' => 'Password baru telah dibuat.',
-            'newPassword' => $newPassword,
+        try {
+            // Send link with token
+            Mail::to($user->email)->send(new NewPasswordMail($token, $user->email));
+            return response()->json([
+                'success' => 'Link reset password telah dikirim ke email Anda.',
+            ]);
+        }
+        catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal mengirim email: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function resetIndex(Request $request)
+    {
+        return view('login.reset-password', [
+            'token' => $request->token,
+            'email' => $request->email
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function resetUpdate(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+            'token' => 'required'
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        $resetRecord = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        if (!$resetRecord) {
+            return back()->withErrors(['email' => 'Token reset password tidak valid.']);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        // Check if token is expired (e.g., 60 minutes)
+        if (Carbon::parse($resetRecord->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return back()->withErrors(['email' => 'Token reset password telah kedaluwarsa.']);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email tidak ditemukan.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Delete the token
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return redirect()->route('bimmo')->with('success', 'Password berhasil diubah. Silakan login.');
     }
 }
