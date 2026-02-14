@@ -144,6 +144,8 @@ Route::post('/ubah-password', [UbahPasswordController::class , 'store'])->middle
 
 // Lupa Password
 Route::resource('/lupa-password', LupaPasswordController::class);
+Route::get('/reset-password', [LupaPasswordController::class , 'resetIndex'])->name('password.reset');
+Route::post('/reset-password', [LupaPasswordController::class , 'resetUpdate'])->name('password.update');
 
 // Hasil Proses Anggaran
 Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)->middleware('auth');
