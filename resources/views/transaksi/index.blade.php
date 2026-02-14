@@ -159,6 +159,8 @@
                                 <ul class="dropdown-menu shadow border-0 rounded-3">
                                     <li><a class="dropdown-item" href="{{ route('transaksi.export.excel', request()->query()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
                                     <li><a class="dropdown-item" href="{{ route('transaksi.export.pdf', request()->query()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ route('transaksi.export.email', request()->query()) }}"><i class="bi bi-envelope me-2 text-primary"></i> Send to Email</a></li>
                                 </ul>
                             </div>
 
