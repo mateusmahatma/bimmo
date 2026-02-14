@@ -41,7 +41,7 @@ $(document).ready(function () {
         });
     }
 
-    $('#danaDaruratTable').DataTable({
+    const table = $('#danaDaruratTable').DataTable({
         paging: true,
         responsive: true,
         lengthChange: true,
@@ -69,22 +69,59 @@ $(document).ready(function () {
             }
         },
         columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
-            { data: 'tgl_transaksi_dana_darurat', className: 'text-center', render: data => moment(data).format('YYYY-MM-DD') },
             {
-                data: 'jenis_transaksi_dana_darurat', className: 'text-center', name: 'jenis_transaksi_dana_darurat', render: function (data, type, row) {
+                data: 'id_dana_darurat',
+                name: 'id_dana_darurat',
+                orderable: false,
+                searchable: false,
+                className: 'align-middle text-center',
+                render: function (data, type, row) {
+                    return `<div class="form-check d-flex justify-content-center"><input class="form-check-input check-item" type="checkbox" value="${data}" style="cursor: pointer;"></div>`;
+                }
+            },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'align-middle text-center text-secondary fw-medium' },
+            {
+                data: 'tgl_transaksi_dana_darurat',
+                className: 'align-middle text-center',
+                render: function (data) {
+                    return moment(data).format('YYYY-MM-DD');
+                }
+            },
+            {
+                data: 'jenis_transaksi_dana_darurat',
+                className: 'align-middle text-center',
+                name: 'jenis_transaksi_dana_darurat',
+                render: function (data, type, row) {
                     if (data === 'Masuk') {
-                        return '<span style="color:green; font-weight:bold;">' + data + '</span>';
+                        return '<span class="badge bg-success"><i class="bi bi-arrow-down-left me-1"></i>' + data + '</span>';
                     } else {
-                        return '<span style="color:red; font-weight:bold;">' + data + '</span>';
+                        return '<span class="badge bg-danger"><i class="bi bi-arrow-up-right me-1"></i>' + data + '</span>';
                     }
                 }
             },
-            { data: 'nominal_dana_darurat', className: 'text-center', render: data => parseFloat(data).toLocaleString("id-ID") },
-            { data: 'keterangan', className: 'text-center' },
-            { data: 'created_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'updated_at', render: data => moment(data).format('YYYY-MM-DD HH:mm:ss'), className: 'text-center' },
-            { data: 'aksi', className: 'text-center' }
+            {
+                data: 'nominal_dana_darurat',
+                className: 'align-middle text-center fw-bold text-dark',
+                render: function (data) {
+                    return parseFloat(data).toLocaleString("id-ID", { style: "currency", currency: "IDR" });
+                }
+            },
+            { data: 'keterangan', className: 'align-middle text-center' },
+            {
+                data: 'created_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${moment(data).format('YYYY-MM-DD HH:mm:ss')}</span>`;
+                }
+            },
+            {
+                data: 'updated_at',
+                className: 'align-middle text-center text-muted small',
+                render: function (data) {
+                    return `<span style="font-family: 'Consolas', monospace;">${moment(data).format('YYYY-MM-DD HH:mm:ss')}</span>`;
+                }
+            },
+            { data: 'aksi', className: 'align-middle text-center' }
         ]
     });
 
@@ -104,9 +141,11 @@ $(document).ready(function () {
     function validasiFormDanaDarurat(data) {
         if (data.tgl_transaksi_dana_darurat === '') {
             showToast('Transaction Date Must Be Filled In!', 'warning');
+            return false;
         }
-        if (isNaN(data.nominal_dana_darurat) || data.nominal_dana_darurat === '') {
-            showToast('Nominal must be filled in!', 'warning');
+        if (isNaN(data.nominal_dana_darurat) || data.nominal_dana_darurat === '' || parseFloat(data.nominal_dana_darurat) <= 0) {
+            showToast('Nominal must be filled in and greater than 0!', 'warning');
+            return false;
         }
         return true;
     }
@@ -132,7 +171,7 @@ $(document).ready(function () {
     function onSuccessSimpanDanaDarurat() {
         showToast('Data saved successfully', 'success');
         $('#danaDaruratModal').modal('hide');
-        $('#danaDaruratTable').DataTable().ajax.reload();
+        table.ajax.reload();
     }
 
     // Simpan atau Update
@@ -212,15 +251,97 @@ $(document).ready(function () {
                     type: 'DELETE',
                     success: function () {
                         showToast('Data berhasil dihapus', 'success');
-                        $('#danaDaruratTable').DataTable().ajax.reload();
+                        table.ajax.reload();
                     },
                     error: function () {
                         showToast('Data gagal dihapus', 'danger');
-                        $('#danaDaruratTable').DataTable().ajax.reload();
+                        table.ajax.reload();
                     }
                 });
             }
         });
+    });
+
+    // ----------------------------------------------------------------
+    // BULK DELETE LOGIC
+    // ----------------------------------------------------------------
+
+    // Check All
+    $(document).on('change', '#checkAll', function () {
+        const isChecked = $(this).is(':checked');
+        $('.check-item').prop('checked', isChecked);
+        updateBulkButton();
+    });
+
+    // Check Item
+    $(document).on('change', '.check-item', function () {
+        var total = $('.check-item').length;
+        var checked = $('.check-item:checked').length;
+
+        $('#checkAll').prop('checked', total === checked);
+        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
+        updateBulkButton();
+    });
+
+    // Update Button Visibility
+    function updateBulkButton() {
+        const checkedCount = $('.check-item:checked').length;
+        $('#countSelected').text(checkedCount);
+        if (checkedCount > 0) {
+            $('#btnBulkDelete').removeClass('d-none');
+        } else {
+            $('#btnBulkDelete').addClass('d-none');
+        }
+    }
+
+    // Handle Bulk Delete Click
+    $('#btnBulkDelete').on('click', function () {
+        const ids = [];
+        $('.check-item:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) return;
+
+        Swal.fire({
+            title: `Delete ${ids.length} items?`,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete selected!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading on button
+                const OriginalBtnText = $(this).html();
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/dana-darurat/bulk-delete',
+                    type: 'DELETE',
+                    data: { ids: ids },
+                    success: function (response) {
+                        showToast(response.message, 'success');
+                        table.ajax.reload();
+                        $('#checkAll').prop('checked', false);
+                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                    },
+                    error: function (xhr) {
+                        showToast('Failed to delete selected data.', 'danger');
+                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                    }
+                });
+            }
+        });
+    });
+
+    // Reset check all on page change
+    table.on('draw', function () {
+        $('#checkAll').prop('checked', false);
+        $('#checkAll').prop('indeterminate', false);
+        updateBulkButton();
     });
 
     $.ajaxSetup({
