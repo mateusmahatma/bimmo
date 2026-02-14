@@ -27,25 +27,25 @@
 
 <body>
 
-    <h3>Arus Kas</h3>
+    <h3>Cash Flow</h3>
 
     <table>
         <tr>
-            <td><strong>Total Pendapatan</strong></td>
+            <td><strong>Total Income</strong></td>
             <td class="text-end">
-                {{ number_format($totalPemasukan,0,',','.') }}
+                {{ number_format($totalPemasukan) }}
             </td>
         </tr>
         <tr>
-            <td><strong>Total Pengeluaran</strong></td>
+            <td><strong>Total Expense</strong></td>
             <td class="text-end">
-                {{ number_format($totalPengeluaran,0,',','.') }}
+                {{ number_format($totalPengeluaran) }}
             </td>
         </tr>
         <tr>
-            <td><strong>Laba Bersih</strong></td>
+            <td><strong>Net Balance</strong></td>
             <td class="text-end">
-                {{ number_format($netIncome,0,',','.') }}
+                {{ number_format($netIncome) }}
             </td>
         </tr>
     </table>
@@ -55,12 +55,12 @@
     <table>
         <thead>
             <tr>
-                <th>Tanggal</th>
-                <th>Pemasukan</th>
-                <th>Nominal Masuk</th>
-                <th>Pengeluaran</th>
-                <th>Nominal Keluar</th>
-                <th>Keterangan</th>
+                <th>Date</th>
+                <th>Income Category</th>
+                <th>Income Amount</th>
+                <th>Expense Category</th>
+                <th>Expense Amount</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
@@ -69,11 +69,11 @@
                 <td>{{ $row->tgl_transaksi }}</td>
                 <td>{{ $row->pemasukanRelation?->nama ?? '-' }}</td>
                 <td class="text-end">
-                    {{ number_format($row->nominal_pemasukan,0,',','.') }}
+                    {{ number_format($row->nominal_pemasukan) }}
                 </td>
                 <td>{{ $row->pengeluaranRelation?->nama ?? '-' }}</td>
                 <td class="text-end">
-                    {{ number_format($row->nominal,0,',','.') }}
+                    {{ number_format($row->nominal) }}
                 </td>
                 <td>{{ $row->keterangan }}</td>
             </tr>
