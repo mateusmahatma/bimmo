@@ -40,7 +40,7 @@
                 <p>8.2. Segala perselisihan yang timbul dari penggunaan layanan ini akan diselesaikan di pengadilan yang berwenang.</p>
 
                 <h3>9. Kontak</h3>
-                <p>Jika Anda memiliki pertanyaan mengenai syarat dan ketentuan ini, Anda dapat menghubungi kami di [mateusmahatma@gmail.com].</p>
+                <p>Jika Anda memiliki pertanyaan mengenai syarat dan ketentuan ini, Anda dapat menghubungi kami di [budgetbimmo@gmail.com].</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
