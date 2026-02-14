@@ -40,14 +40,14 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center {{ Request::is('barang*','dana-darurat*') ? 'active' : '' }} disabled"
+            <a class="nav-link d-flex align-items-center {{ Request::is('barang*') ? 'active' : '' }} disabled"
                 data-bs-toggle="collapse" href="#menuInvestasi" role="button">
                 <i class="bi bi-clipboard-data-fill me-2 disabled">
                 </i> <span>Investment</span>
                 <i class="bi bi-chevron-down ms-auto small"></i>
             </a>
 
-            <div class="collapse {{ Request::is('barang*','dana-darurat*') ? 'show' : '' }}" id="menuInvestasi">
+            <div class="collapse {{ Request::is('barang*') ? 'show' : '' }}" id="menuInvestasi">
                 <ul class="nav flex-column ms-4">
                     <li class="nav-item">
                         <a class="nav-link sub-link {{ Request::is('barang') ? 'active' : '' }}" href="/barang" class="disabled">
@@ -55,18 +55,19 @@
                             Assets
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link sub-link {{ Request::is('dana-darurat') ? 'active' : '' }}" href="/dana-darurat" class="disabled">
-                            <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                            Emergency Fund
-                        </a>
-                    </li>
                 </ul>
             </div>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center {{ Request::is('barang*','dana-darurat*') ? 'active' : '' }}"
+            <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}" href="/dana-darurat" role="button">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                </i> <span>Emergency Fund</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link d-flex align-items-center {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'active' : '' }}"
                 data-bs-toggle="collapse" href="#menuMoneyMovement" role="button">
                 <i class="bi bi-arrow-down-up me-2"></i>
                 <span>Money Movement</span>
