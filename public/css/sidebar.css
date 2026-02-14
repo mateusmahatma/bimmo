@@ -5,6 +5,13 @@
     height: 100vh;
 }
 
+/* Offcanvas Sidebar Adjustments */
+.offcanvas-body .sidebar {
+    height: auto !important;
+    position: relative !important;
+    top: auto !important;
+}
+
 /* LOGO */
 .sidebar img {
     max-height: 28px;
