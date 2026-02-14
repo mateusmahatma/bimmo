@@ -75,7 +75,10 @@ Route::resource('/barang', BarangController::class)->middleware('auth');
 Route::get('/api/barang', [BarangController::class , 'getList'])->middleware('auth');
 
 // Dana Darurat
-Route::resource('/dana-darurat', DanaDaruratController::class)->middleware('auth');
+Route::middleware(['auth'])->group(function () {
+    Route::delete('/dana-darurat/bulk-delete', [DanaDaruratController::class , 'bulkDelete'])->name('dana-darurat.bulkDelete');
+    Route::resource('/dana-darurat', DanaDaruratController::class);
+});
 
 
 // Pemasukan
@@ -105,6 +108,9 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/transaksi/export/excel', [TransaksiController::class , 'exportExcel'])
                 ->name('transaksi.export.excel');
+
+            Route::get('/transaksi/export/email', [TransaksiController::class , 'emailExcel'])
+                ->name('transaksi.export.email');
 
 
             Route::post(
