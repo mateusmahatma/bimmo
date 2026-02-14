@@ -35,14 +35,15 @@ class DanaDaruratController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('jenis_transaksi_dana_darurat', function ($dana) {
-                    return $dana->jenis_transaksi_dana_darurat == 1 ? 'Masuk' : 'Keluar';
-                })
+                return $dana->jenis_transaksi_dana_darurat == 1 ? 'Masuk' : 'Keluar';
+            })
                 ->addColumn('aksi', function ($dana) {
-                    return view('dana_darurat.tombol')->with('request', $dana);
-                })
+                return view('dana_darurat.tombol')->with('request', $dana);
+            })
                 ->with('totalDanaDarurat', $totalDanaDarurat)
                 ->toJson();
-        } else {
+        }
+        else {
             return view('dana_darurat.index');
         }
     }
@@ -64,10 +65,10 @@ class DanaDaruratController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'tgl_transaksi_dana_darurat'    => 'required|date',
-            'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
-            'nominal_dana_darurat'          => 'nullable|numeric',
-            'keterangan'                    => 'nullable|string',
+            'tgl_transaksi_dana_darurat' => 'required|date',
+            'jenis_transaksi_dana_darurat' => 'required|in:1,2',
+            'nominal_dana_darurat' => 'nullable|numeric',
+            'keterangan' => 'nullable|string',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -81,7 +82,7 @@ class DanaDaruratController extends Controller
      */
     public function show(string $id)
     {
-        //
+    //
     }
 
     /**
@@ -100,10 +101,10 @@ class DanaDaruratController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'tgl_transaksi_dana_darurat'    => 'required|date',
-            'jenis_transaksi_dana_darurat'  => 'required|in:1,2',
-            'nominal_dana_darurat'          => 'nullable|numeric',
-            'keterangan'                    => 'nullable|string',
+            'tgl_transaksi_dana_darurat' => 'required|date',
+            'jenis_transaksi_dana_darurat' => 'required|in:1,2',
+            'nominal_dana_darurat' => 'nullable|numeric',
+            'keterangan' => 'nullable|string',
         ]);
 
         DanaDarurat::where('id_dana_darurat', $id)->update($validatedData);
@@ -119,5 +120,26 @@ class DanaDaruratController extends Controller
     {
         $dana = DanaDarurat::findOrFail($id);
         $dana->delete();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:dana_darurat,id_dana_darurat'
+        ]);
+
+        $ids = $validated['ids'];
+
+        // Ensure user owns these records
+        $deleted = DanaDarurat::whereIn('id_dana_darurat', $ids)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => "$deleted data deleted successfully."]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No data found or authorized to delete.'], 404);
     }
 }
