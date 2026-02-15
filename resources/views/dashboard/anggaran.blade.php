@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard/anggaran.css') }}?v={{ filemtime(public_path('css/dashboard/anggaran.css')) }}">
 @endpush
 
-<div class="mb-3 d-flex gap-3 align-items-center">
+<div class="mb-3 d-flex gap-3 align-items-center flex-wrap">
     <label class="fw-semibold">Filter Periode Anggaran:</label>
 
     <select id="filterTanggal" class="form-control" style="max-width: 300px;">

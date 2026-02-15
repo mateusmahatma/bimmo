@@ -21,7 +21,7 @@
         <div class="col-12 col-lg-8 d-flex flex-column gap-4">
 
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                             Financial Summary
@@ -39,7 +39,7 @@
                         <i class="bi {{ $showNominal ? 'bi-eye-slash' : 'bi-eye' }}"></i>
                     </button>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
                 <div class="row g-3 mb-4">
                     <!-- BALANCE -->
                     <div class="col-12 col-md-6 col-xl-3">
@@ -50,7 +50,7 @@
                                         <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Current Balance</h6>
                                         <h4 class="mb-2 fw-bold {{ $totalNominalSisa >= 0 ? 'text-dark' : 'text-danger' }}" id="summary-saldo">{{ $saldoView }}</h4>
                                     </div>
-                                    <div class="icon-shape bg-light text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="icon-shape bg-light text-primary rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
                                         <i class="bi bi-wallet2 fs-5"></i>
                                     </div>
                                 </div>
@@ -77,7 +77,7 @@
                                         <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Total Income</h6>
                                         <h4 class="mb-2 fw-bold text-success" id="summary-pemasukan">{{ $pemasukanView }}</h4>
                                     </div>
-                                    <div class="icon-shape bg-light text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="icon-shape bg-light text-success rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
                                         <i class="bi bi-graph-up-arrow fs-5"></i>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                                         <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Total Expense</h6>
                                         <h4 class="mb-2 fw-bold text-danger" id="summary-pengeluaran">{{ $pengeluaranView }}</h4>
                                     </div>
-                                    <div class="icon-shape bg-light text-danger rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="icon-shape bg-light text-danger rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
                                         <i class="bi bi-graph-down-arrow fs-5"></i>
                                     </div>
                                 </div>
@@ -132,7 +132,7 @@
                                         <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Expense Today</h6>
                                         <h4 class="mb-2 fw-bold text-dark" id="summary-hari-ini">{{ $pengeluaranHariIni }}</h4>
                                     </div>
-                                    <div class="icon-shape bg-light text-warning rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <div class="icon-shape bg-light text-warning rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
                                         <i class="bi bi-calendar-event fs-5"></i>
                                     </div>
                                 </div>
@@ -148,7 +148,7 @@
             </div>
 
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                             Cash Flow
@@ -169,7 +169,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
 
                 <div id="cashflowChart" style="height: 300px;"></div>
 
@@ -198,7 +198,7 @@
                 </div>
             </div> -->
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                      <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                              Saving Rate
@@ -209,7 +209,7 @@
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Track your savings performance.</p>
                     </div>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
 
                 {{-- CHART --}}
                 <div id="savingRateChart" style="height: 300px;"></div>
@@ -236,21 +236,21 @@
                 <ul class="list-group list-group-flush">
 
                     {{-- Expense Ratio --}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
                         Expense / Income
                         <span class="badge bg-{{ $expenseStatus['class'] }}">
                             {{ $expenseRatio }}% – {{ $expenseStatus['label'] }}
                         </span>
                     </li>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
                         Saving Rate
                         <span class="badge bg-{{ $savingStatus['class'] }}">
                             {{ $savingRateLatest }}% – {{ $savingStatus['label'] }}
                         </span>
                     </li>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
                         Emergency Fund
                         <span class="badge bg-{{ $emergencyStatus['class'] }}">
                             {{ $danaDaruratBulan }} months – {{ $emergencyStatus['label'] }}
@@ -262,7 +262,7 @@
 
 
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Expense Bar</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Expenses breakdown by category.</p>
@@ -305,7 +305,7 @@
 
         <!-- Transaksi Hari Ini -->
         <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
                     <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Today's Transactions</h5>
                      <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">
@@ -373,7 +373,7 @@
                     <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Budget Performance</h5>
                     <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Track your budget usage.</p>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
                     @include('dashboard.anggaran')
                     @stack('anggaran-css')
                     @stack('anggaran.scripts')
