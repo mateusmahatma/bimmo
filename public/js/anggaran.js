@@ -147,7 +147,7 @@ $(document).ready(function () {
                     return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
                 }
             },
-            { data: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
+            { data: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center d-none d-md-table-cell' },
             { data: 'nama_anggaran' },
             {
                 data: 'persentase_anggaran',
@@ -175,14 +175,14 @@ $(document).ready(function () {
             },
             {
                 data: 'created_at',
-                className: 'align-middle text-center text-muted small',
+                className: 'align-middle text-center text-muted small d-none d-md-table-cell',
                 render: function (data) {
                     return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
                 }
             },
             {
                 data: 'updated_at',
-                className: 'align-middle text-center text-muted small',
+                className: 'align-middle text-center text-muted small d-none d-md-table-cell',
                 render: function (data) {
                     return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
                 }

@@ -48,17 +48,17 @@
 
         <div class="col-lg-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">List of Budgets</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage your budget allocations efficiently.</p>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
-                            <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
+                    <div class="d-flex gap-2 w-100 w-md-auto justify-content-md-end">
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3 flex-fill flex-md-grow-0">
+                            <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('anggaran.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add New Budget
+                        <a href="{{ route('anggaran.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-fill flex-md-grow-0">
+                            <i class="bi bi-plus-lg me-1"></i> Add New
                         </a>
                     </div>
                 </div>
@@ -73,12 +73,12 @@
                                             <input class="form-check-input" type="checkbox" id="checkAll" style="cursor: pointer;">
                                         </div>
                                     </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">No</th>
+                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">No</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">Budget Name</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Percentage</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Percentage</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">Expense Types</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Created At</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Last Updated</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">Created At</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">Last Updated</th>
                                     <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
                                 </tr>
                             </thead>
