@@ -31,50 +31,109 @@ class TransaksiController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
-
-        $baseQuery = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
-            ->where('id_user', $userId);
+        $query = $this->buildFilteredQuery($request);
 
         // =====================
-        // FILTER
+        // SUMMARY
         // =====================
-        if ($request->filled('start_date')) {
-            $baseQuery->whereDate('tgl_transaksi', '>=', $request->start_date);
-        }
+        // Use clone to get summary without pagination and sorting
+        // We need to re-apply the filters but invalidating sort/pagination
+        // OR better: use the same base query logic before paginate
 
-        if ($request->filled('end_date')) {
-            $baseQuery->whereDate('tgl_transaksi', '<=', $request->end_date);
-        }
+        // Let's refactor to use a fresh query builder for stats to avoid side effects
+        $statsQuery = $this->buildFilteredQuery($request, true); // true = skip sorting
 
-        if ($request->filled('pemasukan')) {
-            if (is_array($request->pemasukan)) {
-                $baseQuery->whereIn('pemasukan', $request->pemasukan);
-            }
-            else {
-                $baseQuery->where('pemasukan', $request->pemasukan);
-            }
-        }
-
-        if ($request->filled('pengeluaran')) {
-            if (is_array($request->pengeluaran)) {
-                $baseQuery->whereIn('pengeluaran', $request->pengeluaran);
-            }
-            else {
-                $baseQuery->where('pengeluaran', $request->pengeluaran);
-            }
-        }
-
-        // =====================
-        // SUMMARY UTAMA
-        // =====================
-        $totalPemasukan = (clone $baseQuery)->sum('nominal_pemasukan');
-        $totalPengeluaran = (clone $baseQuery)->sum('nominal');
+        $totalPemasukan = (clone $statsQuery)->sum('nominal_pemasukan');
+        $totalPengeluaran = (clone $statsQuery)->sum('nominal');
         $netIncome = $totalPemasukan - $totalPengeluaran;
 
         // =====================
-        // SUMMARY DETAIL
+        // PAGINATION
         // =====================
-        $summaryPemasukan = (clone $baseQuery)
+        $transaksi = $query->paginate(10)->withQueryString();
+
+        // =====================
+        // AJAX RESPONSE
+        // =====================
+        if ($request->ajax()) {
+
+            // Stats for Summary Cards
+            $stats = [
+                'totalPemasukan' => $totalPemasukan,
+                'totalPengeluaran' => $totalPengeluaran,
+                'netIncome' => $netIncome
+            ];
+
+            // Summary Details (Re-calculate for modals)
+            $summaryPemasukan = (clone $statsQuery)
+                ->whereNotNull('pemasukan')
+                ->selectRaw('pemasukan, SUM(nominal_pemasukan) as total')
+                ->groupBy('pemasukan')
+                ->orderBy('total', 'desc')
+                ->with('pemasukanRelation')
+                ->get();
+
+            $summaryPengeluaran = (clone $statsQuery)
+                ->whereNotNull('pengeluaran')
+                ->selectRaw('pengeluaran, SUM(nominal) as total')
+                ->groupBy('pengeluaran')
+                ->orderBy('total', 'desc')
+                ->with('pengeluaranRelation')
+                ->get();
+
+            // Helper to render blade with variable scope
+            $renderModal = function ($view, $data) {
+                return view($view, $data)->render();
+            };
+
+            // Render Modals Items
+            $modalPemasukanHtml = '';
+            foreach ($summaryPemasukan as $row) {
+                $percentage = $totalPemasukan > 0 ? ($row->total / $totalPemasukan) * 100 : 0;
+                $modalPemasukanHtml .= '<li class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-medium text-dark">' . ($row->pemasukanRelation->nama ?? 'Others') . '</span>
+                                <span class="fw-bold text-success small">Rp ' . number_format($row->total, 0, ',', '.') . '</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: ' . $percentage . '%" aria-valuenow="' . $percentage . '" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="text-end text-muted" style="font-size: 10px;">' . number_format($percentage, 1) . '%</div>
+                        </li>';
+            }
+            if ($summaryPemasukan->isEmpty())
+                $modalPemasukanHtml = '<li class="list-group-item text-center text-muted py-3">No data available</li>';
+
+            $modalPengeluaranHtml = '';
+            foreach ($summaryPengeluaran as $row) {
+                $percentage = $totalPengeluaran > 0 ? ($row->total / $totalPengeluaran) * 100 : 0;
+                $modalPengeluaranHtml .= '<li class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-medium text-dark">' . ($row->pengeluaranRelation->nama ?? 'Others') . '</span>
+                                <span class="fw-bold text-danger small">Rp ' . number_format($row->total, 0, ',', '.') . '</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: ' . $percentage . '%" aria-valuenow="' . $percentage . '" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                             <div class="text-end text-muted" style="font-size: 10px;">' . number_format($percentage, 1) . '%</div>
+                        </li>';
+            }
+            if ($summaryPengeluaran->isEmpty())
+                $modalPengeluaranHtml = '<li class="list-group-item text-center text-muted py-3">No data available</li>';
+
+
+            return response()->json([
+                'html' => view('transaksi._table_list', compact('transaksi'))->render(),
+                'stats' => $stats,
+                'modal_pemasukan' => $modalPemasukanHtml,
+                'modal_pengeluaran' => $modalPengeluaranHtml
+            ]);
+        }
+
+        // =====================
+        // INITIAL LOAD (Summary Detail)
+        // =====================
+        $summaryPemasukan = (clone $statsQuery)
             ->whereNotNull('pemasukan')
             ->selectRaw('pemasukan, SUM(nominal_pemasukan) as total')
             ->groupBy('pemasukan')
@@ -82,7 +141,7 @@ class TransaksiController extends Controller
             ->with('pemasukanRelation')
             ->get();
 
-        $summaryPengeluaran = (clone $baseQuery)
+        $summaryPengeluaran = (clone $statsQuery)
             ->whereNotNull('pengeluaran')
             ->selectRaw('pengeluaran, SUM(nominal) as total')
             ->groupBy('pengeluaran')
@@ -90,56 +149,46 @@ class TransaksiController extends Controller
             ->with('pengeluaranRelation')
             ->get();
 
-        // =====================
-        // SORTING
-        // =====================
-        $allowedSorts = [
-            'tgl_transaksi',
-            'nominal_pemasukan',
-            'nominal'
-        ];
-
-        $sort = $request->get('sort', 'tgl_transaksi');
-        $direction = $request->get('direction', 'desc');
-
-        if (!in_array($sort, $allowedSorts)) {
-            $sort = 'tgl_transaksi';
-        }
-
-        if (!in_array($direction, ['asc', 'desc'])) {
-            $direction = 'desc';
-        }
-
-        // =====================
-        // PAGINATION
-        // =====================
-        $transaksi = (clone $baseQuery)
-            ->orderBy($sort, $direction)
-            ->paginate(10)
-            ->withQueryString();
-
         return view('transaksi.index', [
             'transaksi' => $transaksi,
-
             'totalPemasukan' => $totalPemasukan,
             'totalPengeluaran' => $totalPengeluaran,
             'netIncome' => $netIncome,
-
             'summaryPemasukan' => $summaryPemasukan,
             'summaryPengeluaran' => $summaryPengeluaran,
-
-            // 🔽 WAJIB UNTUK FILTER
             'listPemasukan' => Pemasukan::where('id_user', $userId)->get(),
             'listPengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
         ]);
     }
 
-    private function buildFilteredQuery(Request $request)
+    private function buildFilteredQuery(Request $request, $skipSort = false)
     {
         $userId = Auth::id();
 
         $query = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
             ->where('id_user', $userId);
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                // Keterangan
+                $q->where('keterangan', 'like', "%{$search}%")
+                    // Nominal
+                    ->orWhere('nominal', 'like', "%{$search}%")
+                    ->orWhere('nominal_pemasukan', 'like', "%{$search}%")
+                    // Related Pemasukan
+                    ->orWhereHas('pemasukanRelation', function ($q2) use ($search) {
+                    $q2->where('nama', 'like', "%{$search}%");
+                }
+                )
+                    // Related Pengeluaran
+                    ->orWhereHas('pengeluaranRelation', function ($q3) use ($search) {
+                    $q3->where('nama', 'like', "%{$search}%");
+                }
+                );
+            });
+        }
 
         if ($request->filled('start_date')) {
             $query->whereDate('tgl_transaksi', '>=', $request->start_date);
@@ -167,12 +216,16 @@ class TransaksiController extends Controller
             }
         }
 
-        // sorting (whitelist)
-        $allowedSorts = ['tgl_transaksi', 'nominal_pemasukan', 'nominal'];
-        $sort = in_array($request->sort, $allowedSorts) ? $request->sort : 'tgl_transaksi';
-        $direction = in_array($request->direction, ['asc', 'desc']) ? $request->direction : 'desc';
+        if (!$skipSort) {
+            // sorting
+            $allowedSorts = ['tgl_transaksi', 'nominal_pemasukan', 'nominal'];
+            $sort = in_array($request->sort, $allowedSorts) ? $request->sort : 'tgl_transaksi';
+            $direction = in_array($request->direction, ['asc', 'desc']) ? $request->direction : 'desc';
 
-        return $query->orderBy($sort, $direction);
+            $query->orderBy($sort, $direction);
+        }
+
+        return $query;
     }
 
 
