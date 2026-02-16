@@ -84,6 +84,7 @@
                                 <i class="bi bi-eye-slash"></i>
                             </button>
                         </div>
+                        <small class="text-muted">At least 3 characters (can be letters, numbers, or symbols).</small>
                     </div>
                      <div class="mb-3">
                         <label for="new_password_confirmation" class="form-label">Confirm New Password</label>
