@@ -100,7 +100,7 @@
                         </div>
 
                         <!-- Advanced Options -->
-                        <div class="card bg-light border-0 mb-4">
+                        {{-- <div class="card bg-light border-0 mb-4">
                             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center" role="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
                                 <span class="fw-bold text-muted small"><i class="bi bi-gear-fill me-2"></i> Advanced Options (Assets & Emergency Fund)</span>
                                 <i class="bi bi-chevron-down text-muted"></i>
@@ -153,7 +153,7 @@
 
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg shadow-sm">
