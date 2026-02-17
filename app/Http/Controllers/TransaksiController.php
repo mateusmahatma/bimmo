@@ -752,9 +752,105 @@ class TransaksiController extends Controller
             'file' => 'required|mimes:xlsx,xls'
         ]);
 
-        Excel::import(new TransaksiImportTest, $request->file('file'));
+        // Retrieve all sheets as a collection
+        $sheets = Excel::toCollection(new TransaksiImportTest, $request->file('file'));
 
-        return back()->with('success', 'Import berhasil');
+        $validDataFound = false;
+        $processedCount = 0;
+
+        foreach ($sheets as $sheetIndex => $rows) {
+            // Check if this sheet has valid data
+            if ($rows->isEmpty()) {
+                continue;
+            }
+
+            // Check first row keys to identify if it's a transaction sheet
+            $firstRow = $rows->first();
+            $keys = array_keys($firstRow->toArray());
+
+            // Check for expected headers (either new template or legacy)
+            $hasDateInfo = in_array('tanggal_transaksi', $keys) || in_array('tgl_transaksi', $keys);
+
+            if (!$hasDateInfo) {
+                continue; // Skip this sheet (probably Pemasukan/Pengeluaran export sheet)
+            }
+
+            // Process valid sheet
+            $dataToInsert = [];
+            foreach ($rows as $row) {
+                // Determine the key for date
+                $tglRaw = $row['tanggal_transaksi'] ?? $row['tgl_transaksi'] ?? null;
+
+                if (empty($tglRaw)) {
+                    continue;
+                }
+
+                try {
+                    if (is_numeric($tglRaw)) {
+                        $tgl = Carbon::instance(
+                            \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw)
+                        )->format('Y-m-d');
+                    }
+                    else {
+                        $tgl = Carbon::parse($tglRaw)->format('Y-m-d');
+                    }
+                }
+                catch (\Exception $e) {
+                    continue;
+                }
+
+                // Handle Income (Pemasukan)
+                $nomPemasukan = $row['nominal_pemasukan'] ?? 0;
+                if ($nomPemasukan > 0) {
+                    $dataToInsert[] = [
+                        'tgl_transaksi' => $tgl,
+                        'pemasukan' => $row['jenis_pemasukan'] ?? $row['pemasukan'] ?? null,
+                        'nominal_pemasukan' => $nomPemasukan,
+                        'pengeluaran' => null,
+                        'nominal' => 0,
+                        'keterangan' => $row['keterangan'] ?? null,
+                        'status' => $row['status'] ?? 1,
+                        'id_user' => Auth::id(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                // Handle Expense (Pengeluaran)
+                $nomPengeluaran = $row['nominal_pengeluaran'] ?? $row['nominal'] ?? 0;
+                // Capture expense type, ensuring we respect both formats 
+                // Note: The view logic expects 'pengeluaran' relation to be present for expenses
+                $jenisPengeluaran = $row['jenis_pengeluaran'] ?? $row['pengeluaran'] ?? null;
+
+                if ($nomPengeluaran > 0) {
+                    $dataToInsert[] = [
+                        'tgl_transaksi' => $tgl,
+                        'pemasukan' => null, // Reset income fields for expense record
+                        'nominal_pemasukan' => 0,
+                        'pengeluaran' => $jenisPengeluaran,
+                        'nominal' => $nomPengeluaran,
+                        'keterangan' => $row['keterangan'] ?? null,
+                        'status' => $row['status'] ?? 1,
+                        'id_user' => Auth::id(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
+
+            if (!empty($dataToInsert)) {
+                Transaksi::insert($dataToInsert);
+                $validDataFound = true;
+                $processedCount += count($dataToInsert);
+                break; // Stop after finding and processing the first valid sheet
+            }
+        }
+
+        if (!$validDataFound) {
+            return back()->with('error', 'Tidak ada sheet transaksi yang valid ditemukan. Pastikan ada kolom "tanggal_transaksi" atau "tgl_transaksi".');
+        }
+
+        return back()->with('success', 'Import berhasil! ' . $processedCount . ' data ditambahkan.');
     }
 
 

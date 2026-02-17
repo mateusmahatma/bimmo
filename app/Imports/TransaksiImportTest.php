@@ -14,44 +14,6 @@ class TransaksiImportTest implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
-        $data = [];
-
-        foreach ($rows as $row) {
-
-            if (empty($row['tgl_transaksi'])) {
-                continue;
-            }
-
-            try {
-                if (is_numeric($row['tgl_transaksi'])) {
-                    $tgl = Carbon::instance(
-                        Date::excelToDateTimeObject($row['tgl_transaksi'])
-                    )->format('Y-m-d');
-                } else {
-                    $tgl = Carbon::parse($row['tgl_transaksi'])->format('Y-m-d');
-                }
-            } catch (\Exception $e) {
-                continue;
-            }
-
-            $data[] = [
-                'tgl_transaksi'     => $tgl,
-                'pemasukan'         => $row['pemasukan'] ?? null,
-                'nominal_pemasukan' => $row['nominal_pemasukan'] ?? 0,
-                'pengeluaran'       => $row['pengeluaran'] ?? null,
-                'nominal'           => $row['nominal'] ?? 0,
-                'keterangan'        => $row['keterangan'] ?? null,
-                'status'            => $row['status'] ?? 1,
-                'id_user'           => Auth::id(),
-                'created_at'        => now(),
-                'updated_at'        => now(),
-            ];
-        }
-
-        if (count($data) === 0) {
-            throw new \Exception('Tidak ada data valid untuk diimport');
-        }
-
-        Transaksi::insert($data);
+    // Logic dipindah ke Controller untuk handle multiple sheets
     }
 }
