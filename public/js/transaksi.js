@@ -37,13 +37,14 @@ const TransaksiConfig = {
 // =====================================================
 const ThemeHandler = {
     init() {
-        const skin = window.userSkin || 'auto';
-        const updateSkinUrl = window.updateSkinUrl;
-        const csrfToken = window.csrfToken;
+        // Theme handled globally
+        // const skin = window.userSkin || 'auto';
+        // const updateSkinUrl = window.updateSkinUrl;
+        // const csrfToken = window.csrfToken;
 
-        this.applyTheme(skin);
-        this.highlightActiveSkin(skin);
-        window.setTheme = this.setTheme.bind(this);
+        // this.applyTheme(skin);
+        // this.highlightActiveSkin(skin);
+        // window.setTheme = this.setTheme.bind(this);
     },
 
     applyTheme(mode) {

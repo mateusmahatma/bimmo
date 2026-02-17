@@ -77,7 +77,7 @@
                                     <label class="form-label">Rentang Tanggal</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i class="bi bi-calendar3"></i></span>
-                                        <div id="daterange" class="form-control" style="background: #fff; cursor: pointer;">
+                                        <div id="daterange" class="form-control" style="cursor: pointer;">
                                             <span></span>
                                         </div>
                                         <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">

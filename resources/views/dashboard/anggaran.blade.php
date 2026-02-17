@@ -53,6 +53,8 @@
                         v > anggaran[i] ? v - anggaran[i] : 0
                     );
 
+                    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
                     const options = {
                         chart: {
                             type: 'bar',
@@ -60,7 +62,8 @@
                             height: 420,
                             toolbar: {
                                 show: true
-                            }
+                            },
+                            foreColor: isDark ? '#e0e0e0' : '#333'
                         },
                         plotOptions: {
                             bar: {
@@ -70,7 +73,7 @@
                         },
                         stroke: {
                             width: 1,
-                            colors: ['#fff']
+                            colors: [isDark ? '#333' : '#fff']
                         },
                         series: [{
                                 name: "Realisasi",
@@ -91,8 +94,14 @@
                         xaxis: {
                             categories: data.labels,
                             labels: {
+                                style: { colors: isDark ? '#e0e0e0' : '#333' },
                                 formatter: value =>
                                     "Rp " + new Intl.NumberFormat("id-ID").format(value)
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: { colors: isDark ? '#e0e0e0' : '#333' }
                             }
                         },
                         dataLabels: {
@@ -100,6 +109,7 @@
                             style: {
                                 fontSize: '12px',
                                 fontWeight: 'bold',
+                                colors: ['#fff']
                             },
                             formatter: value => {
                                 if (value === 0) return "";
@@ -113,10 +123,14 @@
                             }
                         },
                         tooltip: {
+                            theme: isDark ? 'dark' : 'light',
                             y: {
                                 formatter: value =>
                                     "Rp " + new Intl.NumberFormat("id-ID").format(value)
                             }
+                        },
+                        grid: {
+                            borderColor: isDark ? '#444' : '#e0e0e0'
                         }
                     };
 

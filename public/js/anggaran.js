@@ -1,63 +1,10 @@
 $(document).ready(function () {
-    // Theme Handler
-    const skin = window.userSkin || 'auto';
-    const updateSkinUrl = window.updateSkinUrl;
+    // Theme Handler Removed - Managed Globally
     const csrfToken = window.csrfToken;
-
-    function applyTheme(mode) {
-        if (mode === 'light' || mode === 'dark') {
-            document.documentElement.setAttribute('data-bs-theme', mode);
-        } else {
-            document.documentElement.removeAttribute('data-bs-theme'); // auto
-        }
-        document.dispatchEvent(new Event("themeChanged"));
-    }
-
-    // Set Active Theme in Dropdown
-    function highlightActiveSkin(mode) {
-        document.querySelectorAll('.dropdown-item').forEach(el => {
-            el.classList.remove('active');
-            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
-                el.classList.add('active');
-            }
-        });
-    }
-
-    function setTheme(mode) {
-        applyTheme(mode);
-        highlightActiveSkin(mode);
-
-        if (updateSkinUrl) {
-            fetch(updateSkinUrl, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": csrfToken,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ skin: mode })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) alert("Gagal menyimpan tema.");
-                })
-                .catch(err => console.error("Gagal update tema:", err));
-        }
-    }
-
-    // Global Setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    // Eksekusi awal tema
-    applyTheme(skin);
-    highlightActiveSkin(skin);
-    window.setTheme = setTheme;
 
     // Toast Notification
     function showToast(message, type) {
+
         let toastContainer = document.querySelector('.toast-container');
         if (!toastContainer) {
             toastContainer = document.createElement('div');

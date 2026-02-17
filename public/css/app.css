@@ -81,3 +81,179 @@
     padding: 1.5rem;
     border: #6c757d20 1px solid;
 }
+
+/* Dark Mode Overrides */
+[data-bs-theme="dark"] body {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #a0a0a0 !important;
+}
+
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .card-dashboard,
+[data-bs-theme="dark"] .summary-card,
+[data-bs-theme="dark"] .card-summary {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: #1e1e1e !important;
+    border-bottom: 1px solid #333 !important;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .table {
+    color: #e0e0e0;
+    --bs-table-color: #e0e0e0;
+    --bs-table-bg: #1e1e1e;
+    --bs-table-border-color: #333;
+}
+
+[data-bs-theme="dark"] .table-light {
+    --bs-table-bg: #2c2c2c;
+    --bs-table-color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .form-control {
+    background-color: #2c2c2c;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .form-select {
+    background-color: #2c2c2c;
+    border-color: #444;
+    color: #e0e0e0;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e0e0e0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #2c2c2c;
+    border-color: #666;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-item:focus {
+    background-color: #2c2c2c;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .input-group-text {
+    background-color: #2c2c2c !important;
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+[data-bs-theme="dark"] .pagetitle h1 {
+    color: #e0e0e0;
+}
+
+/* Sidebar Dark Mode */
+[data-bs-theme="dark"] .sidebar {
+    background-color: #1e1e1e;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+    border-right: 1px solid #333 !important;
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link {
+    color: #b0b3b8;
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link i {
+    color: #818cf8;
+    /* Light Indigo */
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link:hover {
+    background-color: #2c2c2c;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link.active {
+    background-color: #1e3a8a;
+    /* Darker Blue */
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .sidebar .nav-link.active i {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .sidebar .sub-link {
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .sidebar .sub-link.active {
+    color: #60a5fa;
+    /* Blue 400 */
+}
+
+/* Header Dark Mode */
+[data-bs-theme="dark"] .header {
+    background-color: #1e1e1e;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .list-group-item {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .border-end {
+    border-right-color: #333 !important;
+}
+
+[data-bs-theme="dark"] .border-bottom {
+    border-bottom-color: #333 !important;
+}
+
+[data-bs-theme="dark"] .offcanvas {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .offcanvas-header {
+    border-bottom-color: #333 !important;
+}
+
+[data-bs-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}

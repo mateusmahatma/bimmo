@@ -1,61 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Theme Switcher
-    const skin = window.userSkin || 'auto';
-    const updateSkinUrl = window.updateSkinUrl;
+    // Theme Switcher Removed - Managed Globally
     const csrfToken = window.csrfToken;
-
-    function applyTheme(mode) {
-        if (mode === 'light' || mode === 'dark') {
-            document.documentElement.setAttribute('data-bs-theme', mode);
-        } else {
-            // Auto mode: deteksi prefers-color-scheme
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const autoTheme = prefersDark ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-bs-theme', autoTheme);
-        }
-        document.dispatchEvent(new Event("themeChanged"));
-    }
-
-    function highlightActiveSkin(mode) {
-        document.querySelectorAll('.dropdown-item').forEach(el => {
-            el.classList.remove('active');
-            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
-                el.classList.add('active');
-            }
-        });
-
-        // Highlight active skin in dropdown
-        if (mode === 'auto') {
-            const autoItem = document.querySelector('.dropdown-item[data-skin="auto"]');
-            if (autoItem) autoItem.classList.add('active');
-        }
-    }
-
-    function setTheme(mode) {
-        applyTheme(mode);
-        highlightActiveSkin(mode);
-
-        fetch(updateSkinUrl, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                skin: mode
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) alert("Gagal menyimpan tema.");
-            })
-            .catch(err => console.error("Gagal update tema:", err));
-    }
-
-    // Eksekusi awal tema
-    applyTheme(skin);
-    highlightActiveSkin(skin);
-    window.setTheme = setTheme;
 
     const charts = {};
     const chartData = {};
@@ -991,54 +936,11 @@ document.addEventListener("DOMContentLoaded", function () {
     window.updateChartTheme = updateChartTheme;
 });
 
+// Theme is managed globally by main.js
+// Legacy theme logic removed to prevent conflicts
+
+// ==== NOMINAL DISPLAY HANDLER ====
 document.addEventListener("DOMContentLoaded", function () {
-    const skin = window.userSkin || 'auto';
-    const updateSkinUrl = window.updateSkinUrl;
-    const csrfToken = window.csrfToken;
-
-    function applyTheme(mode) {
-        if (mode === 'light' || mode === 'dark') {
-            document.documentElement.setAttribute('data-bs-theme', mode);
-        } else {
-            document.documentElement.removeAttribute('data-bs-theme'); // auto
-        }
-        document.dispatchEvent(new Event("themeChanged"));
-    }
-
-    function highlightActiveSkin(mode) {
-        document.querySelectorAll('.dropdown-item').forEach(el => {
-            el.classList.remove('active');
-            if (el.getAttribute('onclick') === `setTheme('${mode}')`) {
-                el.classList.add('active');
-            }
-        });
-    }
-
-    function setTheme(mode) {
-        applyTheme(mode);
-        highlightActiveSkin(mode);
-
-        fetch(updateSkinUrl, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ skin: mode })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) alert("Gagal menyimpan tema.");
-            })
-            .catch(err => console.error("Gagal update tema:", err));
-    }
-
-    // Eksekusi awal tema
-    applyTheme(skin);
-    highlightActiveSkin(skin);
-    window.setTheme = setTheme;
-
-    // ==== NOMINAL DISPLAY HANDLER ====
     function updateNominalDisplay(isHidden) {
         document.querySelectorAll(".box-info h3").forEach(h3 => {
             h3.textContent = isHidden ? "****" : h3.getAttribute("data-value");

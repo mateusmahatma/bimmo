@@ -18,6 +18,27 @@
 
 
     @stack('css')
+    
+    <script>
+        (function() {
+            const setTheme = (theme) => {
+                if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                }
+            }
+
+            // Check system preference on load
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            setTheme(prefersDark.matches ? 'dark' : 'light');
+
+            // Monitor system changes
+            prefersDark.addEventListener('change', event => {
+                setTheme(event.matches ? 'dark' : 'light');
+            });
+        })();
+    </script>
 </head>
 
 <body>
@@ -25,6 +46,7 @@
     @yield('body')
 
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/main.js') }}"></script>
     @stack('scripts')
 </body>
 
