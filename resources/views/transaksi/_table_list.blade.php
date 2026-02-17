@@ -46,19 +46,19 @@
         <tbody>
             @forelse ($transaksi as $row)
                 <tr>
-                    <td class="text-center">
+                    <td class="text-center mobile-checkbox" data-label="Select">
                         <div class="form-check d-flex justify-content-center">
                             <input class="form-check-input check-item" type="checkbox" value="{{ $row->id }}">
                         </div>
                     </td>
-                    <td>{{ $loop->iteration + ($transaksi->currentPage() - 1) * $transaksi->perPage() }}</td>
-                    <td>
+                    <td data-label="No">{{ $loop->iteration + ($transaksi->currentPage() - 1) * $transaksi->perPage() }}</td>
+                    <td data-label="Date">
                         <div class="fw-bold text-dark">{{ \Carbon\Carbon::parse($row->tgl_transaksi)->format('d M Y') }}
                         </div>
                         <div class="small text-muted">
                             {{ \Carbon\Carbon::parse($row->tgl_transaksi)->locale('en')->isoFormat('dddd') }}</div>
                     </td>
-                    <td>
+                    <td data-label="Category">
                         @if ($row->nominal_pemasukan > 0)
                             <span
                                 class="badge bg-success-light text-success border border-success-subtle rounded-pill px-3">
@@ -71,7 +71,7 @@
                             </span>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="Description">
                         @if ($row->keterangan)
                             <div class="text-muted small" style="max-height: 60px; overflow-y: auto;">
                                 @php
@@ -95,15 +95,14 @@
                             <span class="text-muted small">-</span>
                         @endif
                     </td>
-                    <td
-                        class="text-end fw-bold {{ $row->nominal_pemasukan > 0 ? 'text-success' : 'text-danger' }}">
+                    <td class="text-end fw-bold {{ $row->nominal_pemasukan > 0 ? 'text-success' : 'text-danger' }}" data-label="Amount">
                         @if ($row->nominal_pemasukan > 0)
                             + Rp {{ number_format($row->nominal_pemasukan, 0, ',', '.') }}
                         @else
                             - Rp {{ number_format($row->nominal, 0, ',', '.') }}
                         @endif
                     </td>
-                    <td class="text-center">
+                    <td class="text-center" data-label="Action">
                         @include('transaksi._aksi', ['row' => $row])
                     </td>
                 </tr>
