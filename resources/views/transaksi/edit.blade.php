@@ -1,208 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Edit Transaction</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-
 @extends('layouts.main')
+
+@section('title', 'Edit Transaction')
+
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Edit Transaction</a>
-</nav>
-
-<div class="card-header">
-    <div class="card-body">
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-        <form action="{{ route('transaksi.update', $transaksi->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <div class="mt-3 mb-3">
-                <label for="tgl_transaksi" class="form-label required">Transaction Date</label>
-                <input name="tgl_transaksi" class="form-control" type="date"
-                    value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi) }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="pemasukan" class="col-form-label">Income</label>
-                <select class="form-select" id="pemasukan" name="pemasukan">
-                    <option value="">- Select -</option>
-                    @foreach ($pemasukan as $item)
-                    <option value="{{ $item->id }}"
-                        {{ old('pemasukan', $transaksi->pemasukan) == $item->id ? 'selected' : '' }}>
-                        {{ $item->nama }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="input-group mb-3">
-                <span class="input-group-text">Rp</span>
-                <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control" placeholder="Income Amount"
-                    value="{{ old('nominal_pemasukan', $transaksi->nominal_pemasukan) }}">
-                <span class="input-group-text">.00</span>
-            </div>
-
-            <div class="mb-3">
-                <label for="pengeluaran" class="col-form-label">Expense</label>
-                <select class="form-select" id="pengeluaran" name="pengeluaran">
-                    <option value="">- Select -</option>
-                    @foreach ($pengeluaran as $item)
-                    <option value="{{ $item->id }}"
-                        {{ old('pengeluaran', $transaksi->pengeluaran) == $item->id ? 'selected' : '' }}>
-                        {{ $item->nama }}
-                    </option> @endforeach
-                </select>
-            </div>
-
-            <div class="input-group mb-3">
-                <span class="input-group-text">Rp</span>
-                <input type="number" id="nominal" name="nominal" class="form-control" placeholder="Expense Amount"
-                    value="{{ old('nominal', $transaksi->nominal) }}">
-                <span class="input-group-text">.00</span>
-            </div>
-
-            <div class="custom-alert">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold">Add amount to Assets/Emergency Fund</h5>
-                    <button id="toggleBtn" type="button" class="btn btn-sm btn-outline-secondary">
-                        <span id="toggleIcon">+</span>
-                    </button>
-                </div>
-                <ol id="detailContent" class="mt-3 ps-3">
-                    <!-- Checkbox kategori -->
-                    <div class="alert alert-success">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" value="asset_list" id="checkAssetList" name="kategori[]">
-                            <label class="form-check-label" for="checkAssetList">
-                                Add to Asset List
-                                <small class="text-muted d-block">
-                                    If checked, this transaction will be recorded in the asset list.
-                                </small>
-                            </label>
-                        </div>
-
-                        <div class="mb-3" id="selectBarangContainer" style="display: none;">
-                            <label for="barang_id" class="form-label">Select Asset</label>
-                            <select class="form-select" id="barang_id" name="barang_id">
-                                <option value="">- Select -</option>
-                                @foreach ($barang as $barang)
-                                <option value="{{ $barang->id }}">{{ $barang->nama_barang }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- {{-- Checkbox Dana Darurat --}} -->
-                    <div class="alert alert-danger">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" value="emergency_fund" id="checkEmergencyFund" name="kategori[]">
-                            <label class="form-check-label" for="checkEmergencyFund">
-                                Add to Emergency Fund
-                                <small class="text-muted d-block">
-                                    If checked, this transaction will be recorded in the emergency fund.
-                                </small>
-                            </label>
-                        </div>
-
-                        <!-- {{-- Form dana darurat --}} -->
-                        <div id="danaDaruratContainer" style="display: none;">
-
-                            <div class="mb-3">
-                                <label class="form-label">Emergency Fund Transaction Type</label>
-                                <select name="jenis_transaksi_dana_darurat" class="form-select">
-                                    <option value="">-- Select Type --</option>
-                                    <option value="1">Fund In</option>
-                                    <option value="2">Fund Out</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Emergency Fund Amount</label>
-                                <input type="number" name="nominal_dana_darurat" class="form-control" placeholder="Amount">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Emergency Fund Note</label>
-                                <textarea name="keterangan_dana_darurat" class="form-control" rows="2"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </ol>
-            </div>
-
-            <div class="mb-3">
-                <label for="keterangan" class="col-form-label">Description</label>
-                <textarea id="keterangan" name="keterangan" class="form-control" placeholder="Description">{{ old('keterangan', $transaksi->keterangan) }}</textarea>
-            </div>
-            <button type="submit" class="btn btn-success">Save</button>
-        </form>
-    </div>
+<div class="pagetitle mb-4">
+    <h1>Edit Transaction</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('transaksi.index') }}">Transactions</a></li>
+            <li class="breadcrumb-item active">Edit</li>
+        </ol>
+    </nav>
 </div>
 
-<script>
-    document.getElementById('checkAssetList').addEventListener('change', function() {
-        const container = document.getElementById('selectBarangContainer');
-        container.style.display = this.checked ? 'block' : 'none';
-    });
+<section class="section">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card-dashboard">
+                <div class="card-body p-4">
+                    
+                    @if ($errors->any())
+                    <div class="alert alert-danger d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <ul class="mb-0 ps-3">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
 
-    document.getElementById('checkEmergencyFund').addEventListener('change', function() {
-        const container = document.getElementById('danaDaruratContainer');
-        container.style.display = this.checked ? 'block' : 'none';
-    });
+                    @php
+                        // Encode ID for the route
+                        $hashId = \Vinkla\Hashids\Facades\Hashids::encode($transaksi->id);
+                    @endphp
 
-    // --- Toggle untuk bagian pertama ---
-    const toggleBtn = document.getElementById("toggleBtn");
-    const toggleIcon = document.getElementById("toggleIcon");
-    const detailContent = document.getElementById("detailContent");
+                    <form action="{{ route('transaksi.update', $hashId) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <!-- Date Section -->
+                        <div class="mb-4">
+                            <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">Transaction Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" 
+                                value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi) }}" required>
+                        </div>
 
-    toggleBtn.addEventListener("click", () => {
-        const isHidden = detailContent.style.display === "none";
-        detailContent.style.display = isHidden ? "block" : "none";
-        toggleIcon.textContent = isHidden ? "−" : "+";
-    });
+                        <div class="row g-4 mb-4">
+                            <!-- Income Section -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #198754 !important;">
+                                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> Income</h6>
+                                    
+                                    <div class="mb-3">
+                                        <label for="pemasukan" class="form-label small text-muted">Category</label>
+                                        <select class="form-select" id="pemasukan" name="pemasukan">
+                                            <option value="">- Select Income -</option>
+                                            @foreach ($pemasukan as $item)
+                                            <option value="{{ $item->id }}" {{ old('pemasukan', $transaksi->pemasukan) == $item->id ? 'selected' : '' }}>
+                                                {{ $item->nama }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <label for="nominal_pemasukan" class="form-label small text-muted">Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-success text-white fw-bold">Rp</span>
+                                            <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control fw-bold text-success" 
+                                                placeholder="0" value="{{ old('nominal_pemasukan', $transaksi->nominal_pemasukan) }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-    // default: sembunyikan konten
-    detailContent.style.display = "none";
+                            <!-- Expense Section -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #dc3545 !important;">
+                                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> Expense</h6>
+                                    
+                                    <div class="mb-3">
+                                        <label for="pengeluaran" class="form-label small text-muted">Category</label>
+                                        <select class="form-select" id="pengeluaran" name="pengeluaran">
+                                            <option value="">- Select Expense -</option>
+                                            @foreach ($pengeluaran as $item)
+                                            <option value="{{ $item->id }}" {{ old('pengeluaran', $transaksi->pengeluaran) == $item->id ? 'selected' : '' }}>
+                                                {{ $item->nama }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <label for="nominal" class="form-label small text-muted">Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-danger text-white fw-bold">Rp</span>
+                                            <input type="number" id="nominal" name="nominal" class="form-control fw-bold text-danger" 
+                                                placeholder="0" value="{{ old('nominal', $transaksi->nominal) }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-    // Filter Tomselect
-    document.addEventListener('DOMContentLoaded', function() {
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">Description / Notes</label>
+                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Additional details about this transaction...">{{ old('keterangan', $transaksi->keterangan) }}</textarea>
+                        </div>
 
-        function initTomSelect(selector) {
-            new TomSelect(selector, {
-                allowEmptyOption: true,
-                placeholder: '- Select -',
-                create: false,
-                onInitialize: function() {
-                    if (!this.getValue()) {
-                        this.setTextboxValue('');
-                    }
-                }
-            });
-        }
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ route('transaksi.index') }}" class="btn btn-light btn-lg border shadow-sm">
+                                <i class="bi bi-arrow-left me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                <i class="bi bi-check-lg me-2"></i> Update Transaction
+                            </button>
+                        </div>
 
-        // Inisialisasi semua TomSelect
-        initTomSelect('#pemasukan');
-        initTomSelect('#pengeluaran');
-        initTomSelect('#barang_id');
-    });
-</script>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 @endsection
 
-
 @section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize TomSelect
+        if (typeof TomSelect !== 'undefined') {
+             if(document.getElementById('pemasukan')) new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- Select Income -' });
+             if(document.getElementById('pengeluaran')) new TomSelect('#pengeluaran', { allowEmptyOption: true, placeholder: '- Select Expense -' });
+        }
+    });
+</script>
 <script src="{{ asset('js/transaksi.js') }}?v={{ filemtime(public_path('js/transaksi.js')) }}"></script>
 @endsection
