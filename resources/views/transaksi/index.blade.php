@@ -4,6 +4,119 @@
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<style>
+    @media screen and (max-width: 768px) {
+        /* Force table to not be like tables anymore */
+        #transaksiTable, 
+        #transaksiTable thead, 
+        #transaksiTable tbody, 
+        #transaksiTable th, 
+        #transaksiTable td, 
+        #transaksiTable tr { 
+            display: block; 
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        #transaksiTable thead tr { 
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #transaksiTable tr { 
+            border: 1px solid #eef2f7; 
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            padding: 0.5rem;
+        }
+
+        #transaksiTable td { 
+            /* Behave  like a "row" */
+            border: none;
+            border-bottom: 1px solid #f8f9fa; 
+            position: relative;
+            padding-left: 45%; 
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            text-align: right; /* Align text to right */
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        #transaksiTable td:last-child {
+            border-bottom: 0;
+            justify-content: center;
+            padding-left: 0;
+            margin-top: 0.5rem;
+        }
+
+        #transaksiTable td:before { 
+            /* Now like a table header */
+            position: absolute;
+            /* Top/left values mimic padding */
+            left: 0.75rem; 
+            width: 40%; 
+            padding-right: 10px; 
+            white-space: nowrap;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            content: attr(data-label);
+        }
+        
+        /* Specific adjustments */
+        #transaksiTable td.mobile-checkbox {
+            padding-left: 0;
+            display: flex;
+            justify-content: flex-start;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+            margin: -0.5rem -0.5rem 0.5rem -0.5rem;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #eef2f7;
+        }
+        
+        #transaksiTable td.mobile-checkbox:before {
+            display: none;
+        }
+        
+        #transaksiTable td.mobile-checkbox .form-check {
+            margin: 0;
+        }
+        
+        /* Adjust Description to allow wrapping */
+        #transaksiTable td[data-label="Description"] {
+            height: auto;
+            align-items: flex-start;
+        }
+        
+         /* No Column - maybe hide it or style it */
+        #transaksiTable td[data-label="No"] {
+            display: none;
+        }
+        
+        /* Category Badge alignment */
+        #transaksiTable td[data-label="Category"] {
+            align-items: center;
+        }
+        
+        /* Action buttons */
+        #transaksiTable td[data-label="Action"] {
+           justify-content: flex-end;
+           padding-left: 45%;
+        }
+        
+         .pagination {
+            justify-content: center !important;
+        }
+    }
+</style>
 @endpush
 
 @section('container')
