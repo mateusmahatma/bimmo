@@ -12,6 +12,8 @@ use Yajra\DataTables\DataTables;
 use App\Models\Transaksi;
 use App\Models\Pengeluaran;
 
+use Vinkla\Hashids\Facades\Hashids;
+
 class FinancialCalculatorController extends Controller
 {
     public function index(Request $request)
@@ -110,8 +112,11 @@ class FinancialCalculatorController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         if ($request->ajax()) {
             $prosesAnggaran = HasilProsesAnggaran::find($id);
 
@@ -149,7 +154,7 @@ class FinancialCalculatorController extends Controller
             $sisaAnggaran = floatval($prosesAnggaran->nominal_anggaran) - $totalTransaksi;
 
             return response()->json([
-                'id' => $prosesAnggaran->id,
+                'id' => $prosesAnggaran->hash,
                 'nama_pengeluaran' => $prosesAnggaran->nama_anggaran,
                 'anggaran_digunakan_terkini' => number_format($totalTransaksi, 0, ',', '.'),
                 'sisa_anggaran' => number_format($sisaAnggaran, 0, ',', '.'),
@@ -264,8 +269,11 @@ class FinancialCalculatorController extends Controller
         return $pdf->stream('');
     }
 
-    public function destroy($id)
+    public function destroy($hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         $deleted = HasilProsesAnggaran::where('id_proses_anggaran', $id)->delete();
 
         if ($deleted) {
@@ -275,8 +283,11 @@ class FinancialCalculatorController extends Controller
         return response()->json(['message' => 'Data tidak ditemukan'], 404);
     }
 
-    public function show(Request $request, $id)
+    public function show(Request $request, $hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         // Ambil hasil proses anggaran
         $HasilProsesAnggaran = HasilProsesAnggaran::with('user')->findOrFail($id);
 
