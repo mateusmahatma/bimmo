@@ -24,19 +24,15 @@ class WhatsAppService
         // 1. Basic Cleaning
         $text = trim($message);
         $parts = explode(' ', $text);
-
         if (count($parts) < 3) {
             return "Format salah. Gunakan: [KATA_KUNCI] [NOMINAL] [KATEGORI] [KETERANGAN (Optional)]\nContoh: KELUAR 50000 MAKAN Nasi Padang";
         }
-
         $keyword = strtoupper($parts[0]);
         $nominal = $this->parseNominal($parts[1]);
         $kategoriName = $parts[2];
         $keterangan = count($parts) > 3 ? implode(' ', array_slice($parts, 3)) : '';
-
         // Default User ID (Admin)
         $userId = 1;
-
         // 2. Determine Type
         if (in_array($keyword, ['PEMASUKAN', 'MASUK', 'IN'])) {
             return $this->handlePemasukan($userId, $nominal, $kategoriName, $keterangan);
@@ -46,29 +42,24 @@ class WhatsAppService
             return "Kata kunci '$keyword' tidak dikenali. Gunakan: MASUK atau KELUAR.";
         }
     }
-
     private function parseNominal($amountStr)
     {
         // Remove Rp, dots, command
         return (float) preg_replace('/[^0-9]/', '', $amountStr);
     }
-
     private function handlePemasukan($userId, $nominal, $kategoriName, $keterangan)
     {
         // Find Category
         $kategori = Pemasukan::where('id_user', $userId)
             ->where('nama', 'LIKE', '%' . $kategoriName . '%')
             ->first();
-
         if (!$kategori) {
-             // Optional: Create if not exists or return error. For now, return error to be safe.
-             // Or try to find a general category.
-             return "Kategori pemasukan '$kategoriName' tidak ditemukan.";
+            // Optional: Create if not exists or return error. For now, return error to be safe.
+            // Or try to find a general category.
+            return "Kategori pemasukan '$kategoriName' tidak ditemukan.";
         }
-
         try {
             DB::beginTransaction();
-
             Transaksi::create([
                 'tgl_transaksi' => now(), // Or parse from message if provided? For now use current time.
                 'pemasukan' => $kategori->id,
@@ -79,7 +70,6 @@ class WhatsAppService
                 'id_user' => $userId,
                 'status' => 1 // Default status
             ]);
-
             DB::commit();
             return "Berhasil mencatat Pemasukan: Rp " . number_format($nominal, 0, ',', '.') . " (" . $kategori->nama . ")";
         } catch (\Exception $e) {
@@ -87,21 +77,17 @@ class WhatsAppService
             return "Gagal menyimpan transaksi: " . $e->getMessage();
         }
     }
-
     private function handlePengeluaran($userId, $nominal, $kategoriName, $keterangan)
     {
         // Find Category
         $kategori = Pengeluaran::where('id_user', $userId)
             ->where('nama', 'LIKE', '%' . $kategoriName . '%')
             ->first();
-
         if (!$kategori) {
-             return "Kategori pengeluaran '$kategoriName' tidak ditemukan.";
+            return "Kategori pengeluaran '$kategoriName' tidak ditemukan.";
         }
-
         try {
             DB::beginTransaction();
-
             Transaksi::create([
                 'tgl_transaksi' => now(),
                 'pemasukan' => null,
@@ -112,10 +98,8 @@ class WhatsAppService
                 'id_user' => $userId,
                 'status' => 1
             ]);
-
             DB::commit();
             return "Berhasil mencatat Pengeluaran: Rp " . number_format($nominal, 0, ',', '.') . " (" . $kategori->nama . ")";
-
         } catch (\Exception $e) {
             DB::rollBack();
             return "Gagal menyimpan transaksi: " . $e->getMessage();
