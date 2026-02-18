@@ -28,6 +28,9 @@ class FinancialCalculatorController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('hash', function ($row) {
+                return Hashids::encode($row->id_proses_anggaran);
+            })
                 ->addColumn('nama_jenis_pengeluaran', function ($row) {
                 $ids = $row->jenis_pengeluaran ?? [];
 
@@ -281,6 +284,39 @@ class FinancialCalculatorController extends Controller
         }
 
         return response()->json(['message' => 'Data tidak ditemukan'], 404);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (empty($ids) || !is_array($ids)) {
+            return response()->json(['message' => 'No data selected'], 400);
+        }
+
+        $decodedIds = [];
+        foreach ($ids as $hash) {
+            $decoded = Hashids::decode($hash)[0] ?? null;
+            if ($decoded) {
+                $decodedIds[] = $decoded;
+            }
+        }
+
+        if (empty($decodedIds)) {
+            return response()->json(['message' => 'Invalid data'], 400);
+        }
+
+        // Ensure user owns the data (optional but recommended safety check)
+        // Since we check user ID in index/show, here we can just delete where id in array AND user_id = auth
+        $count = HasilProsesAnggaran::whereIn('id_proses_anggaran', $decodedIds)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($count > 0) {
+            return response()->json(['message' => "$count data berhasil dihapus"]);
+        }
+
+        return response()->json(['message' => 'Gagal menghapus data atau data tidak ditemukan'], 404);
     }
 
     public function show(Request $request, $hash)

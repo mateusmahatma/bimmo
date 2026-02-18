@@ -4,6 +4,7 @@
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap5.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endpush
 
@@ -103,15 +104,25 @@
         <!-- Result Table -->
         <div class="col-lg-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Riwayat Proses Budget</h5>
-                     <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Daftar riwayat perhitungan Budget Anda.</p>
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Riwayat Proses Budget</h5>
+                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Daftar riwayat perhitungan Budget Anda.</p>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
+                        <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
+                    </button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table id="hasilAnggaranTable" class="table table-hover align-middle mb-0" style="width:100%">
                             <thead class="bg-light">
                                 <tr style="border-bottom: 2px solid #edf2f9;">
+                                    <th style="width: 5%;" class="text-center">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" id="checkAll">
+                                        </div>
+                                    </th>
                                     <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 text-center">No</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">Periode</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">Nama Anggaran</th>
@@ -137,6 +148,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.4.1/js/responsive.bootstrap5.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

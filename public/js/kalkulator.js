@@ -85,20 +85,34 @@ $(document).ready(function () {
             processing: true,
             ajax: { url: '/kalkulator', type: 'GET' },
             columns: [
-                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
+                {
+                    data: 'hash',
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center",
+                    responsivePriority: 1,
+                    render: function (data, type, row) {
+                        return `<div class="form-check d-flex justify-content-center">
+                                    <input class="form-check-input check-item" type="checkbox" value="${data}">
+                                </div>`;
+                    }
+                },
+                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center", responsivePriority: 1 },
                 {
                     data: "tanggal_mulai",
+                    responsivePriority: 2,
                     render: function (data, type, row) {
                         const start = new Date(row.tanggal_mulai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
                         const end = new Date(row.tanggal_selesai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
                         return `<span class="fw-medium">${start}</span> <br> <span class="text-muted small">s/d ${end}</span>`;
                     },
                 },
-                { data: "nama_anggaran", className: "text-center fw-bold", render: d => d || "-" },
+                { data: "nama_anggaran", className: "text-center fw-bold", render: d => d || "-", responsivePriority: 1 },
                 {
                     data: 'nama_jenis_pengeluaran',
                     name: 'nama_jenis_pengeluaran',
                     className: 'text-left',
+                    responsivePriority: 10,
                     render: function (data, type, row) {
                         if (type !== "display" || !Array.isArray(data) || data.length === 0) return "-";
 
@@ -115,12 +129,13 @@ $(document).ready(function () {
                         return output;
                     }
                 },
-                { data: "persentase_anggaran", className: "text-center", render: d => `<span class="badge bg-light text-dark border">${d}%</span>` },
-                { data: "nominal_anggaran", className: "text-end", render: d => 'Rp ' + parseFloat(d).toLocaleString("id-ID") },
-                { data: "anggaran_yang_digunakan", className: "text-end", render: d => 'Rp ' + parseFloat(d).toLocaleString("id-ID") },
+                { data: "persentase_anggaran", className: "text-center", render: d => `<span class="badge bg-light text-dark border">${d}%</span>`, responsivePriority: 4 },
+                { data: "nominal_anggaran", className: "text-end", render: d => 'Rp ' + parseFloat(d).toLocaleString("id-ID"), responsivePriority: 5 },
+                { data: "anggaran_yang_digunakan", className: "text-end", render: d => 'Rp ' + parseFloat(d).toLocaleString("id-ID"), responsivePriority: 6 },
                 {
                     data: "sisa_anggaran",
                     className: "text-end",
+                    responsivePriority: 3,
                     render: function (data, type, row) {
                         const raw = (data ?? row.sisa_anggaran);
                         const numeric = parseNumber(raw);
@@ -133,11 +148,109 @@ $(document).ready(function () {
                         }
                     }
                 },
-                { data: "aksi", orderable: false, searchable: false, className: "text-center" },
+                { data: "aksi", orderable: false, searchable: false, className: "text-center", responsivePriority: 1 },
             ],
             language: {
                 emptyTable: "Belum ada data proses anggaran."
+            },
+            drawCallback: function () {
+                $('#checkAll').prop('checked', false);
+                updateBulkDeleteUI();
             }
+        });
+    }
+
+    // Bulk Delete Logic
+    const checkAll = document.getElementById('checkAll');
+    const btnBulkDelete = document.getElementById('btnBulkDelete');
+    const countSelected = document.getElementById('countSelected');
+
+    function updateBulkDeleteUI() {
+        const checked = document.querySelectorAll('.check-item:checked');
+        const count = checked.length;
+
+        if (countSelected) countSelected.textContent = count;
+
+        if (btnBulkDelete) {
+            if (count > 0) {
+                btnBulkDelete.classList.remove('d-none');
+            } else {
+                btnBulkDelete.classList.add('d-none');
+            }
+        }
+
+        // Update checkAll state
+        const allItems = document.querySelectorAll('.check-item');
+        if (checkAll && allItems.length > 0) {
+            checkAll.checked = checked.length === allItems.length;
+            checkAll.indeterminate = checked.length > 0 && checked.length < allItems.length;
+        }
+    }
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function () {
+            const isChecked = this.checked;
+            document.querySelectorAll('.check-item').forEach(item => {
+                item.checked = isChecked;
+            });
+            updateBulkDeleteUI();
+        });
+    }
+
+    $('body').on('change', '.check-item', function () {
+        updateBulkDeleteUI();
+    });
+
+    if (btnBulkDelete) {
+        btnBulkDelete.addEventListener('click', function () {
+            const checked = document.querySelectorAll('.check-item:checked');
+            const ids = Array.from(checked).map(cb => cb.value);
+
+            if (ids.length === 0) return;
+
+            Swal.fire({
+                title: 'Hapus Terpilih?',
+                text: `Apakah Anda yakin ingin menghapus ${ids.length} data?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...';
+                    this.disabled = true;
+
+                    $.ajax({
+                        url: "/kalkulator/bulk-delete",
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: { ids: ids },
+                        success: (response) => {
+                            showToast(response.message || 'Data berhasil dihapus', 'success');
+                            hasilAnggaranTable?.ajax.reload(null, false);
+
+                            // Reset button
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                            this.classList.add('d-none');
+                            $('#checkAll').prop('checked', false);
+                        },
+                        error: (err) => {
+                            console.error(err);
+                            showToast('Gagal menghapus data', 'danger');
+                            // Reset button
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                        }
+                    });
+                }
+            });
         });
     }
 

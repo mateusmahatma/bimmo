@@ -60,6 +60,7 @@ Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
 
 // Proses Anggaran
 Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
+    Route::delete('/bulk-delete', 'bulkDelete')->name('kalkulator.bulkDelete');
     Route::get('/', 'index')->name('kalkulator.index');
     Route::post('/', 'store')->name('kalkulator.store');
     Route::get('/{hash}', 'show')->name('kalkulator.show');
