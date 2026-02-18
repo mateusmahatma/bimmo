@@ -121,6 +121,8 @@
     --bs-table-color: #e0e0e0;
     --bs-table-bg: #1e1e1e;
     --bs-table-border-color: #333;
+    --bs-table-hover-bg: #2c2c2c;
+    --bs-table-hover-color: #e0e0e0;
 }
 
 [data-bs-theme="dark"] .table-light {
