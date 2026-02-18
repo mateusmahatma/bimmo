@@ -165,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [UserController::class , 'index'])->name('profil.index');
     Route::put('/profil/password', [UserController::class , 'updatePassword'])->name('profil.updatePassword');
     Route::put('/profil/email', [UserController::class , 'updateEmail'])->name('profil.updateEmail');
+    Route::put('/profil/phone', [UserController::class , 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
 });
 
 Route::get('/check-session', function () {

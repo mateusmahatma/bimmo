@@ -83,6 +83,30 @@ class UserController extends Controller
             ->update(['email' => $request->email]);
 
         return redirect()->back()->with('email_status', 'Email berhasil diubah!');
+    }
 
+    public function updatePhoneNumber(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'no_hp' => 'nullable|numeric|unique:users,no_hp,' . auth()->user()->id
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator, 'updatePhoneNumber');
+        }
+
+        // Clean input (remove non-numeric)
+        $cleanNumber = preg_replace('/[^0-9]/', '', $request->no_hp);
+
+        // Ensure starts with 62 if 0
+        if ($cleanNumber && substr($cleanNumber, 0, 1) === '0') {
+            $cleanNumber = '62' . substr($cleanNumber, 1);
+        }
+
+        DB::table('users')
+            ->where('id', auth()->user()->id)
+            ->update(['no_hp' => $cleanNumber]);
+
+        return redirect()->back()->with('phone_status', 'Nomor WhatsApp berhasil disimpan!');
     }
 }

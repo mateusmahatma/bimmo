@@ -41,6 +41,44 @@
             </div>
         </div>
 
+        <!-- WhatsApp Number -->
+        <div class="card mb-4">
+            <div class="card-header">
+                WhatsApp Configuration
+            </div>
+            <div class="card-body">
+                @if(session('phone_status'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('phone_status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if($errors->updatePhoneNumber->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul>
+                            @foreach ($errors->updatePhoneNumber->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
+                <form action="{{ route('profil.updatePhoneNumber') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label for="no_hp" class="form-label">WhatsApp Number (Format: 628...)</label>
+                        <div class="input-group">
+                             <input type="number" class="form-control" id="no_hp" name="no_hp" value="{{ auth()->user()->no_hp }}" placeholder="628123456789">
+                             <button type="submit" class="btn btn-success">Save Number</button>
+                        </div>
+                        <small class="text-muted">Nomor ini akan digunakan untuk fitur pencatatan transaksi via WhatsApp.</small>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Ganti Password -->
         <div class="card">
             <div class="card-header">
