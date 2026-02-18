@@ -4,6 +4,97 @@
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<style>
+    .check-item { cursor: pointer; }
+
+    /* Responsive Table to Card View */
+    @media (max-width: 768px) {
+        #pengeluaranTable, 
+        #pengeluaranTable thead, 
+        #pengeluaranTable tbody, 
+        #pengeluaranTable th, 
+        #pengeluaranTable td, 
+        #pengeluaranTable tr { 
+            display: block; 
+        }
+
+        #pengeluaranTable thead tr { 
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #pengeluaranTable tr { 
+            border: 1px solid #ccc; 
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        #pengeluaranTable td { 
+            border: none;
+            border-bottom: 1px solid #eee; 
+            position: relative;
+            padding-left: 45%; 
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            text-align: right;
+            white-space: normal; 
+        }
+
+        #pengeluaranTable td:before { 
+            position: absolute;
+            top: 0.8rem;
+            left: 10px;
+            width: 40%; 
+            padding-right: 10px; 
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        /* Labeling the data based on th order */
+        #pengeluaranTable td:nth-of-type(1):before { content: "Select"; }
+        #pengeluaranTable td:nth-of-type(3):before { content: "Category Name"; }
+        #pengeluaranTable td:nth-of-type(4):before { content: "Created At"; }
+        #pengeluaranTable td:nth-of-type(5):before { content: "Last Updated"; }
+        #pengeluaranTable td:nth-of-type(6):before { content: "Action"; top: 1.5rem; }
+
+        /* Special handling for the checkbox cell */
+        #pengeluaranTable td:nth-of-type(1) {
+            text-align: left;
+            padding-left: 10px;
+            border-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #pengeluaranTable td:nth-of-type(1):before {
+            position: static;
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        /* Special handling for Action cell */
+        #pengeluaranTable td:nth-of-type(6) {
+             padding-left: 10px;
+             text-align: center;
+             display: flex;
+             justify-content: center;
+             gap: 10px;
+             border-bottom: 0;
+        }
+        #pengeluaranTable td:nth-of-type(6):before { 
+            display: none; 
+        }
+        
+        /* Hide ID/No if needed */
+        #pengeluaranTable td:nth-of-type(2) { display: none; }
+    }
+</style>
 @endpush
 
 @section('container')
