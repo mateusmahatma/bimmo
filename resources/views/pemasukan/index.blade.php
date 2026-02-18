@@ -4,6 +4,97 @@
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<style>
+    .check-item { cursor: pointer; }
+
+    /* Responsive Table to Card View */
+    @media (max-width: 768px) {
+        #pemasukanTable, 
+        #pemasukanTable thead, 
+        #pemasukanTable tbody, 
+        #pemasukanTable th, 
+        #pemasukanTable td, 
+        #pemasukanTable tr { 
+            display: block; 
+        }
+
+        #pemasukanTable thead tr { 
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #pemasukanTable tr { 
+            border: 1px solid #ccc; 
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        #pemasukanTable td { 
+            border: none;
+            border-bottom: 1px solid #eee; 
+            position: relative;
+            padding-left: 45%; 
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            text-align: right;
+            white-space: normal; 
+        }
+
+        #pemasukanTable td:before { 
+            position: absolute;
+            top: 0.8rem;
+            left: 10px;
+            width: 40%; 
+            padding-right: 10px; 
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        /* Labeling the data based on th order */
+        #pemasukanTable td:nth-of-type(1):before { content: "Select"; }
+        #pemasukanTable td:nth-of-type(3):before { content: "Category Name"; }
+        #pemasukanTable td:nth-of-type(4):before { content: "Created At"; }
+        #pemasukanTable td:nth-of-type(5):before { content: "Last Updated"; }
+        #pemasukanTable td:nth-of-type(6):before { content: "Action"; top: 1.5rem; }
+
+        /* Special handling for the checkbox cell */
+        #pemasukanTable td:nth-of-type(1) {
+            text-align: left;
+            padding-left: 10px;
+            border-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #pemasukanTable td:nth-of-type(1):before {
+            position: static;
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        /* Special handling for Action cell */
+        #pemasukanTable td:nth-of-type(6) {
+             padding-left: 10px;
+             text-align: center;
+             display: flex;
+             justify-content: center;
+             gap: 10px;
+             border-bottom: 0;
+        }
+        #pemasukanTable td:nth-of-type(6):before { 
+            display: none; 
+        }
+        
+        /* Hide ID/No if needed */
+        #pemasukanTable td:nth-of-type(2) { display: none; }
+    }
+</style>
 @endpush
 
 @section('container')
