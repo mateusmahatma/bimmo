@@ -13,6 +13,101 @@
         box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
     }
     .check-item { cursor: pointer; }
+
+    /* Responsive Table to Card View */
+    @media (max-width: 768px) {
+        /* Force table to not be like tables anymore */
+        #anggaranTable, 
+        #anggaranTable thead, 
+        #anggaranTable tbody, 
+        #anggaranTable th, 
+        #anggaranTable td, 
+        #anggaranTable tr { 
+            display: block; 
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        #anggaranTable thead tr { 
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #anggaranTable tr { 
+            border: 1px solid #ccc; 
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        #anggaranTable td { 
+            border: none;
+            border-bottom: 1px solid #eee; 
+            position: relative;
+            padding-left: 45%; 
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            text-align: right;
+            white-space: normal; /* Allow text to wrap */
+        }
+
+        #anggaranTable td:before { 
+            position: absolute;
+            top: 0.8rem;
+            left: 10px;
+            width: 40%; 
+            padding-right: 10px; 
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        /* Labeling the data */
+        #anggaranTable td:nth-of-type(1):before { content: "Select"; }
+        #anggaranTable td:nth-of-type(3):before { content: "Budget Name"; }
+        #anggaranTable td:nth-of-type(4):before { content: "Percentage"; }
+        #anggaranTable td:nth-of-type(5):before { content: "Expense Types"; }
+        #anggaranTable td:nth-of-type(8):before { content: "Action"; top: 1.5rem; }
+
+        /* Special handling for the checkbox cell */
+        #anggaranTable td:nth-of-type(1) {
+            text-align: left;
+            padding-left: 10px;
+            border-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #anggaranTable td:nth-of-type(1):before {
+            position: static;
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        /* Special handling for Action cell */
+        #anggaranTable td:nth-of-type(8) {
+             padding-left: 10px;
+             text-align: center;
+             display: flex;
+             justify-content: center;
+             gap: 10px;
+             border-bottom: 0;
+        }
+        #anggaranTable td:nth-of-type(8):before { 
+            display: none; /* Hide label for action buttons */
+        }
+        
+        /* Hide ID/No/Dates on mobile to save space if needed, or style them */
+        #anggaranTable td:nth-of-type(2), /* No */
+        #anggaranTable td:nth-of-type(6), /* Created At */
+        #anggaranTable td:nth-of-type(7)  /* Updated At */
+        {
+            display: none;
+        }
+    }
 </style>
 @endpush
 
