@@ -388,6 +388,7 @@ $(document).ready(function () {
             processing: true,
             serverSide: true,
             paging: true,
+            responsive: true,
             ajax: {
                 url: "/kalkulator/" + kalkulatorId,
                 type: "GET",
@@ -398,24 +399,27 @@ $(document).ready(function () {
                 }
             },
             columns: [
-                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
+                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center", responsivePriority: 3 },
                 {
                     data: "tgl_transaksi",
                     className: "text-center",
+                    responsivePriority: 2,
                     render: function (data) {
                         return new Date(data).toLocaleDateString("id-ID", {
                             day: "numeric", month: "short", year: "numeric"
                         });
                     },
                 },
-                { data: "nama" }, // Nama Pengeluaran
+                { data: "nama", responsivePriority: 1 }, // Nama Pengeluaran
                 {
                     data: "nominal",
                     className: "text-end",
+                    responsivePriority: 1,
                     render: data => "Rp " + parseFloat(data).toLocaleString("id-ID")
                 },
                 {
                     data: "keterangan",
+                    responsivePriority: 10,
                     render: (data, type, row) => {
                         if (type !== "display") return data || "-";
                         if (!data) return "-";
