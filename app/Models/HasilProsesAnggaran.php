@@ -35,12 +35,17 @@ class HasilProsesAnggaran extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class , 'id_user');
+    }
+
+    public function getHashAttribute()
+    {
+        return \Vinkla\Hashids\Facades\Hashids::encode($this->getKey());
     }
 
     public function pengeluaran()
     {
-        return $this->belongsTo(Pengeluaran::class, 'id_pengeluaran');
+        return $this->belongsTo(Pengeluaran::class , 'id_pengeluaran');
     }
 
     public function getNamaJenisPengeluaranAttribute()
