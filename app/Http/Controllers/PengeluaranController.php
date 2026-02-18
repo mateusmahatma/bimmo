@@ -62,6 +62,10 @@ class PengeluaranController extends Controller
     {
         $pengeluaran = Pengeluaran::where('id', $id)->first();
 
+        if (request()->ajax()) {
+            return response()->json(['result' => $pengeluaran]);
+        }
+
         return view('pengeluaran.edit', compact('pengeluaran'));
     }
 
@@ -72,6 +76,10 @@ class PengeluaranController extends Controller
         ]);
 
         Pengeluaran::where('id', $id)->update($validatedData);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('pengeluaran.index')
             ->with('success', 'Berhasil Update Kategori Pengeluaran!');
