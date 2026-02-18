@@ -40,7 +40,7 @@ client.on('message_create', async msg => {
 
     // Check keywords (Case insensitive start)
     const upperText = text.toUpperCase();
-    const keywords = ['MASUK', 'PEMASUKAN', 'IN', 'KELUAR', 'PENGELUARAN', 'OUT'];
+    const keywords = ['MASUK', 'PEMASUKAN', 'IN', 'KELUAR', 'PENGELUARAN', 'OUT', 'CEK'];
 
     const isTransaction = keywords.some(keyword => upperText.startsWith(keyword));
 
