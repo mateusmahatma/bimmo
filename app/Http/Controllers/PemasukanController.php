@@ -63,6 +63,10 @@ class PemasukanController extends Controller
     {
         $pemasukan = Pemasukan::where('id', $id)->first();
 
+        if (request()->ajax()) {
+            return response()->json(['result' => $pemasukan]);
+        }
+
         return view('pemasukan.edit', compact('pemasukan'));
     }
 
@@ -73,6 +77,10 @@ class PemasukanController extends Controller
         ]);
 
         Pemasukan::where('id', $id)->update($validatedData);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('pemasukan.index')
             ->with('success', 'Berhasil Update Kategori Pemasukan!');
