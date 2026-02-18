@@ -62,9 +62,9 @@ Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
 Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
     Route::get('/', 'index')->name('kalkulator.index');
     Route::post('/', 'store')->name('kalkulator.store');
-    Route::get('/{id}', 'show')->name('kalkulator.show');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
+    Route::get('/{hash}', 'show')->name('kalkulator.show');
+    Route::put('/{hash}', 'update');
+    Route::delete('/{hash}', 'destroy');
     Route::post('/calculate', 'calculate');
     Route::get('/calculate', 'showResult')->name('showResult');
     Route::get('/cetak_pdf', 'cetak_pdf');
