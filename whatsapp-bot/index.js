@@ -48,15 +48,19 @@ client.on('message_create', async msg => {
         console.log(`[Pesan Masuk] ${msg.from}: ${text}`);
 
         try {
-            // Error 404 indicates the path /bimmo/api/... is wrong.
-            // If using bimmo.local, it likely maps directly to public.
+            // Resolving Real Number (Handle Linked Device IDs / LIDs)
+            const contact = await msg.getContact();
+            const realSenderNumber = contact.number || contact.id.user;
+
+            console.log(`[Message From] RAW: ${msg.from} | REAL: ${realSenderNumber}`);
+
             const apiUrl = 'https://app.bimmo.id/api/webhook/whatsapp';
 
-            console.log(`[Sending to API] ${apiUrl} | Data: ${JSON.stringify({ message: text, sender: msg.from })}`);
+            console.log(`[Sending to API] ${apiUrl} | Data: ${JSON.stringify({ message: text, sender: realSenderNumber })}`);
 
             const response = await axios.post(apiUrl, {
                 message: text,
-                sender: msg.from
+                sender: realSenderNumber
             });
 
             console.log(`[API Response] Status: ${response.status} | Data:`, response.data);
