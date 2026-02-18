@@ -172,3 +172,6 @@ Route::get('/check-session', function () {
 })->middleware('auth');
 
 Route::get('/logout', [DashboardController::class , 'logout']);
+
+Route::post('/api/webhook/whatsapp', [\App\Http\Controllers\Api\WhatsAppController::class , 'handle'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
