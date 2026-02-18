@@ -6,3 +6,4 @@
 .idea
 *.log
 *.bak
+.wwebjs_auth/
