@@ -196,31 +196,20 @@
             </div>
         </div>
 
-        <!-- Average Stats Row -->
-        <div class="col-12 mb-4">
-            <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);">
+        <!-- Period Expense Row -->
+        <div class="col-12 mb-3">
+            <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px; background: #fff;">
                 <div class="card-body py-3">
-                     <div class="row align-items-center">
-                        <div class="col-md-6 border-end">
-                            <div class="d-flex align-items-center justify-content-center justify-content-md-start">
-                                <div class="rounded-circle bg-warning-light text-warning me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(255, 193, 7, 0.1);">
-                                    <i class="bi bi-calendar-day fs-5"></i>
-                                </div>
-                                <div>
-                                    <h6 class="text-muted small text-uppercase mb-0">Daily Average (Est.)</h6>
-                                    <h5 class="mb-0 fw-bold text-dark" id="avg-daily">Rp {{ number_format($avgDailyPengeluaran, 0, ',', '.') }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-3 mt-md-0">
-                            <div class="d-flex align-items-center justify-content-center justify-content-md-start ps-md-4">
-                                <div class="rounded-circle bg-info-light text-info me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(13, 202, 240, 0.1);">
-                                    <i class="bi bi-calendar-month fs-5"></i>
-                                </div>
-                                <div>
-                                    <h6 class="text-muted small text-uppercase mb-0">Monthly Average (Est.)</h6>
-                                    <h5 class="mb-0 fw-bold text-dark" id="avg-monthly">Rp {{ number_format($avgMonthlyPengeluaran ?? 0, 0, ',', '.') }}</h5>
-                                </div>
+                    <div class="d-flex flex-column align-items-start text-start">
+                        <h6 class="fw-bold text-dark text-uppercase mb-1" style="letter-spacing: 0.5px; font-size: 0.75rem;">Period Expense</h6>
+                        <span class="badge bg-light text-secondary border fw-normal rounded-pill px-2 py-1 mb-2" id="avg-date-range" style="font-size: 0.7rem;">
+                            <i class="bi bi-calendar3 me-1"></i> {{ $dateRange }}
+                        </span>
+
+                        <div class="d-flex align-items-center">
+                             <div class="text-start">
+                                <h4 class="mb-0 fw-bold text-dark" id="avg-daily" style="font-size: 1.25rem;">Rp {{ number_format($avgDailyPengeluaran, 0, ',', '.') }}</h4>
+                                <span class="text-muted small text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Daily Average</span>
                             </div>
                         </div>
                     </div>
@@ -689,8 +678,11 @@
             if(dailyEl && stats.avgDailyPengeluaran !== undefined) {
                 dailyEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(stats.avgDailyPengeluaran);
             }
-            if(monthlyEl && stats.avgMonthlyPengeluaran !== undefined) {
-                monthlyEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(stats.avgMonthlyPengeluaran);
+
+            // Update Date Range
+            const dateRangeEl = document.getElementById('avg-date-range');
+            if(dateRangeEl && stats.dateRange) {
+                dateRangeEl.innerHTML = '<i class="bi bi-calendar3 me-1"></i> ' + stats.dateRange;
             }
         }
         

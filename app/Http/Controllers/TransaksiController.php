@@ -66,6 +66,8 @@ class TransaksiController extends Controller
         $avgDailyPengeluaran = $totalPengeluaran / max(1, $diffInDays);
         $avgMonthlyPengeluaran = $avgDailyPengeluaran * 30;
 
+        $dateRange = $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y');
+
         // =====================
         // PAGINATION
         // =====================
@@ -82,7 +84,8 @@ class TransaksiController extends Controller
                 'totalPengeluaran' => $totalPengeluaran,
                 'netIncome' => $netIncome,
                 'avgDailyPengeluaran' => $avgDailyPengeluaran,
-                'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran
+                'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran,
+                'dateRange' => $dateRange
             ];
 
             // Summary Details (Re-calculate for modals)
@@ -180,7 +183,8 @@ class TransaksiController extends Controller
             'listPemasukan' => Pemasukan::where('id_user', $userId)->get(),
             'listPengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
             'avgDailyPengeluaran' => $avgDailyPengeluaran,
-            'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran
+            'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran,
+            'dateRange' => $dateRange
         ]);
     }
 
