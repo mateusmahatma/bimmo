@@ -560,8 +560,15 @@ class TransaksiController extends Controller
             ->where('id_user', Auth::id())
             ->firstOrFail();
 
-        // logic lama kamu (update anggaran, barang, dll)
+        // logic lama anda (update anggaran, barang, dll)
         $transaksi->delete();
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil dihapus'
+            ]);
+        }
 
         return redirect()
             ->route('transaksi.index')
@@ -674,9 +681,10 @@ class TransaksiController extends Controller
             \Maatwebsite\Excel\Excel::XLSX
         );
 
-        Mail::to(Auth::user()->email)->send(new TransactionExportMail($excelData, 'Arus_Kas_BIMMO.xlsx'));
+        $recipientEmail = $request->email ?? Auth::user()->email;
+        Mail::to($recipientEmail)->send(new TransactionExportMail($excelData, 'Arus_Kas_BIMMO.xlsx'));
 
-        return back()->with('success', 'Data transaksi berhasil dikirim ke email Anda (' . Auth::user()->email . ')');
+        return back()->with('success', 'Data transaksi berhasil dikirim ke email ' . $recipientEmail);
     }
 
     public function importExcel(Request $request)
