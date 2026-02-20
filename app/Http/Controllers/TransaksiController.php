@@ -56,6 +56,16 @@ class TransaksiController extends Controller
         $totalPengeluaran = (clone $statsQuery)->sum('nominal');
         $netIncome = $totalPemasukan - $totalPengeluaran;
 
+        // Calculate Average Stats
+        $startDate = $request->start_date ?Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+        $endDate = $request->end_date ?Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
+
+        // Ensure we don't divide by zero and have at least 1 day
+        $diffInDays = $startDate->diffInDays($endDate) + 1;
+
+        $avgDailyPengeluaran = $totalPengeluaran / max(1, $diffInDays);
+        $avgMonthlyPengeluaran = $avgDailyPengeluaran * 30;
+
         // =====================
         // PAGINATION
         // =====================
@@ -70,7 +80,9 @@ class TransaksiController extends Controller
             $stats = [
                 'totalPemasukan' => $totalPemasukan,
                 'totalPengeluaran' => $totalPengeluaran,
-                'netIncome' => $netIncome
+                'netIncome' => $netIncome,
+                'avgDailyPengeluaran' => $avgDailyPengeluaran,
+                'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran
             ];
 
             // Summary Details (Re-calculate for modals)
@@ -167,6 +179,8 @@ class TransaksiController extends Controller
             'summaryPengeluaran' => $summaryPengeluaran,
             'listPemasukan' => Pemasukan::where('id_user', $userId)->get(),
             'listPengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
+            'avgDailyPengeluaran' => $avgDailyPengeluaran,
+            'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran
         ]);
     }
 
@@ -578,6 +592,9 @@ class TransaksiController extends Controller
 
     public function exportPdf(Request $request)
     {
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '512M');
+
         $query = $this->buildFilteredQuery($request);
 
         $data = $query->get();
@@ -593,6 +610,8 @@ class TransaksiController extends Controller
             'netIncome' => $netIncome,
             'filter' => $request->all(),
         ]);
+
+        $pdf->setPaper('A4', 'landscape');
 
         return $pdf->download('arus_kas.pdf');
     }

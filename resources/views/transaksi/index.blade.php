@@ -157,7 +157,7 @@
         </div>
 
         <div class="col-md-4 mb-4">
-             <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center mb-2">
                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light text-danger me-3" style="width: 48px; height: 48px; background: rgba(220, 53, 69, 0.1);">
@@ -168,6 +168,7 @@
                             <h4 class="mb-0 fw-bold text-danger">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</h4>
                         </div>
                     </div>
+                    
                     <div class="text-end">
                         <a href="#" data-bs-toggle="modal" data-bs-target="#expenseDetailsModal" class="small text-decoration-none text-danger fw-bold">
                             View Details <i class="bi bi-arrow-right"></i>
@@ -189,6 +190,38 @@
                             <h4 class="mb-0 fw-bold {{ $netIncome >= 0 ? 'text-success' : 'text-danger' }}">
                                 Rp {{ number_format($netIncome, 0, ',', '.') }}
                             </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Stats Row -->
+        <div class="col-12 mb-4">
+            <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);">
+                <div class="card-body py-3">
+                     <div class="row align-items-center">
+                        <div class="col-md-6 border-end">
+                            <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+                                <div class="rounded-circle bg-warning-light text-warning me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(255, 193, 7, 0.1);">
+                                    <i class="bi bi-calendar-day fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-muted small text-uppercase mb-0">Daily Average (Est.)</h6>
+                                    <h5 class="mb-0 fw-bold text-dark" id="avg-daily">Rp {{ number_format($avgDailyPengeluaran, 0, ',', '.') }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <div class="d-flex align-items-center justify-content-center justify-content-md-start ps-md-4">
+                                <div class="rounded-circle bg-info-light text-info me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(13, 202, 240, 0.1);">
+                                    <i class="bi bi-calendar-month fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-muted small text-uppercase mb-0">Monthly Average (Est.)</h6>
+                                    <h5 class="mb-0 fw-bold text-dark" id="avg-monthly">Rp {{ number_format($avgMonthlyPengeluaran ?? 0, 0, ',', '.') }}</h5>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -270,10 +303,10 @@
                                     <i class="bi bi-download"></i> Export
                                 </button>
                                 <ul class="dropdown-menu shadow border-0 rounded-3">
-                                    <li><a class="dropdown-item" href="{{ route('transaksi.export.excel', request()->query()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('transaksi.export.pdf', request()->query()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
+                                    <li><a class="dropdown-item" id="btnExportExcel" href="{{ route('transaksi.export.excel', request()->all()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
+                                    <li><a class="dropdown-item" id="btnExportPdf" href="{{ route('transaksi.export.pdf', request()->all()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ route('transaksi.export.email', request()->query()) }}"><i class="bi bi-envelope me-2 text-primary"></i> Send to Email</a></li>
+                                    <li><a class="dropdown-item" id="btnExportEmail" href="{{ route('transaksi.export.email', request()->all()) }}"><i class="bi bi-envelope me-2 text-primary"></i> Send to Email</a></li>
                                 </ul>
                             </div>
 
@@ -606,6 +639,9 @@
                 
                 // Re-initialize bulk delete listeners
                 initBulkDelete();
+                
+                // Update Export Links
+                updateExportLinks();
             })
             .catch(error => {
                 console.error('Error fetching transactions:', error);
@@ -644,6 +680,17 @@
                 netH4.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(stats.netIncome);
                 netH4.classList.remove('text-success', 'text-danger');
                 netH4.classList.add(stats.netIncome >= 0 ? 'text-success' : 'text-danger');
+            }
+
+            // Update Averages (Daily & Monthly)
+            const dailyEl = document.getElementById('avg-daily');
+            const monthlyEl = document.getElementById('avg-monthly');
+            
+            if(dailyEl && stats.avgDailyPengeluaran !== undefined) {
+                dailyEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(stats.avgDailyPengeluaran);
+            }
+            if(monthlyEl && stats.avgMonthlyPengeluaran !== undefined) {
+                monthlyEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(stats.avgMonthlyPengeluaran);
             }
         }
         
@@ -700,6 +747,44 @@
         // Initialize Bulk Delete on Load
         initBulkDelete();
         
+        // Export Links Logic
+        const btnExportExcel = document.getElementById('btnExportExcel');
+        const btnExportPdf = document.getElementById('btnExportPdf');
+        const btnExportEmail = document.getElementById('btnExportEmail');
+
+        function updateExportLinks() {
+            const params = new URLSearchParams();
+
+            // Search
+            if(searchInput && searchInput.value) params.append('search', searchInput.value);
+
+            // Dates
+            if(startDateInput && startDateInput.value) params.append('start_date', startDateInput.value);
+            if(endDateInput && endDateInput.value) params.append('end_date', endDateInput.value);
+
+            // Categories
+            document.querySelectorAll('input[name="pemasukan[]"]:checked').forEach(cb => {
+                params.append('pemasukan[]', cb.value);
+            });
+            document.querySelectorAll('input[name="pengeluaran[]"]:checked').forEach(cb => {
+                params.append('pengeluaran[]', cb.value);
+            });
+
+            // Helper to update href
+            const updateLink = (link) => {
+                if(!link) return;
+                const url = new URL(link.href);
+                link.href = `${url.origin}${url.pathname}?${params.toString()}`;
+            };
+
+            updateLink(btnExportExcel);
+            updateLink(btnExportPdf);
+            updateLink(btnExportEmail);
+        }
+
+        // Call on load to set initial state (including defaults)
+        updateExportLinks();
+
         // Bulk Delete Action
         const btnBulkDelete = document.getElementById('btnBulkDelete');
          if (btnBulkDelete) {
