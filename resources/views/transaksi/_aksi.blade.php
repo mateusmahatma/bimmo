@@ -10,11 +10,10 @@ $hash = Hashids::encode($row->id);
 
 <form action="{{ route('transaksi.destroy', $hash) }}"
     method="POST"
-    class="d-inline"
-    onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
+    class="d-inline form-delete">
     @csrf
     @method('DELETE')
-    <button class="btn btn-sm btn-danger">
+    <button type="submit" class="btn btn-sm btn-danger btn-delete" title="Hapus">
         <i class="bi bi-trash-fill"></i>
     </button>
 </form>
