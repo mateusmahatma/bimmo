@@ -295,7 +295,7 @@
                                     <li><a class="dropdown-item" id="btnExportExcel" href="{{ route('transaksi.export.excel', request()->all()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
                                     <li><a class="dropdown-item" id="btnExportPdf" href="{{ route('transaksi.export.pdf', request()->all()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" id="btnExportEmail" href="{{ route('transaksi.export.email', request()->all()) }}"><i class="bi bi-envelope me-2 text-primary"></i> Send to Email</a></li>
+                                    <li><a class="dropdown-item" id="btnExportEmail" href="#" data-bs-toggle="modal" data-bs-target="#emailExportModal"><i class="bi bi-envelope me-2 text-primary"></i> Send to Email</a></li>
                                 </ul>
                             </div>
 
@@ -453,6 +453,34 @@
                          <li class="list-group-item text-center text-muted py-3">No data available</li>
                     @endforelse
                 </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Export Modal -->
+<div class="modal fade" id="emailExportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Export to Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Recipient Email</label>
+                    <input type="email" id="export_recipient_email" class="form-control" value="{{ Auth::user()->email }}" required>
+                </div>
+                <div class="alert alert-info d-flex align-items-center small border-0 bg-info-light text-info-dark" role="alert">
+                    <i class="bi bi-info-circle me-2 fs-5"></i>
+                    <div>
+                        Current filtered data will be sent to this email.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="btnConfirmExportEmail" class="btn btn-primary rounded-pill px-4">Send</button>
             </div>
         </div>
     </div>
@@ -765,13 +793,58 @@
             // Helper to update href
             const updateLink = (link) => {
                 if(!link) return;
-                const url = new URL(link.href);
+                const url = new URL(link.dataset.baseUrl || link.href);
+                // Store base URL if not already stored
+                if(!link.dataset.baseUrl) link.dataset.baseUrl = link.href;
+                
                 link.href = `${url.origin}${url.pathname}?${params.toString()}`;
             };
 
             updateLink(btnExportExcel);
             updateLink(btnExportPdf);
-            updateLink(btnExportEmail);
+            // btnExportEmail is now a modal trigger, so we'll handle its URL during click
+        }
+
+        // Handle Confirm Email Export
+        const btnConfirmExportEmail = document.getElementById('btnConfirmExportEmail');
+        if (btnConfirmExportEmail) {
+            btnConfirmExportEmail.addEventListener('click', function() {
+                const recipientEmail = document.getElementById('export_recipient_email').value;
+                if (!recipientEmail) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+
+                const params = new URLSearchParams();
+                if(searchInput && searchInput.value) params.append('search', searchInput.value);
+                if(startDateInput && startDateInput.value) params.append('start_date', startDateInput.value);
+                if(endDateInput && endDateInput.value) params.append('end_date', endDateInput.value);
+                document.querySelectorAll('input[name="pemasukan[]"]:checked').forEach(cb => {
+                    params.append('pemasukan[]', cb.value);
+                });
+                document.querySelectorAll('input[name="pengeluaran[]"]:checked').forEach(cb => {
+                    params.append('pengeluaran[]', cb.value);
+                });
+                params.append('email', recipientEmail);
+
+                const exportUrl = "{{ route('transaksi.export.email') }}?" + params.toString();
+                
+                // Show loading state
+                const originalText = this.innerHTML;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+                this.disabled = true;
+
+                // We use window.location.href for simplicity as the controller returns back()
+                window.location.href = exportUrl;
+                
+                // Close modal after a short delay (enough for the browser to trigger the GET)
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('emailExportModal'));
+                    if (modal) modal.hide();
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }, 1000);
+            });
         }
 
         // Call on load to set initial state (including defaults)
@@ -823,6 +896,49 @@
                 }
             });
         }
+
+        // AJAX Deletion for Individual Items
+        tableContainer.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('form-delete')) {
+                e.preventDefault();
+                
+                if (confirm('Yakin ingin menghapus transaksi ini?')) {
+                    const form = e.target;
+                    const url = form.getAttribute('action');
+                    const btn = form.querySelector('button');
+                    const originalContent = btn.innerHTML;
+
+                    // Show loading
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+                    btn.disabled = true;
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            fetchTransactions(); // Refresh table
+                        } else {
+                            alert(data.message || 'Gagal menghapus data');
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat menghapus data');
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    });
+                }
+            }
+        });
     });
 
 </script>
