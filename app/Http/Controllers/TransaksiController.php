@@ -31,6 +31,15 @@ class TransaksiController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
+
+        // Default to this month if no filter is applied
+        if (!$request->filled('start_date') && !$request->filled('end_date') && !$request->ajax()) {
+            $request->merge([
+                'start_date' => Carbon::now()->startOfMonth()->format('Y-m-d'),
+                'end_date' => Carbon::now()->endOfMonth()->format('Y-m-d'),
+            ]);
+        }
+
         $query = $this->buildFilteredQuery($request);
 
         // =====================
