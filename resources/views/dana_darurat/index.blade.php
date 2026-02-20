@@ -27,8 +27,14 @@
                 <div class="card-body p-4 text-white d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-uppercase mb-1" style="opacity: 0.9;">Total Emergency Fund</h6>
-                        <h2 class="mb-0 fw-bold" id="totalDanaDarurat">Rp 0,00</h2>
-                         <span id="exceedMessage" class="badge bg-warning text-dark mt-2 d-none"></span>
+                        <h2 class="mb-0 fw-bold" id="totalDanaDarurat">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h2>
+                        <div class="mt-2">
+                            <small class="opacity-75">Target: Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</small>
+                            <div class="progress mt-1" style="height: 6px; background-color: rgba(255,255,255,0.2);">
+                                <div class="progress-bar bg-white" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="opacity-75">{{ $percentage }}% Terlaksana</small>
+                        </div>
                     </div>
                     <div class="fs-1 opacity-25">
                         <i class="bi bi-shield-check"></i>
@@ -43,6 +49,9 @@
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Kelola riwayat penambahan atau pengurangan dana darurat.</p>
                     </div>
                     <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAturTarget">
+                            <i class="bi bi-gear me-1"></i> Atur Target
+                        </button>
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
                             <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
                         </button>
@@ -82,6 +91,7 @@
 </section>
 
 @include('modal.dana_darurat.index')
+@include('dana_darurat.target_modal')
 
 @endsection
 

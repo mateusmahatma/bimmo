@@ -78,6 +78,7 @@ Route::get('/api/barang', [BarangController::class , 'getList'])->middleware('au
 // Dana Darurat
 Route::middleware(['auth'])->group(function () {
     Route::delete('/dana-darurat/bulk-delete', [DanaDaruratController::class , 'bulkDelete'])->name('dana-darurat.bulkDelete');
+    Route::put('/dana-darurat/target', [DanaDaruratController::class , 'updateTarget'])->name('dana-darurat.update-target');
     Route::resource('/dana-darurat', DanaDaruratController::class);
 });
 

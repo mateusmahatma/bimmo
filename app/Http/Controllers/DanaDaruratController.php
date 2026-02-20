@@ -44,8 +44,85 @@ class DanaDaruratController extends Controller
                 ->toJson();
         }
         else {
-            return view('dana_darurat.index');
+            $userId = Auth::id();
+            $user = Auth::user();
+
+            // Hitung Total Dana Darurat
+            $totalMasuk = DanaDarurat::where('id_user', $userId)
+                ->where('jenis_transaksi_dana_darurat', 1)
+                ->sum('nominal_dana_darurat');
+
+            $totalKeluar = DanaDarurat::where('id_user', $userId)
+                ->where('jenis_transaksi_dana_darurat', 2)
+                ->sum('nominal_dana_darurat');
+
+            $totalDanaDarurat = $totalMasuk - $totalKeluar;
+
+            // Hitung Target
+            $targetDanaDarurat = 0;
+            if ($user->metode_target_dana_darurat === 'manual') {
+                $targetDanaDarurat = $user->nominal_target_dana_darurat ?? 0;
+            }
+            else {
+                // Ambil semua transaksi user untuk menghitung rata-rata
+                $transaksi = \App\Models\Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
+
+                // Hitung total pengeluaran
+                $totalPengeluaran = $transaksi->where('status', '1')->sum('nominal');
+
+                // Hitung selisih bulan dari transaksi pertama ke terakhir
+                if ($transaksi->count() > 1) {
+                    $firstDate = Carbon::parse($transaksi->first()->tgl_transaksi)->startOfMonth();
+                    $lastDate = Carbon::parse($transaksi->last()->tgl_transaksi)->startOfMonth();
+                    $selisihBulan = $firstDate->diffInMonths($lastDate) + 1; // +1 supaya bulan awal ikut dihitung
+                }
+                else {
+                    $selisihBulan = 1;
+                }
+
+                // Rata-rata pengeluaran bulanan
+                $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaran / $selisihBulan : 0;
+
+                $kelipatan = $user->kelipatan_target_dana_darurat ?? 6;
+                $targetDanaDarurat = $rataRataPengeluaran * $kelipatan;
+            }
+
+            // Hitung Persentase
+            $percentage = $targetDanaDarurat > 0 ? ($totalDanaDarurat / $targetDanaDarurat) * 100 : 0;
+            $percentage = min($percentage, 100); // Cap at 100 for progress bar
+            $percentage = round($percentage, 1);
+
+            $targetSettings = [
+                'metode' => $user->metode_target_dana_darurat,
+                'nominal' => $user->nominal_target_dana_darurat,
+                'kelipatan' => $user->kelipatan_target_dana_darurat,
+            ];
+
+            return view('dana_darurat.index', compact('targetSettings', 'totalDanaDarurat', 'targetDanaDarurat', 'percentage'));
         }
+    }
+
+    public function updateTarget(Request $request)
+    {
+        $validated = $request->validate([
+            'metode_target' => 'required|in:manual,otomatis',
+            'nominal_target' => 'nullable|numeric|required_if:metode_target,manual',
+            'kelipatan_target' => 'nullable|integer|min:1|required_if:metode_target,otomatis',
+        ]);
+
+        $user = Auth::user();
+        $user->metode_target_dana_darurat = $validated['metode_target'];
+
+        if ($validated['metode_target'] === 'manual') {
+            $user->nominal_target_dana_darurat = $validated['nominal_target'];
+        }
+        else {
+            $user->kelipatan_target_dana_darurat = $validated['kelipatan_target'];
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Target Dana Darurat berhasil diperbarui!');
     }
 
     /**
