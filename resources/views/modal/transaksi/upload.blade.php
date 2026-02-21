@@ -7,8 +7,9 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-warning">
-                    <ul>
-                        <li>File yang dapat diupload : xlsx,xls,csv</li>
+                    <ul class="mb-0">
+                        <li>File yang dapat diupload : jpg, png, pdf</li>
+                        <li>Ukuran maksimal : 2MB</li>
                     </ul>
                 </div>
                 <form id="uploadForm" enctype="multipart/form-data">

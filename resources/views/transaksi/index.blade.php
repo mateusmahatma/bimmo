@@ -516,6 +516,7 @@
     </div>
 </div>
 
+@include('modal.transaksi.upload')
 @endsection
 
 @push('scripts')
@@ -933,6 +934,108 @@
                     .catch(error => {
                         console.error('Error:', error);
                         alert('Terjadi kesalahan saat menghapus data');
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    });
+                }
+            }
+        });
+        // ========================
+        // UPLOAD FILE LOGIC
+        // ========================
+        const uploadModal = document.getElementById('uploadModal');
+        const uploadForm = document.getElementById('uploadForm');
+        const transaksiIdInput = document.getElementById('transaksiId');
+
+        // Handle Upload Button Click to pass ID
+        tableContainer.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-upload');
+            if (btn) {
+                const id = btn.getAttribute('data-id');
+                if (transaksiIdInput) transaksiIdInput.value = id;
+            }
+        });
+
+        // Handle AJAX Upload
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+
+                // Show loading
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Uploading...';
+                submitBtn.disabled = true;
+
+                fetch("{{ route('upload') }}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(uploadModal);
+                        if (modal) modal.hide();
+                        
+                        // Reset form
+                        uploadForm.reset();
+                        
+                        // Refresh data
+                        fetchTransactions();
+                        
+                        // Show success alert (optional, fetchTransactions might be enough visual feedback)
+                    } else {
+                        alert(data.message || 'Gagal mengupload file');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengupload file');
+                })
+                .finally(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+
+        // Handle File Deletion
+        tableContainer.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-delete-file');
+            if (btn) {
+                const id = btn.getAttribute('data-id');
+                if (confirm('Yakin ingin menghapus file bukti ini?')) {
+                    const originalContent = btn.innerHTML;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+                    btn.disabled = true;
+
+                    fetch(`{{ url('transaksi') }}/${id}/file`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            fetchTransactions();
+                        } else {
+                            alert(data.message || 'Gagal menghapus file');
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat menghapus file');
                         btn.innerHTML = originalContent;
                         btn.disabled = false;
                     });

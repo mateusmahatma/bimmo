@@ -726,8 +726,8 @@ class TransaksiController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
-            'id' => 'required',
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'id' => 'required|exists:transaksi,id',
         ]);
 
         $transaksi = Transaksi::findOrFail($request->id);
@@ -753,6 +753,24 @@ class TransaksiController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'No file uploaded']);
+    }
+
+    public function deleteFile($id)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+
+        if (!empty($transaksi->file)) {
+            if (Storage::disk('public')->exists('uploads/' . $transaksi->file)) {
+                Storage::disk('public')->delete('uploads/' . $transaksi->file);
+            }
+
+            $transaksi->file = null;
+            $transaksi->save();
+
+            return response()->json(['success' => true, 'message' => 'File deleted successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No file to delete']);
     }
 
     public function downloadTemplate()

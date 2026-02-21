@@ -126,6 +126,7 @@ Route::middleware(['auth'])->group(function () {
 
 
             Route::post('/upload', [TransaksiController::class , 'upload'])->name('upload');
+            Route::delete('/{id}/file', [TransaksiController::class , 'deleteFile'])->name('transaksi.deleteFile');
             Route::post('/{id}/toggle-status', [TransaksiController::class , 'toggleStatus'])->name('transaksi.toggleStatus');
         }
         );

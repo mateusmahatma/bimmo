@@ -19,17 +19,18 @@ class Transaksi extends Model
         'nominal',
         'keterangan',
         'id_user',
-        'status'
+        'status',
+        'file'
     ];
 
     public function pengeluaranRelation()
     {
-        return $this->belongsTo(Pengeluaran::class, 'pengeluaran', 'id');
+        return $this->belongsTo(Pengeluaran::class , 'pengeluaran', 'id');
     }
 
     public function pemasukanRelation()
     {
-        return $this->belongsTo(Pemasukan::class, 'pemasukan', 'id');
+        return $this->belongsTo(Pemasukan::class , 'pemasukan', 'id');
     }
 
     public function getHashAttribute()
