@@ -10,65 +10,69 @@ $(document).ready(function () {
     });
 
     // DataTable Initialization
-    const table = $("#pinjamanTable").DataTable({
-        paging: true,
-        responsive: true,
-        lengthChange: true,
-        autoWidth: false,
-        serverSide: true,
-        processing: true,
-        ajax: {
-            url: "/pinjaman",
-            type: "GET",
-            data: function (d) {
-                d.filter_status = $('#filter_status').val();
-            },
-            dataSrc: function (json) {
-                // Update Total Summary
-                if (json.totalPinjaman) {
-                    $("#totalPinjaman").text(json.totalPinjaman);
-                }
-                return json.data;
-            }
-        },
-        columns: [
-            {
-                data: 'id',
-                orderable: false,
-                searchable: false,
-                className: 'text-center',
-                render: function (data, type, row) {
-                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
-                }
-            },
-            { data: "DT_RowIndex", name: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
-            { data: "nama_pinjaman", name: "nama_pinjaman" },
-            { data: "jumlah_pinjaman", name: "jumlah_pinjaman", className: "text-end" },
-            {
-                data: "status",
-                name: "status",
-                className: "text-center",
-                render: function (data) {
-                    if (data === "belum_lunas") {
-                        return `<span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i> Unpaid</span>`;
-                    } else if (data === "lunas") {
-                        return `<span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i> Paid</span>`;
+    let table;
+    if ($("#pinjamanTable").length > 0) {
+        table = $("#pinjamanTable").DataTable({
+            paging: true,
+            responsive: true,
+            lengthChange: true,
+            autoWidth: false,
+            serverSide: true,
+            processing: true,
+            ajax: {
+                url: "/pinjaman",
+                type: "GET",
+                data: function (d) {
+                    d.filter_status = $('#filter_status').val();
+                },
+                dataSrc: function (json) {
+                    // Update Total Summary
+                    if (json.totalPinjaman) {
+                        $("#totalPinjaman").text(json.totalPinjaman);
                     }
-                    return data ? data : '-';
+                    return json.data;
                 }
             },
-            {
-                data: "aksi",
-                orderable: false,
-                searchable: false,
-                className: "text-center"
-            },
-        ],
-    });
+            columns: [
+                {
+                    data: 'id',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return `<input class="form-check-input check-item" type="checkbox" value="${row.hash}">`;
+                    }
+                },
+                { data: "DT_RowIndex", name: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
+                { data: "nama_pinjaman", name: "nama_pinjaman" },
+                { data: "keterangan", name: "keterangan", defaultContent: "-" },
+                { data: "jumlah_pinjaman", name: "jumlah_pinjaman", className: "text-end" },
+                {
+                    data: "status",
+                    name: "status",
+                    className: "text-center",
+                    render: function (data) {
+                        if (data === "belum_lunas") {
+                            return `<span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i> Unpaid</span>`;
+                        } else if (data === "lunas") {
+                            return `<span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i> Paid</span>`;
+                        }
+                        return data ? data : '-';
+                    }
+                },
+                {
+                    data: "aksi",
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center"
+                },
+            ],
+        });
+    }
 
     // Reload Table on Filter Change
     $('#filter_status').on('change', function () {
-        table.ajax.reload();
+        if (table) table.ajax.reload();
     });
 
     // Toast Notification
@@ -116,7 +120,8 @@ $(document).ready(function () {
             jangka_waktu: $('#jangka_waktu').val().trim(),
             start_date: $('#start_date').val().trim(),
             end_date: $('#end_date').val().trim(),
-            status: $('#status').val().trim()
+            status: $('#status').val().trim(),
+            keterangan: $('#keterangan').val().trim()
         };
 
         if (formData.nama_pinjaman === '') {
@@ -133,7 +138,7 @@ $(document).ready(function () {
             success: function () {
                 showToast('Data Berhasil disimpan', 'success');
                 $('#pinjamanModal').modal('hide');
-                table.ajax.reload();
+                if (table) table.ajax.reload();
             },
             error: function (xhr) {
                 console.error(xhr.responseText);
@@ -174,6 +179,7 @@ $(document).ready(function () {
                 $('#start_date').val(response.result.start_date);
                 $('#end_date').val(response.result.end_date);
                 $('#status').val(response.result.status);
+                $('#keterangan').val(response.result.keterangan);
 
                 $('#pinjamanModal').off('click', '.tombol-simpan-pinjaman')
                     .on('click', '.tombol-simpan-pinjaman', () => simpanPinjaman(id));
@@ -205,11 +211,11 @@ $(document).ready(function () {
                     type: 'DELETE',
                     success: function () {
                         showToast('Data Berhasil dihapus', 'success');
-                        table.ajax.reload();
+                        if (table) table.ajax.reload();
                     },
                     error: function () {
                         showToast('Gagal menghapus data', 'danger');
-                        table.ajax.reload();
+                        if (table) table.ajax.reload();
                     }
                 });
             }
@@ -277,7 +283,7 @@ $(document).ready(function () {
                     data: { ids: ids },
                     success: function (response) {
                         showToast(response.message, 'success');
-                        table.ajax.reload();
+                        if (table) table.ajax.reload();
                         $('#checkAll').prop('checked', false);
                         $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
                     },
@@ -291,11 +297,13 @@ $(document).ready(function () {
     });
 
     // Reset check all on page change
-    table.on('draw', function () {
-        $('#checkAll').prop('checked', false);
-        $('#checkAll').prop('indeterminate', false);
-        updateBulkButton();
-    });
+    if (table) {
+        table.on('draw', function () {
+            $('#checkAll').prop('checked', false);
+            $('#checkAll').prop('indeterminate', false);
+            updateBulkButton();
+        });
+    }
 
     // Handle Payment Modal (if applicable)
     $('body').on("click", "[data-bs-target='#bayarModal']", function () {
