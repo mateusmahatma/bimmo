@@ -32,6 +32,10 @@
                         <input type="text" id="status" class="form-control" name='status' placeholder="Input Nama Pinjaman" required hidden>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label for="keterangan" class="col-form-label">Keterangan</label>
+                    <textarea id="keterangan" class="form-control" name="keterangan" placeholder="Input Keterangan (Opsional)"></textarea>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
