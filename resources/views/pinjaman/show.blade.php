@@ -80,7 +80,8 @@
                                     <th style="width: 5%;">No</th>
                                     <th>Amount</th>
                                     <th>Payment Date</th>
-                                    <th style="width: 10%;">Action</th>
+                                    <th>Proof</th>
+                                    <th style="width: 15%;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -90,6 +91,20 @@
                                     <td class="fw-bold text-success">Rp {{ number_format($bayar_pinjaman->jumlah_bayar, 0, ',', '.') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($bayar_pinjaman->tgl_bayar)->format('d M Y') }}</td>
                                     <td>
+                                        @if ($bayar_pinjaman->bukti_bayar)
+                                            <a href="{{ asset('storage/' . $bayar_pinjaman->bukti_bayar) }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="View Proof">
+                                                <i class="bi bi-file-earmark-check"></i>
+                                            </a>
+                                        @else
+                                            <span class="text-muted small">No file</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-primary btn-sm edit-bayar" 
+                                            data-id="{{ $bayar_pinjaman->id_bayar }}"
+                                            data-bs-toggle="tooltip" title="Edit Payment">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                         <form action="{{ route('bayar_pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this payment record?');">
                                             @csrf
                                             @method('DELETE')
@@ -101,7 +116,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
+                                    <td colspan="5" class="text-center text-muted py-4">
                                         <i class="bi bi-info-circle me-2"></i> No payment history found.
                                     </td>
                                 </tr>
