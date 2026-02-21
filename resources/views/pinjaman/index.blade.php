@@ -161,16 +161,49 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">Loan List</h5>
-                        <p class="text-muted small mb-0 mt-1">Manage and track your loan records.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Loan List</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage and track your loan records.</p>
                     </div>
-                    <div class="d-flex gap-2">
-                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
+                            <i class="bi bi-info-circle me-1"></i> Instructions
+                        </button>
+                        <div class="vr mx-1 d-none d-lg-block"></div>
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
                             <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
                             <i class="bi bi-plus-lg me-1"></i> Add New Loan
                         </a>
+                    </div>
+                </div>
+
+                <div class="collapse" id="instructionsCollapse">
+                    <div class="card-body bg-light border-bottom">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
+                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>How to Pay Loan:</h6>
+                                    <ol class="mb-0 ps-3 small">
+                                        <li>Find the loan you want to pay in the list below.</li>
+                                        <li>Click the <strong>Blue Eye Icon</strong> (<i class="bi bi-eye"></i>) to view details.</li>
+                                        <li>Click the <strong>Pay Loan</strong> button at the top right of the history section.</li>
+                                        <li>Enter the amount, date, and optionally upload proof.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-success border-0 bg-white shadow-sm mb-0 text-dark">
+                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-upload me-2"></i>How to Upload Proof:</h6>
+                                    <ol class="mb-0 ps-3 small">
+                                        <li>You can upload proof while <strong>making a payment</strong>.</li>
+                                        <li>To add/update proof later, go to <strong>Details</strong> view.</li>
+                                        <li>In the History table, click the <strong>Pencil Icon</strong> (<i class="bi bi-pencil"></i>) on a payment row.</li>
+                                        <li>Choose your file (JPG, PNG, PDF) and save.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
