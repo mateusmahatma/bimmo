@@ -67,7 +67,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="card-title mb-0 fw-bold">Payment History</h5>
                         @if ($pinjaman->status === 'belum_lunas')
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bayarModal" data-pinjaman-id="{{ $pinjaman->id }}">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bayarModal" data-pinjaman-id="{{ Vinkla\Hashids\Facades\Hashids::encode($pinjaman->id) }}">
                             <i class="bi bi-wallet2 me-1"></i> Pay Loan
                         </button>
                         @endif
@@ -120,6 +120,8 @@
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
 <script>
     // Since pinjaman.js handles the modal trigger logic, we ensure it's loaded.
