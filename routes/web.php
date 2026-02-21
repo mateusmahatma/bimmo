@@ -142,9 +142,12 @@ Route::match (['get', 'post'], '/compare', [CompareController::class , 'index'])
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
     Route::delete('/pinjaman/bulk-delete', [PinjamanController::class , 'bulkDelete'])->name('pinjaman.bulkDelete');
+    Route::get('/pinjaman/export/excel', [PinjamanController::class , 'exportExcel'])->name('pinjaman.export.excel');
     Route::resource('pinjaman', PinjamanController::class)
         ->parameters(['pinjaman' => 'hash']);
     Route::post('/pinjaman/{hash}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
+    Route::get('/bayar-pinjaman/{id}/edit', [BayarPinjamanController::class , 'edit'])->name('bayar_pinjaman.edit');
+    Route::put('/bayar-pinjaman/{id}', [BayarPinjamanController::class , 'update'])->name('bayar_pinjaman.update');
     Route::delete('/bayar_pinjaman/{id}', [BayarPinjamanController::class , 'destroy'])->name('bayar_pinjaman.destroy');
 });
 
