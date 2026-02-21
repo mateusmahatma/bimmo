@@ -46,6 +46,8 @@ $(document).ready(function () {
                 { data: "DT_RowIndex", name: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
                 { data: "nama_pinjaman", name: "nama_pinjaman" },
                 { data: "keterangan", name: "keterangan", defaultContent: "-" },
+                { data: "total_loan", name: "total_loan", className: "text-end" },
+                { data: "paid_amount", name: "paid_amount", className: "text-end" },
                 { data: "jumlah_pinjaman", name: "jumlah_pinjaman", className: "text-end" },
                 {
                     data: "status",
@@ -73,6 +75,14 @@ $(document).ready(function () {
     // Reload Table on Filter Change
     $('#filter_status').on('change', function () {
         if (table) table.ajax.reload();
+
+        // Update export Excel link
+        const filterStatus = $(this).val();
+        let exportUrl = "/pinjaman/export/excel";
+        if (filterStatus) {
+            exportUrl += "?filter_status=" + filterStatus;
+        }
+        $('#btnExportExcel').attr('href', exportUrl);
     });
 
     // Toast Notification
@@ -305,19 +315,75 @@ $(document).ready(function () {
         });
     }
 
-    // Handle Payment Modal (if applicable)
+    // Handle Payment Modal (Create)
     $('body').on("click", "[data-bs-target='#bayarModal']", function () {
         var button = $(this);
         var pinjamanId = button.data("pinjaman-id");
         var modal = $("#bayarModal");
         var form = modal.find("#bayarForm");
+
+        // Reset modal state to "Create"
+        modal.find("#bayarModalLabel").text("Bayar Pinjaman");
+        modal.find(".btn-color").html('<i class="fa fa-check"></i> Bayar');
+        modal.find("#current_file_container").addClass("d-none");
+        form[0].reset();
+
         form.attr("action", "/pinjaman/" + pinjamanId + "/bayar");
         modal.find("#pinjamanId").val(pinjamanId);
+
+        // Remove method spoofing if it exists
+        form.find('input[name="_method"]').remove();
+    });
+
+    // Handle Payment Edit Button
+    $('body').on('click', '.edit-bayar', function () {
+        var id = $(this).data('id');
+        var modal = $("#bayarModal");
+        var form = modal.find("#bayarForm");
+
+        $.ajax({
+            url: '/bayar-pinjaman/' + id + '/edit',
+            type: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    modal.find("#bayarModalLabel").text("Edit Pembayaran");
+                    modal.find(".btn-color").html('<i class="fa fa-save"></i> Perbarui');
+
+                    form.attr("action", "/bayar-pinjaman/" + id);
+                    modal.find("#jumlah_bayar").val(response.data.jumlah_bayar);
+                    modal.find("#tgl_bayar").val(response.data.tgl_bayar);
+
+                    if (response.data.bukti_bayar) {
+                        modal.find("#current_file_link").attr("href", response.data.bukti_bayar);
+                        modal.find("#current_file_container").removeClass("d-none");
+                    } else {
+                        modal.find("#current_file_container").addClass("d-none");
+                    }
+
+                    // Add method PUT for spoofing
+                    if (form.find('input[name="_method"]').length === 0) {
+                        form.append('<input type="hidden" name="_method" value="PUT">');
+                    } else {
+                        form.find('input[name="_method"]').val("PUT");
+                    }
+
+                    modal.modal('show');
+                }
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                showToast('Gagal memuat data pembayaran', 'danger');
+            }
+        });
     });
 
     // Reset modal on close
-    $('#pinjamanModal').on('hidden.bs.modal', function () {
+    $('#pinjamanModal, #bayarModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
+        if ($(this).attr('id') === 'bayarModal') {
+            $(this).find("#current_file_container").addClass("d-none");
+            $(this).find('input[name="_method"]').remove();
+        }
     });
 
 });
