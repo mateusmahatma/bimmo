@@ -7,11 +7,15 @@ use App\Models\Pinjaman;
 use App\Models\BayarPinjaman;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Vinkla\Hashids\Facades\Hashids;
 
 class BayarPinjamanController extends Controller
 {
-    public function bayar(Request $request, $id_pinjaman)
+    public function bayar(Request $request, $hash)
     {
+        $id_pinjaman = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id_pinjaman, 404);
+
         $request->validate([
             'jumlah_bayar' => 'required|numeric|min:0.01',
             'tgl_bayar' => 'required|date',
@@ -55,7 +59,8 @@ class BayarPinjamanController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Pembayaran berhasil');
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -72,7 +77,8 @@ class BayarPinjamanController extends Controller
 
         if ($pinjaman->jumlah_pinjaman > 0) {
             $pinjaman->status = 'belum_lunas';
-        } else {
+        }
+        else {
             $pinjaman->status = 'lunas';
         }
 
