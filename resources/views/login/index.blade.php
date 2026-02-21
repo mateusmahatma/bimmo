@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>BIMMO</title>
+    <title>Bimmo (Budget Investment Money Movement Optimization)</title>
     <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
