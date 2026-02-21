@@ -53,11 +53,16 @@
                                 <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
                             </button>
                         </div>
-                        <button type="button" class="btn btn-success">
-                            <a href="{{ route('pinjaman.create') }}" class="text-white text-decoration-none">
-                                <i class="bi bi-plus-lg me-1"></i> Add New Loan
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
                             </a>
-                        </button>
+                            <button type="button" class="btn btn-success">
+                                <a href="{{ route('pinjaman.create') }}" class="text-white text-decoration-none">
+                                    <i class="bi bi-plus-lg me-1"></i> Add New Loan
+                                </a>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -70,7 +75,9 @@
                                     <th style="width: 5%;">No</th>
                                     <th>Loan Name</th>
                                     <th>Notes</th>
-                                    <th>Amount</th>
+                                    <th class="text-end">Total Loan</th>
+                                    <th class="text-end">Paid Amount</th>
+                                    <th class="text-end">Remaining Balance</th>
                                     <th>Status</th>
                                     <th style="width: 10%;">Action</th>
                                 </tr>
