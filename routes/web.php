@@ -142,8 +142,9 @@ Route::match (['get', 'post'], '/compare', [CompareController::class , 'index'])
 // Pinjaman
 Route::middleware(['auth'])->group(function () {
     Route::delete('/pinjaman/bulk-delete', [PinjamanController::class , 'bulkDelete'])->name('pinjaman.bulkDelete');
-    Route::resource('pinjaman', PinjamanController::class);
-    Route::post('/pinjaman/{id}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
+    Route::resource('pinjaman', PinjamanController::class)
+        ->parameters(['pinjaman' => 'hash']);
+    Route::post('/pinjaman/{hash}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
     Route::delete('/bayar_pinjaman/{id}', [BayarPinjamanController::class , 'destroy'])->name('bayar_pinjaman.destroy');
 });
 
