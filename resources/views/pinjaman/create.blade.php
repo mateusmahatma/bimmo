@@ -90,6 +90,15 @@
                                 @enderror
                             </div>
 
+                            <!-- Keterangan -->
+                            <div class="col-12">
+                                <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">Keterangan</label>
+                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="3" placeholder="Enter additional details (optional)">{{ old('keterangan') }}</textarea>
+                                @error('keterangan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <!-- Buttons -->
                             <div class="col-12 mt-4 d-flex justify-content-end gap-2">
                                 <a href="{{ route('pinjaman.index') }}" class="btn btn-light px-4">Cancel</a>
