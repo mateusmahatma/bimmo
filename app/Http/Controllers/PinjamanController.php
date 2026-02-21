@@ -8,9 +8,17 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Vinkla\Hashids\Facades\Hashids;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PinjamanExport;
 
 class PinjamanController extends Controller
 {
+    public function exportExcel(Request $request)
+    {
+        $filterStatus = $request->input('filter_status');
+        return Excel::download(new PinjamanExport($filterStatus), 'pinjaman.xlsx');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -35,6 +43,14 @@ class PinjamanController extends Controller
                 return Hashids::encode($pinjaman->id);
             }
             ])
+                ->addColumn('total_loan', function ($pinjaman) {
+                $paid = $pinjaman->bayar_pinjaman->sum('jumlah_bayar');
+                return 'Rp ' . number_format($pinjaman->jumlah_pinjaman + $paid, 0, ',', '.');
+            })
+                ->addColumn('paid_amount', function ($pinjaman) {
+                $paid = $pinjaman->bayar_pinjaman->sum('jumlah_bayar');
+                return 'Rp ' . number_format($paid, 0, ',', '.');
+            })
                 ->editColumn('jumlah_pinjaman', function ($pinjaman) {
                 return 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
             })
