@@ -34,7 +34,12 @@ class PinjamanController extends Controller
             }
 
             // total dihitung setelah filter diterapkan
-            $totalPinjaman = $data->sum('jumlah_pinjaman');
+            $totalRemaining = $data->sum('jumlah_pinjaman');
+
+            // Hitung total bayar untuk pinjaman yang difilter
+            $ids = (clone $data)->pluck('id');
+            $totalPaid = \App\Models\BayarPinjaman::whereIn('id_pinjaman', $ids)->sum('jumlah_bayar');
+            $totalOriginal = $totalRemaining + $totalPaid;
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -65,7 +70,9 @@ class PinjamanController extends Controller
                 return view('pinjaman.tombol', ['pinjaman' => $pinjaman])->with('request', $pinjaman);
             })
 
-                ->with('totalPinjaman', 'Rp ' . number_format($totalPinjaman, 0, ',', '.'))
+                ->with('totalPinjaman', 'Rp ' . number_format($totalRemaining, 0, ',', '.'))
+                ->with('totalPaid', 'Rp ' . number_format($totalPaid, 0, ',', '.'))
+                ->with('totalOriginal', 'Rp ' . number_format($totalOriginal, 0, ',', '.'))
                 ->rawColumns(['aksi'])
                 ->toJson();
         }

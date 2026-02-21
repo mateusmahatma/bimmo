@@ -1,45 +1,37 @@
 <div class="modal fade" id="pinjamanModal" tabindex="-1" aria-labelledby="pinjamanModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="pinjamanModalLabel">Input Nama Pinjaman</h1>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark" id="pinjamanModalLabel">Loan Information</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body overflow-auto">
+            <div class="modal-body py-4">
                 <div class="mb-3">
-                    <label for="nama_pinjaman" class="col-form-label">Nama</label>
-                    <div class="position-relative">
-                        <input type="text" id="nama_pinjaman" class="form-control" name='nama_pinjaman' placeholder="Input Nama Pinjaman" required>
-                    </div>
-                    <div class="position-relative">
-                        <label for="jumlah_pinjaman" class="col-form-label">Jumlah Pinjaman</label>
-                        <input type="number" id="jumlah_pinjaman" class="form-control" name='jumlah_pinjaman' placeholder="Input Nama Pinjaman" required>
-                    </div>
-                    <label for="jangka_waktu" class="col-sm-2 col-form-label" hidden>Jangka Waktu</label>
-                    <div class="col-sm-10">
-                        <input type="number" id="jangka_waktu" class="form-control" name='jangka_waktu' placeholder="Input Nama Pinjaman" required hidden>
-                    </div>
-                    <label for="start_date" class="col-sm-2 col-form-label" hidden>Start Date</label>
-                    <div class="col-sm-10">
-                        <input type="date" id="start_date" class="form-control" name='start_date' placeholder="Input Nama Pinjaman" required hidden>
-                    </div>
-                    <label for="end_date" class="col-sm-2 col-form-label" hidden>End Date</label>
-                    <div class="col-sm-10">
-                        <input type="date" id="end_date" class="form-control" name='end_date' placeholder="Input Nama Pinjaman" required hidden>
-                    </div>
-                    <label for="status" class="col-sm-2 col-form-label" hidden>Status</label>
-                    <div class="col-sm-10">
-                        <input type="text" id="status" class="form-control" name='status' placeholder="Input Nama Pinjaman" required hidden>
-                    </div>
+                    <label for="nama_pinjaman" class="form-label small fw-bold text-muted text-uppercase">Loan Name</label>
+                    <input type="text" id="nama_pinjaman" class="form-control rounded-3" name='nama_pinjaman' placeholder="Enter loan name" required>
                 </div>
                 <div class="mb-3">
-                    <label for="keterangan" class="col-form-label">Keterangan</label>
-                    <textarea id="keterangan" class="form-control" name="keterangan" placeholder="Input Keterangan (Opsional)"></textarea>
+                    <label for="jumlah_pinjaman" class="form-label small fw-bold text-muted text-uppercase">Loan Amount</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 rounded-start-3">Rp</span>
+                        <input type="number" id="jumlah_pinjaman" class="form-control border-start-0 rounded-end-3" name='jumlah_pinjaman' placeholder="0" required>
+                    </div>
+                </div>
+                
+                {{-- Hidden fields kept for functional consistency --}}
+                <input type="number" id="jangka_waktu" name='jangka_waktu' value="0" hidden>
+                <input type="date" id="start_date" name='start_date' value="{{ date('Y-m-d') }}" hidden>
+                <input type="date" id="end_date" name='end_date' value="{{ date('Y-m-d') }}" hidden>
+                <input type="text" id="status" name='status' value="belum_lunas" hidden>
+
+                <div class="mb-0">
+                    <label for="keterangan" class="form-label small fw-bold text-muted text-uppercase">Description</label>
+                    <textarea id="keterangan" class="form-control rounded-3" name="keterangan" rows="3" placeholder="Additional notes (optional)"></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success tombol-simpan-pinjaman">Simpan</button>
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4 tombol-simpan-pinjaman">Save</button>
             </div>
         </div>
     </div>

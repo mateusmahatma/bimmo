@@ -101,8 +101,8 @@
 
                             <!-- Buttons -->
                             <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                                <a href="{{ route('pinjaman.index') }}" class="btn btn-light px-4">Cancel</a>
-                                <button type="submit" class="btn btn-primary px-4">
+                                <a href="{{ route('pinjaman.index') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
                                     <i class="bi bi-save me-1"></i> Save Loan
                                 </button>
                             </div>

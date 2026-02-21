@@ -14,7 +14,7 @@ $(document).ready(function () {
     if ($("#pinjamanTable").length > 0) {
         table = $("#pinjamanTable").DataTable({
             paging: true,
-            responsive: true,
+            responsive: false, // Using custom CSS for responsiveness
             lengthChange: true,
             autoWidth: false,
             serverSide: true,
@@ -26,9 +26,15 @@ $(document).ready(function () {
                     d.filter_status = $('#filter_status').val();
                 },
                 dataSrc: function (json) {
-                    // Update Total Summary
+                    // Update Summary Cards
                     if (json.totalPinjaman) {
                         $("#totalPinjaman").text(json.totalPinjaman);
+                    }
+                    if (json.totalPaid) {
+                        $("#statTotalPaid").text(json.totalPaid);
+                    }
+                    if (json.totalOriginal) {
+                        $("#statTotalOriginal").text(json.totalOriginal);
                     }
                     return json.data;
                 }
@@ -69,6 +75,17 @@ $(document).ready(function () {
                     className: "text-center"
                 },
             ],
+            createdRow: function (row, data, dataIndex) {
+                $('td:eq(0)', row).attr('data-label', 'Select').addClass('mobile-checkbox');
+                $('td:eq(1)', row).attr('data-label', 'No');
+                $('td:eq(2)', row).attr('data-label', 'Loan Name');
+                $('td:eq(3)', row).attr('data-label', 'Notes');
+                $('td:eq(4)', row).attr('data-label', 'Total Loan');
+                $('td:eq(5)', row).attr('data-label', 'Paid Amount');
+                $('td:eq(6)', row).attr('data-label', 'Remaining Balance');
+                $('td:eq(7)', row).attr('data-label', 'Status');
+                $('td:eq(8)', row).attr('data-label', 'Action');
+            }
         });
     }
 

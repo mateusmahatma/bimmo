@@ -1,10 +1,11 @@
-<div class="dropdown-sidebar">
-    <button class="icon-elipsis" data-bs-toggle="dropdown" aria-expanded="false">
-        &#8943;
-    </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item tombol-edit-detail" href="{{ route('pinjaman.show', $pinjaman->hash) }}" data-id="#">Detail</a></li>
-        <li><a class="dropdown-item tombol-edit-pinjaman" href="#" data-id="{{ $pinjaman->hash }}">Edit</a></li>
-        <li><a class="dropdown-item tombol-del-pinjaman" href="#" data-id="{{ $pinjaman->hash }}">Delete</a></li>
-    </ul>
+<div class="d-flex justify-content-center gap-1">
+    <a href="{{ route('pinjaman.show', $pinjaman->hash) }}" class="btn btn-sm btn-outline-info rounded-circle" title="Detail" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-eye"></i>
+    </a>
+    <a href="#" class="btn btn-sm btn-outline-primary rounded-circle tombol-edit-pinjaman" data-id="{{ $pinjaman->hash }}" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-pencil"></i>
+    </a>
+    <a href="#" class="btn btn-sm btn-outline-danger rounded-circle tombol-del-pinjaman" data-id="{{ $pinjaman->hash }}" title="Delete" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-trash"></i>
+    </a>
 </div>
