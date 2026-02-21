@@ -13,16 +13,17 @@ class BayarPinjaman extends Model
         'id_user',
         'id_pinjaman',
         'jumlah_bayar',
-        'tgl_bayar'
+        'tgl_bayar',
+        'bukti_bayar'
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class , 'id');
     }
 
     public function pinjaman()
     {
-        return $this->belongsTo(Pinjaman::class, 'id');
+        return $this->belongsTo(Pinjaman::class , 'id');
     }
 }
