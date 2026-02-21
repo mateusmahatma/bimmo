@@ -69,6 +69,7 @@
                                     </th>
                                     <th style="width: 5%;">No</th>
                                     <th>Loan Name</th>
+                                    <th>Notes</th>
                                     <th>Amount</th>
                                     <th>Status</th>
                                     <th style="width: 10%;">Action</th>
