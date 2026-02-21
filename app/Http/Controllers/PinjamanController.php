@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Vinkla\Hashids\Facades\Hashids;
 
 class PinjamanController extends Controller
 {
@@ -29,16 +30,22 @@ class PinjamanController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->setRowAttr([
+                'data-hash' => function ($pinjaman) {
+                return Hashids::encode($pinjaman->id);
+            }
+            ])
                 ->editColumn('jumlah_pinjaman', function ($pinjaman) {
                 return 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
             })
                 ->editColumn('jangka_waktu', function ($pinjaman) {
                 return $pinjaman->jangka_waktu . ' bulan';
             })
-                ->editColumn('status', function ($pinjaman) {
-                return $pinjaman->status;
+                ->addColumn('hash', function ($pinjaman) {
+                return Hashids::encode($pinjaman->id);
             })
                 ->addColumn('aksi', function ($pinjaman) {
+                $pinjaman->hash = Hashids::encode($pinjaman->id);
                 return view('pinjaman.tombol', ['pinjaman' => $pinjaman])->with('request', $pinjaman);
             })
 
@@ -73,6 +80,7 @@ class PinjamanController extends Controller
             'start_date' => 'date',
             'end_date' => 'date',
             'status' => 'in:lunas,belum_lunas',
+            'keterangan' => 'nullable|string',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -82,20 +90,29 @@ class PinjamanController extends Controller
         return redirect()->route('pinjaman.index')->with('success', 'Pinjaman Berhasil Tersimpan.');
     }
 
-    public function show($id)
+    public function show($hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         $pinjaman = Pinjaman::with('user', 'bayar_pinjaman')->findOrFail($id);
         return view('pinjaman.show', compact('pinjaman'));
     }
 
-    public function edit($id)
+    public function edit($hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         $data = Pinjaman::where('id', $id)->first();
         return response()->json(['result' => $data]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         $validasi = Validator::make($request->all(), [
             'nama_pinjaman' => 'required',
             'jumlah_pinjaman' => 'numeric',
@@ -103,6 +120,7 @@ class PinjamanController extends Controller
             'start_date' => 'date',
             'end_date' => 'date',
             'status' => 'in:lunas,belum_lunas',
+            'keterangan' => 'nullable|string',
         ], [
             'nama_pinjaman.required' => 'Nama wajib diisi',
         ]);
@@ -118,6 +136,7 @@ class PinjamanController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'status' => $request->status,
+            'keterangan' => $request->keterangan,
         ];
 
         Pinjaman::where('id', $id)->update($data);
@@ -126,8 +145,11 @@ class PinjamanController extends Controller
 
 
 
-    public function destroy($id)
+    public function destroy($hash)
     {
+        $id = Hashids::decode($hash)[0] ?? null;
+        abort_if(!$id, 404);
+
         $pinjaman = Pinjaman::findOrFail($id);
         $pinjaman->delete(); // Ini akan otomatis menghapus semua pembayaran terkait
 
@@ -141,10 +163,20 @@ class PinjamanController extends Controller
     {
         $validated = $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:pinjaman,id'
         ]);
 
-        $ids = $validated['ids'];
+        $hashedIds = $validated['ids'];
+        $ids = [];
+        foreach ($hashedIds as $hash) {
+            $decoded = Hashids::decode($hash)[0] ?? null;
+            if ($decoded) {
+                $ids[] = $decoded;
+            }
+        }
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Invalid IDs.'], 400);
+        }
 
         // Ensure user owns these records
         $deleted = Pinjaman::whereIn('id', $ids)
