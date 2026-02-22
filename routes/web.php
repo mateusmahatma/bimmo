@@ -29,6 +29,32 @@ Route::get('/', function () {
 Route::get('/bimmo', [LoginController::class , 'index'])->name('bimmo')->middleware('guest');
 Route::post('/bimmo', [LoginController::class , 'authenticate']);
 
+Route::get('/diagnose-encryption', function () {
+    $results = [];
+
+    $check = function ($tableName, $columns) use (&$results) {
+            $rows = Illuminate\Support\Facades\DB::table($tableName)->get();
+            foreach ($rows as $row) {
+                foreach ($columns as $column) {
+                    $value = $row->$column;
+                    if ($value === null)
+                        continue;
+                    try {
+                        Illuminate\Support\Facades\Crypt::decryptString($value);
+                    }
+                    catch (\Exception $e) {
+                        $results[] = "[$tableName] ID {$row->id}: Column '$column' INVALID. Value: " . substr($value, 0, 20) . "...";
+                    }
+                }
+            }
+        }
+            ;
+
+        $check('users', ['name', 'email', 'no_hp', 'nominal_target_dana_darurat']);
+        $check('transaksi', ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan']);
+
+        return count($results) > 0 ? implode("\n", $results) : "ALL OK";    });
+
 // Log in Google
 Route::get('/login/google', [GoogleLoginController::class , 'redirectToGoogle']);
 Route::get('/login/google/callback', [GoogleLoginController::class , 'handleGoogleCallback']);
