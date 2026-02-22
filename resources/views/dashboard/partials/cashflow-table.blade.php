@@ -12,13 +12,13 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($row->bulan.'-01')->translatedFormat('F Y') }}</td>
             <td class="text-end">
-                Rp {{ number_format($row->total_pemasukan,0,',','.') }}
+                Rp {{ number_format((float)$row->total_pemasukan,0,',','.') }}
             </td>
             <td class="text-end">
-                Rp {{ number_format($row->total_pengeluaran,0,',','.') }}
+                Rp {{ number_format((float)$row->total_pengeluaran,0,',','.') }}
             </td>
             <td class="text-end fw-bold">
-                Rp {{ number_format($row->selisih,0,',','.') }}
+                Rp {{ number_format((float)$row->selisih,0,',','.') }}
                 @if($row->selisih < 0)
                     <span class="badge bg-danger ms-1">Defisit</span>
                     @elseif($row->selisih < 1000000)

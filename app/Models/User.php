@@ -34,7 +34,7 @@ class User extends Authenticatable
     // Relasi ke model BayarPinjaman
     public function pembayaranPinjaman()
     {
-        return $this->hasMany(BayarPinjaman::class, 'id_user');
+        return $this->hasMany(BayarPinjaman::class , 'id_user');
     }
 
     // guarded kebalikan dengan fillable, guarded yang tidak boleh diisi
@@ -57,5 +57,26 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'name' => 'encrypted',
+        'email' => 'encrypted',
+        'no_hp' => 'encrypted',
+        'nominal_target_dana_darurat' => 'encrypted',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($user) {
+            if ($user->isDirty('name')) {
+                $user->name_hash = hash('sha256', (string)$user->name);
+            }
+            if ($user->isDirty('email')) {
+                $user->email_hash = hash('sha256', (string)$user->email);
+            }
+            if ($user->isDirty('no_hp')) {
+                $user->no_hp_hash = hash('sha256', (string)$user->no_hp);
+            }
+        });
+    }
 }

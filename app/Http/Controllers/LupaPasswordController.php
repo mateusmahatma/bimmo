@@ -24,7 +24,8 @@ class LupaPasswordController extends Controller
             'email' => 'required|email',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $emailHash = hash('sha256', $request->email);
+        $user = User::where('email_hash', $emailHash)->first();
 
         if (!$user) {
             return response()->json(['error' => 'unregistered email'], 404);
@@ -85,7 +86,8 @@ class LupaPasswordController extends Controller
             return back()->withErrors(['email' => 'Token reset password telah kedaluwarsa.']);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $emailHash = hash('sha256', $request->email);
+        $user = User::where('email_hash', $emailHash)->first();
 
         if (!$user) {
             return back()->withErrors(['email' => 'Email tidak ditemukan.']);

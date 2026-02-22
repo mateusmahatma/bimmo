@@ -78,7 +78,7 @@ class HasilProsesAnggaranController extends Controller
         // Ambil total transaksi yang cocok dengan jenis_pengeluaran dan dalam rentang tanggal
         $totalPengeluaran = Transaksi::whereIn('id_pengeluaran', $validated['jenis_pengeluaran'])
             ->whereBetween('tanggal_transaksi', [$validated['tanggal_mulai'], $validated['tanggal_selesai']])
-            ->sum('nominal');
+            ->sum(fn($t) => (float)$t->nominal);
 
         // Hitung sisa anggaran berdasarkan transaksi
         $sisa = $validated['nominal_anggaran'] - $totalPengeluaran;

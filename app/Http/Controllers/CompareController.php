@@ -32,8 +32,7 @@ class CompareController extends Controller
                 ->when($jenisPengeluaran, function ($query) use ($jenisPengeluaran) {
                     return $query->where('pengeluaran', $jenisPengeluaran);
                 })
-                ->where('status', 1)
-                ->sum('nominal');
+                ->where('status', 1)->get()->sum(fn($t) => (float)$t->nominal);
 
             // Total Nominal Periode 2
             $totalNominal2 = Transaksi::where('id_user', $userId)
@@ -41,8 +40,7 @@ class CompareController extends Controller
                 ->when($jenisPengeluaran, function ($query) use ($jenisPengeluaran) {
                     return $query->where('pengeluaran', $jenisPengeluaran);
                 })
-                ->where('status', 1)
-                ->sum('nominal');
+                ->where('status', 1)->get()->sum(fn($t) => (float)$t->nominal);
 
             // Selisih
             $gap = $totalNominal1 - $totalNominal2;

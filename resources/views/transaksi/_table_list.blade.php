@@ -59,16 +59,20 @@
                             {{ \Carbon\Carbon::parse($row->tgl_transaksi)->locale('en')->isoFormat('dddd') }}</div>
                     </td>
                     <td data-label="Category">
-                        @if ($row->nominal_pemasukan > 0)
-                            <span
-                                class="badge bg-success-light text-success border border-success-subtle rounded-pill px-3">
-                                <i class="bi bi-arrow-down-left me-1"></i> {{ $row->pemasukanRelation?->nama ?? 'Income' }}
-                            </span>
-                        @else
-                            <span class="badge bg-danger-light text-danger border border-danger-subtle rounded-pill px-3">
-                                <i class="bi bi-arrow-up-right me-1"></i>
-                                {{ $row->pengeluaranRelation?->nama ?? 'Expense' }}
-                            </span>
+                        @if ((float)$row->nominal_pemasukan > 0)
+                            <div class="mb-1">
+                                <span class="badge bg-success-light text-success border border-success-subtle rounded-pill px-3">
+                                    <i class="bi bi-arrow-down-left me-1"></i> {{ $row->pemasukanRelation?->nama ?? 'Income' }}
+                                </span>
+                            </div>
+                        @endif
+                        @if ((float)$row->nominal > 0)
+                            <div>
+                                <span class="badge bg-danger-light text-danger border border-danger-subtle rounded-pill px-3">
+                                    <i class="bi bi-arrow-up-right me-1"></i>
+                                    {{ $row->pengeluaranRelation?->nama ?? 'Expense' }}
+                                </span>
+                            </div>
                         @endif
                     </td>
                     <td data-label="Description">
@@ -95,11 +99,12 @@
                             <span class="text-muted small">-</span>
                         @endif
                     </td>
-                    <td class="text-end fw-bold {{ $row->nominal_pemasukan > 0 ? 'text-success' : 'text-danger' }}" data-label="Amount">
-                        @if ($row->nominal_pemasukan > 0)
-                            + Rp {{ number_format($row->nominal_pemasukan, 0, ',', '.') }}
-                        @else
-                            - Rp {{ number_format($row->nominal, 0, ',', '.') }}
+                    <td class="text-end fw-bold" data-label="Amount">
+                        @if ((float)$row->nominal_pemasukan > 0)
+                            <div class="text-success">+ Rp {{ number_format((float)$row->nominal_pemasukan, 0, ',', '.') }}</div>
+                        @endif
+                        @if ((float)$row->nominal > 0)
+                            <div class="text-danger">- Rp {{ number_format((float)$row->nominal, 0, ',', '.') }}</div>
                         @endif
                     </td>
                     <td class="text-center" data-label="Action">

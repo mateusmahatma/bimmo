@@ -122,9 +122,9 @@
                 <td>{{ $no++ }}</td>
                 <td>{{ \Carbon\Carbon::parse($trans->tgl_transaksi)->locale('id')->isoFormat('dddd, D MMMM Y') }}</td>
                 <td>{{ $trans->pemasukanRelation->nama ?? '-' }}</td>
-                <td>{{ number_format($trans->nominal_pemasukan, 0, ',', '.') }}</td>
+                <td>{{ number_format((float)$trans->nominal_pemasukan, 0, ',', '.') }}</td>
                 <td>{{ $trans->pengeluaranRelation->nama ?? '-' }}</td>
-                <td>{{ number_format($trans->nominal, 0, ',', '.') }}</td>
+                <td>{{ number_format((float)$trans->nominal, 0, ',', '.') }}</td>
                 <td>
                     @if($trans->keterangan)
                     <table style="width:100%; border-collapse: collapse;">

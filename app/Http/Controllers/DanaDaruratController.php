@@ -68,7 +68,7 @@ class DanaDaruratController extends Controller
                 $transaksi = \App\Models\Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
 
                 // Hitung total pengeluaran
-                $totalPengeluaran = $transaksi->where('status', '1')->sum('nominal');
+                $totalPengeluaran = $transaksi->where('status', '1')->sum(fn($t) => (float)$t->nominal);
 
                 // Hitung selisih bulan dari transaksi pertama ke terakhir
                 if ($transaksi->count() > 1) {

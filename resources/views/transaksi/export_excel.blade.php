@@ -33,19 +33,19 @@
         <tr>
             <td><strong>Total Income</strong></td>
             <td class="text-end">
-                {{ number_format($totalPemasukan) }}
+                {{ number_format((float)$totalPemasukan) }}
             </td>
         </tr>
         <tr>
             <td><strong>Total Expense</strong></td>
             <td class="text-end">
-                {{ number_format($totalPengeluaran) }}
+                {{ number_format((float)$totalPengeluaran) }}
             </td>
         </tr>
         <tr>
             <td><strong>Net Balance</strong></td>
             <td class="text-end">
-                {{ number_format($netIncome) }}
+                {{ number_format((float)$netIncome) }}
             </td>
         </tr>
     </table>
@@ -69,11 +69,11 @@
                 <td>{{ $row->tgl_transaksi }}</td>
                 <td>{{ $row->pemasukanRelation?->nama ?? '-' }}</td>
                 <td class="text-end">
-                    {{ number_format($row->nominal_pemasukan) }}
+                    {{ number_format((float)$row->nominal_pemasukan) }}
                 </td>
                 <td>{{ $row->pengeluaranRelation?->nama ?? '-' }}</td>
                 <td class="text-end">
-                    {{ number_format($row->nominal) }}
+                    {{ number_format((float)$row->nominal) }}
                 </td>
                 <td>{{ $row->keterangan }}</td>
             </tr>

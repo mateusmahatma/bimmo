@@ -17,7 +17,8 @@ class GoogleLoginController extends Controller
     public function handleGoogleCallback()
     {
         $googleUser = Socialite::driver('google')->user();
-        $user = User::where('email', $googleUser->email)->first();
+        $emailHash = hash('sha256', $googleUser->email);
+        $user = User::where('email_hash', $emailHash)->first();
 
         if (!$user) {
             return redirect('/daftar');

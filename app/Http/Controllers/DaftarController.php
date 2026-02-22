@@ -18,8 +18,8 @@ class DaftarController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => ['required', 'min:3', 'max:255', 'unique:users'],
-            'email' => ['required', 'email:dns', 'max:255', 'unique:users'],
+            'name' => ['required', 'min:3', 'max:255', 'unique:users,name_hash'],
+            'email' => ['required', 'email:dns', 'max:255', 'unique:users,email_hash'],
             'username' => ['required', 'min:3', 'max:255', 'unique:users'],
             'password' => ['required', 'min:3', 'max:255'],
         ]);

@@ -61,9 +61,8 @@ class UserController extends Controller
             return redirect()->back()->withErrors(['current_password' => 'Password Sekarang tidak sesuai.'], 'updatePassword');
         }
 
-        DB::table('users')
-            ->where('id', $user->id)
-            ->update(['password' => Hash::make($request->new_password)]);
+        $user->password = Hash::make($request->new_password);
+        $user->save();
 
         return redirect()->back()->with('password_status', 'Password berhasil diubah!');
     }
@@ -71,16 +70,16 @@ class UserController extends Controller
     public function updateEmail(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email:dns|unique:users,email,' . auth()->user()->id
+            'email' => 'required|email:dns|unique:users,email_hash,' . auth()->user()->id . ',id'
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator, 'updateEmail');
         }
 
-        DB::table('users')
-            ->where('id', auth()->user()->id)
-            ->update(['email' => $request->email]);
+        $user = auth()->user();
+        $user->email = $request->email;
+        $user->save();
 
         return redirect()->back()->with('email_status', 'Email berhasil diubah!');
     }
@@ -88,7 +87,7 @@ class UserController extends Controller
     public function updatePhoneNumber(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'no_hp' => 'nullable|numeric|unique:users,no_hp,' . auth()->user()->id
+            'no_hp' => 'nullable|numeric|unique:users,no_hp_hash,' . auth()->user()->id . ',id'
         ]);
 
         if ($validator->fails()) {
@@ -103,9 +102,9 @@ class UserController extends Controller
             $cleanNumber = '62' . substr($cleanNumber, 1);
         }
 
-        DB::table('users')
-            ->where('id', auth()->user()->id)
-            ->update(['no_hp' => $cleanNumber]);
+        $user = auth()->user();
+        $user->no_hp = $cleanNumber;
+        $user->save();
 
         return redirect()->back()->with('phone_status', 'Nomor WhatsApp berhasil disimpan!');
     }

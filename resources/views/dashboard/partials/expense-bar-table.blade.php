@@ -12,7 +12,7 @@
             <tr>
                 <td>{{ $row->kategori }}</td>
                 <td class="text-end">
-                    Rp {{ number_format($row->total,0,',','.') }}
+                    Rp {{ number_format((float)$row->total,0,',','.') }}
                 </td>
                 <td class="text-end fw-bold
                     {{ $row->persen > 40 ? 'text-danger' : ($row->persen > 25 ? 'text-warning' : 'text-success') }}">

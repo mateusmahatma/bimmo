@@ -23,6 +23,12 @@ class Transaksi extends Model
         'file'
     ];
 
+    protected $casts = [
+        'nominal_pemasukan' => 'encrypted',
+        'nominal' => 'encrypted',
+        'keterangan' => 'encrypted',
+    ];
+
     public function pengeluaranRelation()
     {
         return $this->belongsTo(Pengeluaran::class , 'pengeluaran', 'id');

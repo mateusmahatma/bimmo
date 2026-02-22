@@ -52,8 +52,10 @@ class TransaksiController extends Controller
         // Let's refactor to use a fresh query builder for stats to avoid side effects
         $statsQuery = $this->buildFilteredQuery($request, true); // true = skip sorting
 
-        $totalPemasukan = (clone $statsQuery)->sum('nominal_pemasukan');
-        $totalPengeluaran = (clone $statsQuery)->sum('nominal');
+        // PERFORMA AGGREGATIONS IN PHP FOR ENCRYPTED FIELDS
+        $allTransactions = $statsQuery->get();
+        $totalPemasukan = $allTransactions->sum(fn($t) => (float)$t->nominal_pemasukan);
+        $totalPengeluaran = $allTransactions->sum(fn($t) => (float)$t->nominal);
         $netIncome = $totalPemasukan - $totalPengeluaran;
 
         // Calculate Average Stats
@@ -88,22 +90,30 @@ class TransaksiController extends Controller
                 'dateRange' => $dateRange
             ];
 
-            // Summary Details (Re-calculate for modals)
-            $summaryPemasukan = (clone $statsQuery)
-                ->whereNotNull('pemasukan')
-                ->selectRaw('pemasukan, SUM(nominal_pemasukan) as total')
+            // Summary Details (Re-calculate for modals) in PHP
+            $summaryPemasukan = $allTransactions->whereNotNull('pemasukan')
                 ->groupBy('pemasukan')
-                ->orderBy('total', 'desc')
-                ->with('pemasukanRelation')
-                ->get();
+                ->map(function ($items, $key) {
+                return (object)[
+                'pemasukan' => $key,
+                'total' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+                'pemasukanRelation' => $items->first()->pemasukanRelation
+                ];
+            })
+                ->sortByDesc('total')
+                ->values();
 
-            $summaryPengeluaran = (clone $statsQuery)
-                ->whereNotNull('pengeluaran')
-                ->selectRaw('pengeluaran, SUM(nominal) as total')
+            $summaryPengeluaran = $allTransactions->whereNotNull('pengeluaran')
                 ->groupBy('pengeluaran')
-                ->orderBy('total', 'desc')
-                ->with('pengeluaranRelation')
-                ->get();
+                ->map(function ($items, $key) {
+                return (object)[
+                'pengeluaran' => $key,
+                'total' => $items->sum(fn($t) => (float)$t->nominal),
+                'pengeluaranRelation' => $items->first()->pengeluaranRelation
+                ];
+            })
+                ->sortByDesc('total')
+                ->values();
 
             // Helper to render blade with variable scope
             $renderModal = function ($view, $data) {
@@ -155,23 +165,31 @@ class TransaksiController extends Controller
         }
 
         // =====================
-        // INITIAL LOAD (Summary Detail)
+        // INITIAL LOAD (Summary Detail) in PHP
         // =====================
-        $summaryPemasukan = (clone $statsQuery)
-            ->whereNotNull('pemasukan')
-            ->selectRaw('pemasukan, SUM(nominal_pemasukan) as total')
+        $summaryPemasukan = $allTransactions->whereNotNull('pemasukan')
             ->groupBy('pemasukan')
-            ->orderBy('total', 'desc')
-            ->with('pemasukanRelation')
-            ->get();
+            ->map(function ($items, $key) {
+            return (object)[
+            'pemasukan' => $key,
+            'total' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+            'pemasukanRelation' => $items->first()->pemasukanRelation
+            ];
+        })
+            ->sortByDesc('total')
+            ->values();
 
-        $summaryPengeluaran = (clone $statsQuery)
-            ->whereNotNull('pengeluaran')
-            ->selectRaw('pengeluaran, SUM(nominal) as total')
+        $summaryPengeluaran = $allTransactions->whereNotNull('pengeluaran')
             ->groupBy('pengeluaran')
-            ->orderBy('total', 'desc')
-            ->with('pengeluaranRelation')
-            ->get();
+            ->map(function ($items, $key) {
+            return (object)[
+            'pengeluaran' => $key,
+            'total' => $items->sum(fn($t) => (float)$t->nominal),
+            'pengeluaranRelation' => $items->first()->pengeluaranRelation
+            ];
+        })
+            ->sortByDesc('total')
+            ->values();
 
         return view('transaksi.index', [
             'transaksi' => $transaksi,
@@ -195,22 +213,17 @@ class TransaksiController extends Controller
         $query = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])
             ->where('id_user', $userId);
 
-        // Search
+        // Search (Limited to non-encrypted fields)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                // Keterangan
-                $q->where('keterangan', 'like', "%{$search}%")
-                    // Nominal
-                    ->orWhere('nominal', 'like', "%{$search}%")
-                    ->orWhere('nominal_pemasukan', 'like', "%{$search}%")
-                    // Related Pemasukan
-                    ->orWhereHas('pemasukanRelation', function ($q2) use ($search) {
-                    $q2->where('nama', 'like', "%{$search}%");
-                }
-                )
-                    // Related Pengeluaran
-                    ->orWhereHas('pengeluaranRelation', function ($q3) use ($search) {
+                // Related Pemasukan
+                $q->whereHas('pemasukanRelation', function ($q2) use ($search) {
+                        $q2->where('nama', 'like', "%{$search}%");
+                    }
+                    )
+                        // Related Pengeluaran
+                        ->orWhereHas('pengeluaranRelation', function ($q3) use ($search) {
                     $q3->where('nama', 'like', "%{$search}%");
                 }
                 );
@@ -244,8 +257,8 @@ class TransaksiController extends Controller
         }
 
         if (!$skipSort) {
-            // sorting
-            $allowedSorts = ['tgl_transaksi', 'nominal_pemasukan', 'nominal'];
+            // sorting (Limited to non-encrypted fields)
+            $allowedSorts = ['tgl_transaksi'];
             $sort = in_array($request->sort, $allowedSorts) ? $request->sort : 'tgl_transaksi';
             $direction = in_array($request->direction, ['asc', 'desc']) ? $request->direction : 'desc';
 
@@ -476,9 +489,11 @@ class TransaksiController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-        Transaksi::where('id', $id)
+                $transaksi = Transaksi::where('id', $id)
             ->where('id_user', Auth::id())
-            ->update($validatedData);
+            ->firstOrFail();
+
+        $transaksi->update($validatedData);
 
         return redirect()
             ->route('transaksi.index')
@@ -610,8 +625,8 @@ class TransaksiController extends Controller
 
         $data = $query->get();
 
-        $totalPemasukan = $data->sum('nominal_pemasukan');
-        $totalPengeluaran = $data->sum('nominal');
+        $totalPemasukan = $data->sum(fn($t) => (float)$t->nominal_pemasukan);
+        $totalPengeluaran = $data->sum(fn($t) => (float)$t->nominal);
         $netIncome = $totalPemasukan - $totalPengeluaran;
 
         $pdf = PDF::loadView('transaksi.export_pdf', [
@@ -658,9 +673,9 @@ class TransaksiController extends Controller
         return Excel::download(
             new TransaksiExport(
             $data,
-            $data->sum('nominal_pemasukan'),
-            $data->sum('nominal'),
-            $data->sum('nominal_pemasukan') - $data->sum('nominal')
+            $data->sum(fn($t) => (float)$t->nominal_pemasukan),
+            $data->sum(fn($t) => (float)$t->nominal),
+            $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)
             ),
             'arus_kas.xlsx'
         );
@@ -674,9 +689,9 @@ class TransaksiController extends Controller
         $excelData = Excel::raw(
             new TransaksiExport(
             $data,
-            $data->sum('nominal_pemasukan'),
-            $data->sum('nominal'),
-            $data->sum('nominal_pemasukan') - $data->sum('nominal')
+            $data->sum(fn($t) => (float)$t->nominal_pemasukan),
+            $data->sum(fn($t) => (float)$t->nominal),
+            $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)
             ),
             \Maatwebsite\Excel\Excel::XLSX
         );

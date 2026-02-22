@@ -295,7 +295,7 @@
                 <div class="p-3 border-top bg-light rounded-bottom">
                     <div class="small text-muted">
                         Total Expenditures:
-                        <strong id="totalPengeluaranValue">Rp {{ number_format($totalPengeluaranBulan,0,',','.') }}</strong>
+                        <strong id="totalPengeluaranValue">Rp {{ number_format((float)$totalPengeluaranBulan,0,',','.') }}</strong>
                     </div>
                 </div>
                 </div>
@@ -342,7 +342,7 @@
                             </td>
 
                             <td class="text-end fw-bold {{ $row->jenis === 'pemasukan' ? 'text-success' : 'text-danger' }}">
-                                Rp {{ number_format($row->nominal,0,',','.') }}
+                                Rp {{ number_format((float)$row->nominal,0,',','.') }}
                             </td>
                         </tr>
                         @empty
@@ -358,10 +358,10 @@
 
             <div class="p-3 border-top bg-light rounded-bottom d-flex justify-content-between small">
                 <span class="text-success">
-                    Total Income: <strong>Rp {{ number_format($totalMasukHariIni,0,',','.') }}</strong>
+                    Total Income: <strong>Rp {{ number_format((float)$totalMasukHariIni,0,',','.') }}</strong>
                 </span>
                 <span class="text-danger">
-                    Total Expenses: <strong>Rp {{ number_format($totalKeluarHariIni,0,',','.') }}</strong>
+                    Total Expenses: <strong>Rp {{ number_format((float)$totalKeluarHariIni,0,',','.') }}</strong>
                 </span>
             </div>
             </div>
