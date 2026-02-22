@@ -59,8 +59,8 @@ class TransaksiController extends Controller
         $netIncome = $totalPemasukan - $totalPengeluaran;
 
         // Calculate Average Stats
-        $startDate = $request->start_date ?Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
-        $endDate = $request->end_date ?Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
+        $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+        $endDate = $request->end_date ? Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
 
         // Ensure we don't divide by zero and have at least 1 day
         $diffInDays = $startDate->diffInDays($endDate) + 1;
@@ -94,24 +94,24 @@ class TransaksiController extends Controller
             $summaryPemasukan = $allTransactions->whereNotNull('pemasukan')
                 ->groupBy('pemasukan')
                 ->map(function ($items, $key) {
-                return (object)[
-                'pemasukan' => $key,
-                'total' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
-                'pemasukanRelation' => $items->first()->pemasukanRelation
-                ];
-            })
+                    return (object)[
+                        'pemasukan' => $key,
+                        'total' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+                        'pemasukanRelation' => $items->first()->pemasukanRelation
+                    ];
+                })
                 ->sortByDesc('total')
                 ->values();
 
             $summaryPengeluaran = $allTransactions->whereNotNull('pengeluaran')
                 ->groupBy('pengeluaran')
                 ->map(function ($items, $key) {
-                return (object)[
-                'pengeluaran' => $key,
-                'total' => $items->sum(fn($t) => (float)$t->nominal),
-                'pengeluaranRelation' => $items->first()->pengeluaranRelation
-                ];
-            })
+                    return (object)[
+                        'pengeluaran' => $key,
+                        'total' => $items->sum(fn($t) => (float)$t->nominal),
+                        'pengeluaranRelation' => $items->first()->pengeluaranRelation
+                    ];
+                })
                 ->sortByDesc('total')
                 ->values();
 
@@ -170,24 +170,24 @@ class TransaksiController extends Controller
         $summaryPemasukan = $allTransactions->whereNotNull('pemasukan')
             ->groupBy('pemasukan')
             ->map(function ($items, $key) {
-            return (object)[
-            'pemasukan' => $key,
-            'total' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
-            'pemasukanRelation' => $items->first()->pemasukanRelation
-            ];
-        })
+                return (object)[
+                    'pemasukan' => $key,
+                    'total' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+                    'pemasukanRelation' => $items->first()->pemasukanRelation
+                ];
+            })
             ->sortByDesc('total')
             ->values();
 
         $summaryPengeluaran = $allTransactions->whereNotNull('pengeluaran')
             ->groupBy('pengeluaran')
             ->map(function ($items, $key) {
-            return (object)[
-            'pengeluaran' => $key,
-            'total' => $items->sum(fn($t) => (float)$t->nominal),
-            'pengeluaranRelation' => $items->first()->pengeluaranRelation
-            ];
-        })
+                return (object)[
+                    'pengeluaran' => $key,
+                    'total' => $items->sum(fn($t) => (float)$t->nominal),
+                    'pengeluaranRelation' => $items->first()->pengeluaranRelation
+                ];
+            })
             ->sortByDesc('total')
             ->values();
 
@@ -218,15 +218,19 @@ class TransaksiController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 // Related Pemasukan
-                $q->whereHas('pemasukanRelation', function ($q2) use ($search) {
+                $q->whereHas(
+                    'pemasukanRelation',
+                    function ($q2) use ($search) {
                         $q2->where('nama', 'like', "%{$search}%");
                     }
-                    )
-                        // Related Pengeluaran
-                        ->orWhereHas('pengeluaranRelation', function ($q3) use ($search) {
-                    $q3->where('nama', 'like', "%{$search}%");
-                }
-                );
+                )
+                    // Related Pengeluaran
+                    ->orWhereHas(
+                        'pengeluaranRelation',
+                        function ($q3) use ($search) {
+                            $q3->where('nama', 'like', "%{$search}%");
+                        }
+                    );
             });
         }
 
@@ -241,8 +245,7 @@ class TransaksiController extends Controller
         if ($request->filled('pemasukan')) {
             if (is_array($request->pemasukan)) {
                 $query->whereIn('pemasukan', $request->pemasukan);
-            }
-            else {
+            } else {
                 $query->where('pemasukan', $request->pemasukan);
             }
         }
@@ -250,8 +253,7 @@ class TransaksiController extends Controller
         if ($request->filled('pengeluaran')) {
             if (is_array($request->pengeluaran)) {
                 $query->whereIn('pengeluaran', $request->pengeluaran);
-            }
-            else {
+            } else {
                 $query->where('pengeluaran', $request->pengeluaran);
             }
         }
@@ -355,8 +357,8 @@ class TransaksiController extends Controller
             if (in_array('emergency_fund', $request->kategori ?? []) && $transaksi->nominal > 0) {
 
                 $dana = DanaDarurat::firstOrCreate(
-                ['id_user' => Auth::id()],
-                ['total' => 0]
+                    ['id_user' => Auth::id()],
+                    ['total' => 0]
                 );
 
                 $dana->increment('total', $transaksi->nominal);
@@ -385,8 +387,7 @@ class TransaksiController extends Controller
              * ====================================== */
             return redirect()->route('transaksi.index')
                 ->with('success', 'Data Transaksi Berhasil Disimpan!');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
 
             return back()->with('error', 'Terjadi error: ' . $e->getMessage());
         }
@@ -489,7 +490,7 @@ class TransaksiController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-                $transaksi = Transaksi::where('id', $id)
+        $transaksi = Transaksi::where('id', $id)
             ->where('id_user', Auth::id())
             ->firstOrFail();
 
@@ -501,9 +502,7 @@ class TransaksiController extends Controller
     }
 
 
-    public function show()
-    {
-    }
+    public function show() {}
 
     // public function destroy($id)
     // {
@@ -672,10 +671,10 @@ class TransaksiController extends Controller
 
         return Excel::download(
             new TransaksiExport(
-            $data,
-            $data->sum(fn($t) => (float)$t->nominal_pemasukan),
-            $data->sum(fn($t) => (float)$t->nominal),
-            $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)
+                $data,
+                $data->sum(fn($t) => (float)$t->nominal_pemasukan),
+                $data->sum(fn($t) => (float)$t->nominal),
+                $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)
             ),
             'arus_kas.xlsx'
         );
@@ -688,10 +687,10 @@ class TransaksiController extends Controller
 
         $excelData = Excel::raw(
             new TransaksiExport(
-            $data,
-            $data->sum(fn($t) => (float)$t->nominal_pemasukan),
-            $data->sum(fn($t) => (float)$t->nominal),
-            $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)
+                $data,
+                $data->sum(fn($t) => (float)$t->nominal_pemasukan),
+                $data->sum(fn($t) => (float)$t->nominal),
+                $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)
             ),
             \Maatwebsite\Excel\Excel::XLSX
         );
@@ -863,12 +862,10 @@ class TransaksiController extends Controller
                         $tgl = Carbon::instance(
                             \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw)
                         )->format('Y-m-d');
-                    }
-                    else {
+                    } else {
                         $tgl = Carbon::parse($tglRaw)->format('Y-m-d');
                     }
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     continue;
                 }
 
