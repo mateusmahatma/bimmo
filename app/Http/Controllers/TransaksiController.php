@@ -73,7 +73,7 @@ class TransaksiController extends Controller
         // =====================
         // PAGINATION
         // =====================
-        $transaksi = $query->paginate(10)->withQueryString();
+        $transaksi = $query->paginate(10)->appends($request->query());
 
         // =====================
         // AJAX RESPONSE
@@ -909,7 +909,9 @@ class TransaksiController extends Controller
             }
 
             if (!empty($dataToInsert)) {
-                foreach ($dataToInsert as $data) { Transaksi::create($data); }
+                foreach ($dataToInsert as $data) {
+                    Transaksi::create($data);
+                }
                 $validDataFound = true;
                 $processedCount += count($dataToInsert);
                 break; // Stop after finding and processing the first valid sheet
