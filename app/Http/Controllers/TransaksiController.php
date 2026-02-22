@@ -909,7 +909,7 @@ class TransaksiController extends Controller
             }
 
             if (!empty($dataToInsert)) {
-                Transaksi::insert($dataToInsert);
+                foreach ($dataToInsert as $data) { Transaksi::create($data); }
                 $validDataFound = true;
                 $processedCount += count($dataToInsert);
                 break; // Stop after finding and processing the first valid sheet
