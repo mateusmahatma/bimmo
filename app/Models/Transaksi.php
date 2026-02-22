@@ -24,7 +24,9 @@ class Transaksi extends Model
     ];
 
     protected $casts = [
+        'pemasukan' => 'encrypted',
         'nominal_pemasukan' => 'encrypted',
+        'pengeluaran' => 'encrypted',
         'nominal' => 'encrypted',
         'keterangan' => 'encrypted',
     ];
