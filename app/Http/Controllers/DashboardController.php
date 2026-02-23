@@ -82,7 +82,7 @@ class DashboardController extends Controller
         ]);
     }
 
-        protected function maskNominal($value, $show)
+    protected function maskNominal($value, $show)
     {
         return $show ? 'Rp ' . number_format($value, 0, ',', '.') : 'Rp ********';
     }
@@ -333,12 +333,42 @@ class DashboardController extends Controller
             $periode = (int)$request->periode;
             if (!in_array($periode, [2, 6, 12])) $periode = 6;
             $cashflow = Transaksi::where('id_user', Auth::id())->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())->get()->groupBy(fn($t) => \Carbon\Carbon::parse($t->tgl_transaksi)->format('Y-m'))->map(fn($items, $bulan) => (object)['bulan' => $bulan, 'total_pemasukan' => $items->sum(fn($t) => (float)$t->nominal_pemasukan), 'total_pengeluaran' => $items->sum(fn($t) => (float)$t->nominal), 'selisih' => $items->sum(fn($t) => (float)$t->nominal_pemasukan) - $items->sum(fn($t) => (float)$t->nominal)])->sortBy('bulan')->values();
-            $chartData = ['cashflow' => $cashflow->map(fn($row) => ['bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'), 'total_pemasukan' => $row->total_pemasukan, 'total_pengeluaran' => $row->total_pengeluaran]), 'savingRate' => $cashflow->map(function ($row) {
-                $pendapatan = (float)$row->total_pemasukan;
-                $rate = $pendapatan > 0 ? round((($pendapatan - (float)$row->total_pengeluaran) / $pendapatan) * 100, 2) : 0;
-                return ['bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'), 'saving_rate' => $rate];
-            })];
-            return response()->json(['cashflow' => view('dashboard.partials.cashflow-table', compact('cashflow'))->render(), 'chartData' => $chartData]);
+            
+            $savingRateStatus = function ($rate) {
+                if ($rate > 20) return ['label' => 'Sangat Sehat', 'class' => 'success'];
+                if ($rate >= 10) return ['label' => 'Sehat', 'class' => 'primary'];
+                if ($rate >= 0) return ['label' => 'Waspada', 'class' => 'warning'];
+                return ['label' => 'Defisit', 'class' => 'danger'];
+            };
+
+            $savingRate = $cashflow->map(function ($row) use ($savingRateStatus) {
+                $pendapatan = (float) $row->total_pemasukan;
+                $pengeluaran = (float) $row->total_pengeluaran;
+                $rate = $pendapatan > 0 ? round((($pendapatan - $pengeluaran) / $pendapatan) * 100, 2) : 0;
+                $status = $savingRateStatus($rate);
+                $row->saving_rate = $rate;
+                $row->saving_label = $status['label'];
+                $row->saving_class = $status['class'];
+                return $row;
+            });
+
+            $chartData = [
+                'cashflow' => $cashflow->map(fn($row) => [
+                    'bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
+                    'total_pemasukan' => $row->total_pemasukan,
+                    'total_pengeluaran' => $row->total_pengeluaran
+                ]),
+                'savingRate' => $savingRate->map(fn($row) => [
+                    'bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
+                    'saving_rate' => $row->saving_rate
+                ])
+            ];
+
+            return response()->json([
+                'cashflow' => view('dashboard.partials.cashflow-table', compact('cashflow'))->render(),
+                'savingRate' => view('dashboard.partials.saving-rate-table', compact('savingRate'))->render(),
+                'chartData' => $chartData
+            ]);
         }
         if ($request->has(['bulan', 'tahun'])) {
             $bulan = (int)$request->bulan;
@@ -354,4 +384,3 @@ class DashboardController extends Controller
         return response()->json(['error' => 'Invalid request'], 400);
     }
 }
-
