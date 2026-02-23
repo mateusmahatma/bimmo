@@ -80,7 +80,7 @@
         </div>
 
         <!-- Ganti Password -->
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
                 Change Password
             </div>
@@ -135,6 +135,63 @@
                     </div>
                     <button type="submit" class="btn btn-warning">Save Password</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Foto Profil -->
+        <div class="card mb-4">
+            <div class="card-header">
+                Profile Photo
+            </div>
+            <div class="card-body">
+                @if(session('photo_status'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('photo_status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if($errors->updatePhoto->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul>
+                            @foreach ($errors->updatePhoto->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center mb-3 mb-md-0">
+                        @if(auth()->user()->profile_photo)
+                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Profile Photo" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                        @else
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
+                                <i class="bi bi-person-fill text-white fs-1"></i>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="col-md-9">
+                        <form action="{{ route('profil.updatePhoto') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label for="profile_photo" class="form-label">Select Photo</label>
+                                <input class="form-control" type="file" id="profile_photo" name="profile_photo" accept="image/*" required>
+                                <div class="form-text">Maksimum 2MB (JPG, PNG, GIF, SVG).</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Upload New Photo</button>
+                        </form>
+                        
+                        @if(auth()->user()->profile_photo)
+                            <form action="{{ route('profil.deletePhoto') }}" method="POST" class="mt-2">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?')">Remove Photo</button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>

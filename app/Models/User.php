@@ -61,6 +61,7 @@ class User extends Authenticatable
         'email' => 'encrypted',
         'no_hp' => 'encrypted',
         'nominal_target_dana_darurat' => 'encrypted',
+        'profile_photo' => 'encrypted',
     ];
 
     protected static function boot()

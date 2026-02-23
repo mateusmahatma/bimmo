@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -107,5 +108,50 @@ class UserController extends Controller
         $user->save();
 
         return redirect()->back()->with('phone_status', 'Nomor WhatsApp berhasil disimpan!');
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator, 'updatePhoto');
+        }
+
+        $user = Auth::user();
+
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $file = $request->file('profile_photo');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public');
+
+            $user->profile_photo = $path;
+            $user->save();
+        }
+
+        return redirect()->back()->with('photo_status', 'Foto profil berhasil diperbarui!');
+    }
+
+    public function deletePhoto()
+    {
+        $user = Auth::user();
+
+        if ($user->profile_photo) {
+            if (Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $user->profile_photo = null;
+            $user->save();
+        }
+
+        return redirect()->back()->with('photo_status', 'Foto profil berhasil dihapus!');
     }
 }

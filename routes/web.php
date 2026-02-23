@@ -53,7 +53,8 @@ Route::get('/diagnose-encryption', function () {
         $check('users', ['name', 'email', 'no_hp', 'nominal_target_dana_darurat']);
         $check('transaksi', ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan']);
 
-        return count($results) > 0 ? implode("\n", $results) : "ALL OK";    });
+        return count($results) > 0 ? implode("\n", $results) : "ALL OK";
+    });
 
 // Log in Google
 Route::get('/login/google', [GoogleLoginController::class , 'redirectToGoogle']);
@@ -198,6 +199,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/password', [UserController::class , 'updatePassword'])->name('profil.updatePassword');
     Route::put('/profil/email', [UserController::class , 'updateEmail'])->name('profil.updateEmail');
     Route::put('/profil/phone', [UserController::class , 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
+    Route::put('/profil/photo', [UserController::class , 'updatePhoto'])->name('profil.updatePhoto');
+    Route::delete('/profil/photo', [UserController::class , 'deletePhoto'])->name('profil.deletePhoto');
 });
 
 Route::get('/check-session', function () {
