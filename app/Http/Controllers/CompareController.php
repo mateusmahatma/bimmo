@@ -29,18 +29,22 @@ class CompareController extends Controller
             // Total Nominal Periode 1
             $totalNominal1 = Transaksi::where('id_user', $userId)
                 ->whereBetween('tgl_transaksi', [$startDate1, $endDate1])
-                ->when($jenisPengeluaran, function ($query) use ($jenisPengeluaran) {
-                    return $query->where('pengeluaran', $jenisPengeluaran);
+                ->where('status', 1)
+                ->get()
+                ->filter(function ($t) use ($jenisPengeluaran) {
+                    return !$jenisPengeluaran || $t->pengeluaran == $jenisPengeluaran;
                 })
-                ->where('status', 1)->get()->sum(fn($t) => (float)$t->nominal);
+                ->sum(fn($t) => (float)$t->nominal);
 
             // Total Nominal Periode 2
             $totalNominal2 = Transaksi::where('id_user', $userId)
                 ->whereBetween('tgl_transaksi', [$startDate2, $endDate2])
-                ->when($jenisPengeluaran, function ($query) use ($jenisPengeluaran) {
-                    return $query->where('pengeluaran', $jenisPengeluaran);
+                ->where('status', 1)
+                ->get()
+                ->filter(function ($t) use ($jenisPengeluaran) {
+                    return !$jenisPengeluaran || $t->pengeluaran == $jenisPengeluaran;
                 })
-                ->where('status', 1)->get()->sum(fn($t) => (float)$t->nominal);
+                ->sum(fn($t) => (float)$t->nominal);
 
             // Selisih
             $gap = $totalNominal1 - $totalNominal2;
