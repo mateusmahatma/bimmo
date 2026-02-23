@@ -1,13 +1,40 @@
+@media (min-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 16.666667%;
+        /* matches col-md-2 */
+        height: 100vh;
+        z-index: 1000;
+        overflow-y: auto;
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .sidebar::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
+}
+
 .sidebar {
     background-color: #F8F9FA;
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.sidebar-bottom {
+    padding-bottom: 20px;
 }
 
 /* Offcanvas Sidebar Adjustments */
 .offcanvas-body .sidebar {
-    height: auto !important;
+    height: 100% !important;
+    width: 100% !important;
     position: relative !important;
     top: auto !important;
 }
