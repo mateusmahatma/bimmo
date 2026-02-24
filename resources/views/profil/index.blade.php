@@ -164,7 +164,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-3 text-center mb-3 mb-md-0">
                         @if(auth()->user()->profile_photo)
-                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Profile Photo" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                            <img src="{{ route('storage.profile_photo', ['filename' => basename(auth()->user()->profile_photo)]) }}" alt="Profile Photo" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
                         @else
                             <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
                                 <i class="bi bi-person-fill text-white fs-1"></i>

@@ -118,7 +118,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}">
                         @if(Auth::user()->profile_photo)
-                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">
+                            <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">
                         @else
                             <i class="bi bi-person-circle me-2"></i>
                         @endif

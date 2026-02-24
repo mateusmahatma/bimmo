@@ -202,7 +202,18 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/photo', [UserController::class , 'updatePhoto'])->name('profil.updatePhoto');
     Route::delete('/profil/photo', [UserController::class , 'deletePhoto'])->name('profil.deletePhoto');
     Route::put('/profil/notification', [UserController::class , 'updateNotification'])->name('profil.updateNotification');
-});
+
+    // Serve profile photos robustly
+    Route::get('/storage/profile_photos/{filename}', function ($filename) {
+            $path = storage_path('app/public/profile_photos/' . $filename);
+            if (!file_exists($path)) {
+                abort(404);
+            }
+            $file = file_get_contents($path);
+            $type = mime_content_type($path);
+            return response($file)->header('Content-Type', $type);
+        }
+        )->name('storage.profile_photo');    });
 
 Route::get('/check-session', function () {
     return response()->json(['alive' => true]);
