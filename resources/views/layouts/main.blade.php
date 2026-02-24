@@ -35,13 +35,6 @@
 
 {{-- Daily Transaction Notification Toast --}}
 @if(auth()->check() && auth()->user()->daily_notification)
-    @php
-        $hasTransactionToday = \App\Models\Transaksi::where('id_user', auth()->id())
-            ->whereDate('tgl_transaksi', \Carbon\Carbon::today())
-            ->exists();
-    @endphp
-
-    @if(!$hasTransactionToday)
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
         <div id="transactionToast" class="toast hide shadow-lg border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
             <div class="toast-header bg-warning text-dark border-0">
@@ -89,24 +82,71 @@
                 return (now - parseInt(lastDismissed)) >= interval;
             }
 
-            function showNotification() {
-                if (shouldShowNotification()) {
-                    toast.show();
+            async function checkAndShowNotification() {
+                try {
+                    const response = await fetch("{{ url('dashboard/todayTransactions') }}", {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    const transactions = await response.json();
+                    
+                    if (transactions.length === 0) {
+                        if (shouldShowNotification()) {
+                            // Show Bootstrap Toast (In-app)
+                            toast.show();
+
+                            // Show Browser Native Notification (OS-level)
+                            if ("Notification" in window) {
+                                if (Notification.permission === "granted") {
+                                    sendNativeNotification();
+                                } else if (Notification.permission !== "denied") {
+                                    Notification.requestPermission().then(permission => {
+                                        if (permission === "granted") {
+                                            sendNativeNotification();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    } else {
+                        // If there are transactions, hide the toast if it's currently showing
+                        toast.hide();
+                    }
+                } catch (error) {
+                    console.error('Error checking transactions:', error);
                 }
             }
 
+            function sendNativeNotification() {
+                const options = {
+                    body: "Anda belum mencatat transaksi apapun hari ini! Mari catat sekarang agar keuangan tetap terpantau.",
+                    icon: "{{ asset('img/bimmo_2.png') }}",
+                    badge: "{{ asset('img/bimmo_2.png') }}",
+                    tag: "daily-transaction-reminder",
+                    requireInteraction: true
+                };
+                
+                const n = new Notification("Reminder Transaksi - BIMMO", options);
+                
+                n.onclick = function(event) {
+                    event.preventDefault(); 
+                    window.open("{{ route('transaksi.create') }}", "_blank");
+                    n.close();
+                };
+            }
+
             // Initial check
-            showNotification();
+            checkAndShowNotification();
 
             // Recurring check
-            setInterval(showNotification, 60000); // Check every minute
+            setInterval(checkAndShowNotification, 60000); // Check every minute
 
             toastEl.addEventListener('hidden.bs.toast', function () {
                 localStorage.setItem('transaction_notification_dismissed', new Date().getTime());
             });
         });
     </script>
-    @endif
 @endif
 
 @endsection
