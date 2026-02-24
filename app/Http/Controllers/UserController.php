@@ -154,4 +154,23 @@ class UserController extends Controller
 
         return redirect()->back()->with('photo_status', 'Foto profil berhasil dihapus!');
     }
+
+    public function updateNotification(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'daily_notification' => 'boolean',
+            'notification_interval' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator, 'updateNotification');
+        }
+
+        $user = auth()->user();
+        $user->daily_notification = $request->has('daily_notification');
+        $user->notification_interval = $request->notification_interval;
+        $user->save();
+
+        return redirect()->back()->with('notification_status', 'Pengaturan notifikasi berhasil diperbarui!');
+    }
 }

@@ -194,12 +194,69 @@
                 </div>
             </div>
         </div>
+
+        <!-- Daily Notification Configuration -->
+        <div class="card mb-4">
+            <div class="card-header">
+                Notification Settings
+            </div>
+            <div class="card-body">
+                @if(session('notification_status'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('notification_status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if($errors->updateNotification->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul>
+                            @foreach ($errors->updateNotification->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <form action="{{ route('profil.updateNotification') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="daily_notification" name="daily_notification" value="1" {{ auth()->user()->daily_notification ? 'checked' : '' }}>
+                        <label class="form-check-label" for="daily_notification">Enable Daily Transaction Reminder</label>
+                    </div>
+
+                    <div id="interval_settings" class="{{ auth()->user()->daily_notification ? '' : 'd-none' }}">
+                        <div class="mb-3">
+                            <label for="notification_interval" class="form-label">Reminder Interval (Minutes)</label>
+                            <div class="input-group" style="max-width: 250px;">
+                                <input type="number" class="form-control" id="notification_interval" name="notification_interval" value="{{ auth()->user()->notification_interval ?? 30 }}" min="1">
+                                <span class="input-group-text">minutes</span>
+                            </div>
+                            <small class="text-muted">The notification will reappear every X minutes if you haven't logged any transactions today.</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
+    document.getElementById('daily_notification')?.addEventListener('change', function() {
+        const intervalSettings = document.getElementById('interval_settings');
+        if (this.checked) {
+            intervalSettings.classList.remove('d-none');
+        } else {
+            intervalSettings.classList.add('d-none');
+        }
+    });
+
     document.querySelectorAll('.toggle-password').forEach(button => {
         button.addEventListener('click', function() {
             const input = this.previousElementSibling;

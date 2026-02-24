@@ -201,6 +201,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/phone', [UserController::class , 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
     Route::put('/profil/photo', [UserController::class , 'updatePhoto'])->name('profil.updatePhoto');
     Route::delete('/profil/photo', [UserController::class , 'deletePhoto'])->name('profil.deletePhoto');
+    Route::put('/profil/notification', [UserController::class , 'updateNotification'])->name('profil.updateNotification');
 });
 
 Route::get('/check-session', function () {

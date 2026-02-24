@@ -62,6 +62,8 @@ class User extends Authenticatable
         'no_hp' => 'encrypted',
         'nominal_target_dana_darurat' => 'encrypted',
         'profile_photo' => 'encrypted',
+        'daily_notification' => 'boolean',
+        'notification_interval' => 'integer',
     ];
 
     protected static function boot()
