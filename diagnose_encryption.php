@@ -1,37 +1,33 @@
 <?php
-
-use App\Models\Transaksi;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
-
-require __DIR__ . '/vendor/autoload.php';
-$app = require_once __DIR__ . '/bootstrap/app.php';
+require 'vendor/autoload.php';
+$app = require_once 'bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-$transaksi = Transaksi::orderBy('id', 'desc')->first();
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 
-if (!$transaksi) {
-    echo "No transactions found.\n";
-    exit;
-}
-
-echo "ID: " . $transaksi->id . "\n";
-
-$fields = ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan'];
-
-foreach ($fields as $field) {
-    $raw = DB::table('transaksi')->where('id', $transaksi->id)->value($field);
-    echo "--- Field: $field ---\n";
-    echo "Raw DB: " . $raw . "\n";
-    echo "Model Value: " . $transaksi->$field . "\n";
+function checkModel($modelClass, $columns)
+{
+    echo "--- Checking Model: $modelClass ---" . PHP_EOL;
     try {
-        echo "Manual Decrypt: " . Crypt::decryptString($raw) . "\n";
+        $rows = $modelClass::all();
+        foreach ($rows as $row) {
+            foreach ($columns as $column) {
+                try {
+                    $val = $row->$column;
+                }
+                catch (\Exception $e) {
+                    $raw = DB::table($row->getTable())->where('id', $row->id)->value($column);
+                    echo "ID {$row->id}: Column '$column' DECRYPT FAIL. Raw: " . substr((string)$raw, 0, 30) . "..." . PHP_EOL;
+                }
+            }
+        }
     }
     catch (\Exception $e) {
-        echo "Manual Decrypt Error: " . $e->getMessage() . "\n";
+        echo "Error loading model $modelClass: " . $e->getMessage() . PHP_EOL;
     }
 }
 
-echo "APP_KEY: " . config('app.key') . "\n";
-Joseph:
+checkModel(App\Models\User::class , ['name', 'email', 'no_hp', 'nominal_target_dana_darurat']);
+checkModel(App\Models\Transaksi::class , ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan']);

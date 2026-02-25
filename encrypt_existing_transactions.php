@@ -9,22 +9,49 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 
 $count = DB::table('transaksi')->count();
-echo "Starting encryption of $count transactions..." . PHP_EOL;
+echo "Starting safe encryption of $count transactions..." . PHP_EOL;
 
 $transactions = DB::table('transaksi')->get();
+$processed = 0;
+$skipped = 0;
 
 foreach ($transactions as $index => $row) {
-    DB::table('transaksi')->where('id', $row->id)->update([
-        'pemasukan' => $row->pemasukan !== null ?Crypt::encryptString((string)$row->pemasukan) : null,
-        'nominal_pemasukan' => $row->nominal_pemasukan !== null ?Crypt::encryptString((string)$row->nominal_pemasukan) : null,
-        'pengeluaran' => $row->pengeluaran !== null ?Crypt::encryptString((string)$row->pengeluaran) : null,
-        'nominal' => $row->nominal !== null ?Crypt::encryptString((string)$row->nominal) : null,
-        'keterangan' => $row->keterangan !== null ?Crypt::encryptString((string)$row->keterangan) : null,
-    ]);
+    if ($index % 100 == 0) {
+        echo "Processing batch starting at $index..." . PHP_EOL;
+    }
 
-    if (($index + 1) % 100 == 0) {
-        echo "Processed " . ($index + 1) . " / $count" . PHP_EOL;
+    $updateData = [];
+    $cols = ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan'];
+
+    foreach ($cols as $col) {
+        $val = $row->$col;
+        if ($val === null)
+            continue;
+
+        // Check if already encrypted
+        $isAlreadyEncrypted = false;
+        try {
+            Crypt::decryptString($val);
+            $isAlreadyEncrypted = true;
+        }
+        catch (\Exception $e) {
+            $isAlreadyEncrypted = false;
+        }
+
+        if (!$isAlreadyEncrypted) {
+            $updateData[$col] = Crypt::encryptString((string)$val);
+        }
+    }
+
+    if (!empty($updateData)) {
+        DB::table('transaksi')->where('id', $row->id)->update($updateData);
+        $processed++;
+    }
+    else {
+        $skipped++;
     }
 }
 
 echo "Encryption complete!" . PHP_EOL;
+echo "Processed (New Encryptions): $processed" . PHP_EOL;
+echo "Skipped (Already Encrypted): $skipped" . PHP_EOL;
