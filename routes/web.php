@@ -213,7 +213,13 @@ Route::middleware(['auth'])->group(function () {
             $type = mime_content_type($path);
             return response($file)->header('Content-Type', $type);
         }
-        )->name('storage.profile_photo');    });
+        )->name('storage.profile_photo');
+
+        // Subscription
+        Route::post('/subscription/subscribe', [\App\Http\Controllers\SubscriptionController::class , 'subscribe'])->name('subscription.subscribe');
+        Route::post('/subscription/cancel', [\App\Http\Controllers\SubscriptionController::class , 'cancel'])->name('subscription.cancel');    });
+
+Route::post('/payment/webhook', [\App\Http\Controllers\SubscriptionController::class , 'webhook'])->name('payment.webhook');
 
 Route::get('/check-session', function () {
     return response()->json(['alive' => true]);

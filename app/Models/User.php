@@ -64,7 +64,36 @@ class User extends Authenticatable
         'profile_photo' => 'encrypted',
         'daily_notification' => 'boolean',
         'notification_interval' => 'integer',
+        'trial_ends_at' => 'datetime',
+        'subscription_ends_at' => 'datetime',
+        'subscription_auto_renew' => 'boolean',
     ];
+
+    public function isOnTrial()
+    {
+        return $this->trial_ends_at && now()->lt($this->trial_ends_at);
+    }
+
+    public function isSubscribed()
+    {
+        return $this->subscription_status == 1 && $this->subscription_ends_at && now()->lt($this->subscription_ends_at);
+    }
+
+    public function canAccessFeatures()
+    {
+        return $this->isOnTrial() || $this->isSubscribed();
+    }
+
+    public function getRemainingDays()
+    {
+        if ($this->isSubscribed()) {
+            return (int)now()->diffInDays($this->subscription_ends_at);
+        }
+        if ($this->isOnTrial()) {
+            return (int)now()->diffInDays($this->trial_ends_at);
+        }
+        return 0;
+    }
 
     protected static function boot()
     {
