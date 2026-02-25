@@ -30,6 +30,6 @@ class DaftarController extends Controller
 
         User::create($validatedData);
 
-        return redirect('/pointech')->with('success', 'Pendaftaran Berhasil, Silahkan Login');
+        return redirect('/bimmo')->with('success', 'Pendaftaran Berhasil, Silahkan Login');
     }
 }
