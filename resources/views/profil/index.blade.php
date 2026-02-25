@@ -242,7 +242,11 @@
 @endsection
 
 @push('scripts')
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+@if(config('services.midtrans.is_production'))
+    <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+@else
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+@endif
 <script>
     const payButton = document.getElementById('pay-button');
     if (payButton) {
