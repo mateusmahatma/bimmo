@@ -16,8 +16,9 @@ class HasilProsesAnggaran extends Model
 
     protected $casts = [
         'jenis_pengeluaran' => 'array',
-        'nominal_anggaran' => 'float',
-        'anggaran_yang_digunakan' => 'float',
+        'nominal_anggaran' => 'encrypted',
+        'anggaran_yang_digunakan' => 'encrypted',
+        'sisa_anggaran' => 'encrypted',
     ];
 
     protected $fillable = [
@@ -28,6 +29,7 @@ class HasilProsesAnggaran extends Model
         'persentase_anggaran',
         'nominal_anggaran',
         'anggaran_yang_digunakan',
+        'sisa_anggaran',
         'id_user',
     ];
 
