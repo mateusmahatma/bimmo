@@ -1,5 +1,11 @@
 $(document).ready(function () {
-    // Theme Handler Removed - Managed Globally
+    // CSRF Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
     // Fungsi Toast
@@ -166,9 +172,14 @@ $(document).ready(function () {
 
         $('.tombol-simpan-barang').prop('disabled', true).html(spinnerButton());
 
-        $.post('/barang', data)
-            .done(onSuccessSimpanBarang)
-            .always(resetTombolSimpanBarang);
+        $.ajax({
+            url: '/barang',
+            type: 'POST',
+            data,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: onSuccessSimpanBarang,
+            complete: resetTombolSimpanBarang
+        });
     }
 
     function updateBarang(id) {
@@ -181,6 +192,7 @@ $(document).ready(function () {
             url: '/barang/' + id,
             type: 'PUT',
             data,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: onSuccessSimpanBarang,
             complete: resetTombolSimpanBarang
         });
@@ -198,16 +210,21 @@ $(document).ready(function () {
         e.preventDefault();
         const id = $(this).data('id');
 
-        $.get('/barang/' + id + '/edit', function (res) {
-            const barang = res.result;
-            $('#barangModal').modal('show');
-            $('#nama_barang').val(barang.nama_barang);
-            $('#status_barang').val(barang.status);
-            $('#nama_toko').val(barang.nama_toko);
-            $('#harga').val(parseFloat(barang.harga));
-            $('#barangModal').data('id', id);
-            $('#barangModalLabel').text('Edit Asset');
-            $('.tombol-simpan-barang').html('Update');
+        $.ajax({
+            url: '/barang/' + id + '/edit',
+            type: 'GET',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function (res) {
+                const barang = res.result;
+                $('#barangModal').modal('show');
+                $('#nama_barang').val(barang.nama_barang);
+                $('#status_barang').val(barang.status);
+                $('#nama_toko').val(barang.nama_toko);
+                $('#harga').val(parseFloat(barang.harga));
+                $('#barangModal').data('id', id);
+                $('#barangModalLabel').text('Edit Asset');
+                $('.tombol-simpan-barang').html('Update');
+            }
         });
     });
 
@@ -234,6 +251,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: '/barang/' + id,
                     type: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
                         showToast('Data berhasil dihapus', 'success');
                         $('#barangTable').DataTable().ajax.reload();
@@ -245,12 +263,5 @@ $(document).ready(function () {
                 });
             }
         });
-    });
-
-    // Ajax Setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
     });
 });

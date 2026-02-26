@@ -88,8 +88,18 @@ class PemasukanController extends Controller
 
     public function destroy($id)
     {
-        $pemasukan = Pemasukan::findOrFail($id);
-        $pemasukan->delete();
+        $deleted = Pemasukan::where('id', $id)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if (request()->ajax()) {
+            if ($deleted) {
+                return response()->json(['success' => true, 'message' => 'Data deleted successfully']);
+            }
+            return response()->json(['success' => false, 'message' => 'Data not found or unauthorized'], 404);
+        }
+
+        return redirect()->back();
     }
 
     public function bulkDelete(Request $request)

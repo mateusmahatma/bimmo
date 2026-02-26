@@ -19,18 +19,20 @@ class BarangController extends Controller
             $query = Barang::where('id_user', $userId);
             if ($status === '1') {
                 $query = $query->where('status', '1');
-            } elseif ($status === '0') {
+            }
+            elseif ($status === '0') {
                 $query = $query->where('status', '!=', '1');
             }
 
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->addColumn('aksi', function ($barang) {
-                    return view('barang.tombol')->with('request', $barang);
-                })
+                return view('barang.tombol')->with('request', $barang);
+            })
                 ->with('totalBarang', 'Rp ' . number_format($totalBarang, 0, ',', '.'))
                 ->toJson();
-        } else {
+        }
+        else {
             return view('barang.index');
         }
     }
@@ -81,7 +83,18 @@ class BarangController extends Controller
 
     public function destroy($id)
     {
-        $id = Barang::where('id', $id)->delete();
+        $deleted = Barang::where('id', $id)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if (request()->ajax()) {
+            if ($deleted) {
+                return response()->json(['success' => true, 'message' => 'Data deleted successfully']);
+            }
+            return response()->json(['success' => false, 'message' => 'Data not found or unauthorized'], 404);
+        }
+
+        return redirect()->back();
     }
 
     public function getList()

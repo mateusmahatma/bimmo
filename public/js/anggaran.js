@@ -1,5 +1,11 @@
 $(document).ready(function () {
-    // Theme Handler Removed - Managed Globally
+    // CSRF Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     const csrfToken = window.csrfToken;
 
     // Toast Notification
@@ -193,6 +199,7 @@ $(document).ready(function () {
             url: url,
             type: type,
             data: data,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: function (response) {
                 showToast(response.message || 'Data saved successfully', 'success');
                 $('#anggaranModal').modal('hide');
@@ -280,6 +287,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: '/anggaran/' + id,
                     type: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
                         showToast('Data deleted successfully', 'success');
                         table.ajax.reload();
@@ -351,6 +359,7 @@ $(document).ready(function () {
                     url: '/anggaran/bulk-delete',
                     type: 'DELETE',
                     data: { ids: ids },
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
                         showToast(response.message, 'success');
                         table.ajax.reload();

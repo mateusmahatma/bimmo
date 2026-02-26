@@ -1,5 +1,11 @@
 $(document).ready(function () {
-    // Theme Handler Removed - Managed Globally
+    // CSRF Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     const csrfToken = window.csrfToken;
 
     const table = $('#pengeluaranTable').DataTable({
@@ -177,6 +183,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: `/pengeluaran/${id}`,
                     type: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: () => {
                         showToast('Data deleted successfully', 'success');
                         table.ajax.reload();
@@ -242,6 +249,7 @@ $(document).ready(function () {
                     url: '/pengeluaran/bulk-delete',
                     type: 'DELETE',
                     data: { ids: ids },
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
                         showToast(response.message, 'success');
                         table.ajax.reload();
@@ -264,10 +272,4 @@ $(document).ready(function () {
         updateBulkButton();
     });
 
-    // Global Setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
 });

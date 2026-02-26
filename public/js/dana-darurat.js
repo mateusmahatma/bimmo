@@ -1,4 +1,11 @@
 $(document).ready(function () {
+    // CSRF Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     // Fungsi Toast
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
@@ -181,9 +188,14 @@ $(document).ready(function () {
 
         $('.tombol-simpan-dana-darurat').prop('disabled', true).html(spinnerButton());
 
-        $.post('/dana-darurat', data)
-            .done(onSuccessSimpanDanaDarurat)
-            .always(resetTombolSimpanDanaDarurat);
+        $.ajax({
+            url: '/dana-darurat',
+            type: 'POST',
+            data: data,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: onSuccessSimpanDanaDarurat,
+            complete: resetTombolSimpanDanaDarurat
+        });
     }
 
     function updateDanaDarurat(id) {
@@ -196,6 +208,7 @@ $(document).ready(function () {
             url: '/dana-darurat/' + id,
             type: 'PUT',
             data,
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: onSuccessSimpanDanaDarurat,
             complete: resetTombolSimpanDanaDarurat
         });
@@ -213,16 +226,21 @@ $(document).ready(function () {
         e.preventDefault();
         const id = $(this).data('id');
 
-        $.get('/dana-darurat/' + id + '/edit', function (res) {
-            const danaDarurat = res.result;
-            $('#danaDaruratModal').modal('show');
-            $('#tgl_transaksi_dana_darurat').val(danaDarurat.tgl_transaksi_dana_darurat);
-            $('#jenis_transaksi_dana_darurat').val(danaDarurat.jenis_transaksi_dana_darurat);
-            $('#nominal_dana_darurat').val(parseFloat(danaDarurat.nominal_dana_darurat));
-            $('#keterangan').val(danaDarurat.keterangan);
-            $('#danaDaruratModal').data('id', id);
-            $('#danaDaruratModalLabel').text('Edit Emergency Fund');
-            $('.tombol-simpan-dana-darurat').html('Update');
+        $.ajax({
+            url: '/dana-darurat/' + id + '/edit',
+            type: 'GET',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function (res) {
+                const danaDarurat = res.result;
+                $('#danaDaruratModal').modal('show');
+                $('#tgl_transaksi_dana_darurat').val(danaDarurat.tgl_transaksi_dana_darurat);
+                $('#jenis_transaksi_dana_darurat').val(danaDarurat.jenis_transaksi_dana_darurat);
+                $('#nominal_dana_darurat').val(parseFloat(danaDarurat.nominal_dana_darurat));
+                $('#keterangan').val(danaDarurat.keterangan);
+                $('#danaDaruratModal').data('id', id);
+                $('#danaDaruratModalLabel').text('Edit Emergency Fund');
+                $('.tombol-simpan-dana-darurat').html('Update');
+            }
         });
     });
 
@@ -249,6 +267,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: '/dana-darurat/' + id,
                     type: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
                         showToast('Data berhasil dihapus', 'success');
                         table.ajax.reload();
@@ -322,6 +341,7 @@ $(document).ready(function () {
                     url: '/dana-darurat/bulk-delete',
                     type: 'DELETE',
                     data: { ids: ids },
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
                         showToast(response.message, 'success');
                         table.ajax.reload();
@@ -342,9 +362,5 @@ $(document).ready(function () {
         $('#checkAll').prop('checked', false);
         $('#checkAll').prop('indeterminate', false);
         updateBulkButton();
-    });
-
-    $.ajaxSetup({
-        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 });

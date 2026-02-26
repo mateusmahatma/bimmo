@@ -82,8 +82,6 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/filter', [DashboardController::class , 'filter'])->name('dashboard.filter');
 });
 
-// Anggaran
-Route::resource('/anggaran', AnggaranController::class)->middleware('auth');
 
 // Proses Anggaran
 Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
@@ -217,7 +215,8 @@ Route::middleware(['auth'])->group(function () {
 
         // Subscription
         Route::post('/subscription/subscribe', [\App\Http\Controllers\SubscriptionController::class , 'subscribe'])->name('subscription.subscribe');
-        Route::post('/subscription/cancel', [\App\Http\Controllers\SubscriptionController::class , 'cancel'])->name('subscription.cancel');    });
+        Route::post('/subscription/cancel', [\App\Http\Controllers\SubscriptionController::class , 'cancel'])->name('subscription.cancel');
+    });
 
 Route::post('/payment/webhook', [\App\Http\Controllers\SubscriptionController::class , 'webhook'])->name('payment.webhook');
 
