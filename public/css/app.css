@@ -273,3 +273,25 @@ body {
         display: none !important;
     }
 }
+
+/* Netflix-style Blackout */
+body.protection-active {
+    background: #000 !important;
+    overflow: hidden !important;
+}
+
+body.protection-active>*:not(#protection-overlay):not(script) {
+    visibility: hidden !important;
+}
+
+/* Sensitive Data Masking */
+.sensitive-data {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+    cursor: help;
+    display: inline-block;
+}
+
+.sensitive-data:hover {
+    filter: blur(0);
+}
