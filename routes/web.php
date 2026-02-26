@@ -21,6 +21,7 @@ use App\Http\Controllers\UbahPasswordController;
 use App\Http\Controllers\DanaDaruratController;
 use App\Http\Controllers\HasilProsesAnggaranController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FeedbackController;
 
 // Log in
 Route::get('/', function () {
@@ -190,6 +191,9 @@ Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)-
 
 // Update skin
 Route::middleware(['auth'])->post('/user/skin', [UserController::class , 'updateSkin'])->name('user.update.skin');
+
+// Feedback
+Route::middleware(['auth'])->post('/feedback', [FeedbackController::class , 'store'])->name('feedback.store');
 
 // Profil
 Route::middleware(['auth'])->group(function () {
