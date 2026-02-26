@@ -38,6 +38,109 @@
                 setTheme(event.matches ? 'dark' : 'light');
             });
         })();
+
+        // Extreme Source Code Protection
+        (function() {
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+
+            // Disable common shortcuts
+            document.onkeydown = function(e) {
+                if (
+                    e.keyCode === 123 || // F12
+                    (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || // Ctrl+Shift+I/J/C
+                    (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
+                    (e.ctrlKey && e.keyCode === 83)    // Ctrl+S
+                ) {
+                    return false;
+                }
+            };
+
+            const blockAccess = () => {
+                document.body.innerHTML = `
+                    <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#f8f9fa;">
+                        <h1 style="color:#dc3545;">Akses Dibatasi</h1>
+                        <p style="color:#6c757d;">Developer Tools terdeteksi. Silakan tutup Developer Tools untuk melanjutkan.</p>
+                        <button onclick="window.location.reload()" style="padding:10px 20px;border:none;background:#007bff;color:white;border-radius:5px;cursor:pointer;">Muat Ulang Halaman</button>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden';
+            };
+
+            // Detect DevTools by monitoring window dimensions
+            let threshold = 160;
+            const checkDevTools = () => {
+                const widthDiff = window.outerWidth - window.innerWidth > threshold;
+                const heightDiff = window.outerHeight - window.innerHeight > threshold;
+                
+                if (widthDiff || heightDiff) {
+                    blockAccess();
+                }
+            };
+            window.addEventListener('resize', checkDevTools);
+            checkDevTools();
+
+            // Detect DevTools using a specialized getter
+            const devtools = {
+                isOpen: false,
+                orientation: undefined
+            };
+            const threshold2 = 160;
+            const emitEvent = (isOpen, orientation) => {
+                if (isOpen) {
+                    blockAccess();
+                }
+            };
+
+            setInterval(() => {
+                const widthThreshold = window.outerWidth - window.innerWidth > threshold2;
+                const heightThreshold = window.outerHeight - window.innerHeight > threshold2;
+                const orientation = widthThreshold ? 'vertical' : 'horizontal';
+
+                if (!(heightThreshold && widthThreshold) &&
+                    ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
+                    if (!devtools.isOpen || devtools.orientation !== orientation) {
+                        emitEvent(true, orientation);
+                    }
+                    devtools.isOpen = true;
+                    devtools.orientation = orientation;
+                } else {
+                    if (devtools.isOpen) {
+                        emitEvent(false, undefined);
+                    }
+                    devtools.isOpen = false;
+                    devtools.orientation = undefined;
+                }
+            }, 500);
+
+            // Robust Debugger Trap via Function constructor
+            const detector = function() {
+                try {
+                    (function() {
+                        (function a() {
+                            try {
+                                (function b(i) {
+                                    if (('' + (i / i)).length !== 1 || i % 20 === 0) {
+                                        (function() {}).constructor('debugger')();
+                                    } else {
+                                        debugger;
+                                    }
+                                    b(++i);
+                                })(0);
+                            } catch (e) {
+                                setTimeout(a, 50);
+                            }
+                        })();
+                    })();
+                } catch (e) {}
+            };
+
+            // Start the extreme debugger trap
+            setTimeout(detector, 1000);
+
+            // Continuous console clearing
+            setInterval(() => console.clear(), 100);
+        })();
     </script>
 </head>
 
