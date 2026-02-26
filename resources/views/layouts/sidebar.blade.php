@@ -41,14 +41,14 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center {{ Request::is('barang*') ? 'active' : '' }} disabled"
+                    {{-- <a class="nav-link d-flex align-items-center {{ Request::is('barang*') ? 'active' : '' }} disabled"
                         data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuInvestasi" role="button">
                         <i class="bi bi-clipboard-data-fill me-2 disabled">
                         </i> <span>Investment</span>
                         <i class="bi bi-chevron-down ms-auto small"></i>
-                    </a>
+                    </a> --}}
 
-                    <div class="collapse {{ Request::is('barang*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuInvestasi">
+                    {{-- <div class="collapse {{ Request::is('barang*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuInvestasi">
                         <ul class="nav flex-column ms-4">
                             <li class="nav-item">
                                 <a class="nav-link sub-link {{ Request::is('barang') ? 'active' : '' }}" href="/barang" class="disabled">
@@ -57,7 +57,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
 
                 <li class="nav-item">
