@@ -170,6 +170,24 @@
 
             window.addEventListener('blur', hideContent);
             window.addEventListener('focus', showContent);
+            window.addEventListener('pagehide', hideContent);
+            window.addEventListener('beforeunload', hideContent);
+
+            // Aggressive Focus Check (For mobile system overlays/screenshots)
+            setInterval(() => {
+                if (!document.hasFocus()) {
+                    hideContent();
+                }
+            }, 500);
+
+            // Mobile Multi-finger Touch Detection (Common screenshot gestures)
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 2) { // 3 or more fingers
+                    hideContent();
+                    clearClipboard();
+                    isLocked = true;
+                }
+            }, {passive: true});
 
             // Aggressive Protection Logic
             const clearClipboard = () => {
@@ -213,7 +231,7 @@
                 // Show content again if only modifier keys were pressed and no capture was triggered
                 if (['Meta', 'Shift', 'Control', 'Alt'].includes(e.key)) {
                     setTimeout(() => {
-                        if (!isLocked) {
+                        if (!isLocked && document.hasFocus()) {
                             showContent();
                         }
                     }, 500);
