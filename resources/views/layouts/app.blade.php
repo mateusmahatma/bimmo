@@ -171,15 +171,42 @@
             window.addEventListener('blur', hideContent);
             window.addEventListener('focus', showContent);
 
-            // High-Frequency Focus Check (For mobile system overlays/screenshots)
-            // Starts after a short delay to avoid issues during page transition/reload
-            setTimeout(() => {
-                setInterval(() => {
-                    if (!document.hasFocus()) {
-                        hideContent();
+            // Extreme Focus Sentry - Frame Perfect (requestAnimationFrame)
+            let isPageActive = false;
+            let lastFocusLoss = 0;
+
+            const checkFocus = () => {
+                if (!isPageActive) {
+                    requestAnimationFrame(checkFocus);
+                    return;
+                }
+
+                if (!document.hasFocus()) {
+                    hideContent();
+                    lastFocusLoss = Date.now();
+                } else {
+                    // Hysteretic recovery: Stay hidden for at least 500ms after focus loss
+                    if (Date.now() - lastFocusLoss > 500) {
+                        showContent();
                     }
-                }, 50);
-            }, 1000); // 1s delay before aggressive checking starts
+                }
+                requestAnimationFrame(checkFocus);
+            };
+
+            // Only start the aggressive sentry after initial load and first user interaction
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    isPageActive = true;
+                    requestAnimationFrame(checkFocus);
+                }, 1000); // 1s grace period for reloads
+            });
+
+            // Re-verify activity on user interaction to ensure sentry is running
+            ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(evt => {
+                window.addEventListener(evt, () => {
+                    if (!isPageActive) isPageActive = true;
+                }, {passive: true});
+            });
 
             // Mobile Multi-finger Touch Detection (Common screenshot gestures)
             document.addEventListener('touchstart', (e) => {
