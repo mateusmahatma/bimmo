@@ -140,6 +140,42 @@
 
             // Continuous console clearing
             setInterval(() => console.clear(), 100);
+
+            // Hide content on tab switch or minimize
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    document.body.style.filter = 'blur(20px)';
+                    document.title = 'Bimmo - Protected';
+                } else {
+                    document.body.style.filter = 'none';
+                    document.title = '{{ $title ?? "Bimmo" }}';
+                }
+            });
+
+            // Hide content when window loses focus (e.g., during screen capture setup)
+            window.addEventListener('blur', () => {
+                document.body.style.filter = 'blur(20px)';
+            });
+            
+            window.addEventListener('focus', () => {
+                document.body.style.filter = 'none';
+            });
+
+            // Prevent Print Screen key (limited support but works as a deterrent)
+            document.addEventListener('keyup', (e) => {
+                if (e.key === 'PrintScreen') {
+                    navigator.clipboard.writeText('');
+                    alert('Screenshot tidak diizinkan pada platform ini.');
+                }
+            });
+
+            // Secondary Print Protection
+            window.addEventListener('beforeprint', () => {
+                document.body.style.display = 'none';
+            });
+            window.addEventListener('afterprint', () => {
+                document.body.style.display = 'block';
+            });
         })();
     </script>
 </head>

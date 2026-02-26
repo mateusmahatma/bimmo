@@ -259,3 +259,17 @@
 [data-bs-theme="dark"] .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
 }
+
+/* Screen and Print Protection */
+body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+@media print {
+    body {
+        display: none !important;
+    }
+}
