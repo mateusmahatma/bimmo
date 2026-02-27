@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Loan Details')
+@section('title', 'Liability Details')
 
 @push('css')
 <style>
@@ -74,11 +74,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Loan Details</h1>
+    <h1>Liability Details</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">Loans</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">Liabilitys</a></li>
             <li class="breadcrumb-item active">Details</li>
         </ol>
     </nav>
@@ -86,14 +86,14 @@
 
 <section class="section">
     <div class="row">
-        <!-- Loan Information Card -->
+        <!-- Liability Information Card -->
         <div class="col-lg-12 mb-4">
             <div class="card-dashboard h-100 border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-4 text-dark" style="font-size: 1.1rem;">Loan Information</h5>
+                    <h5 class="card-title fw-bold mb-4 text-dark" style="font-size: 1.1rem;">Liability Information</h5>
                     <div class="row g-4">
                         <div class="col-md-6 border-start border-primary border-4 py-1 ps-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">Loan Name</label>
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">Liability Name</label>
                             <p class="fs-5 fw-bold text-dark mb-0">{{ $pinjaman->nama_pinjaman }}</p>
                         </div>
                         <div class="col-md-6 border-start border-success border-4 py-1 ps-3">
@@ -136,11 +136,11 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">Payment History</h5>
-                            <p class="text-muted small mb-0 mt-1">Track all payments made for this loan.</p>
+                            <p class="text-muted small mb-0 mt-1">Track all payments made for this Liability.</p>
                         </div>
                         @if ($pinjaman->status === 'belum_lunas')
                         <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#bayarModal" data-pinjaman-id="{{ Vinkla\Hashids\Facades\Hashids::encode($pinjaman->id) }}">
-                            <i class="bi bi-wallet2 me-1"></i> Pay Loan
+                            <i class="bi bi-wallet2 me-1"></i> Payment
                         </button>
                         @endif
                     </div>

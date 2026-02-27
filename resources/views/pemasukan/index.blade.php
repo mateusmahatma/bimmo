@@ -100,11 +100,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Income Categories</h1>
+    <h1>Income</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Income Categories</li>
+            <li class="breadcrumb-item active">Income</li>
         </ol>
     </nav>
 </div>
@@ -123,7 +123,7 @@
                             <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
                         </button>
                         <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 tombol-tambah-pemasukan shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add Category
+                            <i class="bi bi-plus-lg me-1"></i> Add Income
                         </button>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
                                         </div>
                                     </th>
                                     <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Category Name</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Income Name</th>
                                     <th class="text-center text-secondary small text-uppercase fw-bold py-3">Created At</th>
                                     <th class="text-center text-secondary small text-uppercase fw-bold py-3">Last Updated</th>
                                     <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>

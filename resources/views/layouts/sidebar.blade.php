@@ -80,13 +80,13 @@
                 <li class="nav-item">
                     <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
                         <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                        Income Categories
+                        Income
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran">
                         <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                        Expense Categories
+                        Expense
                     </a>
                 </li>
                 <li class="nav-item">
@@ -98,7 +98,7 @@
                 <li class="nav-item">
                     <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
                         <i class="bi bi-arrow-right-circle-fill me-2"></i>
-                        Loan
+                        Liability
                     </a>
                 </li>
             </ul>

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Loan List')
+@section('title', 'Liability List')
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -90,11 +90,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Loan List</h1>
+    <h1>Liability List</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Loans</li>
+            <li class="breadcrumb-item active">Liabilitys</li>
         </ol>
     </nav>
 </div>
@@ -116,7 +116,7 @@
                             <i class="bi bi-bank fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Total Loan</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">Total Liability</h6>
                             <h4 class="mb-0 fw-bold text-primary" id="statTotalOriginal">Rp {{ number_format($totalOriginal, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -161,8 +161,8 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Loan List</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage and track your loan records.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Liability List</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage and track your Liability records.</p>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
@@ -173,7 +173,7 @@
                             <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add New Loan
+                            <i class="bi bi-plus-lg me-1"></i> Add New Liability
                         </a>
                     </div>
                 </div>
@@ -183,11 +183,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>How to Pay Loan:</h6>
+                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>How to Pay Liability:</h6>
                                     <ol class="mb-0 ps-3 small">
-                                        <li>Find the loan you want to pay in the list below.</li>
+                                        <li>Find the Liability you want to pay in the list below.</li>
                                         <li>Click the <strong>Blue Eye Icon</strong> (<i class="bi bi-eye"></i>) to view details.</li>
-                                        <li>Click the <strong>Pay Loan</strong> button at the top right of the history section.</li>
+                                        <li>Click the <strong>Pay Liability</strong> button at the top right of the history section.</li>
                                         <li>Enter the amount, date, and optionally upload proof.</li>
                                     </ol>
                                 </div>
@@ -248,9 +248,9 @@
                                         <input class="form-check-input" type="checkbox" id="checkAll">
                                     </th>
                                     <th style="width: 5%;">No</th>
-                                    <th>Loan Name</th>
+                                    <th>Liability Name</th>
                                     <th>Notes</th>
-                                    <th class="text-end">Total Loan</th>
+                                    <th class="text-end">Total Liability</th>
                                     <th class="text-end">Paid Amount</th>
                                     <th class="text-end">Remaining Balance</th>
                                     <th class="text-center">Status</th>

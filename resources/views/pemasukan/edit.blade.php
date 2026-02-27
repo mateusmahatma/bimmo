@@ -2,7 +2,7 @@
 <html lang="id">
 
 <head>
-    <title>Pemasukan</title>
+    <title>Income</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -12,7 +12,7 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Edit Kategori Pemasukan</a>
+    <a class="navbar-brand" href="#">Edit Income</a>
 </nav>
 
 <div class="card-header">
@@ -31,12 +31,12 @@
             @method('PUT')
 
             <div class="mt-3 mb-3">
-                <label for="nama" class="form-label required">Nama Kategori Pemasukan</label>
-                <input name="nama" class="form-control" placeholder="Nama Kategori Pemasukan"
+                <label for="nama" class="form-label required">Name of Income</label>
+                <input name="nama" class="form-control" placeholder="Name of Income"
                     value="{{ old('nama', $pemasukan->nama) }}">
             </div>
 
-            <button type="submit" class="btn btn-success">Simpan</button>
+            <button type="submit" class="btn btn-success">Save</button>
         </form>
     </div>
 </div>

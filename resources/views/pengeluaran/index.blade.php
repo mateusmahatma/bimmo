@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Expense Categories')
+@section('title', 'Expense')
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -100,11 +100,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Expense Categories</h1>
+    <h1>Expense</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Expense Categories</li>
+            <li class="breadcrumb-item active">Expense</li>
         </ol>
     </nav>
 </div>
@@ -115,7 +115,7 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">List of Expense Categories</h5>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">List of Expense</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage your expense classification and types efficiently.</p>
                     </div>
                     <div class="d-flex gap-2">
