@@ -444,16 +444,32 @@ class TransaksiController extends Controller
             foreach ($rows as $row) {
                 $tglRaw = $row['tanggal_transaksi'] ?? $row['tgl_transaksi'] ?? null;
                 if (empty($tglRaw)) continue;
+
+                // Robust column detection for 'keterangan'
+                $keterangan = $row['keterangan'] ?? $row['description'] ?? $row['deskripsi'] ?? $row['remarks'] ?? $row['catatan'] ?? null;
+
                 try {
                     $tgl = is_numeric($tglRaw) ? Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw))->format('Y-m-d') : Carbon::parse($tglRaw)->format('Y-m-d');
                 } catch (\Exception $e) { continue; }
 
                 if (($row['nominal_pemasukan'] ?? 0) > 0) {
-                    Transaksi::create(['tgl_transaksi'=>$tgl, 'pemasukan'=>$row['jenis_pemasukan']??$row['pemasukan']??null, 'nominal_pemasukan'=>$row['nominal_pemasukan'], 'id_user'=>Auth::id()]);
+                    Transaksi::create([
+                        'tgl_transaksi' => $tgl,
+                        'pemasukan' => $row['jenis_pemasukan'] ?? $row['pemasukan'] ?? null,
+                        'nominal_pemasukan' => $row['nominal_pemasukan'],
+                        'keterangan' => $keterangan,
+                        'id_user' => Auth::id()
+                    ]);
                     $processedCount++;
                 }
                 if (($row['nominal_pengeluaran'] ?? $row['nominal'] ?? 0) > 0) {
-                    Transaksi::create(['tgl_transaksi'=>$tgl, 'pengeluaran'=>$row['jenis_pengeluaran']??$row['pengeluaran']??null, 'nominal'=>$row['nominal_pengeluaran']??$row['nominal'], 'id_user'=>Auth::id()]);
+                    Transaksi::create([
+                        'tgl_transaksi' => $tgl,
+                        'pengeluaran' => $row['jenis_pengeluaran'] ?? $row['pengeluaran'] ?? null,
+                        'nominal' => $row['nominal_pengeluaran'] ?? $row['nominal'],
+                        'keterangan' => $keterangan,
+                        'id_user' => Auth::id()
+                    ]);
                     $processedCount++;
                 }
             }
