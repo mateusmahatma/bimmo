@@ -32,6 +32,11 @@
             padding: 0.5rem;
         }
 
+        [data-bs-theme="dark"] #transaksiTable tr {
+            background: #1e1e1e;
+            border-color: #333;
+        }
+
         #transaksiTable td { 
             /* Behave  like a "row" */
             border: none;
@@ -45,6 +50,10 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+        }
+
+        [data-bs-theme="dark"] #transaksiTable td {
+            border-bottom-color: #2c2c2c;
         }
         
         #transaksiTable td:last-child {
@@ -80,6 +89,11 @@
             margin: -0.5rem -0.5rem 0.5rem -0.5rem;
             padding: 0.5rem 1rem;
             border-bottom: 1px solid #eef2f7;
+        }
+
+        [data-bs-theme="dark"] #transaksiTable td.mobile-checkbox {
+            background: #2c2c2c;
+            border-bottom-color: #333;
         }
         
         #transaksiTable td.mobile-checkbox:before {
@@ -198,7 +212,7 @@
 
         <!-- Period Expense Row -->
         <div class="col-12 mb-3">
-            <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px; background: #fff;">
+            <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body py-3">
                     <div class="d-flex flex-column align-items-start text-start">
                         <h6 class="fw-bold text-dark text-uppercase mb-1" style="letter-spacing: 0.5px; font-size: 0.75rem;">Period Expense</h6>
