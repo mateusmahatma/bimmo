@@ -280,15 +280,6 @@ class TransaksiController extends Controller
 
         $validatedData['id_user'] = Auth::id();
         try {
-            if (!empty($validatedData['pengeluaran'])) {
-                $peng = Pengeluaran::where('nama', $validatedData['pengeluaran'])->first();
-                if ($peng) $validatedData['pengeluaran'] = $peng->id;
-            }
-            if (!empty($validatedData['pemasukan'])) {
-                $pem = Pemasukan::where('nama', $validatedData['pemasukan'])->first();
-                if ($pem) $validatedData['pemasukan'] = $pem->id;
-            }
-
             if (in_array('asset_list', $request->kategori ?? [])) $validatedData['status'] = 2;
 
             $transaksi = Transaksi::create($validatedData);

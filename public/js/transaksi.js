@@ -341,6 +341,10 @@ const TomSelectHandler = {
     instances: {},
 
     init(selector, options = {}) {
+        if (this.instances[selector]) {
+            this.instances[selector].destroy();
+        }
+
         const defaultOptions = {
             allowEmptyOption: true,
             placeholder: '- Pilih -',
@@ -363,10 +367,21 @@ const TomSelectHandler = {
         this.init('#barang_id');
         this.init('#filter_pemasukan');
         this.init('#filter_pengeluaran');
+        this.init('#edit_pemasukan');
+        this.init('#edit_pengeluaran');
     },
 
     getInstance(selector) {
         return this.instances[selector];
+    },
+
+    setValue(selector, value) {
+        const instance = this.getInstance(selector);
+        if (instance) {
+            instance.setValue(value);
+        } else {
+            $(selector).val(value);
+        }
     }
 };
 
@@ -519,9 +534,9 @@ const TransaksiCRUD = {
                     }
 
                     $("#edit_tgl_transaksi").val(tgl_transaksi);
-                    $("#edit_pemasukan").val(response.result.pemasukan);
+                    TomSelectHandler.setValue("#edit_pemasukan", response.result.pemasukan);
                     $("#edit_nominal_pemasukan").val(response.result.nominal_pemasukan);
-                    $("#edit_pengeluaran").val(response.result.pengeluaran);
+                    TomSelectHandler.setValue("#edit_pengeluaran", response.result.pengeluaran);
                     $("#edit_nominal").val(response.result.nominal);
                     $("#edit_keterangan").val(response.result.keterangan);
 

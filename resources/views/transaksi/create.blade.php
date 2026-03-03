@@ -3,6 +3,15 @@
 @section('title', 'Add Transaction')
 
 @section('container')
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<style>
+    .ts-control {
+        border-radius: 0.5rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+</style>
+@endpush
 
 <div class="pagetitle mb-4">
     <h1>Add Transaction</h1>
@@ -52,7 +61,7 @@
                                         <select class="form-select" id="pemasukan" name="pemasukan">
                                             <option value="">- Select Income -</option>
                                             @foreach ($pemasukan as $item)
-                                            <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -77,7 +86,7 @@
                                         <select class="form-select" id="pengeluaran" name="pengeluaran">
                                             <option value="">- Select Expense -</option>
                                             @foreach ($pengeluaran as $item)
-                                            <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -170,7 +179,8 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Toggle Logic for Advanced Options
@@ -206,4 +216,4 @@
     });
 </script>
 <script src="{{ asset('js/transaksi.js') }}?v={{ filemtime(public_path('js/transaksi.js')) }}"></script>
-@endsection
+@endpush

@@ -260,6 +260,28 @@
     filter: invert(1) grayscale(100%) brightness(200%);
 }
 
+/* TomSelect Dark Mode */
+[data-bs-theme="dark"] .ts-control,
+[data-bs-theme="dark"] .ts-wrapper.single .ts-control,
+[data-bs-theme="dark"] .ts-wrapper.single .ts-control input,
+[data-bs-theme="dark"] .ts-dropdown,
+[data-bs-theme="dark"] .ts-dropdown .option,
+[data-bs-theme="dark"] .ts-control .item {
+    background-color: #2c2c2c !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+}
+
+[data-bs-theme="dark"] .ts-dropdown .active {
+    background-color: #1e3a8a !important;
+    color: #fff !important;
+}
+
+/* Ensure placeholder text is also visible if any */
+[data-bs-theme="dark"] .ts-control input::placeholder {
+    color: #a0a0a0 !important;
+}
+
 /* Screen and Print Protection */
 body {
     -webkit-user-select: none;

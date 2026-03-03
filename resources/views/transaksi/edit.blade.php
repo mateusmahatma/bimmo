@@ -3,6 +3,15 @@
 @section('title', 'Edit Transaction')
 
 @section('container')
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<style>
+    .ts-control {
+        border-radius: 0.5rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+</style>
+@endpush
 
 <div class="pagetitle mb-4">
     <h1>Edit Transaction</h1>
@@ -130,7 +139,8 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize TomSelect
@@ -141,4 +151,4 @@
     });
 </script>
 <script src="{{ asset('js/transaksi.js') }}?v={{ filemtime(public_path('js/transaksi.js')) }}"></script>
-@endsection
+@endpush
