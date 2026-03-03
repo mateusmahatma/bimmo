@@ -290,8 +290,12 @@
                             
                             <!-- Quick Dates -->
                             <div class="btn-group btn-group-sm ms-lg-2">
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')])) }}" class="btn btn-outline-secondary rounded-start-pill" title="This Month">This Month</a>
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01', strtotime('-1 month')), 'end_date' => date('Y-m-t', strtotime('-1 month'))])) }}" class="btn btn-outline-secondary rounded-end-pill" title="Last Month">Last Month</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')])) }}" class="btn btn-outline-secondary rounded-start-pill" title="Today">Today</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-d', strtotime('-1 day')), 'end_date' => date('Y-m-d', strtotime('-1 day'))])) }}" class="btn btn-outline-secondary" title="Yesterday">Yesterday</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')])) }}" class="btn btn-outline-secondary" title="This Month">This Month</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01', strtotime('-1 month')), 'end_date' => date('Y-m-t', strtotime('-1 month'))])) }}" class="btn btn-outline-secondary" title="Last Month">Last Month</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-01-01'), 'end_date' => date('Y-12-31')])) }}" class="btn btn-outline-secondary" title="This Year">This Year</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-01-01', strtotime('-1 year')), 'end_date' => date('Y-12-31', strtotime('-1 year'))])) }}" class="btn btn-outline-secondary rounded-end-pill" title="Last Year">Last Year</a>
                             </div>
                         </div>
 
