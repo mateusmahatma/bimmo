@@ -107,6 +107,34 @@
 
                     <hr class="text-muted opacity-25 my-4">
 
+                    <!-- Recurrence Section -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-0" style="letter-spacing: 0.05em;">Recurrence</label>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" name="is_recurring" id="recurringSwitch">
+                                <label class="form-check-label small fw-bold" for="recurringSwitch">Repeat Event</label>
+                            </div>
+                        </div>
+
+                        <div id="recurringInputs" class="row d-none g-3">
+                            <div class="col-md-6 mt-0">
+                                <label class="form-label small fw-bold">Frequency</label>
+                                <select name="rrule_freq" id="rruleFreq" class="form-select form-select-sm rounded-3 shadow-sm border-light">
+                                    <option value="DAILY">Daily</option>
+                                    <option value="WEEKLY">Weekly</option>
+                                    <option value="MONTHLY">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-0">
+                                <label class="form-label small fw-bold">Ends On (Optional)</label>
+                                <input type="date" name="rrule_until" id="rruleUntil" class="form-control form-control-sm rounded-3 shadow-sm border-light">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25 my-4">
+
                     <!-- Settings Section -->
                     <div class="mb-0">
                         <label class="form-label small fw-bold text-muted text-uppercase mb-3" style="letter-spacing: 0.05em;">Notifications & Details</label>

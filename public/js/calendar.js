@@ -94,6 +94,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    const recurringSwitch = document.getElementById('recurringSwitch');
+    const recurringInputs = document.getElementById('recurringInputs');
+    const rruleFreq = document.getElementById('rruleFreq');
+    const rruleUntil = document.getElementById('rruleUntil');
+
+    console.log('Calendar UI Elements:', {
+        recurringSwitch: !!recurringSwitch,
+        recurringInputs: !!recurringInputs
+    });
+
+    if (recurringSwitch) {
+        recurringSwitch.addEventListener('change', function () {
+            console.log('Recurring Switch Changed:', this.checked);
+            if (this.checked) {
+                recurringInputs.classList.remove('d-none');
+                console.log('Class d-none removed from recurringInputs');
+            } else {
+                recurringInputs.classList.add('d-none');
+                console.log('Class d-none added to recurringInputs');
+            }
+        });
+
+        // Trigger once on load to ensure sync if browser autocomplete is on
+        if (recurringSwitch.checked) {
+            recurringInputs.classList.remove('d-none');
+        } else {
+            recurringInputs.classList.add('d-none');
+        }
+    }
+
     function openEventModal(data = null) {
         form.reset();
         document.getElementById('eventId').value = '';
@@ -106,6 +136,12 @@ document.addEventListener('DOMContentLoaded', function () {
         emailSwitch.checked = true;
         emailContainer.classList.remove('d-none');
         emailInput.value = userEmail;
+        if (recurringSwitch) {
+            recurringSwitch.checked = false;
+            if (recurringInputs) recurringInputs.classList.add('d-none');
+            if (rruleFreq) rruleFreq.value = 'DAILY';
+            if (rruleUntil) rruleUntil.value = '';
+        }
 
         if (data) {
             if (data.id) {
@@ -124,6 +160,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     emailContainer.classList.remove('d-none');
                 } else {
                     emailContainer.classList.add('d-none');
+                }
+
+                // Recurrence
+                if (data.rrule) {
+                    recurringSwitch.checked = true;
+                    if (recurringInputs) recurringInputs.classList.remove('d-none');
+
+                    // Extract RRULE part if it contains DTSTART
+                    let rulePart = data.rrule;
+                    if (rulePart.includes('RRULE:')) {
+                        rulePart = rulePart.split('RRULE:')[1];
+                    }
+
+                    const parts = rulePart.split(';');
+                    parts.forEach(p => {
+                        const [key, val] = p.split('=');
+                        if (key === 'FREQ' && rruleFreq) rruleFreq.value = val;
+                        if (key === 'UNTIL' && rruleUntil) {
+                            const ymd = val.split('T')[0];
+                            rruleUntil.value = ymd.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+                        }
+                    });
                 }
             }
 
@@ -183,6 +241,20 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        let rruleStr = null;
+        if (recurringSwitch.checked) {
+            // Include DTSTART in the string for maximum compatibility with RRule plugin
+            const dtStart = startVal.replace(/[-:]/g, '');
+            // If it's all day, we just need the date part
+            const dtStartFormatted = isAllDay ? dtStart.split('T')[0] : dtStart.replace('T', 'T') + '00Z';
+
+            rruleStr = `DTSTART:${dtStartFormatted}\nRRULE:FREQ=${rruleFreq.value}`;
+            if (rruleUntil.value) {
+                const untilClean = rruleUntil.value.replace(/-/g, '');
+                rruleStr += `;UNTIL=${untilClean}T235959Z`;
+            }
+        }
+
         const data = {
             title: formData.get('title'),
             category: formData.get('category'),
@@ -191,7 +263,8 @@ document.addEventListener('DOMContentLoaded', function () {
             start_at: startVal,
             end_at: endVal || null,
             send_email: emailSwitch.checked ? 1 : 0,
-            notification_email: emailInput.value
+            notification_email: emailInput.value,
+            rrule: rruleStr
         };
 
         // Use POST with _method spoofing for maximum compatibility (PUT often fails in some setups)
@@ -289,7 +362,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 end: event.end, // Send Date object directly
                 allDay: event.allDay,
                 category: event.extendedProps.category,
-                description: event.extendedProps.description
+                description: event.extendedProps.description,
+                rrule: event.extendedProps.rrule
             });
             hidePopover();
         };

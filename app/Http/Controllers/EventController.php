@@ -15,9 +15,15 @@ class EventController extends Controller
 
         $events = Event::where('id_user', auth()->id())
             ->where(function ($query) use ($start, $end) {
-            $query->whereBetween('start_at', [$start, $end])
-                ->orWhereBetween('end_at', [$start, $end]);
-        })
+            // Regular events within range
+            $query->where(function ($q) use ($start, $end) {
+                    $q->whereBetween('start_at', [$start, $end])
+                        ->orWhereBetween('end_at', [$start, $end]);
+                }
+                )
+                    // Recurring events (let FullCalendar handle expansion/filtering)
+                    ->orWhereNotNull('rrule');
+            })
             ->get()
             ->map(function ($event) {
             $colors = [
@@ -29,26 +35,45 @@ class EventController extends Controller
 
             $color = $event->color ?: ($colors[$event->category] ?? '#3788d8');
 
-            return [
-            'id' => $event->id,
-            'title' => $event->title,
-            'start' => $event->start_at->toIso8601String(),
-            'end' => $event->end_at ? $event->end_at->toIso8601String() : null,
-            'allDay' => $event->all_day,
-            'description' => $event->description,
-            'category' => $event->category,
-            'status' => $event->status,
-            'color' => $color,
-            'backgroundColor' => $color,
-            'borderColor' => $color,
-            'extendedProps' => [
-            'category' => $event->category,
-            'status' => $event->status,
-            'description' => $event->description,
-            'send_email' => $event->send_email,
-            'notification_email' => $event->notification_email
-            ]
+            $isAllDay = (bool)$event->all_day;
+            $start = $isAllDay ? $event->start_at->format('Y-m-d') : $event->start_at->toIso8601String();
+
+            $eventData = [
+                'id' => $event->id,
+                'title' => $event->title,
+                'start' => $start,
+                'allDay' => $isAllDay,
+                'color' => $color,
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'extendedProps' => [
+                    'category' => $event->category,
+                    'status' => $event->status,
+                    'description' => $event->description,
+                    'send_email' => $event->send_email,
+                    'notification_email' => $event->notification_email,
+                    'rrule' => $event->rrule
+                ]
             ];
+
+            if ($event->rrule) {
+                // FullCalendar RRule plugin expects the string
+                $eventData['rrule'] = $event->rrule;
+
+                // If it's a recurring event, 'duration' helps FullCalendar know how long each instance is
+                if (!$isAllDay && $event->start_at && $event->end_at) {
+                    $diff = $event->start_at->diff($event->end_at);
+                    $eventData['duration'] = sprintf('%02d:%02d', ($diff->days * 24) + $diff->h, $diff->i);
+                }
+                else if ($isAllDay) {
+                    $eventData['duration'] = ['days' => 1];
+                }
+            }
+            else {
+                $eventData['end'] = $event->end_at ? ($isAllDay ? $event->end_at->format('Y-m-d') : $event->end_at->toIso8601String()) : null;
+            }
+
+            return $eventData;
         });
 
         return response()->json($events);
@@ -67,12 +92,14 @@ class EventController extends Controller
                 'color' => 'nullable|string|max:20',
                 'send_email' => 'nullable|boolean',
                 'notification_email' => 'nullable|email|max:255',
+                'rrule' => 'nullable|string',
             ]);
 
             $validated['id_user'] = auth()->id();
             $validated['all_day'] = $request->input('all_day', false);
             $validated['send_email'] = $request->input('send_email', true);
             $validated['notification_email'] = $request->input('notification_email', auth()->user()->email);
+            $validated['rrule'] = $request->input('rrule');
             $validated['status'] = 'pending';
             // Ensure category is never null if DB doesn't allow it
             $validated['category'] = $validated['category'] ?? 'reminder';
@@ -104,6 +131,7 @@ class EventController extends Controller
                 'color' => 'nullable|string|max:20',
                 'send_email' => 'nullable|boolean',
                 'notification_email' => 'nullable|email|max:255',
+                'rrule' => 'nullable|string',
             ]);
 
             $event->update(array_filter($validated, fn($value) => $value !== null));

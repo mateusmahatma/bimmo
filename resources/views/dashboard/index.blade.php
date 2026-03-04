@@ -404,5 +404,5 @@
 <script src="{{ asset('js/dashboard-cashflow.js') }}"></script>
 <script src="{{ asset('js/dashboard-saving-rate.js') }}"></script>
 <script src="{{ asset('js/dashboard.js') }}"></script>
-<script src="{{ asset('js/calendar.js') }}"></script>
+<script src="{{ asset('js/calendar.js') }}?v={{ filemtime(public_path('js/calendar.js')) }}"></script>
 @endpush
