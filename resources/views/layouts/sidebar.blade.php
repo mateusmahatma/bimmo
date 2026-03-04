@@ -13,14 +13,6 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link {{ request()->is('events*') ? 'active' : '' }}"
-                    href="{{ url('events') }}">
-                    <i class="bi bi-calendar3 me-2"></i>
-                    <span>Calendar</span>
-                </a>
-            </li>
-
             <!-- Anggaran -->
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }}"
