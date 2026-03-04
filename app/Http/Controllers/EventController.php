@@ -56,29 +56,34 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_at' => 'required|date',
-            'end_at' => 'nullable|date|after_or_equal:start_at',
-            'all_day' => 'nullable|boolean',
-            'category' => 'nullable|string',
-            'color' => 'nullable|string|max:20',
-            'send_email' => 'nullable|boolean',
-            'notification_email' => 'nullable|email|max:255',
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'start_at' => 'required|date',
+                'end_at' => 'nullable|date|after_or_equal:start_at',
+                'all_day' => 'nullable|boolean',
+                'category' => 'nullable|string',
+                'color' => 'nullable|string|max:20',
+                'send_email' => 'nullable|boolean',
+                'notification_email' => 'nullable|email|max:255',
+            ]);
 
-        $validated['id_user'] = auth()->id();
-        $validated['all_day'] = $request->input('all_day', false);
-        $validated['send_email'] = $request->input('send_email', true);
-        $validated['notification_email'] = $request->input('notification_email', auth()->user()->email);
-        $validated['status'] = 'pending';
-        // Ensure category is never null if DB doesn't allow it
-        $validated['category'] = $validated['category'] ?? 'reminder';
+            $validated['id_user'] = auth()->id();
+            $validated['all_day'] = $request->input('all_day', false);
+            $validated['send_email'] = $request->input('send_email', true);
+            $validated['notification_email'] = $request->input('notification_email', auth()->user()->email);
+            $validated['status'] = 'pending';
+            // Ensure category is never null if DB doesn't allow it
+            $validated['category'] = $validated['category'] ?? 'reminder';
 
-        $event = Event::create($validated);
+            $event = Event::create($validated);
 
-        return response()->json($event);
+            return response()->json($event);
+        }
+        catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     public function update(Request $request, Event $event)
@@ -87,22 +92,27 @@ class EventController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'start_at' => 'nullable|date',
-            'end_at' => 'nullable|date|after_or_equal:start_at',
-            'all_day' => 'nullable|boolean',
-            'category' => 'nullable|string',
-            'status' => 'nullable|string',
-            'color' => 'nullable|string|max:20',
-            'send_email' => 'nullable|boolean',
-            'notification_email' => 'nullable|email|max:255',
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'start_at' => 'nullable|date',
+                'end_at' => 'nullable|date|after_or_equal:start_at',
+                'all_day' => 'nullable|boolean',
+                'category' => 'nullable|string',
+                'status' => 'nullable|string',
+                'color' => 'nullable|string|max:20',
+                'send_email' => 'nullable|boolean',
+                'notification_email' => 'nullable|email|max:255',
+            ]);
 
-        $event->update(array_filter($validated, fn($value) => $value !== null));
+            $event->update(array_filter($validated, fn($value) => $value !== null));
 
-        return response()->json($event);
+            return response()->json($event);
+        }
+        catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     public function destroy(Event $event)
