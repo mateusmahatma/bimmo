@@ -73,6 +73,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Helper to get local ISO string without 'Z' for datetime-local
+    function toLocalISO(date) {
+        if (!date) return null;
+        const tzOffset = date.getTimezoneOffset() * 60000; // offset in milliseconds
+        const localISOTime = (new Date(date - tzOffset)).toISOString().slice(0, 16);
+        return localISOTime;
+    }
+
     function openEventModal(data = null) {
         form.reset();
         document.getElementById('eventId').value = '';
@@ -95,6 +103,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const isAllDay = data.allDay === true || data.allDay === 1;
             allDaySwitch.checked = isAllDay;
 
+            // Date processing
+            let startVal = data.start;
+            let endVal = data.end;
+
+            // If it's a Date object (from FullCalendar), convert to local string
+            if (startVal instanceof Date) startVal = toLocalISO(startVal);
+            if (endVal instanceof Date) endVal = toLocalISO(endVal);
+
             // Helper to format string for datetime-local (YYYY-MM-DDTHH:mm)
             const formatForDateTimeLocal = (str) => {
                 if (!str) return '';
@@ -113,13 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isAllDay) {
                 timeInputs.classList.add('d-none');
                 dateInputs.classList.remove('d-none');
-                if (data.start) dateInputs.querySelector('[name="start_date"]').value = formatForDate(data.start);
-                if (data.end) dateInputs.querySelector('[name="end_date"]').value = formatForDate(data.end);
+                if (startVal) dateInputs.querySelector('[name="start_date"]').value = formatForDate(startVal);
+                if (endVal) dateInputs.querySelector('[name="end_date"]').value = formatForDate(endVal);
             } else {
                 timeInputs.classList.remove('d-none');
                 dateInputs.classList.add('d-none');
-                if (data.start) timeInputs.querySelector('[name="start_at"]').value = formatForDateTimeLocal(data.start);
-                if (data.end) timeInputs.querySelector('[name="end_at"]').value = formatForDateTimeLocal(data.end);
+                if (startVal) timeInputs.querySelector('[name="start_at"]').value = formatForDateTimeLocal(startVal);
+                if (endVal) timeInputs.querySelector('[name="end_at"]').value = formatForDateTimeLocal(endVal);
             }
         }
         bootstrapModal.show();
@@ -189,8 +205,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateEventAjax(event) {
         const data = {
             _method: 'PUT',
-            start_at: event.start.toISOString(),
-            end_at: event.end ? event.end.toISOString() : null,
+            start_at: toLocalISO(event.start),
+            end_at: event.end ? toLocalISO(event.end) : null,
             all_day: event.allDay ? 1 : 0
         };
 
@@ -240,8 +256,8 @@ document.addEventListener('DOMContentLoaded', function () {
             openEventModal({
                 id: event.id,
                 title: event.title,
-                start: event.start.toISOString(),
-                end: event.end ? event.end.toISOString() : null,
+                start: event.start, // Send Date object directly
+                end: event.end, // Send Date object directly
                 allDay: event.allDay,
                 category: event.extendedProps.category,
                 description: event.extendedProps.description
