@@ -24,6 +24,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\TujuanKeuanganController;
 use App\Http\Controllers\AsetController;
+use App\Http\Controllers\EventController;
 
 // Log in
 Route::get('/', function () {
@@ -124,6 +125,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/aset/{id}/maintenance', [AsetController::class , 'addMaintenance'])->name('aset.maintenance.store');
     Route::post('/aset/{id}/dispose', [AsetController::class , 'dispose'])->name('aset.dispose');
     Route::resource('/aset', AsetController::class);
+});
+
+
+// Kalender
+Route::middleware(['auth'])->group(function () {
+    Route::resource('events', EventController::class);
 });
 
 

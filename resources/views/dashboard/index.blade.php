@@ -304,7 +304,11 @@
         </div>
 
         <!-- Transaksi Hari Ini -->
-        <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+        <div class="col-12 mb-4">
+            @include('dashboard.partials.calendar')
+        </div>
+
+        <div class="col-12">
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
                     <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Today's Transactions</h5>
@@ -391,6 +395,7 @@
     window.cashflowData = @json($cashflow ?? []);
     window.savingRateData = @json($savingRate ?? []);
     window.dashboardFilterUrl = "{{ route('dashboard.filter') }}";
+    window.eventsUrl = "{{ url('events') }}";
 </script>
 @endpush
 
@@ -399,4 +404,5 @@
 <script src="{{ asset('js/dashboard-cashflow.js') }}"></script>
 <script src="{{ asset('js/dashboard-saving-rate.js') }}"></script>
 <script src="{{ asset('js/dashboard.js') }}"></script>
+<script src="{{ asset('js/calendar.js') }}"></script>
 @endpush

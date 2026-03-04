@@ -37,7 +37,11 @@ class User extends Authenticatable
         return $this->hasMany(BayarPinjaman::class , 'id_user');
     }
 
-    // guarded kebalikan dengan fillable, guarded yang tidak boleh diisi
+    // Relasi ke model Event
+    public function events()
+    {
+        return $this->hasMany(Event::class , 'id_user');
+    }
     protected $guarded = ['id'];
 
     /**
