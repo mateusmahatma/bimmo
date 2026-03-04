@@ -23,6 +23,7 @@ use App\Http\Controllers\HasilProsesAnggaranController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\TujuanKeuanganController;
+use App\Http\Controllers\AsetController;
 
 // Log in
 Route::get('/', function () {
@@ -115,6 +116,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tujuan-keuangan/{id}/history', [TujuanKeuanganController::class , 'getHistory'])->name('tujuan-keuangan.history');
     Route::delete('/tujuan-keuangan/log/{id}', [TujuanKeuanganController::class , 'destroyLog'])->name('tujuan-keuangan.log.destroy');
     Route::resource('/tujuan-keuangan', TujuanKeuanganController::class);
+});
+
+// Manajemen Aset
+Route::middleware(['auth'])->group(function () {
+    Route::get('/aset/report', [AsetController::class , 'report'])->name('aset.report');
+    Route::post('/aset/{id}/maintenance', [AsetController::class , 'addMaintenance'])->name('aset.maintenance.store');
+    Route::post('/aset/{id}/dispose', [AsetController::class , 'dispose'])->name('aset.dispose');
+    Route::resource('/aset', AsetController::class);
 });
 
 

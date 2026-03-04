@@ -1,0 +1,142 @@
+@extends('layouts.main')
+
+@section('title', 'Asset Inventory')
+
+@push('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<style>
+    .aset-card { transition: all 0.3s ease; border: none; border-radius: 12px; }
+    .aset-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+    .status-badge { border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; }
+    .bg-baik { background-color: #d1e7dd; color: #0f5132; }
+    .bg-kurang { background-color: #fff3cd; color: #664d03; }
+    .bg-rusak { background-color: #f8d7da; color: #842029; }
+    .bg-hilang { background-color: #e2e3e5; color: #41464b; }
+</style>
+@endpush
+
+@section('container')
+<div class="pagetitle mb-4">
+    <h1>Asset Inventory</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Assets</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm p-3" style="border-radius: 12px;">
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+                    <div class="d-flex gap-2">
+                        <select id="filterKondisi" class="form-select form-select-sm" style="width: 150px;">
+                            <option value="">All Conditions</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Kurang Baik">Kurang Baik</option>
+                            <option value="Rusak Berat">Rusak Berat</option>
+                            <option value="Hilang">Hilang</option>
+                        </select>
+                        <select id="filterKategori" class="form-select form-select-sm" style="width: 150px;">
+                            <option value="">All Categories</option>
+                            <option value="IT">IT</option>
+                            <option value="Kendaraan">Kendaraan</option>
+                            <option value="Furnitur">Furnitur</option>
+                            <option value="Elektronik">Elektronik</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                        <select id="filterStatus" class="form-select form-select-sm" style="width: 150px;">
+                            <option value="active">Active Inventory</option>
+                            <option value="disposed">Disposed Assets</option>
+                        </select>
+                    </div>
+                    <div>
+                        <a href="{{ route('aset.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Asset
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-body p-0">
+                    <div class="table-responsive p-3">
+                        <table id="asetTable" class="table table-hover align-middle mb-0" style="width:100%">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Code</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Asset Name</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Category</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Purchase Date</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Current Value (Book)</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Condition</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
+
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        var table = $('#asetTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('aset.index') }}",
+                data: function (d) {
+                    d.kondisi = $('#filterKondisi').val();
+                    d.kategori = $('#filterKategori').val();
+                    d.status = $('#filterStatus').val();
+                }
+            },
+            columns: [
+                {data: 'kode_aset', name: 'kode_aset'},
+                {data: 'nama_aset', name: 'nama_aset'},
+                {data: 'kategori', name: 'kategori'},
+                {data: 'tanggal_pembelian', name: 'tanggal_pembelian'},
+                {data: 'nilai_buku', name: 'nilai_buku', orderable: false, searchable: false},
+                {
+                    data: 'kondisi', 
+                    name: 'kondisi',
+                    render: function(data) {
+                        let badgeClass = 'bg-baik';
+                        if(data == 'Kurang Baik') badgeClass = 'bg-kurang';
+                        if(data == 'Rusak Berat') badgeClass = 'bg-rusak';
+                        if(data == 'Hilang') badgeClass = 'bg-hilang';
+                        return `<span class="status-badge ${badgeClass}">${data}</span>`;
+                    }
+                },
+                {data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center'},
+            ],
+            language: {
+                paginate: {
+                    next: '<i class="bi bi-chevron-right"></i>',
+                    previous: '<i class="bi bi-chevron-left"></i>'
+                }
+            }
+        });
+
+        $('#filterKondisi, #filterKategori, #filterStatus').change(function() {
+            table.draw();
+        });
+    });
+</script>
+@endpush
