@@ -18,12 +18,15 @@ class Event extends Model
         'status',
         'color',
         'rrule',
+        'send_email',
+        'notification_email',
     ];
 
     protected $casts = [
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'all_day' => 'boolean',
+        'send_email' => 'boolean',
     ];
 
     public function user()

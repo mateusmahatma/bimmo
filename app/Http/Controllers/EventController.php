@@ -44,7 +44,9 @@ class EventController extends Controller
             'extendedProps' => [
             'category' => $event->category,
             'status' => $event->status,
-            'description' => $event->description
+            'description' => $event->description,
+            'send_email' => $event->send_email,
+            'notification_email' => $event->notification_email
             ]
             ];
         });
@@ -62,10 +64,14 @@ class EventController extends Controller
             'all_day' => 'nullable|boolean',
             'category' => 'nullable|string',
             'color' => 'nullable|string|max:20',
+            'send_email' => 'nullable|boolean',
+            'notification_email' => 'nullable|email|max:255',
         ]);
 
         $validated['id_user'] = auth()->id();
         $validated['all_day'] = $request->input('all_day', false);
+        $validated['send_email'] = $request->input('send_email', true);
+        $validated['notification_email'] = $request->input('notification_email', auth()->user()->email);
         $validated['status'] = 'pending';
         // Ensure category is never null if DB doesn't allow it
         $validated['category'] = $validated['category'] ?? 'reminder';
@@ -90,6 +96,8 @@ class EventController extends Controller
             'category' => 'nullable|string',
             'status' => 'nullable|string',
             'color' => 'nullable|string|max:20',
+            'send_email' => 'nullable|boolean',
+            'notification_email' => 'nullable|email|max:255',
         ]);
 
         $event->update(array_filter($validated, fn($value) => $value !== null));

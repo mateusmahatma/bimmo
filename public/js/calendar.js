@@ -81,6 +81,19 @@ document.addEventListener('DOMContentLoaded', function () {
         return localISOTime;
     }
 
+    const emailSwitch = document.getElementById('sendEmailSwitch');
+    const emailContainer = document.getElementById('emailInputContainer');
+    const emailInput = document.getElementById('notificationEmail');
+    const userEmail = emailInput ? emailInput.value : '';
+
+    emailSwitch.addEventListener('change', function () {
+        if (this.checked) {
+            emailContainer.classList.remove('d-none');
+        } else {
+            emailContainer.classList.add('d-none');
+        }
+    });
+
     function openEventModal(data = null) {
         form.reset();
         document.getElementById('eventId').value = '';
@@ -90,6 +103,9 @@ document.addEventListener('DOMContentLoaded', function () {
         allDaySwitch.checked = false;
         timeInputs.classList.remove('d-none');
         dateInputs.classList.add('d-none');
+        emailSwitch.checked = true;
+        emailContainer.classList.remove('d-none');
+        emailInput.value = userEmail;
 
         if (data) {
             if (data.id) {
@@ -98,6 +114,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 form.querySelector('[name="title"]').value = data.title;
                 form.querySelector('[name="category"]').value = data.category;
                 form.querySelector('[name="description"]').value = data.description || '';
+
+                // Email Notification Fields
+                const extended = data.extendedProps || {};
+                emailSwitch.checked = extended.send_email !== false && extended.send_email !== 0;
+                emailInput.value = extended.notification_email || userEmail;
+
+                if (emailSwitch.checked) {
+                    emailContainer.classList.remove('d-none');
+                } else {
+                    emailContainer.classList.add('d-none');
+                }
             }
 
             const isAllDay = data.allDay === true || data.allDay === 1;
@@ -162,7 +189,9 @@ document.addEventListener('DOMContentLoaded', function () {
             description: formData.get('description') || null,
             all_day: isAllDay ? 1 : 0,
             start_at: startVal,
-            end_at: endVal || null
+            end_at: endVal || null,
+            send_email: emailSwitch.checked ? 1 : 0,
+            notification_email: emailInput.value
         };
 
         // Use POST with _method spoofing for maximum compatibility (PUT often fails in some setups)

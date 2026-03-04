@@ -52,48 +52,81 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Title</label>
-                        <input type="text" name="title" class="form-control rounded-3" required placeholder="Event name">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Category</label>
-                        <select name="category" class="form-select rounded-3" required>
-                            <option value="reminder">Reminder</option>
-                            <option value="task">Task</option>
-                            <option value="meeting">Meeting</option>
-                            <option value="deadline">Deadline</option>
-                        </select>
-                    </div>
-                    <div class="row" id="timeInputsContainer">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">Start</label>
-                            <input type="datetime-local" name="start_at" class="form-control rounded-3">
+                    <!-- Basic Information Section -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.05em;">Basic Information</label>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Event Title</label>
+                            <input type="text" name="title" class="form-control rounded-3 shadow-sm border-light" required placeholder="What are you planning?">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">End (Optional)</label>
-                            <input type="datetime-local" name="end_at" class="form-control rounded-3">
+                        <div class="mb-0">
+                            <label class="form-label small fw-bold">Category</label>
+                            <select name="category" class="form-select rounded-3 shadow-sm border-light" required>
+                                <option value="reminder">Reminder</option>
+                                <option value="task">Task</option>
+                                <option value="meeting">Meeting</option>
+                                <option value="deadline">Deadline</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="row d-none" id="dateInputsContainer">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">Start Date</label>
-                            <input type="date" name="start_date" class="form-control rounded-3">
+
+                    <hr class="text-muted opacity-25 my-4">
+
+                    <!-- Schedule Section -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-0" style="letter-spacing: 0.05em;">Schedule</label>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" name="all_day" id="allDaySwitch">
+                                <label class="form-check-label small fw-bold" for="allDaySwitch">All Day</label>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">End Date (Optional)</label>
-                            <input type="date" name="end_date" class="form-control rounded-3">
+
+                        <div id="timeInputsContainer" class="row g-3">
+                            <div class="col-md-6 mt-0">
+                                <label class="form-label small fw-bold">Starts At</label>
+                                <input type="datetime-local" name="start_at" class="form-control rounded-3 shadow-sm border-light">
+                            </div>
+                            <div class="col-md-6 mt-0">
+                                <label class="form-label small fw-bold">Ends At (Optional)</label>
+                                <input type="datetime-local" name="end_at" class="form-control rounded-3 shadow-sm border-light">
+                            </div>
+                        </div>
+
+                        <div id="dateInputsContainer" class="row d-none g-3">
+                            <div class="col-md-6 mt-0">
+                                <label class="form-label small fw-bold">Start Date</label>
+                                <input type="date" name="start_date" class="form-control rounded-3 shadow-sm border-light">
+                            </div>
+                            <div class="col-md-6 mt-0">
+                                <label class="form-label small fw-bold">End Date (Optional)</label>
+                                <input type="date" name="end_date" class="form-control rounded-3 shadow-sm border-light">
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="all_day" id="allDaySwitch">
-                            <label class="form-check-label small" for="allDaySwitch">All Day Event</label>
+
+                    <hr class="text-muted opacity-25 my-4">
+
+                    <!-- Settings Section -->
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-3" style="letter-spacing: 0.05em;">Notifications & Details</label>
+                        
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="send_email" id="sendEmailSwitch" checked>
+                                    <label class="form-check-label small fw-bold" for="sendEmailSwitch">Email Reminder</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-none" id="emailInputContainer">
+                                <input type="email" name="notification_email" id="notificationEmail" class="form-control form-control-sm rounded-3 shadow-sm border-light" value="{{ auth()->user()->email }}" placeholder="Notification target">
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Description</label>
-                        <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Additional details..."></textarea>
+
+                        <div class="mb-0">
+                            <label class="form-label small fw-bold">Description</label>
+                            <textarea name="description" class="form-control rounded-3 shadow-sm border-light" rows="2" placeholder="Add some notes..."></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top p-3">
