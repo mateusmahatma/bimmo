@@ -22,6 +22,7 @@ use App\Http\Controllers\DanaDaruratController;
 use App\Http\Controllers\HasilProsesAnggaranController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\TujuanKeuanganController;
 
 // Log in
 Route::get('/', function () {
@@ -106,6 +107,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/dana-darurat/bulk-delete', [DanaDaruratController::class , 'bulkDelete'])->name('dana-darurat.bulkDelete');
     Route::put('/dana-darurat/target', [DanaDaruratController::class , 'updateTarget'])->name('dana-darurat.update-target');
     Route::resource('/dana-darurat', DanaDaruratController::class);
+});
+
+// Tujuan Keuangan
+Route::middleware(['auth'])->group(function () {
+    Route::post('/tujuan-keuangan/{id}/progress', [TujuanKeuanganController::class , 'updateProgress'])->name('tujuan-keuangan.update-progress');
+    Route::get('/tujuan-keuangan/{id}/history', [TujuanKeuanganController::class , 'getHistory'])->name('tujuan-keuangan.history');
+    Route::delete('/tujuan-keuangan/log/{id}', [TujuanKeuanganController::class , 'destroyLog'])->name('tujuan-keuangan.log.destroy');
+    Route::resource('/tujuan-keuangan', TujuanKeuanganController::class);
 });
 
 

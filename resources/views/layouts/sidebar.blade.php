@@ -68,6 +68,13 @@
     </li>
 
     <li class="nav-item">
+        <a class="nav-link d-flex align-items-center {{ Request::is('tujuan-keuangan*') ? 'active' : '' }}" href="/tujuan-keuangan" role="button">
+            <i class="bi bi-bullseye me-2"></i>
+            <span>Financial Goals</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
         <a class="nav-link d-flex align-items-center {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'active' : '' }}"
             data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuMoneyMovement" role="button">
             <i class="bi bi-arrow-down-up me-2"></i>
