@@ -149,12 +149,17 @@ document.addEventListener('DOMContentLoaded', function () {
             end_at: endVal || null
         };
 
+        // Use POST with _method spoofing for maximum compatibility (PUT often fails in some setups)
         const url = eventId ? `${eventsBaseUrl}/${eventId}` : eventsBaseUrl;
-        const method = eventId ? 'PUT' : 'POST';
+
+        const payload = { ...data };
+        if (eventId) {
+            payload._method = 'PUT';
+        }
 
         fetch(url, {
-            method: method,
-            body: JSON.stringify(data),
+            method: 'POST',
+            body: JSON.stringify(payload),
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -162,8 +167,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
             .then(async resp => {
-                const result = await resp.json();
-                if (!resp.ok) throw new Error(result.message || 'Error processing request');
+                const result = await resp.json().catch(() => ({}));
+                if (!resp.ok) {
+                    const errorDetail = result.message || result.error || resp.statusText || 'Unknown Server Error';
+                    throw new Error(`${errorDetail} (Status: ${resp.status})`);
+                }
                 return result;
             })
             .then(() => {
@@ -171,19 +179,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 bootstrapModal.hide();
                 hidePopover();
             })
-            .catch(err => alert('Save failed: ' + err.message));
+            .catch(err => {
+                console.error('Event saving error:', err);
+                alert('Save failed: ' + err.message);
+            });
     });
 
     // Update Event (Drag/Resize)
     function updateEventAjax(event) {
         const data = {
+            _method: 'PUT',
             start_at: event.start.toISOString(),
             end_at: event.end ? event.end.toISOString() : null,
             all_day: event.allDay ? 1 : 0
         };
 
         fetch(`${eventsBaseUrl}/${event.id}`, {
-            method: 'PUT',
+            method: 'POST',
             body: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json',

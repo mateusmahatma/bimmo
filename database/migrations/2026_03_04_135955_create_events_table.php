@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, completed
             $table->string('color', 20)->nullable();
             $table->string('rrule')->nullable(); // For future recurring event logic
+            $table->boolean('reminder_sent')->default(false);
             $table->timestamps();
         });
     }

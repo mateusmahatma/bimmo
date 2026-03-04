@@ -67,6 +67,8 @@ class EventController extends Controller
         $validated['id_user'] = auth()->id();
         $validated['all_day'] = $request->input('all_day', false);
         $validated['status'] = 'pending';
+        // Ensure category is never null if DB doesn't allow it
+        $validated['category'] = $validated['category'] ?? 'reminder';
 
         $event = Event::create($validated);
 

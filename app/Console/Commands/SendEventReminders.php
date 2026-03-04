@@ -14,23 +14,30 @@ class SendEventReminders extends Command
 
     public function handle()
     {
-        $now = now();
-        $soon = now()->addMinutes(30);
+        $targetDate = now()->addDays(3)->format('Y-m-d');
 
-        // Find events starting in the next 30 minutes that haven't been notified
-        // Note: For simplicity, we're assuming events only need one reminder
-        // In a production app, you might want to track 'reminder_sent' in the DB
+        // Find events starting exactly in 3 days that haven't been notified
         $events = Event::with('user')
-            ->whereBetween('start_at', [$now, $soon])
+            ->whereDate('start_at', $targetDate)
+            ->where('reminder_sent', false)
             ->get();
 
         foreach ($events as $event) {
             if ($event->user && $event->user->email) {
-                Mail::to($event->user->email)->send(new EventReminder($event));
-                $this->info("Reminder sent for event: {$event->title} to {$event->user->email}");
+                try {
+                    Mail::to($event->user->email)->send(new EventReminder($event));
+
+                    $event->reminder_sent = true;
+                    $event->save();
+
+                    $this->info("H-3 Reminder sent for event: {$event->title} to {$event->user->email}");
+                }
+                catch (\Exception $e) {
+                    $this->error("Failed to send reminder for event #{$event->id}: " . $e->getMessage());
+                }
             }
         }
 
-        $this->info('Event reminders check completed.');
+        $this->info('Event reminders (H-3) check completed.');
     }
 }
