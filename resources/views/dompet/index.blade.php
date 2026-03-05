@@ -32,15 +32,14 @@
     <div class="row">
         <!-- Total Balance Card -->
         <div class="col-12 mb-4">
-            <div class="card border-0 shadow-sm" style="border-radius: 12px; border-left: 5px solid #012970; background: #ffffff;">
+            <div class="card border-0 shadow-sm border-start border-5 border-primary bg-white" style="border-radius: 12px;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <div class="d-flex align-items-center mb-1">
                                 <h6 class="text-secondary text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1.2px;">Total Current Balance</h6>
-                                <span class="badge bg-light text-primary ms-2 border" style="font-weight: 500;">Real-time</span>
                             </div>
-                            <h1 class="display-6 fw-bold mb-0 text-dark" style="color: #012970;">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h1>
+                            <h1 class="display-6 fw-bold mb-0 text-dark">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h1>
                             <p class="text-muted small mt-2 mb-0">
                                 <i class="bi bi-info-circle me-1"></i> Accumulated balance from all active wallet accounts.
                             </p>
@@ -74,8 +73,8 @@
 
             <!-- Instructions Section -->
             <div class="collapse mb-4" id="instructionsCollapse">
-                <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #f8f9fa;">
-                    <div class="card-body p-4">
+                <div class="card-body bg-light border-bottom mb-4" style="border-radius: 12px;">
+                    <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
                         <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-lightbulb me-2"></i>How to Use the Wallet Page:</h6>
                         <div class="row g-4">
                             <div class="col-md-6">
