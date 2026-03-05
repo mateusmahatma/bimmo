@@ -23,21 +23,20 @@
         <div class="col-lg-12">
             
              <!-- Total Card -->
-             <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; border-left: 5px solid #198754; background: #ffffff;">
+             <div class="card border-0 shadow-sm mb-4 border-start border-5 border-success bg-white" style="border-radius: 12px;">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <div class="d-flex align-items-center mb-1">
                                 <h6 class="text-secondary text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1.2px;">Total Emergency Fund</h6>
-                                <span class="badge bg-success bg-opacity-10 text-success ms-2 border border-success border-opacity-25" style="font-weight: 500;">Secured</span>
                             </div>
-                            <h1 class="display-6 fw-bold mb-0 text-dark" style="color: #012970;" id="totalDanaDarurat">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h1>
+                            <h1 class="display-6 fw-bold mb-0 text-dark" id="totalDanaDarurat">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h1>
                             <div class="mt-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="text-muted small fw-medium">Target achievement progress</span>
                                     <span class="text-dark small fw-bold">{{ $percentage }}%</span>
                                 </div>
-                                <div class="progress rounded-pill" style="height: 8px; background-color: #f0f2f5;">
+                                <div class="progress rounded-pill bg-light" style="height: 8px;">
                                     <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-2">
