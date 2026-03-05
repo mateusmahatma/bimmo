@@ -1,15 +1,15 @@
 @extends('layouts.main')
 
-@section('title', 'Laporan Dompet')
+@section('title', 'Wallet Reports')
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1>Laporan Keuangan</h1>
+    <h1>Financial Reports</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('dompet.index') }}">Dompet</a></li>
-            <li class="breadcrumb-item active">Laporan</li>
+            <li class="breadcrumb-item"><a href="{{ route('dompet.index') }}">Wallet</a></li>
+            <li class="breadcrumb-item active">Reports</li>
         </ol>
     </nav>
 </div>
@@ -20,7 +20,7 @@
         <div class="col-12 col-md-6">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-3">Distribusi Saldo</h5>
+                    <h5 class="card-title fw-bold mb-3">Balance Distribution</h5>
                     <div id="walletDistributionChart" style="min-height: 300px;"></div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
         <div class="col-12 col-md-6">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-3">Pemasukan vs Pengeluaran</h5>
+                    <h5 class="card-title fw-bold mb-3">Income vs Expense</h5>
                     <div id="incomeVsExpenseChart" style="min-height: 300px;"></div>
                 </div>
             </div>
@@ -71,10 +71,10 @@
         // Income vs Expense Chart (Placeholder or real data if available)
         var optionsComparison = {
             series: [{
-                name: 'Pemasukan',
+                name: 'Income',
                 data: [30, 40, 35, 50, 49, 60, 70, 91, 125] // Example data
             }, {
-                name: 'Pengeluaran',
+                name: 'Expense',
                 data: [20, 30, 25, 40, 39, 50, 60, 81, 105] // Example data
             }],
             chart: {
