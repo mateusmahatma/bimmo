@@ -62,9 +62,39 @@
                     <h5 class="fw-bold mb-0 text-dark">Portfolio Dompet</h5>
                     <p class="text-muted small mb-0">Kelola berbagai sumber dana Anda di sini</p>
                 </div>
-                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                    <i class="bi bi-plus-lg me-1"></i> Tambah Dompet
-                </button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
+                        <i class="bi bi-info-circle me-1"></i> Instructions
+                    </button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addWalletModal">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah Dompet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions Section -->
+            <div class="collapse mb-4" id="instructionsCollapse">
+                <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #f8f9fa;">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-lightbulb me-2"></i>How to Use the Wallet Page:</h6>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <ul class="mb-0 ps-3 small text-muted list-unstyled">
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">1</span> Click <strong>Add Wallet</strong> to create a new account.</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">2</span> Enter the wallet name, icon, and initial balance, if any.</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">3</span> Activate <strong>"Input as income"</strong> if you want the opening balance to be recorded in the cash flow.</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="mb-0 ps-3 small text-muted list-unstyled">
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">4</span> Click on the wallet card to view <strong>Transaction History</strong>.</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">5</span> Use the <strong>Add Balance</strong> button in the history to manually top up.</li>
+                                    <li><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">6</span> Balance is automatically updated when recording income/expense transactions.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="row g-4">
