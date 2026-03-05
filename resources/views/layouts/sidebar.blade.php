@@ -1,6 +1,10 @@
 <aside class="sidebar d-flex flex-column">
     <div class="p-3 fw-bold fs-5 d-flex align-items-center justify-content-between border-bottom mb-2">
-        <img src="{{ asset('img/bimmo_2.png') }}" class="me-2" style="height: 25px; width: 110px;" alt="BIMMO Logo">
+        <picture>
+            <source srcset="{{ asset('img/bimmo_dark.png') }}" media="(prefers-color-scheme: dark)">
+            <source srcset="{{ asset('img/bimmo_light.png') }}" media="(prefers-color-scheme: light)">
+            <img src="{{ asset('img/bimmo_light.png') }}" class="me-2" style="height: 25px; width: 110px;">
+        </picture>
     </div>
 
     <div class="sidebar-menu-items flex-grow-1">
