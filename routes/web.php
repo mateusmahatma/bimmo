@@ -24,6 +24,7 @@ use App\Http\Controllers\TujuanKeuanganController;
 use App\Http\Controllers\AsetController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\DompetController;
+use App\Http\Controllers\SubscriptionController;
 
 // Authentication & Public Routes
 Route::get('/', function () {
@@ -153,6 +154,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('transaksi', TransaksiController::class)->parameters(['transaksi' => 'hash']);
 
         // Pinjaman & More
+        Route::get('/pinjaman/export/excel', [PinjamanController::class , 'exportExcel'])->name('pinjaman.export.excel');
         Route::resource('pinjaman', PinjamanController::class)->parameters(['pinjaman' => 'hash']);
         Route::post('/pinjaman/{hash}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
         Route::resource('bayar-pinjaman', BayarPinjamanController::class)->except(['index', 'create', 'store', 'show']);
@@ -165,10 +167,17 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/profil/phone', [UserController::class , 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
         Route::put('/profil/photo', [UserController::class , 'updatePhoto'])->name('profil.updatePhoto');
         Route::delete('/profil/photo', [UserController::class , 'deletePhoto'])->name('profil.deletePhoto');
+        Route::get('/storage/profile-photo/{filename}', [UserController::class , 'showPhoto'])->name('storage.profile_photo');
         Route::post('/user/skin', [UserController::class , 'updateSkin'])->name('user.update.skin');
         Route::get('/ubah-password', [UbahPasswordController::class , 'index']);
         Route::post('/ubah-password', [UbahPasswordController::class , 'store']);
         Route::post('/feedback', [FeedbackController::class , 'store'])->name('feedback.store');
+
+        // Subscription
+        Route::post('/subscription/subscribe', [SubscriptionController::class , 'subscribe'])->name('subscription.subscribe');
+        Route::post('/subscription/cancel', [SubscriptionController::class , 'cancel'])->name('subscription.cancel');
+        Route::post('/subscription/webhook', [SubscriptionController::class , 'webhook'])->name('subscription.webhook');
+
         Route::resource('hasil_proses_anggaran', HasilProsesAnggaranController::class);
     });
 
