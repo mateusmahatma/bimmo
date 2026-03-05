@@ -173,4 +173,14 @@ class UserController extends Controller
 
         return redirect()->back()->with('notification_status', 'Pengaturan notifikasi berhasil diperbarui!');
     }
+
+    public function showPhoto($filename)
+    {
+        $path = 'profile_photos/' . $filename;
+        if (!Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return response()->file(Storage::disk('public')->path($path));
+    }
 }
