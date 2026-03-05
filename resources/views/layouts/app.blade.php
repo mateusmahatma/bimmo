@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title','Bimmo')</title>
 
-    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="{{ asset('img/bimmo_dark_favicon.png') }}" type="image/x-icon" media="(prefers-color-scheme: dark)">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -22,7 +23,7 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@6.1.10/index.global.min.js"></script>
-    
+
     <script>
         (function() {
             const setTheme = (theme) => {
@@ -54,7 +55,7 @@
                     e.keyCode === 123 || // F12
                     (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || // Ctrl+Shift+I/J/C
                     (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
-                    (e.ctrlKey && e.keyCode === 83)    // Ctrl+S
+                    (e.ctrlKey && e.keyCode === 83) // Ctrl+S
                 ) {
                     return false;
                 }
@@ -76,7 +77,7 @@
             const checkDevTools = () => {
                 const widthDiff = window.outerWidth - window.innerWidth > threshold;
                 const heightDiff = window.outerHeight - window.innerHeight > threshold;
-                
+
                 if (widthDiff || heightDiff) {
                     blockAccess();
                 }
@@ -209,7 +210,9 @@
             ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(evt => {
                 window.addEventListener(evt, () => {
                     if (!isPageActive) isPageActive = true;
-                }, {passive: true});
+                }, {
+                    passive: true
+                });
             });
 
             // Mobile Multi-finger Touch Detection (Common screenshot gestures)
@@ -219,7 +222,9 @@
                     clearClipboard();
                     isLocked = true;
                 }
-            }, {passive: true});
+            }, {
+                passive: true
+            });
 
             // Aggressive Protection Logic
             const clearClipboard = () => {
@@ -244,15 +249,15 @@
 
                 // F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, etc.
                 if (
-                    e.keyCode === 123 || 
-                    (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || 
+                    e.keyCode === 123 ||
+                    (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
                     (e.ctrlKey && [85, 83, 80].includes(e.keyCode)) || // U, S, P (Print)
                     e.key === 'PrintScreen' || e.keyCode === 44
                 ) {
                     isLocked = true; // Permanent lock
                     hideContent();
                     clearClipboard();
-                    
+
                     if (e.key === 'PrintScreen' || e.keyCode === 44) {
                         e.preventDefault();
                     }
@@ -335,14 +340,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sessionLifetime = {{ config('session.lifetime') }} * 60 * 1000; // minutes to milliseconds
+            const sessionLifetime = {
+                {
+                    config('session.lifetime')
+                }
+            }* 60 * 1000; // minutes to milliseconds
             let timeoutTimer;
             const modalElement = document.getElementById('sessionTimeoutModal');
             let sessionModal;
-            
+
             if (modalElement) {
                 sessionModal = new bootstrap.Modal(modalElement);
-                
+
                 document.getElementById('btnSessionExpired').addEventListener('click', function() {
                     window.location.href = "{{ route('login') }}";
                 });
