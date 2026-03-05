@@ -56,9 +56,9 @@
                             <i class="bi bi-funnel me-1"></i> Filter
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 10px;">
-                            <li><a class="dropdown-item" href="#">Semua</a></li>
-                            <li><a class="dropdown-item" href="#">Pemasukan</a></li>
-                            <li><a class="dropdown-item" href="#">Pengeluaran</a></li>
+                            <li><a class="dropdown-item {{ !request()->has('type') ? 'active' : '' }}" href="{{ route('dompet.show', $wallet->id) }}">Semua</a></li>
+                            <li><a class="dropdown-item {{ request('type') === 'income' ? 'active' : '' }}" href="{{ route('dompet.show', [$wallet->id, 'type' => 'income']) }}">Pemasukan</a></li>
+                            <li><a class="dropdown-item {{ request('type') === 'expense' ? 'active' : '' }}" href="{{ route('dompet.show', [$wallet->id, 'type' => 'expense']) }}">Pengeluaran</a></li>
                         </ul>
                     </div>
                 </div>
@@ -79,7 +79,13 @@
                                         <div class="fw-medium">{{ \Carbon\Carbon::parse($t->tgl_transaksi)->format('d M Y') }}</div>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">{{ $t->pemasukan ?? $t->pengeluaran ?? '-' }}</div>
+                                        <div class="fw-bold text-dark">
+                                            @if($t->nominal_pemasukan > 0)
+                                                {{ $t->pemasukanRelation->nama ?? 'Pemasukan' }}
+                                            @else
+                                                {{ $t->pengeluaranRelation->nama ?? 'Pengeluaran' }}
+                                            @endif
+                                        </div>
                                         <div class="small text-muted text-truncate" style="max-width: 200px;">{{ $t->keterangan ?? 'No description' }}</div>
                                     </td>
                                     <td class="text-end pe-4">

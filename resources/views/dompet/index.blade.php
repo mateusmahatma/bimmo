@@ -145,9 +145,15 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">Saldo Awal</label>
-                        <div class="input-group">
+                        <div class="input-group mb-2">
                             <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
                             <input type="number" name="saldo" class="form-control rounded-end-3 border-start-0" placeholder="0" required>
+                        </div>
+                        <div class="form-check form-switch small">
+                            <input class="form-check-input" type="checkbox" name="record_income" id="recordIncome" value="1" checked>
+                            <label class="form-check-label text-muted" for="recordIncome">
+                                Masukan sebagai pemasukan di cash flow?
+                            </label>
                         </div>
                     </div>
                     <div class="mb-3">

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Dompet;
 use App\Models\Transaksi;
+use App\Models\Pemasukan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DompetController extends Controller
 {
@@ -34,7 +36,6 @@ class DompetController extends Controller
             $name = str_replace(' ', '_', $request->nama) . '_' . time() . '.' . $image->getClientOriginalExtension();
             $destinationPath = public_path('/img/icons/uploads');
             
-            // Create directory if not exists
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0755, true);
             }
@@ -43,25 +44,79 @@ class DompetController extends Controller
             $ikon = 'uploads/' . $name;
         }
 
-        Dompet::create([
+        $initialSaldo = $request->filled('saldo') ? (float)$request->saldo : 0;
+
+        $dompet = Dompet::create([
             'nama' => $request->nama,
             'ikon' => $ikon,
-            'saldo' => $request->saldo ?? 0,
+            'saldo' => $initialSaldo,
             'id_user' => Auth::id(),
             'status' => 1,
         ]);
 
+        if ($initialSaldo > 0 && $request->has('record_income')) {
+            $pemasukan = Pemasukan::firstOrCreate(
+                ['nama' => $dompet->nama, 'id_user' => Auth::id()],
+                ['kode_pemasukan' => 'M0000']
+            );
+
+            Transaksi::create([
+                'tgl_transaksi' => now(),
+                'pemasukan' => $pemasukan->id,
+                'nominal_pemasukan' => $initialSaldo,
+                'keterangan' => 'Saldo awal ' . $dompet->nama,
+                'dompet_id' => $dompet->id,
+                'id_user' => Auth::id(),
+                'status' => 1,
+            ]);
+
+            Log::info('Automated initial balance transaction created', [
+                'wallet_id' => $dompet->id,
+                'pemasukan_id' => $pemasukan->id
+            ]);
+        }
+
         return redirect()->route('dompet.index')->with('success', 'Dompet berhasil ditambahkan');
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $wallet = Dompet::where('id_user', Auth::id())->findOrFail($id);
-        $transactions = Transaksi::where('dompet_id', $id)
-            ->orderBy('tgl_transaksi', 'desc')
-            ->paginate(10);
+        
+        $query = Transaksi::where('dompet_id', $id)
+            ->with(['pemasukanRelation', 'pengeluaranRelation'])
+            ->orderBy('tgl_transaksi', 'desc');
+
+        // Fetch all to handle encrypted column filtering in PHP
+        $transactions = $query->get();
+
+        if ($request->has('type')) {
+            $type = $request->type;
+            $transactions = $transactions->filter(function ($t) use ($type) {
+                if ($type === 'income') {
+                    return (float)$t->nominal_pemasukan > 0;
+                } elseif ($type === 'expense') {
+                    return (float)$t->nominal > 0;
+                }
+                return true;
+            });
+        }
+
+        // Manual pagination for the filtered collection
+        $perPage = 10;
+        $page = $request->get('page', 1);
+        $offset = ($page * $perPage) - $perPage;
+        
+        $paginatedTransactions = new \Illuminate\Pagination\LengthAwarePaginator(
+            $transactions->slice($offset, $perPage)->values(),
+            $transactions->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
             
-        return view('dompet.history', compact('wallet', 'transactions'));
+        return view('dompet.history', compact('wallet', 'transactions', 'paginatedTransactions'))
+            ->with('transactions', $paginatedTransactions);
     }
 
     public function addBalance(Request $request, $id)
@@ -73,16 +128,29 @@ class DompetController extends Controller
 
         $wallet = Dompet::where('id_user', Auth::id())->findOrFail($id);
         
+        $pemasukan = Pemasukan::firstOrCreate(
+            ['nama' => $wallet->nama, 'id_user' => Auth::id()],
+            ['kode_pemasukan' => 'M0000']
+        );
+
         Transaksi::create([
             'tgl_transaksi' => now(),
+            'pemasukan' => $pemasukan->id,
             'nominal_pemasukan' => $request->nominal,
             'keterangan' => $request->keterangan ?? 'Top up saldo manual',
             'dompet_id' => $id,
             'id_user' => Auth::id(),
+            'status' => 1,
         ]);
 
         $wallet->saldo = (float)$wallet->saldo + (float)$request->nominal;
         $wallet->save();
+
+        Log::info('Manual top up transaction created', [
+            'wallet_id' => $id,
+            'pemasukan_id' => $pemasukan->id,
+            'nominal' => $request->nominal
+        ]);
 
         return redirect()->route('dompet.show', $id)->with('success', 'Saldo berhasil ditambahkan');
     }
@@ -98,14 +166,12 @@ class DompetController extends Controller
     {
         $wallet = Dompet::where('id_user', Auth::id())->findOrFail($id);
         
-        // Check if wallet has transactions
         $hasTransactions = Transaksi::where('dompet_id', $id)->exists();
         
         if ($hasTransactions) {
             return redirect()->route('dompet.index')->with('error', 'Tidak bisa menghapus dompet ini data ada di cash flow');
         }
 
-        // Delete custom icon if exists
         if ($wallet->ikon && str_starts_with($wallet->ikon, 'uploads/')) {
             $iconPath = public_path('img/icons/' . $wallet->ikon);
             if (file_exists($iconPath)) {
