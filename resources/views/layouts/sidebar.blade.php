@@ -13,11 +13,19 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('dompet*') ? 'active' : '' }}"
+                    href="{{ route('dompet.index') }}">
+                    <i class="bi bi-wallet2 me-2"></i>
+                    <span>Wallet</span>
+                </a>
+            </li>
+
             <!-- Anggaran -->
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }}"
                     data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAnggaran" role="button">
-                    <i class="bi bi-wallet2 me-2"></i>
+                    <i class="bi bi-calculator-fill me-2"></i>
                     <span>Budget</span>
                     <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>

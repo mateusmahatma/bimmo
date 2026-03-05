@@ -23,21 +23,34 @@
         <div class="col-lg-12">
             
              <!-- Total Card -->
-             <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: linear-gradient(45deg, #4158d0, #c850c0);">
-                <div class="card-body p-4 text-white d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1" style="opacity: 0.9;">Total Emergency Fund</h6>
-                        <h2 class="mb-0 fw-bold" id="totalDanaDarurat">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h2>
-                        <div class="mt-2">
-                            <small class="opacity-75">Target: Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</small>
-                            <div class="progress mt-1" style="height: 6px; background-color: rgba(255,255,255,0.2);">
-                                <div class="progress-bar bg-white" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+             <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; border-left: 5px solid #198754; background: #ffffff;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-1">
+                                <h6 class="text-secondary text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1.2px;">Total Emergency Fund</h6>
+                                <span class="badge bg-success bg-opacity-10 text-success ms-2 border border-success border-opacity-25" style="font-weight: 500;">Secured</span>
                             </div>
-                            <small class="opacity-75">{{ $percentage }}% Terlaksana</small>
+                            <h1 class="display-6 fw-bold mb-0 text-dark" style="color: #012970;" id="totalDanaDarurat">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h1>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-muted small fw-medium">Progress pencapaian target</span>
+                                    <span class="text-dark small fw-bold">{{ $percentage }}%</span>
+                                </div>
+                                <div class="progress rounded-pill" style="height: 8px; background-color: #f0f2f5;">
+                                    <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <small class="text-muted">Target: <span class="text-dark fw-semibold">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</span></small>
+                                    <small class="text-muted italic">Bersiap untuk hal tak terduga</small>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="fs-1 opacity-25">
-                        <i class="bi bi-shield-check"></i>
+                        <div class="col-md-4 text-end d-none d-md-block">
+                            <div class="icon-shape bg-success bg-opacity-10 text-success rounded-4 p-4 d-inline-flex">
+                                <i class="bi bi-shield-check fs-1"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

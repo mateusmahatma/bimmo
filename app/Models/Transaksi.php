@@ -19,6 +19,7 @@ class Transaksi extends Model
         'nominal',
         'keterangan',
         'id_user',
+        'dompet_id',
         'status',
         'file'
     ];
@@ -39,6 +40,11 @@ class Transaksi extends Model
     public function pemasukanRelation()
     {
         return $this->belongsTo(Pemasukan::class , 'pemasukan', 'id');
+    }
+
+    public function dompet()
+    {
+        return $this->belongsTo(Dompet::class , 'dompet_id');
     }
 
     public function getHashAttribute()

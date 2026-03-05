@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Auth\GoogleLoginController;
@@ -25,235 +23,155 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\TujuanKeuanganController;
 use App\Http\Controllers\AsetController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\DompetController;
 
-// Log in
+// Authentication & Public Routes
 Route::get('/', function () {
     return redirect()->route('bimmo');
 })->name('login');
 Route::get('/bimmo', [LoginController::class , 'index'])->name('bimmo')->middleware('guest');
 Route::post('/bimmo', [LoginController::class , 'authenticate']);
+Route::get('/login/google', [GoogleLoginController::class , 'redirectToGoogle']);
+Route::get('/login/google/callback', [GoogleLoginController::class , 'handleGoogleCallback']);
+Route::get('/daftar', [DaftarController::class , 'index']);
+Route::post('/daftar', [DaftarController::class , 'store']);
+Route::resource('/lupa-password', LupaPasswordController::class);
+Route::get('/reset-password', [LupaPasswordController::class , 'resetIndex'])->name('password.reset');
+Route::post('/reset-password', [LupaPasswordController::class , 'resetUpdate'])->name('password.update');
 
+// Diagnostics
 Route::get('/diagnose-encryption', function () {
     $results = [];
-
     $check = function ($tableName, $columns) use (&$results) {
-            $rows = Illuminate\Support\Facades\DB::table($tableName)->get();
+            $rows = \Illuminate\Support\Facades\DB::table($tableName)->get();
             foreach ($rows as $row) {
                 foreach ($columns as $column) {
-                    $value = $row->$column;
-                    if ($value === null)
+                    if ($row->$column === null)
                         continue;
                     try {
-                        Illuminate\Support\Facades\Crypt::decryptString($value);
+                        \Illuminate\Support\Facades\Crypt::decryptString($row->$column);
                     }
                     catch (\Exception $e) {
-                        $results[] = "[$tableName] ID {$row->id}: Column '$column' INVALID. Value: " . substr($value, 0, 20) . "...";
+                        $results[] = "[$tableName] ID {$row->id}: Column '$column' INVALID.";
                     }
                 }
             }
         }
             ;
-
         $check('users', ['name', 'email', 'no_hp', 'nominal_target_dana_darurat']);
         $check('transaksi', ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan']);
-
         return count($results) > 0 ? implode("\n", $results) : "ALL OK";
     });
 
-// Log in Google
-Route::get('/login/google', [GoogleLoginController::class , 'redirectToGoogle']);
-Route::get('/login/google/callback', [GoogleLoginController::class , 'handleGoogleCallback']);
-
-// Daftar
-Route::get('/daftar', [DaftarController::class , 'index']);
-Route::post('/daftar', [DaftarController::class , 'store']);
-
-// Dashboard
-Route::middleware(['auth'])->prefix('dashboard')->group(function () {
-    Route::get('/', [DashboardController::class , 'index'])->name('dashboard');
-    Route::get('/chart-data', [DashboardController::class , 'getChartData']);
-    Route::get('/pie-data', [DashboardController::class , 'getPieData']);
-    Route::get('/todayTransactions', [DashboardController::class , 'TodayTransactions']);
-    Route::get('/line-data', [DashboardController::class , 'lineData']);
-    Route::get('/jenis-pengeluaran', [DashboardController::class , 'getJenisPengeluaran']);
-    Route::get('/transaksi', [DashboardController::class , 'getTransaksiByPengeluaran']);
-    Route::get('/saving-rate-data', [DashboardController::class , 'getSavingRateData']);
-    Route::get('/anggaran/chart', [DashboardController::class , 'AnggaranChart'])->name('anggaran.chart');
-    Route::post(
-        '/dashboard/toggle-nominal-ajax',
-    [DashboardController::class , 'toggleNominalAjax']
-    )->name('dashboard.toggle-nominal.ajax');
-    Route::get('/filter', [DashboardController::class , 'filter'])->name('dashboard.filter');
-});
-
-
-// Proses Anggaran
-Route::middleware('auth')->controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
-    Route::delete('/bulk-delete', 'bulkDelete')->name('kalkulator.bulkDelete');
-    Route::get('/', 'index')->name('kalkulator.index');
-    Route::post('/', 'store')->name('kalkulator.store');
-    Route::get('/{hash}', 'show')->name('kalkulator.show');
-    Route::put('/{hash}', 'update');
-    Route::delete('/{hash}', 'destroy');
-    Route::post('/calculate', 'calculate');
-    Route::get('/calculate', 'showResult')->name('showResult');
-    Route::get('/cetak_pdf', 'cetak_pdf');
-});
-
-// Aset
-Route::resource('/barang', BarangController::class)->middleware('auth');
-Route::get('/api/barang', [BarangController::class , 'getList'])->middleware('auth');
-
-// Dana Darurat
+// Authenticated Routes
 Route::middleware(['auth'])->group(function () {
-    Route::delete('/dana-darurat/bulk-delete', [DanaDaruratController::class , 'bulkDelete'])->name('dana-darurat.bulkDelete');
-    Route::put('/dana-darurat/target', [DanaDaruratController::class , 'updateTarget'])->name('dana-darurat.update-target');
-    Route::resource('/dana-darurat', DanaDaruratController::class);
-});
 
-// Tujuan Keuangan
-Route::middleware(['auth'])->group(function () {
-    Route::post('/tujuan-keuangan/{id}/progress', [TujuanKeuanganController::class , 'updateProgress'])->name('tujuan-keuangan.update-progress');
-    Route::get('/tujuan-keuangan/{id}/history', [TujuanKeuanganController::class , 'getHistory'])->name('tujuan-keuangan.history');
-    Route::delete('/tujuan-keuangan/log/{id}', [TujuanKeuanganController::class , 'destroyLog'])->name('tujuan-keuangan.log.destroy');
-    Route::resource('/tujuan-keuangan', TujuanKeuanganController::class);
-});
+    // Dashboard & Session
+    Route::get('/check-session', function () {
+            return response()->json(['alive' => true]);
+        }
+        );
+        Route::get('/logout', [DashboardController::class , 'logout']);
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/', [DashboardController::class , 'index'])->name('dashboard');
+            Route::get('/chart-data', [DashboardController::class , 'getChartData']);
+            Route::get('/pie-data', [DashboardController::class , 'getPieData']);
+            Route::get('/todayTransactions', [DashboardController::class , 'TodayTransactions']);
+            Route::get('/line-data', [DashboardController::class , 'lineData']);
+            Route::get('/jenis-pengeluaran', [DashboardController::class , 'getJenisPengeluaran']);
+            Route::get('/transaksi', [DashboardController::class , 'getTransaksiByPengeluaran']);
+            Route::get('/filter', [DashboardController::class , 'filter'])->name('dashboard.filter');
+            Route::get('/saving-rate-data', [DashboardController::class , 'getSavingRateData']);
+            Route::get('/anggaran/chart', [DashboardController::class , 'AnggaranChart'])->name('anggaran.chart');
+            Route::post('/toggle-nominal-ajax', [DashboardController::class , 'toggleNominalAjax'])->name('dashboard.toggle-nominal.ajax');
+        }
+        );
 
-// Manajemen Aset
-Route::middleware(['auth'])->group(function () {
-    Route::get('/aset/report', [AsetController::class , 'report'])->name('aset.report');
-    Route::post('/aset/{id}/maintenance', [AsetController::class , 'addMaintenance'])->name('aset.maintenance.store');
-    Route::post('/aset/{id}/dispose', [AsetController::class , 'dispose'])->name('aset.dispose');
-    Route::resource('/aset', AsetController::class);
-});
+        // Main Features (Calculators, Dana Darurat, Tujuan Keuangan)
+        Route::controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(function () {
+            Route::get('/', 'index')->name('kalkulator.index');
+            Route::post('/', 'store')->name('kalkulator.store');
+            Route::get('/{hash}', 'show')->name('kalkulator.show');
+            Route::put('/{hash}', 'update');
+            Route::delete('/{hash}', 'destroy');
+            Route::post('/calculate', 'calculate');
+            Route::get('/calculate/result', 'showResult')->name('showResult');
+            Route::get('/cetak-pdf', 'cetak_pdf');
+            Route::delete('/bulk-delete', 'bulkDelete')->name('kalkulator.bulkDelete');
+        }
+        );
 
+        Route::prefix('dana-darurat')->group(function () {
+            Route::put('/target', [DanaDaruratController::class , 'updateTarget'])->name('dana-darurat.update-target');
+            Route::delete('/bulk-delete', [DanaDaruratController::class , 'bulkDelete'])->name('dana-darurat.bulkDelete');
+        }
+        );
+        Route::resource('dana-darurat', DanaDaruratController::class);
 
-// Kalender
-Route::middleware(['auth'])->group(function () {
-    Route::resource('events', EventController::class);
-});
+        Route::prefix('tujuan-keuangan')->group(function () {
+            Route::post('/{id}/progress', [TujuanKeuanganController::class , 'updateProgress'])->name('tujuan-keuangan.update-progress');
+            Route::get('/{id}/history', [TujuanKeuanganController::class , 'getHistory'])->name('tujuan-keuangan.history');
+            Route::delete('/log/{id}', [TujuanKeuanganController::class , 'destroyLog'])->name('tujuan-keuangan.log.destroy');
+        }
+        );
+        Route::resource('tujuan-keuangan', TujuanKeuanganController::class);
 
+        // Assets & Events
+        Route::prefix('aset')->group(function () {
+            Route::get('/report', [AsetController::class , 'report'])->name('aset.report');
+            Route::post('/{id}/maintenance', [AsetController::class , 'addMaintenance'])->name('aset.maintenance.store');
+            Route::post('/{id}/dispose', [AsetController::class , 'dispose'])->name('aset.dispose');
+        }
+        );
+        Route::resource('aset', AsetController::class);
+        Route::resource('events', EventController::class);
+        Route::resource('barang', BarangController::class);
 
-// Pemasukan
-Route::middleware(['auth'])->group(function () {
-    Route::delete('/pemasukan/bulk-delete', [PemasukanController::class , 'bulkDelete'])->name('pemasukan.bulkDelete');
-    Route::resource('pemasukan', PemasukanController::class);
-});
+        // Pemasukan, Pengeluaran, Anggaran
+        Route::resource('pemasukan', PemasukanController::class);
+        Route::resource('pengeluaran', PengeluaranController::class);
+        Route::resource('anggaran', AnggaranController::class);
 
-// Anggaran
-Route::middleware(['auth'])->group(function () {
-    Route::delete('/anggaran/bulk-delete', [AnggaranController::class , 'bulkDelete'])->name('anggaran.bulkDelete');
-    Route::resource('anggaran', AnggaranController::class);
-});
+        // Dompet (Wallet)
+        Route::get('/dompet/reports', [DompetController::class , 'reports'])->name('dompet.reports');
+        Route::post('/dompet/{id}/add-balance', [DompetController::class , 'addBalance'])->name('dompet.add-balance');
+        Route::resource('dompet', DompetController::class);
 
-// Pengeluaran
-Route::middleware(['auth'])->group(function () {
-    Route::delete('/pengeluaran/bulk-delete', [PengeluaranController::class , 'bulkDelete'])->name('pengeluaran.bulkDelete');
-    Route::resource('pengeluaran', PengeluaranController::class);
-});
-
-// Transaksi
-Route::middleware(['auth'])->group(function () {
-    Route::prefix('transaksi')->group(function () {
-            // web.php
-            Route::get('/transaksi/export/pdf', [TransaksiController::class , 'exportPdf'])
-                ->name('transaksi.export.pdf');
-
-            Route::get('/transaksi/export/excel', [TransaksiController::class , 'exportExcel'])
-                ->name('transaksi.export.excel');
-
-            Route::get('/transaksi/export/email', [TransaksiController::class , 'emailExcel'])
-                ->name('transaksi.export.email');
-
-
-            Route::post(
-                '/transaksi/import-test',
-            [TransaksiController::class , 'importTest']
-            )->name('transaksi.importTest');
-
-
-            Route::get('/transaksi/template', [TransaksiController::class , 'downloadTemplate'])
-                ->name('transaksi.download.template');
-
-
+        // Transaksi
+        Route::prefix('transaksi')->group(function () {
+            Route::get('/export/pdf', [TransaksiController::class , 'exportPdf'])->name('transaksi.export.pdf');
+            Route::get('/export/excel', [TransaksiController::class , 'exportExcel'])->name('transaksi.export.excel');
+            Route::get('/export/email', [TransaksiController::class , 'emailExcel'])->name('transaksi.export.email');
+            Route::get('/template', [TransaksiController::class , 'downloadTemplate'])->name('transaksi.download.template');
+            Route::post('/import', [TransaksiController::class , 'importTest'])->name('transaksi.importTest');
             Route::post('/upload', [TransaksiController::class , 'upload'])->name('upload');
+            Route::delete('/bulk-delete', [TransaksiController::class , 'bulkDelete'])->name('transaksi.bulkDelete');
             Route::delete('/{id}/file', [TransaksiController::class , 'deleteFile'])->name('transaksi.deleteFile');
             Route::post('/{id}/toggle-status', [TransaksiController::class , 'toggleStatus'])->name('transaksi.toggleStatus');
         }
         );
+        Route::resource('transaksi', TransaksiController::class)->parameters(['transaksi' => 'hash']);
 
-        Route::delete('/transaksi/bulk-delete', [TransaksiController::class , 'bulkDelete'])->name('transaksi.bulkDelete');
-        Route::resource('transaksi', TransaksiController::class)
-            ->parameters(['transaksi' => 'hash']);
+        // Pinjaman & More
+        Route::resource('pinjaman', PinjamanController::class)->parameters(['pinjaman' => 'hash']);
+        Route::post('/pinjaman/{hash}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
+        Route::resource('bayar-pinjaman', BayarPinjamanController::class)->except(['index', 'create', 'store', 'show']);
+        Route::match (['get', 'post'], '/compare', [CompareController::class , 'index'])->name('compare');
+
+        // User Management
+        Route::get('/profil', [UserController::class , 'index'])->name('profil.index');
+        Route::put('/profil/password', [UserController::class , 'updatePassword'])->name('profil.updatePassword');
+        Route::put('/profil/email', [UserController::class , 'updateEmail'])->name('profil.updateEmail');
+        Route::put('/profil/phone', [UserController::class , 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
+        Route::put('/profil/photo', [UserController::class , 'updatePhoto'])->name('profil.updatePhoto');
+        Route::delete('/profil/photo', [UserController::class , 'deletePhoto'])->name('profil.deletePhoto');
+        Route::post('/user/skin', [UserController::class , 'updateSkin'])->name('user.update.skin');
+        Route::get('/ubah-password', [UbahPasswordController::class , 'index']);
+        Route::post('/ubah-password', [UbahPasswordController::class , 'store']);
+        Route::post('/feedback', [FeedbackController::class , 'store'])->name('feedback.store');
+        Route::resource('hasil_proses_anggaran', HasilProsesAnggaranController::class);
     });
 
-// Compare
-Route::match (['get', 'post'], '/compare', [CompareController::class , 'index'])->middleware('auth');
-
-// Pinjaman
-Route::middleware(['auth'])->group(function () {
-    Route::delete('/pinjaman/bulk-delete', [PinjamanController::class , 'bulkDelete'])->name('pinjaman.bulkDelete');
-    Route::get('/pinjaman/export/excel', [PinjamanController::class , 'exportExcel'])->name('pinjaman.export.excel');
-    Route::resource('pinjaman', PinjamanController::class)
-        ->parameters(['pinjaman' => 'hash']);
-    Route::post('/pinjaman/{hash}/bayar', [BayarPinjamanController::class , 'bayar'])->name('pinjaman.bayar');
-    Route::get('/bayar-pinjaman/{id}/edit', [BayarPinjamanController::class , 'edit'])->name('bayar_pinjaman.edit');
-    Route::put('/bayar-pinjaman/{id}', [BayarPinjamanController::class , 'update'])->name('bayar_pinjaman.update');
-    Route::delete('/bayar_pinjaman/{id}', [BayarPinjamanController::class , 'destroy'])->name('bayar_pinjaman.destroy');
-});
-
-// Ubah Password
-Route::get('/ubah-password', [UbahPasswordController::class , 'index'])->middleware('auth');
-Route::post('/ubah-password', [UbahPasswordController::class , 'store'])->middleware('auth');
-
-// Lupa Password
-Route::resource('/lupa-password', LupaPasswordController::class);
-Route::get('/reset-password', [LupaPasswordController::class , 'resetIndex'])->name('password.reset');
-Route::post('/reset-password', [LupaPasswordController::class , 'resetUpdate'])->name('password.update');
-
-// Hasil Proses Anggaran
-Route::resource('/hasil_proses_anggaran', HasilProsesAnggaranController::class)->middleware('auth');
-
-// Update skin
-Route::middleware(['auth'])->post('/user/skin', [UserController::class , 'updateSkin'])->name('user.update.skin');
-
-// Feedback
-Route::middleware(['auth'])->post('/feedback', [FeedbackController::class , 'store'])->name('feedback.store');
-
-// Profil
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profil', [UserController::class , 'index'])->name('profil.index');
-    Route::put('/profil/password', [UserController::class , 'updatePassword'])->name('profil.updatePassword');
-    Route::put('/profil/email', [UserController::class , 'updateEmail'])->name('profil.updateEmail');
-    Route::put('/profil/phone', [UserController::class , 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
-    Route::put('/profil/photo', [UserController::class , 'updatePhoto'])->name('profil.updatePhoto');
-    Route::delete('/profil/photo', [UserController::class , 'deletePhoto'])->name('profil.deletePhoto');
-    Route::put('/profil/notification', [UserController::class , 'updateNotification'])->name('profil.updateNotification');
-
-    // Serve profile photos robustly
-    Route::get('/storage/profile_photos/{filename}', function ($filename) {
-            $path = storage_path('app/public/profile_photos/' . $filename);
-            if (!file_exists($path)) {
-                abort(404);
-            }
-            $file = file_get_contents($path);
-            $type = mime_content_type($path);
-            return response($file)->header('Content-Type', $type);
-        }
-        )->name('storage.profile_photo');
-
-        // Subscription
-        Route::post('/subscription/subscribe', [\App\Http\Controllers\SubscriptionController::class , 'subscribe'])->name('subscription.subscribe');
-        Route::post('/subscription/cancel', [\App\Http\Controllers\SubscriptionController::class , 'cancel'])->name('subscription.cancel');
-    });
-
-Route::post('/payment/webhook', [\App\Http\Controllers\SubscriptionController::class , 'webhook'])->name('payment.webhook');
-
-Route::get('/check-session', function () {
-    return response()->json(['alive' => true]);
-})->middleware('auth');
-
-Route::get('/logout', [DashboardController::class , 'logout']);
-
+// App Webhook
 Route::post('/api/webhook/whatsapp', [\App\Http\Controllers\Api\WhatsAppController::class , 'handle'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);

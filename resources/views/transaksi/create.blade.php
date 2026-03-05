@@ -102,6 +102,18 @@
                             </div>
                         </div>
 
+                        <!-- Wallet Selection -->
+                        <div class="mb-4">
+                            <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">Select Wallet <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-lg" id="dompet_id" name="dompet_id" required>
+                                <option value="">- Select Wallet -</option>
+                                @foreach ($dompet as $d)
+                                <option value="{{ $d->id }}">{{ $d->nama }} (Rp {{ number_format((float)$d->saldo, 0, ',', '.') }})</option>
+                                @endforeach
+                            </select>
+                            <div class="form-text small">Transaction will affect the balance of the selected wallet.</div>
+                        </div>
+
                         <!-- Description -->
                         <div class="mb-4">
                             <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">Description / Notes</label>

@@ -22,7 +22,8 @@ class ImportTransaksi implements FromCollection, WithHeadings, WithMapping, With
             'Nominal Pemasukan',
             'Jenis Pengeluaran',
             'Nominal Pengeluaran',
-            'Keterangan'
+            'Keterangan',
+            'ID Dompet'
         ];
     }
 
@@ -34,7 +35,8 @@ class ImportTransaksi implements FromCollection, WithHeadings, WithMapping, With
             $row->nominal_pemasukan,
             $row->pengeluaran,
             $row->nominal,
-            $row->keterangan
+            $row->keterangan,
+            $row->dompet_id
         ];
     }
 

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Barang;
 use App\Models\DanaDarurat;
+use App\Models\Dompet;
 use Vinkla\Hashids\Facades\Hashids;
 use App\Exports\TransaksiExport;
 use App\Imports\TransaksiImportTest;
@@ -259,10 +260,10 @@ class TransaksiController extends Controller
     {
         $userId = Auth::id();
         return view('transaksi.create', [
-            'transaksi' => new Transaksi(),
             'pemasukan' => Pemasukan::where('id_user', $userId)->get(),
             'pengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
-            'barang' => Barang::where('id_user', $userId)->get()
+            'barang' => Barang::where('id_user', $userId)->get(),
+            'dompet' => Dompet::where('id_user', $userId)->get(),
         ]);
     }
 
@@ -276,6 +277,7 @@ class TransaksiController extends Controller
             'nominal' => 'nullable|numeric',
             'keterangan' => 'nullable|string',
             'barang_id' => 'nullable|exists:barang,id',
+            'dompet_id' => 'nullable|exists:dompet,id',
         ]);
 
         $validatedData['id_user'] = Auth::id();
@@ -300,6 +302,18 @@ class TransaksiController extends Controller
                 if ($hasil) $hasil->increment('anggaran_yang_digunakan', (float)$transaksi->nominal);
             }
 
+            if ($transaksi->dompet_id) {
+                $dompet = Dompet::find($transaksi->dompet_id);
+                if ($dompet) {
+                    if ($transaksi->nominal_pemasukan > 0) {
+                        $dompet->saldo = (float)$dompet->saldo + (float)$transaksi->nominal_pemasukan;
+                    } else if ($transaksi->nominal > 0) {
+                        $dompet->saldo = (float)$dompet->saldo - (float)$transaksi->nominal;
+                    }
+                    $dompet->save();
+                }
+            }
+
             return redirect()->route('transaksi.index')->with('success', 'Data Transaksi Berhasil Disimpan!');
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi error: ' . $e->getMessage());
@@ -315,7 +329,8 @@ class TransaksiController extends Controller
             'transaksi' => $transaksi,
             'pemasukan' => Pemasukan::where('id_user', $userId)->get(),
             'pengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
-            'barang' => Barang::where('id_user', $userId)->get()
+            'barang' => Barang::where('id_user', $userId)->get(),
+            'dompet' => Dompet::where('id_user', $userId)->get(),
         ]);
     }
 
@@ -329,22 +344,68 @@ class TransaksiController extends Controller
             'pengeluaran' => 'nullable|numeric',
             'nominal' => 'nullable|numeric',
             'keterangan' => 'nullable|string|max:255',
+            'dompet_id' => 'nullable|exists:dompet,id',
         ]);
 
         $transaksi = Transaksi::where('id', $id)->where('id_user', Auth::id())->firstOrFail();
-        $transaksi->update($validatedData);
 
-        return redirect()->route('transaksi.index')->with('success', 'Berhasil update transaksi');
+        try {
+            // Revert old wallet balance
+            if ($transaksi->dompet_id) {
+                $oldDompet = Dompet::find($transaksi->dompet_id);
+                if ($oldDompet) {
+                    if ($transaksi->nominal_pemasukan > 0) {
+                        $oldDompet->saldo = (float)$oldDompet->saldo - (float)$transaksi->nominal_pemasukan;
+                    } else if ($transaksi->nominal > 0) {
+                        $oldDompet->saldo = (float)$oldDompet->saldo + (float)$transaksi->nominal;
+                    }
+                    $oldDompet->save();
+                }
+            }
+
+            $transaksi->update($validatedData);
+
+            // Apply new wallet balance
+            if ($transaksi->dompet_id) {
+                $newDompet = Dompet::find($transaksi->dompet_id);
+                if ($newDompet) {
+                    if ($transaksi->nominal_pemasukan > 0) {
+                        $newDompet->saldo = (float)$newDompet->saldo + (float)$transaksi->nominal_pemasukan;
+                    } else if ($transaksi->nominal > 0) {
+                        $newDompet->saldo = (float)$newDompet->saldo - (float)$transaksi->nominal;
+                    }
+                    $newDompet->save();
+                }
+            }
+
+            return redirect()->route('transaksi.index')->with('success', 'Data Transaksi Berhasil Diperbarui!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi error: ' . $e->getMessage());
+        }
     }
 
     public function destroy($hash)
     {
         $id = Hashids::decode($hash)[0] ?? abort(404);
         $transaksi = Transaksi::where('id', $id)->where('id_user', Auth::id())->firstOrFail();
+
+        // Revert wallet balance before deleting
+        if ($transaksi->dompet_id) {
+            $dompet = Dompet::find($transaksi->dompet_id);
+            if ($dompet) {
+                if ($transaksi->nominal_pemasukan > 0) {
+                    $dompet->saldo = (float)$dompet->saldo - (float)$transaksi->nominal_pemasukan;
+                } else if ($transaksi->nominal > 0) {
+                    $dompet->saldo = (float)$dompet->saldo + (float)$transaksi->nominal;
+                }
+                $dompet->save();
+            }
+        }
+
         $transaksi->delete();
 
         if (request()->ajax()) return response()->json(['success' => true, 'message' => 'Transaksi berhasil dihapus']);
-        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil dihapus');
+        return redirect()->route('transaksi.index')->with('success', 'Data Transaksi Berhasil Dihapus!');
     }
 
     public function exportPdf(Request $request)
