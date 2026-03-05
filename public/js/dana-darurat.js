@@ -100,10 +100,11 @@ $(document).ready(function () {
                 name: 'jenis_transaksi_dana_darurat',
                 render: function (data, type, row) {
                     if (data === 'Masuk') {
-                        return '<span class="badge bg-success"><i class="bi bi-arrow-down-left me-1"></i>' + data + '</span>';
-                    } else {
-                        return '<span class="badge bg-danger"><i class="bi bi-arrow-up-right me-1"></i>' + data + '</span>';
+                        return '<span class="badge bg-success"><i class="bi bi-arrow-down-left me-1"></i>Deposit</span>';
+                    } else if (data === 'Keluar') {
+                        return '<span class="badge bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Withdrawal</span>';
                     }
+                    return data;
                 }
             },
             {
@@ -269,11 +270,11 @@ $(document).ready(function () {
                     type: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
-                        showToast('Data berhasil dihapus', 'success');
+                        showToast('Data deleted successfully', 'success');
                         table.ajax.reload();
                     },
                     error: function () {
-                        showToast('Data gagal dihapus', 'danger');
+                        showToast('Failed to delete data', 'danger');
                         table.ajax.reload();
                     }
                 });

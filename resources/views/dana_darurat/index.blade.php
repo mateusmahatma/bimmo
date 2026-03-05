@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Dana Darurat')
+@section('title', 'Emergency Fund')
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -9,11 +9,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Dana Darurat</h1>
+    <h1>Emergency Fund</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Dana Darurat</li>
+            <li class="breadcrumb-item active">Emergency Fund</li>
         </ol>
     </nav>
 </div>
@@ -34,7 +34,7 @@
                             <h1 class="display-6 fw-bold mb-0 text-dark" style="color: #012970;" id="totalDanaDarurat">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h1>
                             <div class="mt-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="text-muted small fw-medium">Progress pencapaian target</span>
+                                    <span class="text-muted small fw-medium">Target achievement progress</span>
                                     <span class="text-dark small fw-bold">{{ $percentage }}%</span>
                                 </div>
                                 <div class="progress rounded-pill" style="height: 8px; background-color: #f0f2f5;">
@@ -42,7 +42,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between mt-2">
                                     <small class="text-muted">Target: <span class="text-dark fw-semibold">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</span></small>
-                                    <small class="text-muted italic">Bersiap untuk hal tak terduga</small>
+                                    <small class="text-muted italic">Prepared for the unexpected</small>
                                 </div>
                             </div>
                         </div>
@@ -58,18 +58,18 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Daftar Transaksi Dana Darurat</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Kelola riwayat penambahan atau pengurangan dana darurat.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Emergency Fund Transaction List</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage history of emergency fund additions or reductions.</p>
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAturTarget">
-                            <i class="bi bi-gear me-1"></i> Atur Target
+                            <i class="bi bi-gear me-1"></i> Set Target
                         </button>
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
                             <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('dana-darurat.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Tambah Data
+                            <i class="bi bi-plus-lg me-1"></i> Add Data
                         </a>
                     </div>
                 </div>
@@ -85,13 +85,13 @@
                                         </div>
                                     </th>
                                     <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 text-center">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Tanggal</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Jenis</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Nominal</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Catatan</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Dibuat</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Diperbarui</th>
-                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Aksi</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Date</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Type</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Amount</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Note</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Created</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Updated</th>
+                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
