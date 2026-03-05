@@ -44,9 +44,9 @@
                                     <tr>
                                         <td class="text-muted small text-uppercase fw-bold">Period</td>
                                         <td class="fw-medium">: 
-                                            {{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_mulai)->locale('id')->isoFormat('D MMM Y') }} 
-                                            s/d 
-                                            {{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }}
+                                            {{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_mulai)->locale('en')->isoFormat('D MMM Y') }} 
+                                            to 
+                                            {{ \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_selesai)->locale('en')->isoFormat('D MMM Y') }}
                                         </td>
                                     </tr>
                                     <tr>

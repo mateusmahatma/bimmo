@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anggaran</title>
+    <title>Budget</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,19 +40,19 @@
 
 <body>
     <center>
-        <h1>Hasil Perhitungan Anggaran</h1>
+        <h1>Budget Calculation Results</h1>
     </center>
 
     <table>
         <thead>
             <tr>
-                <th>Kategori</th>
-                <th>Nominal</th>
+                <th>Category</th>
+                <th>Amount</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Total Pendapatan</td>
+                <td>Total Income</td>
                 <td>{{ number_format($totalIncome, 0, ',', '.') }}</td>
             </tr>
             @foreach ($budgetAllocations as $allocation)
@@ -62,11 +62,11 @@
             </tr>
             @endforeach
             <tr>
-                <td>Total Anggaran</td>
+                <td>Total Budget</td>
                 <td>{{ number_format($totalBudget, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td>Sisa Pendapatan</td>
+                <td>Remaining Income</td>
                 <td>{{ number_format($remainingIncome, 0, ',', '.') }}</td>
             </tr>
         </tbody>

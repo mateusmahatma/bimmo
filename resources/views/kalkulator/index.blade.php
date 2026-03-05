@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Kalkulator Budget')
+@section('title', 'Budget Calculator')
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -54,28 +54,28 @@
                         <div class="row g-4">
                             <!-- Income Section -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-uppercase text-muted">Informasi Pendapatan</label>
+                                <label class="form-label fw-bold small text-uppercase text-muted">Income Information</label>
                                 <div class="mb-3">
-                                    <label for="monthly_income" class="form-label">Pendapatan Tetap (Bulanan)</label>
+                                    <label for="monthly_income" class="form-label">Fixed Income (Monthly)</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">Rp</span>
-                                        <input type="text" class="form-control" id="monthly_income" name="monthly_income" placeholder="Contoh: 5.000.000" required>
+                                        <input type="text" class="form-control" id="monthly_income" name="monthly_income" placeholder="Example: 5.000.000" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="additional_income" class="form-label">Pendapatan Lain (Opsional)</label>
+                                    <label for="additional_income" class="form-label">Other Income (Optional)</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">Rp</span>
-                                        <input type="text" class="form-control" id="additional_income" name="additional_income" placeholder="Contoh: 1.000.000">
+                                        <input type="text" class="form-control" id="additional_income" name="additional_income" placeholder="Example: 1.000.000">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Period Section -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-uppercase text-muted">Periode Budget</label>
+                                <label class="form-label fw-bold small text-uppercase text-muted">Budget Period</label>
                                 <div class="mb-3">
-                                    <label class="form-label">Rentang Tanggal</label>
+                                    <label class="form-label">Date Range</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i class="bi bi-calendar3"></i></span>
                                         <div id="daterange" class="form-control" style="cursor: pointer;">
@@ -84,7 +84,7 @@
                                         <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
                                         <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
                                     </div>
-                                    <div class="form-text small">Pilih tanggal mulai dan tanggal akhir untuk perhitungan Budget.</div>
+                                    <div class="form-text small">Select start and end dates for budget calculation.</div>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +92,7 @@
                         <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                             <button type="button" class="btn btn-light rounded-pill px-3 shadow-sm" id="btnReset">Reset</button>
                             <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm" id="btnProses">
-                                <i class="bi bi-Monitoring me-1"></i> Proses Budget
+                                <i class="bi bi-Monitoring me-1"></i> Process Budget
                                 <span id="btnProsesSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -106,8 +106,8 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Riwayat Proses Budget</h5>
-                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Daftar riwayat perhitungan Budget Anda.</p>
+                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Budget Process History</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">List of your budget calculation history.</p>
                     </div>
                     <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
                         <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
@@ -124,14 +124,14 @@
                                         </div>
                                     </th>
                                     <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 text-center">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Periode</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Nama Anggaran</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Jenis Pengeluaran</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Persentase</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Nominal Anggaran</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Terpakai</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Sisa</th>
-                                    <th style="width: 5%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Aksi</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Period</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Budget Name</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">Expense Type</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Percentage</th>
+                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Budget Amount</th>
+                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Used</th>
+                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Remaining</th>
+                                    <th style="width: 5%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

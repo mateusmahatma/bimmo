@@ -1,5 +1,5 @@
 <head>
-    <title>Hasil Perhitungan Anggaran</title>
+    <title>Budget Calculation Results</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,11 +8,11 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Hasil Perhitungan Anggaran</a>
+    <a class="navbar-brand" href="#">Budget Calculation Results</a>
     <ul class="nav nav-pills">
         <li class="nav-item dropdown">
             <a class="nav-link" href="/kalkulator" role="button" aria-expanded="false">
-                <span class="badge-primary">Kalkulator Anggaran</span>
+                <span class="badge-primary">Budget Calculator</span>
             </a>
         </li>
         <li class="nav-item">
@@ -30,13 +30,13 @@
         <table class="customTable">
             <thead>
                 <tr>
-                    <th class="text-center">Kategori</th>
-                    <th class="text-center">Nominal</th>
+                    <th class="text-center">Category</th>
+                    <th class="text-center">Amount</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Total Pendapatan</td>
+                    <td>Total Income</td>
                     <td>{{ number_format($totalIncome, 0, ',', '.') }}</td>
                 </tr>
                 @foreach ($budgetAllocations as $allocation)
@@ -46,11 +46,11 @@
                 </tr>
                 @endforeach
                 <tr>
-                    <td>Total Anggaran</td>
+                    <td>Total Budget</td>
                     <td>{{ number_format($totalBudget, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
-                    <td>Sisa Pendapatan</td>
+                    <td>Remaining Income</td>
                     <td>{{ number_format($remainingIncome, 0, ',', '.') }}</td>
                 </tr>
             </tbody>

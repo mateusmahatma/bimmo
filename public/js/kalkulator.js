@@ -104,7 +104,7 @@ $(document).ready(function () {
                     render: function (data, type, row) {
                         const start = new Date(row.tanggal_mulai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
                         const end = new Date(row.tanggal_selesai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
-                        return `<span class="fw-medium">${start}</span> <br> <span class="text-muted small">s/d ${end}</span>`;
+                        return `<span class="fw-medium">${start}</span> <br> <span class="text-muted small">to ${end}</span>`;
                     },
                 },
                 { data: "nama_anggaran", className: "text-center fw-bold", render: d => d || "-", responsivePriority: 1 },
@@ -151,7 +151,7 @@ $(document).ready(function () {
                 { data: "aksi", orderable: false, searchable: false, className: "text-center", responsivePriority: 1 },
             ],
             language: {
-                emptyTable: "Belum ada data proses anggaran."
+                emptyTable: "No budget process data yet."
             },
             drawCallback: function () {
                 $('#checkAll').prop('checked', false);
@@ -209,19 +209,19 @@ $(document).ready(function () {
             if (ids.length === 0) return;
 
             Swal.fire({
-                title: 'Hapus Terpilih?',
-                text: `Apakah Anda yakin ingin menghapus ${ids.length} data?`,
+                title: 'Delete Selected?',
+                text: `Are you sure you want to delete ${ids.length} items?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
+                confirmButtonText: 'Yes, delete!',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Show loading state
                     const originalText = this.innerHTML;
-                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...';
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
                     this.disabled = true;
 
                     $.ajax({
@@ -232,7 +232,7 @@ $(document).ready(function () {
                         },
                         data: { ids: ids },
                         success: (response) => {
-                            showToast(response.message || 'Data berhasil dihapus', 'success');
+                            showToast(response.message || 'Data deleted successfully', 'success');
                             hasilAnggaranTable?.ajax.reload(null, false);
 
                             // Reset button
@@ -243,7 +243,7 @@ $(document).ready(function () {
                         },
                         error: (err) => {
                             console.error(err);
-                            showToast('Gagal menghapus data', 'danger');
+                            showToast('Failed to delete data', 'danger');
                             // Reset button
                             this.innerHTML = originalText;
                             this.disabled = false;
@@ -270,18 +270,18 @@ $(document).ready(function () {
         const income = $('#monthly_income').val();
 
         if (!income) {
-            showToast('Pendapatan bulanan wajib diisi!', 'danger');
+            showToast('Monthly income is required!', 'danger');
             $('#monthly_income').focus();
             return false;
         }
 
         if (!startDate || !endDate) {
-            showToast('Silakan pilih rentang tanggal!', 'danger');
+            showToast('Please select a date range!', 'danger');
             return false;
         }
 
         if (new Date(startDate) > new Date(endDate)) {
-            showToast('Tanggal mulai tidak boleh lebih besar dari tanggal akhir!', 'danger');
+            showToast('Start date cannot be greater than end date!', 'danger');
             return false;
         }
 
@@ -311,18 +311,18 @@ $(document).ready(function () {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    showToast(data.message || 'Anggaran berhasil diproses!', 'success');
+                    showToast(data.message || 'Budget processed successfully!', 'success');
                     if (hasilAnggaranTable) hasilAnggaranTable.ajax.reload(null, false);
                     // Don't reset date range, keep it for user convenience or reset partial
                     $('#monthly_income').val('');
                     $('#additional_income').val('');
                 } else {
-                    showToast(data.message || 'Gagal memproses anggaran', 'danger');
+                    showToast(data.message || 'Failed to process budget', 'danger');
                 }
             })
             .catch(err => {
                 console.error(err);
-                showToast('Terjadi kesalahan: ' + err.message, 'danger');
+                showToast('An error occurred: ' + err.message, 'danger');
             })
             .finally(() => {
                 btnSpinner.addClass('d-none');
@@ -346,14 +346,14 @@ $(document).ready(function () {
         e.preventDefault();
         const id = $(this).data('id');
         Swal.fire({
-            title: 'Hapus Riwayat?',
-            text: "Data yang dihapus tidak dapat dikembalikan!",
+            title: 'Delete History?',
+            text: "Deleted data cannot be recovered!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
+            confirmButtonText: 'Yes, delete!',
+            cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -361,7 +361,7 @@ $(document).ready(function () {
                     type: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: () => {
-                        showToast('Data berhasil dihapus', 'success');
+                        showToast('Data deleted successfully', 'success');
                         hasilAnggaranTable?.ajax.reload(null, false);
                     },
                     error: () => {
@@ -443,7 +443,7 @@ $(document).ready(function () {
                 },
             ],
             language: {
-                emptyTable: "Belum ada transaksi pada periode ini."
+                emptyTable: "No transactions in this period."
             }
         });
     }
