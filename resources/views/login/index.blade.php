@@ -17,17 +17,38 @@
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
     <script>
-        // PWA early capture script
+        // PWA Diagnostic Suite
         window.deferredPrompt = null;
+        console.log('PWA Debug: Starting diagnostics...');
+
+        // 1. Listen for the install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('PWA Debug: beforeinstallprompt fired early!');
+            console.log('PWA Debug: EVENT beforeinstallprompt fired!');
             e.preventDefault();
             window.deferredPrompt = e;
             const btn = document.getElementById('installPwa');
-            if (btn) {
-                btn.style.display = 'block';
-                console.log('PWA Debug: Install button shown via early listener');
+            if (btn) btn.style.display = 'block';
+        });
+
+        // 2. Check current mode
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('PWA Debug: STATUS Running in Standalone (App) mode');
+        }
+
+        // 3. Verify Manifest and Icons after load
+        window.addEventListener('load', () => {
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (!manifestLink) {
+                console.error('PWA Debug: ERROR Manifest link missing in head!');
+            } else {
+                console.log('PWA Debug: Manifest link found:', manifestLink.href);
+                fetch(manifestLink.href).then(r => console.log('PWA Debug: Manifest file is reachable')).catch(e => console.error('PWA Debug: Manifest file NOT reachable!', e));
             }
+
+            const img = new Image();
+            img.onload = () => console.log('PWA Debug: Icon file is reachable');
+            img.onerror = () => console.error('PWA Debug: Icon file NOT reachable!');
+            img.src = '/img/pwa-icon-512.png';
         });
     </script>
 </head>
@@ -76,7 +97,7 @@
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <button id="installPwa" class="btn btn-primary tombol-login w-100" style="display: none;">
+                                        <button id="installPwa" class="btn btn-primary w-100">
                                             Install App
                                         </button>
                                     </div>
@@ -117,20 +138,11 @@
     <script>
         const installBtn = document.getElementById('installPwa');
 
-        // Check if already in standalone mode
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            console.log('PWA Debug: App is already running in standalone mode');
-        } else {
-            // Check if we captured the prompt early or later
-            if (window.deferredPrompt && installBtn) {
-                installBtn.style.display = 'block';
-            }
-        }
-
         if (installBtn) {
             installBtn.addEventListener('click', () => {
                 if (!window.deferredPrompt) {
-                    console.log('PWA Debug: No deferredPrompt captured yet');
+                    alert('Browser belum mengizinkan instalasi. Mohon tunggu beberapa detik atau pastikan Anda menggunakan Chrome/Edge di Android/Windows.');
+                    console.warn('PWA Debug: Clicked install but deferredPrompt is null');
                     return;
                 }
                 installBtn.style.display = 'none';
@@ -147,7 +159,7 @@
                 const swPath = "{{ asset('sw.js') }}";
                 navigator.serviceWorker.register(swPath, { scope: '/' })
                     .then(reg => {
-                        console.log('PWA Debug: Service Worker registered with scope:', reg.scope);
+                        console.log('PWA Debug: Service Worker registered. Path:', swPath);
                     })
                     .catch(err => console.error('PWA Debug: Service Worker registration FAILED:', err));
             });
