@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -15,9 +14,10 @@ class DanaDaruratController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $userId = Auth::id();
+        $userId = Auth::id();
+        $user = Auth::user();
 
+        if ($request->ajax()) {
             // Ambil semua data transaksi untuk user
             $query = DanaDarurat::where('id_user', $userId);
 
@@ -32,6 +32,32 @@ class DanaDaruratController extends Controller
 
             $totalDanaDarurat = $totalMasuk - $totalKeluar;
 
+            // Hitung Target
+            $targetDanaDarurat = 0;
+            if ($user->metode_target_dana_darurat === 'manual') {
+                $targetDanaDarurat = $user->nominal_target_dana_darurat ?? 0;
+            }
+            else {
+                $transaksi = \App\Models\Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
+                $totalPengeluaran = $transaksi->where('status', '1')->sum(fn($t) => (float)$t->nominal);
+                if ($transaksi->count() > 1) {
+                    $firstDate = Carbon::parse($transaksi->first()->tgl_transaksi)->startOfMonth();
+                    $lastDate = Carbon::parse($transaksi->last()->tgl_transaksi)->startOfMonth();
+                    $selisihBulan = $firstDate->diffInMonths($lastDate) + 1;
+                }
+                else {
+                    $selisihBulan = 1;
+                }
+                $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaran / $selisihBulan : 0;
+                $kelipatan = $user->kelipatan_target_dana_darurat ?? 6;
+                $targetDanaDarurat = $rataRataPengeluaran * $kelipatan;
+            }
+
+            // Hitung Persentase
+            $percentage = $targetDanaDarurat > 0 ? ($totalDanaDarurat / $targetDanaDarurat) * 100 : 0;
+            $percentage = min($percentage, 100);
+            $percentage = round($percentage, 1);
+
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('jenis_transaksi_dana_darurat', function ($dana) {
@@ -40,13 +66,14 @@ class DanaDaruratController extends Controller
                 ->addColumn('aksi', function ($dana) {
                 return view('dana_darurat.tombol')->with('request', $dana);
             })
-                ->with('totalDanaDarurat', $totalDanaDarurat)
+                ->with([
+                    'totalDanaDarurat' => $totalDanaDarurat,
+                    'targetDanaDarurat' => $targetDanaDarurat,
+                    'percentage' => $percentage
+                ])
                 ->toJson();
         }
         else {
-            $userId = Auth::id();
-            $user = Auth::user();
-
             // Hitung Total Dana Darurat
             $totalMasuk = DanaDarurat::where('id_user', $userId)
                 ->where('jenis_transaksi_dana_darurat', 1)
@@ -196,7 +223,13 @@ class DanaDaruratController extends Controller
     public function destroy($id)
     {
         $dana = DanaDarurat::findOrFail($id);
-        $dana->delete();
+        $deleted = $dana->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => 'Data deleted successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to delete data.'], 500);
     }
 
     public function bulkDelete(Request $request)

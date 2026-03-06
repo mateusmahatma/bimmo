@@ -59,17 +59,50 @@ $(document).ready(function () {
             url: '/dana-darurat',
             type: 'GET',
             dataSrc: function (json) {
+                // Debug log
+                console.log('Emergency Fund AJAX Response:', json);
+
+                // Update Total Balance
                 const total = parseFloat(json.totalDanaDarurat);
                 if (!isNaN(total)) {
                     $("#totalDanaDarurat").text(
                         total.toLocaleString("id-ID", {
                             style: "currency",
                             currency: "IDR",
-                            minimumFractionDigits: 2
+                            minimumFractionDigits: 0
                         })
                     );
-                } else {
-                    $("#totalDanaDarurat").text("Rp 0,00");
+                }
+
+                // Update Percentage Text
+                const percentage = parseFloat(json.percentage);
+                if (!isNaN(percentage)) {
+                    $("#targetPercentage").text(percentage);
+                    console.log('Updated percentage text to:', percentage);
+                }
+
+                // Update Progress Bar
+                if (!isNaN(percentage)) {
+                    const progressBar = $("#progressBar");
+                    if (progressBar.length) {
+                        progressBar.css("width", percentage + "%");
+                        progressBar.attr("aria-valuenow", percentage);
+                        console.log('Updated progressBar width to:', percentage + "%");
+                    } else {
+                        console.warn('Element #progressBar not found!');
+                    }
+                }
+
+                // Update Target Amount
+                const target = parseFloat(json.targetDanaDarurat);
+                if (!isNaN(target)) {
+                    $("#targetDanaDaruratAmount").text(
+                        target.toLocaleString("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                            minimumFractionDigits: 0
+                        })
+                    );
                 }
 
                 return json.data;

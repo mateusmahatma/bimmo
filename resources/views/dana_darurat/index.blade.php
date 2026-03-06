@@ -34,13 +34,13 @@
                             <div class="mt-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="text-muted small fw-medium">Target achievement progress</span>
-                                    <span class="text-dark small fw-bold">{{ $percentage }}%</span>
+                                    <span class="text-dark small fw-bold"><span id="targetPercentage">{{ $percentage }}</span>%</span>
                                 </div>
                                 <div class="progress rounded-pill bg-light" style="height: 8px;">
-                                    <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-success rounded-pill" id="progressBar" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-2">
-                                    <small class="text-muted">Target: <span class="text-dark fw-semibold">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</span></small>
+                                    <small class="text-muted">Target: <span class="text-dark fw-semibold" id="targetDanaDaruratAmount">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</span></small>
                                     <small class="text-muted italic">Prepared for the unexpected</small>
                                 </div>
                             </div>
