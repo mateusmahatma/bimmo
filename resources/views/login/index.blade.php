@@ -153,7 +153,9 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                const swPath = "{{ asset('sw.js') }}";
+                console.log('PWA Debug: Registering Service Worker at:', swPath);
+                navigator.serviceWorker.register(swPath)
                     .then(reg => {
                         console.log('PWA Debug: Service Worker registered', reg);
                         // Check if manifest is working
@@ -161,7 +163,7 @@
                             console.warn('PWA Debug: Manifest link NOT found in DOM!');
                         }
                     })
-                    .catch(err => console.log('PWA Debug: Service Worker NOT registered', err));
+                    .catch(err => console.error('PWA Debug: Service Worker registration FAILED:', err));
             });
         }
     </script>

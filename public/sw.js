@@ -11,8 +11,15 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('Opened cache');
-            return cache.addAll(ASSETS_TO_CACHE);
+            console.log('PWA Debug: Service Worker caching assets');
+            // Use map to cache individually so one fail doesn't break the whole thing
+            return Promise.allSettled(
+                ASSETS_TO_CACHE.map(url => {
+                    return cache.add(url).catch(err => {
+                        console.warn(`PWA Debug: Failed to cache ${url}:`, err);
+                    });
+                })
+            );
         })
     );
 });
