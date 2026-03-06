@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title','Bimmo')</title>
 
-    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon" media="(prefers-color-scheme: light)">
-    <link rel="icon" href="{{ asset('img/bimmo_dark_favicon.png') }}" type="image/x-icon" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
+
+    <link rel="icon" href="{{ asset('img/bimmo_dark_favicon.png') }}" type="image/png" media="(prefers-color-scheme: dark)">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
