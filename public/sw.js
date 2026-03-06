@@ -9,10 +9,10 @@ const ASSETS_TO_CACHE = [
 
 // Install Service Worker
 self.addEventListener('install', (event) => {
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             console.log('PWA Debug: Service Worker caching assets');
-            // Use map to cache individually so one fail doesn't break the whole thing
             return Promise.allSettled(
                 ASSETS_TO_CACHE.map(url => {
                     return cache.add(url).catch(err => {
@@ -26,12 +26,13 @@ self.addEventListener('install', (event) => {
 
 // Activate Service Worker
 self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
-                        console.log('Service Worker: Clearing Old Cache');
+                        console.log('PWA Debug: Service Worker clearing old cache');
                         return caches.delete(cache);
                     }
                 })
@@ -40,7 +41,7 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch events
+// Fetch events (Required for PWA)
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         fetch(event.request).catch(() => {
