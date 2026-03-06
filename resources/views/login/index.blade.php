@@ -16,6 +16,20 @@
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
+    <script>
+        // PWA early capture script
+        window.deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA Debug: beforeinstallprompt fired early!');
+            e.preventDefault();
+            window.deferredPrompt = e;
+            const btn = document.getElementById('installPwa');
+            if (btn) {
+                btn.style.display = 'block';
+                console.log('PWA Debug: Install button shown via early listener');
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -101,67 +115,39 @@
         })();
     </script>
     <script>
-        let deferredPrompt;
         const installBtn = document.getElementById('installPwa');
 
-        // Check for iOS
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-        console.log('PWA Debug: Checking installation possibility...');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('PWA Debug: beforeinstallprompt fired!');
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            deferredPrompt = e;
-            // Update UI notify the user they can add to home screen
-            if (installBtn) {
+        // Check if already in standalone mode
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('PWA Debug: App is already running in standalone mode');
+        } else {
+            // Check if we captured the prompt early or later
+            if (window.deferredPrompt && installBtn) {
                 installBtn.style.display = 'block';
-                console.log('PWA Debug: Install button displayed');
             }
-        });
-
-        if (isIOS) {
-            console.log('PWA Debug: Running on iOS');
-            // iOS doesn't support beforeinstallprompt, but we can show instructions
-            // You might want to show a message like "To install, tap the share icon and select 'Add to Home Screen'"
         }
 
         if (installBtn) {
-            installBtn.addEventListener('click', (e) => {
-                if (!deferredPrompt) {
-                    console.log('PWA Debug: No deferredPrompt found');
+            installBtn.addEventListener('click', () => {
+                if (!window.deferredPrompt) {
+                    console.log('PWA Debug: No deferredPrompt captured yet');
                     return;
                 }
-                // hide our user interface that shows our A2HS button
                 installBtn.style.display = 'none';
-                // Show the prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then((choiceResult) => {
                     console.log('PWA Debug: User choice outcome:', choiceResult.outcome);
-                    deferredPrompt = null;
+                    window.deferredPrompt = null;
                 });
             });
         }
 
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('PWA Debug: Bimmo was installed');
-            if (installBtn) installBtn.style.display = 'none';
-        });
-
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swPath = "{{ asset('sw.js') }}";
-                console.log('PWA Debug: Registering Service Worker at:', swPath);
-                navigator.serviceWorker.register(swPath)
+                navigator.serviceWorker.register(swPath, { scope: '/' })
                     .then(reg => {
-                        console.log('PWA Debug: Service Worker registered', reg);
-                        // Check if manifest is working
-                        if (!document.querySelector('link[rel="manifest"]')) {
-                            console.warn('PWA Debug: Manifest link NOT found in DOM!');
-                        }
+                        console.log('PWA Debug: Service Worker registered with scope:', reg.scope);
                     })
                     .catch(err => console.error('PWA Debug: Service Worker registration FAILED:', err));
             });
