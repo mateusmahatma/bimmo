@@ -207,8 +207,7 @@
                 navigator.serviceWorker.register(swPath, { scope: '/' })
                     .then(reg => {
                         console.log('PWA Debug: Service Worker registered. Path:', swPath);
-                        // Force update check
-                        reg.update();
+                        reg.update(); // Force update check
                     })
                     .catch(err => console.error('PWA Debug: Service Worker registration FAILED:', err));
             });

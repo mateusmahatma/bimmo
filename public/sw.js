@@ -1,9 +1,9 @@
-const CACHE_NAME = 'bimmo-v1';
+const CACHE_NAME = 'bimmo-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/css/app.css',
     '/js/app.js',
-    '/img/bimmo_favicon.png',
+    '/img/pwa-icon-512.png',
     '/img/bimmo.png'
 ];
 
