@@ -1,0 +1,23 @@
+{
+    "name": "Bimmo - Personal Finance Manager",
+    "short_name": "Bimmo",
+    "description": "Aplikasi Pengelola Keuangan Pribadi yang Cerdas",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#0984e3",
+    "icons": [
+        {
+            "src": "/img/bimmo_favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/img/bimmo_favicon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
