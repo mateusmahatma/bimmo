@@ -6,7 +6,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Bimmo</title>
     <link rel="icon" id="favicon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
-    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
     <meta name="theme-color" content="#0984e3">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,38 +17,44 @@
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
     <script>
-        // PWA Diagnostic Suite
+        // PWA Diagnostic Suite v3
         window.deferredPrompt = null;
-        console.log('PWA Debug: Starting diagnostics...');
+        console.log('PWA Debug: Starting advanced diagnostics...');
 
         // 1. Listen for the install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('PWA Debug: EVENT beforeinstallprompt fired!');
+            console.info('%c PWA Debug: SUCCESS! beforeinstallprompt event fired.', 'background: #222; color: #bada55');
             e.preventDefault();
             window.deferredPrompt = e;
             const btn = document.getElementById('installPwa');
             if (btn) btn.style.display = 'block';
         });
 
-        // 2. Check current mode
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            console.log('PWA Debug: STATUS Running in Standalone (App) mode');
-        }
-
-        // 3. Verify Manifest and Icons after load
+        // 2. Check current mode & existence
         window.addEventListener('load', () => {
-            const manifestLink = document.querySelector('link[rel="manifest"]');
-            if (!manifestLink) {
-                console.error('PWA Debug: ERROR Manifest link missing in head!');
-            } else {
-                console.log('PWA Debug: Manifest link found:', manifestLink.href);
-                fetch(manifestLink.href).then(r => console.log('PWA Debug: Manifest file is reachable')).catch(e => console.error('PWA Debug: Manifest file NOT reachable!', e));
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            if (isStandalone) {
+                console.warn('PWA Debug: STATUS - Aplikasi sudah berjalan dalam mode STANDALONE (sudah terinstal).');
             }
 
-            const img = new Image();
-            img.onload = () => console.log('PWA Debug: Icon file is reachable');
-            img.onerror = () => console.error('PWA Debug: Icon file NOT reachable!');
-            img.src = '/img/pwa-icon-512.png';
+            // 3. Verify Manifest and Icons
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (!manifestLink) {
+                console.error('PWA Debug: ERROR - Manifest link hilang di <head>!');
+            } else {
+                console.log('PWA Debug: Manifest ditemukan:', manifestLink.href);
+                fetch(manifestLink.href)
+                    .then(r => r.json())
+                    .then(json => console.log('PWA Debug: Manifest valid & terbaca:', json.short_name))
+                    .catch(e => console.error('PWA Debug: Manifest TIDAK valid atau tidak terbaca!', e));
+            }
+
+            // 4. Trace why event might not fire
+            setTimeout(() => {
+                if (!window.deferredPrompt && !isStandalone) {
+                    console.info('PWA Debug: INFO - Event belum muncul setelah 10 detik. Kemungkinan: 1) App sudah terinstal di OS, 2) Kriteria PWA belum 100% dipenuhi di tab Application > Manifest, atau 3) Browser butuh interaksi user lebih banyak.');
+                }
+            }, 10000);
         });
     </script>
 </head>
@@ -108,6 +114,31 @@
                 </div>
             </section>
         </div>
+
+        <!-- PWA Manual Install Modal -->
+        <div class="modal fade" id="pwaInstructionModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cara Instal Aplikasi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p id="pwaDeviceText">Browser Anda belum mengizinkan instalasi otomatis.</p>
+                        <div id="pwaInstructions" class="text-start mt-3">
+                            <strong>Instal Manual:</strong>
+                            <ul class="mt-2" id="instructionList">
+                                <li><strong>Chrome/Edge (Android/PC):</strong> Klik titik tiga di pojok kanan atas, lalu cari menu <strong>"Instal aplikasi"</strong> atau <strong>"Add to Home screen"</strong>.</li>
+                                <li><strong>Safari (iOS/iPhone):</strong> Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas), lalu pilih <strong>"Add to Home Screen"</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
@@ -140,17 +171,33 @@
 
         if (installBtn) {
             installBtn.addEventListener('click', () => {
-                if (!window.deferredPrompt) {
-                    alert('Browser belum mengizinkan instalasi. Mohon tunggu beberapa detik atau pastikan Anda menggunakan Chrome/Edge di Android/Windows.');
-                    console.warn('PWA Debug: Clicked install but deferredPrompt is null');
-                    return;
+                if (window.deferredPrompt) {
+                    // Use the automatic prompt if available
+                    window.deferredPrompt.prompt();
+                    window.deferredPrompt.userChoice.then((choiceResult) => {
+                        console.log('PWA Debug: User choice outcome:', choiceResult.outcome);
+                        window.deferredPrompt = null;
+                        if (choiceResult.outcome === 'accepted') {
+                            installBtn.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Show manual instructions modal as fallback
+                    console.warn('PWA Debug: Using manual fallback');
+                    const modal = new bootstrap.Modal(document.getElementById('pwaInstructionModal'));
+                    
+                    // Detect device for specific message
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    const deviceText = document.getElementById('pwaDeviceText');
+                    const list = document.getElementById('instructionList');
+                    
+                    if (isIOS) {
+                        deviceText.innerText = "Khusus pengguna iPhone/iPad, instalasi harus dilakukan secara manual melalui Safari.";
+                        list.innerHTML = '<li>Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas) di bawah layar.</li><li>Gulir ke bawah dan pilih <strong>"Add to Home Screen"</strong>.</li>';
+                    }
+                    
+                    modal.show();
                 }
-                installBtn.style.display = 'none';
-                window.deferredPrompt.prompt();
-                window.deferredPrompt.userChoice.then((choiceResult) => {
-                    console.log('PWA Debug: User choice outcome:', choiceResult.outcome);
-                    window.deferredPrompt = null;
-                });
             });
         }
 
@@ -160,6 +207,8 @@
                 navigator.serviceWorker.register(swPath, { scope: '/' })
                     .then(reg => {
                         console.log('PWA Debug: Service Worker registered. Path:', swPath);
+                        // Force update check
+                        reg.update();
                     })
                     .catch(err => console.error('PWA Debug: Service Worker registration FAILED:', err));
             });
