@@ -62,7 +62,7 @@
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <button id="installPwa" class="btn btn-outline-primary btn-sm w-100" style="display: none;">
+                                        <button id="installPwa" class="btn btn-primary tombol-login w-100" style="display: none;">
                                             Install App
                                         </button>
                                     </div>
