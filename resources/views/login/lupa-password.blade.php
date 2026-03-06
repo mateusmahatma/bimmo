@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Forgot Password - BIMMO</title>
-    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
+    <link rel="icon" id="favicon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -178,6 +178,25 @@
                 });
             });
         });
+    </script>
+    <script>
+        (function() {
+            const setTheme = (theme) => {
+                const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                // Dynamic Favicon Switching
+                const favicon = document.getElementById('favicon');
+                if (favicon) {
+                    favicon.setAttribute('href', isDark ? "{{ asset('img/bimmo_dark_favicon.png') }}" : "{{ asset('img/bimmo_favicon.png') }}");
+                }
+            }
+
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            setTheme(prefersDark.matches ? 'dark' : 'light');
+
+            prefersDark.addEventListener('change', event => {
+                setTheme(event.matches ? 'dark' : 'light');
+            });
+        })();
     </script>
 </body>
 

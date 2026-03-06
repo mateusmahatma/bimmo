@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title','Bimmo')</title>
 
-    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
-
-    <link rel="icon" href="{{ asset('img/bimmo_dark_favicon.png') }}" type="image/png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" id="favicon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -28,10 +26,13 @@
     <script>
         (function() {
             const setTheme = (theme) => {
-                if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-bs-theme', 'dark');
-                } else {
-                    document.documentElement.setAttribute('data-bs-theme', theme);
+                const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
+
+                // Dynamic Favicon Switching
+                const favicon = document.getElementById('favicon');
+                if (favicon) {
+                    favicon.setAttribute('href', isDark ? "{{ asset('img/bimmo_dark_favicon.png') }}" : "{{ asset('img/bimmo_favicon.png') }}");
                 }
             }
 

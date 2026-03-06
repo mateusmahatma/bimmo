@@ -6,12 +6,8 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
     <title>Register Account - BIMMO</title>
-    <link rel="icon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/x-icon">
-
-    <meta content="" name="description" />
-    <meta content="" name="keywords" />
-
-    <link href="/img/bimmo_icon.png" rel="icon" />
+    <link rel="icon" id="favicon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="/img/apple-touch-icon.png" rel="apple-touch-icon" />
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
@@ -138,6 +134,25 @@
     <script src="{{ asset('js/main.js') }}"></script>
     <script src="{{ asset('js/daftar.js') }}"></script>
 
+    <script>
+        (function() {
+            const setTheme = (theme) => {
+                const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                // Dynamic Favicon Switching
+                const favicon = document.getElementById('favicon');
+                if (favicon) {
+                    favicon.setAttribute('href', isDark ? "{{ asset('img/bimmo_dark_favicon.png') }}" : "{{ asset('img/bimmo_favicon.png') }}");
+                }
+            }
+
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            setTheme(prefersDark.matches ? 'dark' : 'light');
+
+            prefersDark.addEventListener('change', event => {
+                setTheme(event.matches ? 'dark' : 'light');
+            });
+        })();
+    </script>
 </body>
 
 </html>
