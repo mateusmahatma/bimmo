@@ -6,6 +6,12 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Bimmo</title>
     <link rel="icon" id="favicon" href="{{ asset('img/bimmo_favicon.png') }}" type="image/png">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0984e3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bimmo">
+    <link rel="apple-touch-icon" href="{{ asset('img/bimmo_favicon.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
@@ -54,6 +60,12 @@
                                             <p class="small mb-0">Don't have an account? <a href="/daftar">Create Account</a></p>
                                         </div>
                                     </form>
+                                    <hr>
+                                    <div class="text-center">
+                                        <button id="installPwa" class="btn btn-outline-primary btn-sm w-100" style="display: none;">
+                                            Install App
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -87,6 +99,71 @@
                 setTheme(event.matches ? 'dark' : 'light');
             });
         })();
+    </script>
+    <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById('installPwa');
+
+        // Check for iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        console.log('PWA Debug: Checking installation possibility...');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA Debug: beforeinstallprompt fired!');
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI notify the user they can add to home screen
+            if (installBtn) {
+                installBtn.style.display = 'block';
+                console.log('PWA Debug: Install button displayed');
+            }
+        });
+
+        if (isIOS) {
+            console.log('PWA Debug: Running on iOS');
+            // iOS doesn't support beforeinstallprompt, but we can show instructions
+            // You might want to show a message like "To install, tap the share icon and select 'Add to Home Screen'"
+        }
+
+        if (installBtn) {
+            installBtn.addEventListener('click', (e) => {
+                if (!deferredPrompt) {
+                    console.log('PWA Debug: No deferredPrompt found');
+                    return;
+                }
+                // hide our user interface that shows our A2HS button
+                installBtn.style.display = 'none';
+                // Show the prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    console.log('PWA Debug: User choice outcome:', choiceResult.outcome);
+                    deferredPrompt = null;
+                });
+            });
+        }
+
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA Debug: Bimmo was installed');
+            if (installBtn) installBtn.style.display = 'none';
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        console.log('PWA Debug: Service Worker registered', reg);
+                        // Check if manifest is working
+                        if (!document.querySelector('link[rel="manifest"]')) {
+                            console.warn('PWA Debug: Manifest link NOT found in DOM!');
+                        }
+                    })
+                    .catch(err => console.log('PWA Debug: Service Worker NOT registered', err));
+            });
+        }
     </script>
 </body>
 
