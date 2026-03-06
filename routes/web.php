@@ -179,6 +179,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/subscription/webhook', [SubscriptionController::class , 'webhook'])->name('subscription.webhook');
 
         Route::resource('hasil_proses_anggaran', HasilProsesAnggaranController::class);
+        Route::get('/panduan', [App\Http\Controllers\UserGuideController::class , 'index'])->name('panduan.index');
     });
 
 // App Webhook

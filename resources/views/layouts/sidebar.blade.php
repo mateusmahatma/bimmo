@@ -136,6 +136,13 @@
     <div class="sidebar-bottom mt-auto border-top pt-2">
         <ul class="nav flex-column">
             <li class="nav-item">
+                <a class="nav-link {{ request()->is('panduan*') ? 'active' : '' }}"
+                    href="{{ route('panduan.index') }}">
+                    <i class="bi bi-book me-2"></i>
+                    <span>User Guide</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link"
                     href="#"
                     data-bs-toggle="modal"
