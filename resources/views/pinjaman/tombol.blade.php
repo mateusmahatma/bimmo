@@ -1,11 +1,23 @@
-<div class="d-flex justify-content-center gap-1">
-    <a href="{{ route('pinjaman.show', $pinjaman->hash) }}" class="btn btn-sm btn-outline-info rounded-circle" title="Detail" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-        <i class="bi bi-eye"></i>
-    </a>
-    <a href="#" class="btn btn-sm btn-outline-primary rounded-circle tombol-edit-pinjaman" data-id="{{ $pinjaman->hash }}" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-        <i class="bi bi-pencil"></i>
-    </a>
-    <a href="#" class="btn btn-sm btn-outline-danger rounded-circle tombol-del-pinjaman" data-id="{{ $pinjaman->hash }}" title="Delete" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-        <i class="bi bi-trash"></i>
-    </a>
+<div class="dropdown text-center">
+    <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px; padding: 0;">
+        <i class="bi bi-three-dots-vertical"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+        <li>
+            <a class="dropdown-item py-2" href="{{ route('pinjaman.show', $pinjaman->hash) }}">
+                <i class="bi bi-eye me-2 text-info"></i> Detail
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item py-2 tombol-edit-pinjaman" href="#" data-id="{{ $pinjaman->hash }}">
+                <i class="bi bi-pencil me-2 text-primary"></i> Edit
+            </a>
+        </li>
+        <li><hr class="dropdown-divider opacity-50"></li>
+        <li>
+            <a class="dropdown-item py-2 text-danger tombol-del-pinjaman" href="#" data-id="{{ $pinjaman->hash }}">
+                <i class="bi bi-trash me-2"></i> Delete
+            </a>
+        </li>
+    </ul>
 </div>
