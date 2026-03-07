@@ -6,7 +6,14 @@ $(document).ready(function () {
         ajax: '/tujuan-keuangan',
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
-            { data: 'nama_target', name: 'nama_target' },
+            {
+                data: 'nama_target',
+                name: 'nama_target',
+                className: 'goal-name-cell',
+                render: function (data) {
+                    return `<span title="${data}">${data}</span>`;
+                }
+            },
             { data: 'kategori', name: 'kategori' },
             {
                 data: 'nominal_target',
