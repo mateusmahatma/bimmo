@@ -15,6 +15,17 @@
     .priority-high { border-left: 5px solid #dc3545; }
     .priority-medium { border-left: 5px solid #ffc107; }
     .priority-low { border-left: 5px solid #0dcaf0; }
+
+    /* Improved Table Styling */
+    #goalsTable th, #goalsTable td {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 </style>
 @endpush
 
