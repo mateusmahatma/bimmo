@@ -21,14 +21,6 @@
         white-space: nowrap;
         vertical-align: middle;
     }
-
-    .goal-name-cell {
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        cursor: help;
-    }
     
     .table-responsive {
         overflow-x: auto;
