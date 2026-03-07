@@ -7,8 +7,8 @@
             <!-- Corporate Header Section -->
             <div class="text-center mb-5 pb-2">
                 <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3 fw-semibold">BIMMO USER GUIDE</span>
-                <h1 class="display-5 fw-bold text-navy mb-3">Selamat Datang di Bimmo</h1>
-                <p class="lead text-muted mx-auto" style="max-width: 700px;">Panduan komprehensif bagi Anda untuk mengoptimalkan pengelolaan keuangan pribadi dengan efisien, transparan, dan terukur.</p>
+                <h1 class="display-5 fw-bold text-navy mb-3">Welcome to Bimmo</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">A comprehensive guide to help you optimize your personal financial management with efficiency, transparency, and measurable results.</p>
                 <div class="mt-4">
                     <hr class="mx-auto" style="width: 60px; height: 3px; background-color: #0d6efd; border: none; border-radius: 2px;">
                 </div>
@@ -28,8 +28,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-8 p-4 p-lg-5">
-                                    <h4 class="fw-bold text-navy mb-3">Pencatatan Arus Kas</h4>
-                                    <p class="text-muted mb-4">Langkah awal yang krusial adalah membangun disiplin dalam mencatat setiap aktivitas keuangan. Melalui fitur ini, Anda dapat memantau likuiditas Anda secara real-time.</p>
+                                    <h4 class="fw-bold text-navy mb-3">Cash Flow Recording</h4>
+                                    <p class="text-muted mb-4">The first crucial step is building discipline in recording every financial activity. Through this feature, you can monitor your liquidity in real-time.</p>
                                     
                                     <div class="row g-3">
                                         <div class="col-sm-6">
@@ -38,8 +38,8 @@
                                                     <i class="bi bi-graph-up-arrow"></i>
                                                 </div>
                                                 <div>
-                                                    <span class="d-block fw-bold text-dark mb-0">Pemasukan</span>
-                                                    <small class="text-muted">Kelola sumber pendapatan</small>
+                                                    <span class="d-block fw-bold text-dark mb-0">Income</span>
+                                                    <small class="text-muted">Manage revenue sources</small>
                                                 </div>
                                             </a>
                                         </div>
@@ -49,8 +49,8 @@
                                                     <i class="bi bi-graph-down-arrow"></i>
                                                 </div>
                                                 <div>
-                                                    <span class="d-block fw-bold text-dark mb-0">Pengeluaran</span>
-                                                    <small class="text-muted">Pantau beban biaya</small>
+                                                    <span class="d-block fw-bold text-dark mb-0">Expense</span>
+                                                    <small class="text-muted">Monitor cost burdens</small>
                                                 </div>
                                             </a>
                                         </div>
@@ -69,8 +69,8 @@
                                 <div class="step-badge me-3">02</div>
                                 <h5 class="fw-bold text-navy mb-0">Asset Allocation</h5>
                             </div>
-                            <h5 class="fw-bold mb-3"><a href="{{ route('dompet.index') }}" target="_blank" class="text-decoration-none text-navy hover-blue">Pengelolaan Dompet</a></h5>
-                            <p class="text-muted small mb-0">Strukturisasi aset Anda ke dalam berbagai kategori likuiditas seperti Kas, Rekening Bank, atau Digital Wallet untuk akurasi pelaporan yang lebih tinggi.</p>
+                            <h5 class="fw-bold mb-3"><a href="{{ route('dompet.index') }}" target="_blank" class="text-decoration-none text-navy hover-blue">Wallet Management</a></h5>
+                            <p class="text-muted small mb-0">Sructure your assets into various liquidity categories such as Cash, Bank Accounts, or Digital Wallets for higher reporting accuracy.</p>
                         </div>
                     </div>
                 </div>
@@ -82,8 +82,8 @@
                                 <div class="step-badge me-3">03</div>
                                 <h5 class="fw-bold text-navy mb-0">Risk Management</h5>
                             </div>
-                            <h5 class="fw-bold mb-3"><a href="{{ route('dana-darurat.index') }}" target="_blank" class="text-decoration-none text-navy hover-blue">Dana Darurat</a></h5>
-                            <p class="text-muted small mb-0">Mitigasi risiko finansial dengan membangun cadangan dana. Sistem akan membantu kalkulasi target berdasarkan profil pengeluaran Anda.</p>
+                            <h5 class="fw-bold mb-3"><a href="{{ route('dana-darurat.index') }}" target="_blank" class="text-decoration-none text-navy hover-blue">Emergency Fund</a></h5>
+                            <p class="text-muted small mb-0">Mitigate financial risks by building a cash reserve. The system will help calculate targets based on your spending profile.</p>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                             <div class="row align-items-center">
                                 <div class="col-lg-7">
                                     <h4 class="fw-bold text-dark mb-3">Monitoring & Budgeting</h4>
-                                    <p class="text-muted mb-4 mb-lg-0">Implementasikan kontrol anggaran yang ketat untuk memastikan operasional keuangan Anda tetap berada dalam koridor yang direncanakan.</p>
+                                    <p class="text-muted mb-4 mb-lg-0">Implement strict budget controls to ensure your financial operations stay within planned corridors.</p>
                                 </div>
                                 <div class="col-lg-5">
                                     <div class="list-group list-group-flush border rounded-3 overflow-hidden">
@@ -121,28 +121,28 @@
                 <div class="col-12 mt-2">
                     <div class="p-4 bg-light rounded-4 border-style-dashed">
                         <h5 class="fw-bold text-navy mb-4 d-flex align-items-center">
-                            <i class="bi bi-grid-fill me-2 opacity-50"></i> Fitur Ekosistem Lanjutan
+                            <i class="bi bi-grid-fill me-2 opacity-50"></i> Advanced Ecosystem Features
                         </h5>
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <a href="{{ route('tujuan-keuangan.index') }}" target="_blank" class="tool-card p-3 rounded-3 bg-white border text-decoration-none d-block">
                                     <div class="mb-2 text-primary opacity-75"><i class="bi bi-bullseye fs-4"></i></div>
                                     <span class="fw-bold text-navy d-block mb-1">Financial Goals</span>
-                                    <small class="text-muted">Perencanaan tujuan masa depan</small>
+                                    <small class="text-muted">Future goal planning</small>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="{{ route('aset.index') }}" target="_blank" class="tool-card p-3 rounded-3 bg-white border text-decoration-none d-block">
                                     <div class="mb-2 text-primary opacity-75"><i class="bi bi-box-seam fs-4"></i></div>
                                     <span class="fw-bold text-navy d-block mb-1">Inventory Assets</span>
-                                    <small class="text-muted">Manajemen aset tetap</small>
+                                    <small class="text-muted">Fixed asset management</small>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="{{ route('pinjaman.index') }}" target="_blank" class="tool-card p-3 rounded-3 bg-white border text-decoration-none d-block">
                                     <div class="mb-2 text-primary opacity-75"><i class="bi bi-arrow-down-up fs-4"></i></div>
                                     <span class="fw-bold text-navy d-block mb-1">Liability</span>
-                                    <small class="text-muted">Pemantauan kewajiban & hutang</small>
+                                    <small class="text-muted">Obligation & debt tracking</small>
                                 </a>
                             </div>
                         </div>
