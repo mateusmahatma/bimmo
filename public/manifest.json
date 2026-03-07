@@ -27,7 +27,7 @@
             "purpose": "any"
         },
         {
-            "src": "/img/pwa-icon-512.png",
+            "src": "/img/pwa-maskable-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
