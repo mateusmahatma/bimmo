@@ -2,11 +2,62 @@
 
 @section('title', 'Wallet')
 
+@push('css')
+<style>
+    /* Header Enhancements */
+    .pagetitle {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.75rem;
+    }
+    .pagetitle h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        color: #2d3436;
+    }
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+    .breadcrumb-item a {
+        color: #636e72;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-item a:hover {
+        color: #0984e3;
+    }
+    .breadcrumb-item.active {
+        color: #0984e3;
+        font-weight: 600;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "\F285"; /* bi-chevron-right */
+        font-family: "bootstrap-icons";
+        font-size: 0.65rem;
+        color: #b2bec3;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    [data-bs-theme="dark"] .pagetitle {
+        border-bottom: 1px solid #2d2d2d;
+    }
+    [data-bs-theme="dark"] .pagetitle h1 {
+        color: #e0e0e0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item a {
+        color: #a0a0a0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item.active {
+        color: #60a5fa;
+    }
+</style>
+@endpush
+
 @section('container')
 <div class="pagetitle mb-4">
-    <h1>Wallet</h1>
+    <h1 class="fw-bold mb-1">Wallet</h1>
     <nav>
-        <ol class="breadcrumb">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item active">Wallet</li>
         </ol>
@@ -30,29 +81,35 @@
 
 <section class="section">
     <div class="row">
-        <!-- Total Balance Card -->
-        <div class="col-12 mb-4">
-            <div class="card border-0 shadow-sm border-start border-5 border-primary bg-white" style="border-radius: 12px;">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <div class="d-flex align-items-center mb-1">
-                                <h6 class="text-secondary text-uppercase fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1.2px;">Total Current Balance</h6>
-                            </div>
-                            <h1 class="display-6 fw-bold mb-0 text-dark">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h1>
-                            <p class="text-muted small mt-2 mb-0">
-                                <i class="bi bi-info-circle me-1"></i> Accumulated balance from all active wallet accounts.
-                            </p>
-                        </div>
-                        <div class="col-md-4 text-end d-none d-md-block">
-                            <div class="icon-shape bg-primary bg-opacity-10 text-primary rounded-4 p-4 d-inline-flex">
-                                <i class="bi bi-bank fs-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<style>
+    /* Custom style for summary card - clean corporate look matching Budget menu */
+    .card-summary {
+        border-radius: 12px;
+        border: 0;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+        background-color: #fff;
+    }
+    .balance-amount {
+        color: #4154f1; /* primary color */
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+</style>
+
+<div class="col-lg-12 mb-4">
+    <div class="card card-summary shadow-sm">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">Total Current Balance</h5>
+                <p class="text-muted small mb-0">Combined balance from all of your active wallet accounts.</p>
+            </div>
+            <div class="text-end">
+                <h2 class="balance-amount mb-0">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- Wallets Grid -->
         <div class="col-12">
@@ -100,7 +157,7 @@
                 @if(count($wallets) > 0)
                     @foreach($wallets as $wallet)
                     <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card wallet-card border-0 shadow-sm h-100 position-relative" style="border-radius: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(0,0,0,0.05) !important;">
+                        <div class="card wallet-card border-0 shadow-sm h-100 position-relative" style="border-radius: 16px; border: 1px solid rgba(0,0,0,0.05) !important;">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-start justify-content-between mb-3">
                                     <div class="wallet-icon-wrapper rounded-4 d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary" style="width: 56px; height: 56px;">
@@ -152,9 +209,6 @@
                 @endif
             </div>
         </div>
-    </div>
-</section>
-    </div>
 </section>
 
 <!-- Add Wallet Modal -->
@@ -186,32 +240,10 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <input type="hidden" name="ikon" value="wallet">
                         <label class="form-label small fw-bold text-muted">Or Attach Custom Image/Icon</label>
                         <input type="file" name="custom_ikon" class="form-control rounded-3" accept="image/*">
                         <div class="form-text small">Maximum 2MB (Jpeg, Png, Svg, Gif)</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Select Icon</label>
-                        <div class="row g-2">
-                            @php
-                                $icons = ['bca', 'mandiri', 'bni', 'bri', 'dana', 'ovo', 'gopay', 'shopeepay', 'linkaja', 'wallet'];
-                            @endphp
-                            @foreach($icons as $icon)
-                            <div class="col-3">
-                                <label class="icon-selector w-100 h-100">
-                                    <input type="radio" name="ikon" value="{{ $icon }}" class="d-none">
-                                    <div class="card border border-2 rounded-3 p-2 text-center cursor-pointer">
-                                        @if($icon == 'wallet')
-                                            <i class="bi bi-wallet2 fs-4"></i>
-                                        @else
-                                            <img src="{{ asset('img/icons/' . $icon . '.png') }}" alt="{{ $icon }}" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.outerHTML='<i class=\'bi bi-wallet2\'></i>'">
-                                        @endif
-                                        <div class="small mt-1 text-capitalize" style="font-size: 0.6rem;">{{ $icon }}</div>
-                                    </div>
-                                </label>
-                            </div>
-                            @endforeach
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -221,7 +253,6 @@
             </form>
         </div>
     </div>
-</div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -264,23 +295,12 @@
 </script>
 
 <style>
-    .icon-selector input[type="radio"]:checked + .card {
-        border-color: #4154f1 !important;
-        background-color: #f0f2ff;
-    }
     .cursor-pointer {
         cursor: pointer;
     }
     .wallet-card:hover {
-        transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
         border-color: #4154f1 !important;
-    }
-    .wallet-card:hover .transition-icon {
-        transform: translateX(5px);
-    }
-    .transition-icon {
-        transition: transform 0.3s ease;
     }
 </style>
 @endsection
