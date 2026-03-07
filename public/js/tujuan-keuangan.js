@@ -4,27 +4,23 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: '/tujuan-keuangan',
-        responsive: true,
-        autoWidth: false,
         columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center', responsivePriority: 1 },
-            { data: 'nama_target', name: 'nama_target', responsivePriority: 1 },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
+            { data: 'nama_target', name: 'nama_target' },
             { data: 'kategori', name: 'kategori' },
             {
                 data: 'nominal_target',
                 name: 'nominal_target',
                 render: function (data) {
                     return 'Rp ' + new Intl.NumberFormat('id-ID').format(data);
-                },
-                responsivePriority: 2
+                }
             },
             {
                 data: 'nominal_terkumpul',
                 name: 'nominal_terkumpul',
                 render: function (data) {
                     return 'Rp ' + new Intl.NumberFormat('id-ID').format(data);
-                },
-                responsivePriority: 1
+                }
             },
             {
                 data: 'progress',
@@ -37,13 +33,12 @@ $(document).ready(function () {
                     else if (data < 25) color = 'bg-danger';
 
                     return `
-                        <div class="progress" style="height: 10px; min-width: 80px; margin: auto;">
+                        <div class="progress" style="height: 10px; width: 100px; margin: auto;">
                             <div class="progress-bar ${color}" role="progressbar" style="width: ${data}%" aria-valuenow="${data}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <small class="text-muted d-block mt-1">${data}%</small>
+                        <small class="text-muted">${data}%</small>
                     `;
-                },
-                responsivePriority: 1
+                }
             },
             { data: 'sisa_waktu', name: 'sisa_waktu' },
             {
@@ -62,10 +57,10 @@ $(document).ready(function () {
                     if (data === 'High') badge = 'bg-danger';
                     if (data === 'Medium') badge = 'bg-warning text-dark';
                     if (data === 'Low') badge = 'bg-info text-dark';
-                    return `< span class="badge ${badge}" > ${data}</span > `;
+                    return `<span class="badge ${badge}">${data}</span>`;
                 }
             },
-            { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center', responsivePriority: 1 }
+            { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center' }
         ]
     });
 
@@ -86,11 +81,11 @@ $(document).ready(function () {
                     recText = "Deadline must be in the future.";
                 } else {
                     const perDay = target / days;
-                    recText = `You need to save < strong > Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perDay))} /day</strong > to reach this goal.`;
+                    recText = `You need to save <strong>Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perDay))}/day</strong> to reach this goal.`;
                 }
             } else {
                 const perMonth = target / months;
-                recText = `You need to save < strong > Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perMonth))} /month</strong > to reach this goal.`;
+                recText = `You need to save <strong>Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perMonth))}/month</strong> to reach this goal.`;
             }
 
             $('#recommendationText').html(recText);
@@ -126,7 +121,7 @@ $(document).ready(function () {
 
 function updateProgress(id, name) {
     $('#goalNameProgress').text(name);
-    $('#formUpdateProgress').attr('action', `/ tujuan - keuangan / ${id}/progress`);
+    $('#formUpdateProgress').attr('action', `/tujuan-keuangan/${id}/progress`);
     $('#formUpdateProgress')[0].reset(); // Reset form field
     $('#modalProgress').modal('show');
 }
