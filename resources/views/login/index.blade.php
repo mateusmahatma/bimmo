@@ -124,9 +124,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <p id="pwaDeviceText">Browser Anda belum mengizinkan instalasi otomatis.</p>
                         <div id="pwaInstructions" class="text-start mt-3">
-                            <strong>Instal Manual:</strong>
                             <ul class="mt-2" id="instructionList">
                                 <li><strong>Chrome/Edge (Android/PC):</strong> Klik titik tiga di pojok kanan atas, lalu cari menu <strong>"Instal aplikasi"</strong> atau <strong>"Add to Home screen"</strong>.</li>
                                 <li><strong>Safari (iOS/iPhone):</strong> Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas), lalu pilih <strong>"Add to Home Screen"</strong>.</li>
