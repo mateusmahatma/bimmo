@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Add New Asset')
+@section('title', __('Add New Asset'))
 
 @push('css')
 <style>
@@ -55,12 +55,12 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Add New Asset</h1>
+    <h1 class="fw-bold mb-1">{{ __('Add New Asset') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('aset.index') }}">Assets</a></li>
-            <li class="breadcrumb-item active">Add Asset</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('aset.index') }}">{{ __('Assets') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Add Asset') }}</li>
         </ol>
     </nav>
 </div>
@@ -85,88 +85,88 @@
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Asset Code <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Asset Code') }} <span class="text-danger">*</span></label>
                                 <input type="text" name="kode_aset" class="form-control" value="{{ old('kode_aset', 'AST-'.time()) }}" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Asset Name <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Asset Name') }} <span class="text-danger">*</span></label>
                                 <input type="text" name="nama_aset" class="form-control" value="{{ old('nama_aset') }}" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Category') }} <span class="text-danger">*</span></label>
                                 <select name="kategori" class="form-select" required>
-                                    <option value="">Select Category</option>
+                                    <option value="">{{ __('Select Category') }}</option>
                                     <option value="IT" {{ old('kategori') == 'IT' ? 'selected' : '' }}>IT</option>
-                                    <option value="Kendaraan" {{ old('kategori') == 'Kendaraan' ? 'selected' : '' }}>Kendaraan</option>
-                                    <option value="Furnitur" {{ old('kategori') == 'Furnitur' ? 'selected' : '' }}>Furnitur</option>
-                                    <option value="Elektronik" {{ old('kategori') == 'Elektronik' ? 'selected' : '' }}>Elektronik</option>
-                                    <option value="Lainnya" {{ old('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                    <option value="Kendaraan" {{ old('kategori') == 'Kendaraan' ? 'selected' : '' }}>{{ __('Vehicle') }}</option>
+                                    <option value="Furnitur" {{ old('kategori') == 'Furnitur' ? 'selected' : '' }}>{{ __('Furniture') }}</option>
+                                    <option value="Elektronik" {{ old('kategori') == 'Elektronik' ? 'selected' : '' }}>{{ __('Electronic') }}</option>
+                                    <option value="Lainnya" {{ old('kategori') == 'Lainnya' ? 'selected' : '' }}>{{ __('Others') }}</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Brand / Model</label>
+                                <label class="form-label fw-bold">{{ __('Brand / Model') }}</label>
                                 <input type="text" name="merk_model" class="form-control" value="{{ old('merk_model') }}">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Serial Number</label>
+                                <label class="form-label fw-bold">{{ __('Serial Number') }}</label>
                                 <input type="text" name="nomor_seri" class="form-control" value="{{ old('nomor_seri') }}">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Purchase Date <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Purchase Date') }} <span class="text-danger">*</span></label>
                                 <input type="date" name="tanggal_pembelian" class="form-control" value="{{ old('tanggal_pembelian', date('Y-m-d')) }}" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Purchase Price <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Purchase Price') }} <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="number" name="harga_beli" class="form-control" value="{{ old('harga_beli') }}" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Useful Life (Years) <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Useful Life (Years)') }} <span class="text-danger">*</span></label>
                                 <input type="number" name="masa_pakai" class="form-control" value="{{ old('masa_pakai', 5) }}" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Residual Value (Nilai Sisa)</label>
+                                <label class="form-label fw-bold">{{ __('Residual Value (Nilai Sisa)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="number" name="nilai_sisa" class="form-control" value="{{ old('nilai_sisa', 0) }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Warranty Until</label>
+                                <label class="form-label fw-bold">{{ __('Warranty Until') }}</label>
                                 <input type="date" name="garansi_sampai" class="form-control" value="{{ old('garansi_sampai') }}">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Condition <span class="text-danger">*</span></label>
+                                <label class="form-label fw-bold">{{ __('Condition') }} <span class="text-danger">*</span></label>
                                 <select name="kondisi" class="form-select" required>
-                                    <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                    <option value="Kurang Baik" {{ old('kondisi') == 'Kurang Baik' ? 'selected' : '' }}>Kurang Baik</option>
-                                    <option value="Rusak Berat" {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
-                                    <option value="Hilang" {{ old('kondisi') == 'Hilang' ? 'selected' : '' }}>Hilang</option>
+                                    <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>{{ __('Good') }}</option>
+                                    <option value="Kurang Baik" {{ old('kondisi') == 'Kurang Baik' ? 'selected' : '' }}>{{ __('Fair') }}</option>
+                                    <option value="Rusak Berat" {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>{{ __('Bad') }}</option>
+                                    <option value="Hilang" {{ old('kondisi') == 'Hilang' ? 'selected' : '' }}>{{ __('Lost') }}</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Location</label>
+                                <label class="form-label fw-bold">{{ __('Location') }}</label>
                                 <input type="text" name="lokasi" class="form-control" value="{{ old('lokasi') }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">PIC (Person in Charge)</label>
+                                <label class="form-label fw-bold">{{ __('PIC (Person in Charge)') }}</label>
                                 <input type="text" name="pic" class="form-control" value="{{ old('pic') }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Asset Photo</label>
+                                <label class="form-label fw-bold">{{ __('Asset Photo') }}</label>
                                 <input type="file" name="foto" class="form-control" accept="image/*">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Purchase Invoice / Warranty Doc</label>
+                                <label class="form-label fw-bold">{{ __('Purchase Invoice / Warranty Doc') }}</label>
                                 <input type="file" name="dokumen" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                             </div>
                         </div>
 
                         <div class="mt-4 d-flex justify-content-end gap-2">
-                            <a href="{{ route('aset.index') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">Save Asset</button>
+                            <a href="{{ route('aset.index') }}" class="btn btn-light rounded-pill px-4">{{ __('Cancel') }}</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">{{ __('Save Asset') }}</button>
                         </div>
                     </form>
                 </div>

@@ -20,6 +20,9 @@ $(document).ready(function () {
             url: '/pemasukan',
             type: 'GET',
         },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+        },
         columns: [
             {
                 data: 'id',
@@ -105,23 +108,23 @@ $(document).ready(function () {
         const nama = $('#nama').val().trim();
 
         if (nama === '') {
-            showToast('Name is required!', 'danger');
+            showToast('Nama kategori harus diisi!', 'danger');
             return;
         }
 
-        $('.tombol-simpan-pemasukan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing ...');
+        $('.tombol-simpan-pemasukan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Sedang memproses...');
 
         $.ajax({
             url,
             type: method,
             data: { nama },
             success: () => {
-                showToast('Data saved successfully', 'success');
+                showToast('Data berhasil disimpan', 'success');
                 $('#pemasukanModal').modal('hide');
                 table.ajax.reload();
             },
             complete: () => {
-                $('.tombol-simpan-pemasukan').prop('disabled', false).html('Save');
+                $('.tombol-simpan-pemasukan').prop('disabled', false).html('Simpan');
             }
         });
     }
@@ -157,14 +160,14 @@ $(document).ready(function () {
         const id = $(this).data('id');
 
         Swal.fire({
-            title: 'Are you sure?',
-            html: 'You will not be able to recover this data!',
+            title: 'Apakah Anda yakin?',
+            html: 'Data yang dihapus tidak dapat dikembalikan!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
             customClass: { popup: 'dark-mode' }
         }).then((result) => {
             if (result.isConfirmed) {
@@ -173,11 +176,11 @@ $(document).ready(function () {
                     type: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: () => {
-                        showToast('Data deleted successfully', 'success');
+                        showToast('Data berhasil dihapus', 'success');
                         table.ajax.reload();
                     },
                     error: () => {
-                        showToast('Delete failed, data might be in use', 'danger');
+                        showToast('Gagal menghapus, data mungkin sedang digunakan', 'danger');
                         table.ajax.reload();
                     }
                 });
@@ -227,19 +230,19 @@ $(document).ready(function () {
         if (ids.length === 0) return;
 
         Swal.fire({
-            title: `Delete ${ids.length} categories?`,
-            text: "You won't be able to revert this!",
+            title: `Hapus ${ids.length} kategori?`,
+            text: "Anda tidak akan dapat mengembalikan ini!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete selected!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Ya, hapus yang dipilih!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Show loading on button
                 const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
 
                 $.ajax({
                     url: '/pemasukan/bulk-delete',
@@ -253,7 +256,7 @@ $(document).ready(function () {
                         $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
                     },
                     error: function (xhr) {
-                        showToast('Failed to delete selected categories.', 'danger');
+                        showToast('Gagal menghapus kategori yang dipilih.', 'danger');
                         $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
                     }
                 });

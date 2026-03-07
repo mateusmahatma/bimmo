@@ -35,11 +35,11 @@
                     <div class="alert alert-warning fade show rounded-3 mb-3 border-0 text-center py-2 sticky-top mt-2" role="alert" style="background: #fff3cd; color: #856404; font-size: 0.9rem; z-index: 1020; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                         <i class="bi bi-clock-history me-2"></i>
                         @if($remainingDays == 0)
-                            Your subscription/trial expires <strong>Today</strong>.
+                            {{ __('Your subscription/trial expires') }} <strong>{{ __('Today') }}</strong>.
                         @else
-                            Your subscription/trial expires in <strong>{{ $remainingDays }} days</strong>.
+                            {{ __('Your subscription/trial expires in') }} <strong>{{ $remainingDays }} {{ __('days') }}</strong>.
                         @endif
-                        <a href="{{ route('profil.index') }}" class="alert-link text-decoration-underline ms-2">Renew now</a> to maintain access.
+                        <a href="{{ route('profil.index') }}" class="alert-link text-decoration-underline ms-2">{{ __('Renew now') }}</a> to maintain access.
                     </div>
                 @endif
             @endif
@@ -67,11 +67,11 @@
                             <i class="bi bi-lock-fill fs-1"></i>
                         </div>
                     </div>
-                    <h3 class="fw-bold mb-3">Access Expired</h3>
-                    <p class="text-muted mb-4">Your subscription or trial period has ended. Please subscribe to continue using BIMMO's features.</p>
+                    <h3 class="fw-bold mb-3">{{ __('Access Expired') }}</h3>
+                    <p class="text-muted mb-4">{{ __("Your subscription or trial period has ended. Please subscribe to continue using BIMMO's features.") }}</p>
                     <div class="d-grid gap-2">
                         <a href="{{ route('profil.index') }}" class="btn btn-primary btn-lg rounded-pill">
-                            <i class="bi bi-person-fill me-2"></i> Go to Profile to Subscribe
+                            <i class="bi bi-person-fill me-2"></i> {{ __('Go to Profile to Subscribe') }}
                         </a>
                     </div>
                 </div>
@@ -89,14 +89,14 @@
         <div id="transactionToast" class="toast hide shadow-lg border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
             <div class="toast-header bg-warning text-dark border-0">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong class="me-auto">Reminder Transaksi</strong>
+                <strong class="me-auto">{{ __('Reminder Transaksi') }}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body bg-white rounded-bottom">
-                <p class="mb-2">Anda belum mencatat transaksi apapun hari ini! Mari catat sekarang agar keuangan tetap terpantau.</p>
+                <p class="mb-2">{{ __("Anda belum mencatat transaksi apapun hari ini! Mari catat sekarang agar keuangan tetap terpantau.") }}</p>
                 <div class="d-grid">
                     <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-1"></i> Tambah Transaksi
+                        <i class="bi bi-plus-circle me-1"></i> {{ __('Tambah Transaksi') }}
                     </a>
                 </div>
             </div>
@@ -199,4 +199,31 @@
     </script>
 @endif
 
+    <script>
+        function updateLanguage(lang) {
+            fetch("{{ route('user.update.language') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ language: lang })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 300);
+                } else {
+                    alert('Gagal mengubah bahasa.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan.');
+            });
+        }
+    </script>
 @endsection

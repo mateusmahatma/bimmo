@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Asset Analysis & Report')
+@section('title', __('Asset Analysis & Report'))
 
 @push('css')
 <style>
@@ -55,12 +55,12 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Asset Analysis & Report</h1>
+    <h1 class="fw-bold mb-1">{{ __('Asset Analysis & Report') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('aset.index') }}">Assets</a></li>
-            <li class="breadcrumb-item active">Analysis</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('aset.index') }}">{{ __('Assets') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Analysis') }}</li>
         </ol>
     </nav>
 </div>
@@ -71,7 +71,7 @@
         <div class="col-md-4">
             <div class="card border-0 shadow-sm info-card sales-card" style="border-radius: 12px;">
                 <div class="card-body">
-                    <h5 class="card-title">Total Assets <span class="text-muted small">| Active</span></h5>
+                    <h5 class="card-title">{{ __('Total Assets') }} <span class="text-muted small">| {{ __('Active') }}</span></h5>
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
                             <i class="bi bi-box-seam text-primary"></i>
@@ -86,7 +86,7 @@
         <div class="col-md-4">
             <div class="card border-0 shadow-sm info-card revenue-card" style="border-radius: 12px;">
                 <div class="card-body">
-                    <h5 class="card-title">Total Purchase Value</h5>
+                    <h5 class="card-title">{{ __('Total Purchase Value') }}</h5>
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light">
                             <i class="bi bi-cart-check text-success"></i>
@@ -101,7 +101,7 @@
         <div class="col-md-4">
             <div class="card border-0 shadow-sm info-card customers-card" style="border-radius: 12px;">
                 <div class="card-body">
-                    <h5 class="card-title">Total Book Value <span class="text-muted small">| Current</span></h5>
+                    <h5 class="card-title">{{ __('Total Book Value') }} <span class="text-muted small">| {{ __('Current') }}</span></h5>
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-info-light">
                             <i class="bi bi-graph-down text-info"></i>
@@ -120,7 +120,7 @@
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-0 py-3">
-                    <h5 class="card-title mb-0 fw-bold">Asset Condition</h5>
+                    <h5 class="card-title mb-0 fw-bold">{{ __('Asset Condition') }}</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="conditionChart" style="max-height: 300px;"></canvas>
@@ -132,17 +132,17 @@
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0 fw-bold">Recent Maintenance Costs</h5>
-                    <span class="text-muted small">Top 5 Records</span>
+                    <h5 class="card-title mb-0 fw-bold">{{ __('Recent Maintenance Costs') }}</h5>
+                    <span class="text-muted small">{{ __('Top 5 Records') }}</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0 small">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="px-3">Asset</th>
-                                    <th>Activity</th>
-                                    <th class="text-end px-3">Cost</th>
+                                    <th class="px-3">{{ __('Asset') }}</th>
+                                    <th>{{ __('Activity') }}</th>
+                                    <th class="text-end px-3">{{ __('Cost') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -161,7 +161,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="3" class="text-center py-4 text-muted">No maintenance records yet.</td>
+                                    <td colspan="3" class="text-center py-4 text-muted">{{ __('No maintenance records yet.') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -189,15 +189,23 @@
             'Rusak Berat': '#dc3545',
             'Hilang': '#6c757d'
         };
+
+        const labelMap = {
+            'Baik': "{{ __('Good') }}",
+            'Kurang Baik': "{{ __('Fair') }}",
+            'Rusak Berat': "{{ __('Bad') }}",
+            'Hilang': "{{ __('Lost') }}"
+        };
         
+        const translatedLabels = labels.map(label => labelMap[label] || label);
         const bgColors = labels.map(label => colors[label] || '#0d6efd');
 
         new Chart(document.querySelector('#conditionChart'), {
             type: 'doughnut',
             data: {
-                labels: labels,
+                labels: translatedLabels,
                 datasets: [{
-                    label: 'Total Assets',
+                    label: "{{ __('Total Assets') }}",
                     data: values,
                     backgroundColor: bgColors,
                     hoverOffset: 4

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Asset Inventory')
+@section('title', __('Asset Inventory'))
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -64,11 +64,11 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Asset Inventory</h1>
+    <h1 class="fw-bold mb-1">{{ __('Asset Inventory') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Assets</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Assets') }}</li>
         </ol>
     </nav>
 </div>
@@ -80,28 +80,28 @@
                 <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
                     <div class="d-flex gap-2">
                         <select id="filterKondisi" class="form-select form-select-sm" style="width: 150px;">
-                            <option value="">All Conditions</option>
-                            <option value="Baik">Baik</option>
-                            <option value="Kurang Baik">Kurang Baik</option>
-                            <option value="Rusak Berat">Rusak Berat</option>
-                            <option value="Hilang">Hilang</option>
+                            <option value="">{{ __('All Conditions') }}</option>
+                            <option value="Baik">{{ __('Good') }}</option>
+                            <option value="Kurang Baik">{{ __('Fair') }}</option>
+                            <option value="Rusak Berat">{{ __('Bad') }}</option>
+                            <option value="Hilang">{{ __('Lost') }}</option>
                         </select>
                         <select id="filterKategori" class="form-select form-select-sm" style="width: 150px;">
-                            <option value="">All Categories</option>
+                            <option value="">{{ __('All Categories') }}</option>
                             <option value="IT">IT</option>
-                            <option value="Kendaraan">Kendaraan</option>
-                            <option value="Furnitur">Furnitur</option>
-                            <option value="Elektronik">Elektronik</option>
-                            <option value="Lainnya">Lainnya</option>
+                            <option value="Kendaraan">{{ __('Vehicle') }}</option>
+                            <option value="Furnitur">{{ __('Furniture') }}</option>
+                            <option value="Elektronik">{{ __('Electronic') }}</option>
+                            <option value="Lainnya">{{ __('Others') }}</option>
                         </select>
                         <select id="filterStatus" class="form-select form-select-sm" style="width: 150px;">
-                            <option value="active">Active Inventory</option>
-                            <option value="disposed">Disposed Assets</option>
+                            <option value="active">{{ __('Active Inventory') }}</option>
+                            <option value="disposed">{{ __('Disposed Assets') }}</option>
                         </select>
                     </div>
                     <div>
                         <a href="{{ route('aset.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add Asset
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Asset') }}
                         </a>
                     </div>
                 </div>
@@ -117,13 +117,13 @@
                         <table id="asetTable" class="table table-hover align-middle mb-0" style="width:100%">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Code</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Asset Name</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Category</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Purchase Date</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Current Value (Book)</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Condition</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Code') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Asset Name') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Category') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Purchase Date') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Current Value (Book)') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Condition') }}</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -191,14 +191,14 @@
             const id = $(this).data('id');
             
             Swal.fire({
-                title: 'Are you sure?',
-                text: "This action cannot be undone!",
+                title: "{{ __('Are you sure?') }}",
+                text: "{{ __('This action cannot be undone!') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: "{{ __('Yes, delete it!') }}",
+                cancelButtonText: "{{ __('Cancel') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -210,8 +210,8 @@
                         success: function(response) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Deleted!',
-                                text: 'Asset has been deleted successfully.',
+                                title: "{{ __('Deleted!') }}",
+                                text: "{{ __('Asset has been deleted successfully.') }}",
                                 timer: 2000,
                                 showConfirmButton: false
                             });
@@ -220,8 +220,8 @@
                         error: function(xhr) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Oops...',
-                                text: 'Something went wrong while deleting the asset.'
+                                title: "{{ __('Oops...') }}",
+                                text: "{{ __('Something went wrong while deleting the asset.') }}"
                             });
                         }
                     });

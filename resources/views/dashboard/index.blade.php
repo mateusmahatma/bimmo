@@ -4,11 +4,11 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1>Dashboard</h1>
+    <h1>{{ __('Dashboard') }}</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item active">
-                Hai, {{ auth()->user()->name }}
+                {{ __('Hai') }}, {{ auth()->user()->name }}
             </li>
         </ol>
     </nav>
@@ -24,14 +24,14 @@
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
-                            Financial Summary
+                            {{ __('Financial Summary') }}
                             @if($totalNominalSisa > 0)
-                            <span class="badge bg-success ms-2" style="font-size: 0.7em;">Surplus</span>
+                            <span class="badge bg-success ms-2" style="font-size: 0.7em;">{{ __('Surplus') }}</span>
                             @elseif($totalNominalSisa < 0)
-                            <span class="badge bg-danger ms-2" style="font-size: 0.7em;">Defisit</span>
+                            <span class="badge bg-danger ms-2" style="font-size: 0.7em;">{{ __('Deficit') }}</span>
                             @endif
                         </h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Overview of your financial status this month.</p>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Overview of your financial status this month.') }}</p>
                     </div>
                     <button id="toggleNominalBtn"
                         class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm"
@@ -47,7 +47,7 @@
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Current Balance</h6>
+                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Current Balance') }}</h6>
                                         <h4 class="mb-2 fw-bold {{ $totalNominalSisa >= 0 ? 'text-dark' : 'text-danger' }}" id="summary-saldo">{{ $saldoView }}</h4>
                                     </div>
                                     <div class="icon-shape bg-light text-primary rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
@@ -62,7 +62,7 @@
                                     @else
                                         <span class="text-muted"><i class="bi bi-dash"></i> 0%</span>
                                     @endif
-                                    <span class="text-muted ms-1" style="font-size: 0.8rem;">vs last month</span>
+                                    <span class="text-muted ms-1" style="font-size: 0.8rem;">{{ __('vs last month') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Total Income</h6>
+                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Total Income') }}</h6>
                                         <h4 class="mb-2 fw-bold text-success" id="summary-pemasukan">{{ $pemasukanView }}</h4>
                                     </div>
                                     <div class="icon-shape bg-light text-success rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
@@ -101,7 +101,7 @@
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Total Expense</h6>
+                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Total Expense') }}</h6>
                                         <h4 class="mb-2 fw-bold text-danger" id="summary-pengeluaran">{{ $pengeluaranView }}</h4>
                                     </div>
                                     <div class="icon-shape bg-light text-danger rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
@@ -129,7 +129,7 @@
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Expense Today</h6>
+                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Expense Today') }}</h6>
                                         <h4 class="mb-2 fw-bold text-dark" id="summary-hari-ini">{{ $pengeluaranHariIni }}</h4>
                                     </div>
                                     <div class="icon-shape bg-light text-warning rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
@@ -137,7 +137,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-2 small">
-                                    <span class="text-muted" style="font-size: 0.8rem;">Monitor daily spending</span>
+                                    <span class="text-muted" style="font-size: 0.8rem;">{{ __('Monitor daily spending') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -151,21 +151,21 @@
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
-                            Cash Flow
+                            {{ __('Cash Flow') }}
                             <span class="text-muted small fw-normal ms-1" id="cashFlowPeriodeLabel">
-                                ({{ request('periode', 6) }} months ago)
+                                ({{ request('periode', 6) }} {{ __('months ago') }})
                             </span>
                         </h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Monitor your income and expenses over time.</p>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Monitor your income and expenses over time.') }}</p>
                     </div>
                     <div class="m-0">
                         <select id="filterPeriode"
                             name="periode"
                             class="form-select form-select-sm rounded-pill shadow-sm"
                             style="width:120px">
-                            <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>2 Months</option>
-                            <option value="6" {{ request('periode', 6) == 6 ? 'selected' : '' }}>6 Months</option>
-                            <option value="12" {{ request('periode') == 12 ? 'selected' : '' }}>12 Months</option>
+                            <option value="2" {{ request('periode') == 2 ? 'selected' : '' }}>2 {{ __('Months') }}</option>
+                            <option value="6" {{ request('periode', 6) == 6 ? 'selected' : '' }}>6 {{ __('Months') }}</option>
+                            <option value="12" {{ request('periode') == 12 ? 'selected' : '' }}>12 {{ __('Months') }}</option>
                         </select>
                     </div>
                 </div>
@@ -201,12 +201,12 @@
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                      <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
-                             Saving Rate
+                             {{ __('Saving Rate') }}
                             <span class="text-muted small fw-normal ms-1" id="savingRatePeriodeLabel">
-                                ({{ request('periode', 6) }} bulan terakhir)
+                                ({{ request('periode', 6) }} {{ __('months ago') }})
                             </span>
                         </h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Track your savings performance.</p>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Track your savings performance.') }}</p>
                     </div>
                 </div>
                 <div class="card-body p-3 p-md-4">
@@ -228,8 +228,8 @@
 
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Financial Ratio</h5>
-                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Key financial health indicators.</p>
+                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Financial Ratio') }}</h5>
+                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Key financial health indicators.') }}</p>
                 </div>
                 <div class="card-body p-0">
 
@@ -237,21 +237,21 @@
 
                     {{-- Expense Ratio --}}
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        Expense / Income
+                        {{ __('Expense / Income') }}
                         <span class="badge bg-{{ $expenseStatus['class'] }}">
                             {{ $expenseRatio }}% – {{ $expenseStatus['label'] }}
                         </span>
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        Saving Rate
+                        {{ __('Saving Rate') }}
                         <span class="badge bg-{{ $savingStatus['class'] }}">
                             {{ $savingRateLatest }}% – {{ $savingStatus['label'] }}
                         </span>
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        Emergency Fund
+                        {{ __('Emergency Fund') }}
                         <span class="badge bg-{{ $emergencyStatus['class'] }}">
                             {{ $danaDaruratBulan }} months – {{ $emergencyStatus['label'] }}
                         </span>
@@ -264,8 +264,8 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Expense Bar</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Expenses breakdown by category.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Expense Bar') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Expenses breakdown by category.') }}</p>
                     </div>
 
                     <div class="d-flex gap-2">
@@ -294,7 +294,7 @@
 
                 <div class="p-3 border-top bg-light rounded-bottom">
                     <div class="small text-muted">
-                        Total Expenditures:
+                        {{ __('Total Expenditures') }}:
                         <strong id="totalPengeluaranValue">Rp {{ number_format((float)$totalPengeluaranBulan,0,',','.') }}</strong>
                     </div>
                 </div>
@@ -311,7 +311,7 @@
         <div class="col-12">
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Today's Transactions</h5>
+                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __("Today's Transactions") }}</h5>
                      <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">
                         {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}
                     </p>
@@ -323,10 +323,10 @@
                 <table class="table table-sm align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Time</th>
-                            <th>Type</th>
-                            <th>Explanation</th>
-                            <th class="text-end">Amount</th>
+                            <th>{{ __('Time') }}</th>
+                            <th>{{ __('Type') }}</th>
+                            <th>{{ __('Explanation') }}</th>
+                            <th class="text-end">{{ __('Amount') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -352,7 +352,7 @@
                         @empty
                         <tr>
                             <td colspan="4" class="text-center text-muted">
-                                Belum ada transaksi hari ini
+                                {{ __('No transactions today') }}
                             </td>
                         </tr>
                         @endforelse
@@ -362,10 +362,10 @@
 
             <div class="p-3 border-top bg-light rounded-bottom d-flex justify-content-between small">
                 <span class="text-success">
-                    Total Income: <strong>Rp {{ number_format((float)$totalMasukHariIni,0,',','.') }}</strong>
+                    {{ __('Total Income') }}: <strong>Rp {{ number_format((float)$totalMasukHariIni,0,',','.') }}</strong>
                 </span>
                 <span class="text-danger">
-                    Total Expenses: <strong>Rp {{ number_format((float)$totalKeluarHariIni,0,',','.') }}</strong>
+                    {{ __('Total Expenses') }}: <strong>Rp {{ number_format((float)$totalKeluarHariIni,0,',','.') }}</strong>
                 </span>
             </div>
             </div>
@@ -374,8 +374,8 @@
         <div class="col-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                  <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Budget Performance</h5>
-                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Track your budget usage.</p>
+                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Performance') }}</h5>
+                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Track your budget usage.') }}</p>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     @include('dashboard.anggaran')

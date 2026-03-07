@@ -55,6 +55,9 @@ $(document).ready(function () {
         autoWidth: false,
         serverSide: true,
         processing: true,
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+        },
         ajax: {
             url: '/dana-darurat',
             type: 'GET',
@@ -133,9 +136,9 @@ $(document).ready(function () {
                 name: 'jenis_transaksi_dana_darurat',
                 render: function (data, type, row) {
                     if (data === 'Masuk') {
-                        return '<span class="badge bg-success"><i class="bi bi-arrow-down-left me-1"></i>Deposit</span>';
+                        return '<span class="badge bg-success"><i class="bi bi-arrow-down-left me-1"></i>Simpanan</span>';
                     } else if (data === 'Keluar') {
-                        return '<span class="badge bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Withdrawal</span>';
+                        return '<span class="badge bg-danger"><i class="bi bi-arrow-up-right me-1"></i>Penarikan</span>';
                     }
                     return data;
                 }
@@ -181,11 +184,11 @@ $(document).ready(function () {
 
     function validasiFormDanaDarurat(data) {
         if (data.tgl_transaksi_dana_darurat === '') {
-            showToast('Transaction Date Must Be Filled In!', 'warning');
+            showToast('Tanggal transaksi harus diisi!', 'warning');
             return false;
         }
         if (isNaN(data.nominal_dana_darurat) || data.nominal_dana_darurat === '' || parseFloat(data.nominal_dana_darurat) <= 0) {
-            showToast('Nominal must be filled in and greater than 0!', 'warning');
+            showToast('Nominal harus diisi dan lebih besar dari 0!', 'warning');
             return false;
         }
         return true;
@@ -197,20 +200,20 @@ $(document).ready(function () {
         $('#nominal_dana_darurat').val('');
         $('#keterangan').val('');
         $('#danaDaruratModal').removeData('id');
-        $('#danaDaruratModalLabel').text('Add Emergency Fund');
-        $('.tombol-simpan-dana-darurat').html('Save');
+        $('#danaDaruratModalLabel').text('Tambah Dana Darurat');
+        $('.tombol-simpan-dana-darurat').html('Simpan');
     }
 
     function spinnerButton() {
-        return '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Process ...';
+        return '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses ...';
     }
 
     function resetTombolSimpanDanaDarurat() {
-        $('.tombol-simpan-dana-darurat').prop('disabled', false).html('Save');
+        $('.tombol-simpan-dana-darurat').prop('disabled', false).html('Simpan');
     }
 
     function onSuccessSimpanDanaDarurat() {
-        showToast('Data saved successfully', 'success');
+        showToast('Data berhasil disimpan', 'success');
         $('#danaDaruratModal').modal('hide');
         table.ajax.reload();
     }
@@ -272,8 +275,8 @@ $(document).ready(function () {
                 $('#nominal_dana_darurat').val(parseFloat(danaDarurat.nominal_dana_darurat));
                 $('#keterangan').val(danaDarurat.keterangan);
                 $('#danaDaruratModal').data('id', id);
-                $('#danaDaruratModalLabel').text('Edit Emergency Fund');
-                $('.tombol-simpan-dana-darurat').html('Update');
+                $('#danaDaruratModalLabel').text('Edit Dana Darurat');
+                $('.tombol-simpan-dana-darurat').html('Perbarui');
             }
         });
     });
@@ -286,13 +289,13 @@ $(document).ready(function () {
         const id = $(this).data('id');
 
         Swal.fire({
-            title: 'Are you sure you want to delete this data?',
-            html: 'Deleted data cannot be recovered!',
+            title: 'Apakah Anda yakin ingin menghapus data ini?',
+            html: 'Data yang dihapus tidak dapat dikembalikan!',
             showCancelButton: true,
             confirmButtonColor: '#012970',
             cancelButtonColor: '#DB504A',
-            confirmButtonText: 'Yes, delete!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
             customClass: {
                 popup: 'dark-mode'
             }
@@ -303,11 +306,11 @@ $(document).ready(function () {
                     type: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
-                        showToast('Data deleted successfully', 'success');
+                        showToast('Data berhasil dihapus', 'success');
                         table.ajax.reload();
                     },
                     error: function () {
-                        showToast('Failed to delete data', 'danger');
+                        showToast('Gagal menghapus data', 'danger');
                         table.ajax.reload();
                     }
                 });
@@ -357,14 +360,14 @@ $(document).ready(function () {
         if (ids.length === 0) return;
 
         Swal.fire({
-            title: `Delete ${ids.length} items?`,
-            text: "You won't be able to revert this!",
+            title: `Hapus ${ids.length} data?`,
+            text: "Anda tidak akan dapat mengembalikan ini!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete selected!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Ya, hapus yang dipilih!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Show loading on button

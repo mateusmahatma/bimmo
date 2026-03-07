@@ -5,18 +5,18 @@
     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
         <li>
             <a class="dropdown-item" href="{{ route('aset.show', $row->id) }}">
-                <i class="bi bi-eye me-2 text-primary"></i> Detail
+                <i class="bi bi-eye me-2 text-primary"></i> {{ __('Detail') }}
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="{{ route('aset.edit', $row->id) }}">
-                <i class="bi bi-pencil me-2 text-warning"></i> Edit
+                <i class="bi bi-pencil me-2 text-warning"></i> {{ __('Edit') }}
             </a>
         </li>
         <li><hr class="dropdown-divider"></li>
         <li>
             <a class="dropdown-item text-danger delete-aset" href="#" data-id="{{ $row->id }}">
-                <i class="bi bi-trash me-2"></i> Delete
+                <i class="bi bi-trash me-2"></i> {{ __('Delete') }}
             </a>
         </li>
     </ul>

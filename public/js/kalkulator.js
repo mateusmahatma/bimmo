@@ -63,11 +63,11 @@ $(document).ready(function () {
             startDate: start,
             endDate: end,
             ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                'This Year': [moment().startOf('year'), moment().endOf('year')],
+                'Hari Ini': [moment(), moment()],
+                'Kemarin': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Tahun Ini': [moment().startOf('year'), moment().endOf('year')],
             },
             locale: { format: 'YYYY-MM-DD' }
         }, cb);
@@ -83,6 +83,9 @@ $(document).ready(function () {
             autoWidth: false,
             serverSide: true,
             processing: true,
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+            },
             ajax: { url: '/kalkulator', type: 'GET' },
             columns: [
                 {
@@ -104,7 +107,7 @@ $(document).ready(function () {
                     render: function (data, type, row) {
                         const start = new Date(row.tanggal_mulai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
                         const end = new Date(row.tanggal_selesai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
-                        return `<span class="fw-medium">${start}</span> <br> <span class="text-muted small">to ${end}</span>`;
+                        return `<span class="fw-medium">${start}</span> <br> <span class="text-muted small">sampai ${end}</span>`;
                     },
                 },
                 { data: "nama_anggaran", className: "text-center fw-bold", render: d => d || "-", responsivePriority: 1 },
@@ -123,7 +126,7 @@ $(document).ready(function () {
                             output += `<li><i class="bi bi-dot"></i> ${name}</li>`;
                         });
                         if (data.length > limit) {
-                            output += `<li class="text-muted ms-3">+${data.length - limit} more</li>`;
+                            output += `<li class="text-muted ms-3">+${data.length - limit} lainnya</li>`;
                         }
                         output += '</ul>';
                         return output;
@@ -142,16 +145,17 @@ $(document).ready(function () {
                         const formatted = 'Rp ' + numeric.toLocaleString("id-ID");
 
                         if (numeric < 0) {
-                            return `<span class="text-danger fw-bold">${formatted}</span><br><span class="badge bg-danger-subtle text-danger" style="font-size:10px;">Over Budget</span>`;
+                            return `<span class="text-danger fw-bold">${formatted}</span><br><span class="badge bg-danger-subtle text-danger" style="font-size:10px;">Melebihi Anggaran</span>`;
                         } else {
-                            return `<span class="text-success fw-bold">${formatted}</span><br><span class="badge bg-success-subtle text-success" style="font-size:10px;">On Track</span>`;
+                            return `<span class="text-success fw-bold">${formatted}</span><br><span class="badge bg-success-subtle text-success" style="font-size:10px;">Dalam Anggaran</span>`;
                         }
                     }
                 },
                 { data: "aksi", orderable: false, searchable: false, className: "text-center", responsivePriority: 1 },
             ],
             language: {
-                emptyTable: "No budget process data yet."
+                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json",
+                emptyTable: "Belum ada data proses anggaran."
             },
             drawCallback: function () {
                 $('#checkAll').prop('checked', false);
@@ -209,19 +213,19 @@ $(document).ready(function () {
             if (ids.length === 0) return;
 
             Swal.fire({
-                title: 'Delete Selected?',
-                text: `Are you sure you want to delete ${ids.length} items?`,
+                title: 'Hapus Terpilih?',
+                text: `Apakah Anda yakin ingin menghapus ${ids.length} item?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete!',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Show loading state
                     const originalText = this.innerHTML;
-                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...';
                     this.disabled = true;
 
                     $.ajax({
@@ -270,18 +274,18 @@ $(document).ready(function () {
         const income = $('#monthly_income').val();
 
         if (!income) {
-            showToast('Monthly income is required!', 'danger');
+            showToast('Pemasukan bulanan harus diisi!', 'danger');
             $('#monthly_income').focus();
             return false;
         }
 
         if (!startDate || !endDate) {
-            showToast('Please select a date range!', 'danger');
+            showToast('Silakan pilih rentang tanggal!', 'danger');
             return false;
         }
 
         if (new Date(startDate) > new Date(endDate)) {
-            showToast('Start date cannot be greater than end date!', 'danger');
+            showToast('Tanggal mulai tidak boleh lebih besar dari tanggal selesai!', 'danger');
             return false;
         }
 
@@ -346,14 +350,15 @@ $(document).ready(function () {
         e.preventDefault();
         const id = $(this).data('id');
         Swal.fire({
-            title: 'Delete History?',
-            text: "Deleted data cannot be recovered!",
+            title: 'Hapus Riwayat?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
+            confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -443,7 +448,8 @@ $(document).ready(function () {
                 },
             ],
             language: {
-                emptyTable: "No transactions in this period."
+                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json",
+                emptyTable: "Tidak ada transaksi pada periode ini."
             }
         });
     }

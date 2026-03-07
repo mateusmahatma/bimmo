@@ -23,24 +23,24 @@
                         class="text-decoration-none text-secondary d-flex align-items-center gap-1 sort-link"
                         data-sort="tgl_transaksi"
                         data-direction="{{ $currentSort === 'tgl_transaksi' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
-                        Date @if ($currentSort === 'tgl_transaksi')
+                        {{ __('Date') }} @if ($currentSort === 'tgl_transaksi')
                             <i class="bi bi-arrow-{{ $currentDir === 'asc' ? 'up' : 'down' }}"></i>
                         @endif
                     </a>
                 </th>
-                <th style="width: 20%;" class="text-secondary small text-uppercase fw-bold py-3">Category</th>
-                <th class="text-secondary small text-uppercase fw-bold py-3">Description</th>
+                <th style="width: 20%;" class="text-secondary small text-uppercase fw-bold py-3">{{ __('Category') }}</th>
+                <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Description') }}</th>
                 <th style="width: 15%;" class="text-end text-secondary small text-uppercase fw-bold py-3">
                     <a href="{{ $sortLink('nominal_pemasukan') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
                         data-sort="nominal_pemasukan"
                         data-direction="{{ $currentSort === 'nominal_pemasukan' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
-                        Amount @if ($currentSort === 'nominal_pemasukan' || $currentSort === 'nominal')
+                        {{ __('Amount') }} @if ($currentSort === 'nominal_pemasukan' || $currentSort === 'nominal')
                             <i class="bi bi-arrow-{{ $currentDir === 'asc' ? 'up' : 'down' }}"></i>
                         @endif
                     </a>
                 </th>
-                <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
+                <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -56,13 +56,13 @@
                         <div class="fw-bold text-dark">{{ \Carbon\Carbon::parse($row->tgl_transaksi)->format('d M Y') }}
                         </div>
                         <div class="small text-muted">
-                            {{ \Carbon\Carbon::parse($row->tgl_transaksi)->locale('en')->isoFormat('dddd') }}</div>
+                            {{ \Carbon\Carbon::parse($row->tgl_transaksi)->locale(app()->getLocale())->isoFormat('dddd') }}</div>
                     </td>
                     <td data-label="Category">
                         @if ((float)$row->nominal_pemasukan > 0)
                             <div class="mb-1">
                                 <span class="badge bg-success-light text-success border border-success-subtle rounded-pill px-3">
-                                    <i class="bi bi-arrow-down-left me-1"></i> {{ $row->pemasukanRelation?->nama ?? 'Income' }}
+                                    <i class="bi bi-arrow-down-left me-1"></i> {{ $row->pemasukanRelation?->nama ?? __('Income') }}
                                 </span>
                             </div>
                         @endif
@@ -70,7 +70,7 @@
                             <div>
                                 <span class="badge bg-danger-light text-danger border border-danger-subtle rounded-pill px-3">
                                     <i class="bi bi-arrow-up-right me-1"></i>
-                                    {{ $row->pengeluaranRelation?->nama ?? 'Expense' }}
+                                    {{ $row->pengeluaranRelation?->nama ?? __('Expense') }}
                                 </span>
                             </div>
                         @endif
@@ -117,9 +117,9 @@
                         <div class="py-4">
                             <img src="{{ asset('img/no-data.svg') }}" alt="No Data" style="width: 80px; opacity: 0.5;"
                                 class="mb-3">
-                            <p class="text-muted mb-1">No transaction data found.</p>
+                            <p class="text-muted mb-1">{{ __('No transaction data found.') }}</p>
                             <a href="{{ route('transaksi.create') }}"
-                                class="btn btn-primary btn-sm rounded-pill mt-2">Add Transaction</a>
+                                class="btn btn-primary btn-sm rounded-pill mt-2">{{ __('Add Transaction') }}</a>
                         </div>
                     </td>
                 </tr>

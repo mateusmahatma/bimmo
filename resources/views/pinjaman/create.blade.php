@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Add New Loan')
+@section('title', __('Add New Loan'))
 
 @section('container')
 @push('css')
@@ -55,11 +55,11 @@
 @endpush
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Add New Loan</h1>
+    <h1 class="fw-bold mb-1">{{ __('Add New Loan') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">Loans</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">{{ __('Loans') }}</a></li>
             <li class="breadcrumb-item active">Add New</li>
         </ol>
     </nav>
@@ -70,7 +70,7 @@
         <div class="col-lg-8 mx-auto">
             <div class="card-dashboard">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-4">Loan Details</h5>
+                    <h5 class="card-title fw-bold mb-4">{{ __('Loan Details') }}</h5>
                     
                     <form action="{{ route('pinjaman.store') }}" method="POST" id="createLoanForm">
                         @csrf
@@ -78,8 +78,8 @@
                         <div class="row g-3">
                             <!-- Loan Name -->
                             <div class="col-12">
-                                <label for="nama_pinjaman" class="form-label fw-bold small text-uppercase text-muted">Loan Name</label>
-                                <input type="text" class="form-control @error('nama_pinjaman') is-invalid @enderror" id="nama_pinjaman" name="nama_pinjaman" value="{{ old('nama_pinjaman') }}" placeholder="e.g., Koperasi Loan, Bank Loan" required>
+                                <label for="nama_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Liability Name') }}</label>
+                                <input type="text" class="form-control @error('nama_pinjaman') is-invalid @enderror" id="nama_pinjaman" name="nama_pinjaman" value="{{ old('nama_pinjaman') }}" placeholder="{{ __('e.g., Koperasi Loan, Bank Loan') }}" required>
                                 @error('nama_pinjaman')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -87,7 +87,7 @@
 
                             <!-- Amount -->
                             <div class="col-md-6">
-                                <label for="jumlah_pinjaman" class="form-label fw-bold small text-uppercase text-muted">Amount (Rp)</label>
+                                <label for="jumlah_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Amount (Rp)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light">Rp</span>
                                     <input type="number" class="form-control @error('jumlah_pinjaman') is-invalid @enderror" id="jumlah_pinjaman" name="jumlah_pinjaman" value="{{ old('jumlah_pinjaman') }}" placeholder="0" min="0" step="1000" required>
@@ -99,10 +99,10 @@
 
                             <!-- Duration -->
                             <div class="col-md-6">
-                                <label for="jangka_waktu" class="form-label fw-bold small text-uppercase text-muted">Duration (Months)</label>
+                                <label for="jangka_waktu" class="form-label fw-bold small text-uppercase text-muted">{{ __('Duration (Months)') }}</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control @error('jangka_waktu') is-invalid @enderror" id="jangka_waktu" name="jangka_waktu" value="{{ old('jangka_waktu') }}" placeholder="e.g., 12" min="1" required>
-                                    <span class="input-group-text bg-light">Months</span>
+                                    <span class="input-group-text bg-light">{{ __('Months') }}</span>
                                 </div>
                                 @error('jangka_waktu')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -111,7 +111,7 @@
 
                             <!-- Start Date -->
                             <div class="col-md-6">
-                                <label for="start_date" class="form-label fw-bold small text-uppercase text-muted">Start Date</label>
+                                <label for="start_date" class="form-label fw-bold small text-uppercase text-muted">{{ __('Start Date') }}</label>
                                 <input type="date" class="form-control @error('start_date') is-invalid @enderror" id="start_date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}" required>
                                 @error('start_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -120,9 +120,9 @@
 
                             <!-- End Date (Auto-calculated) -->
                             <div class="col-md-6">
-                                <label for="end_date" class="form-label fw-bold small text-uppercase text-muted">End Date</label>
+                                <label for="end_date" class="form-label fw-bold small text-uppercase text-muted">{{ __('End Date') }}</label>
                                 <input type="date" class="form-control @error('end_date') is-invalid @enderror bg-light" id="end_date" name="end_date" value="{{ old('end_date') }}" required readonly>
-                                <div class="form-text small text-muted">Auto-calculated based on duration.</div>
+                                <div class="form-text small text-muted">{{ __('Auto-calculated based on duration.') }}</div>
                                 @error('end_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -130,10 +130,10 @@
 
                             <!-- Status -->
                             <div class="col-12">
-                                <label for="status" class="form-label fw-bold small text-uppercase text-muted">Status</label>
+                                <label for="status" class="form-label fw-bold small text-uppercase text-muted">{{ __('Status') }}</label>
                                 <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                                    <option value="belum_lunas" {{ old('status') == 'belum_lunas' ? 'selected' : '' }}>Unpaid (Belum Lunas)</option>
-                                    <option value="lunas" {{ old('status') == 'lunas' ? 'selected' : '' }}>Paid (Lunas)</option>
+                                    <option value="belum_lunas" {{ old('status') == 'belum_lunas' ? 'selected' : '' }}>{{ __('Unpaid (Belum Lunas)') }}</option>
+                                    <option value="lunas" {{ old('status') == 'lunas' ? 'selected' : '' }}>{{ __('Paid (Lunas)') }}</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -142,8 +142,8 @@
 
                             <!-- Keterangan -->
                             <div class="col-12">
-                                <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">Keterangan</label>
-                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="3" placeholder="Enter additional details (optional)">{{ old('keterangan') }}</textarea>
+                                <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">{{ __('Keterangan') }}</label>
+                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="3" placeholder="{{ __('Enter additional details (optional)') }}">{{ old('keterangan') }}</textarea>
                                 @error('keterangan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -151,9 +151,9 @@
 
                             <!-- Buttons -->
                             <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                                <a href="{{ route('pinjaman.index') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                                <a href="{{ route('pinjaman.index') }}" class="btn btn-light rounded-pill px-4">{{ __('Cancel') }}</a>
                                 <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                                    <i class="bi bi-save me-1"></i> Save Loan
+                                    <i class="bi bi-save me-1"></i> {{ __('Save Loan') }}
                                 </button>
                             </div>
                         </div>

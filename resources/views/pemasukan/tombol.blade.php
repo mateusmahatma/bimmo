@@ -13,7 +13,7 @@
             <a class="dropdown-item tombol-edit-pemasukan"
                 href="#"
                 data-id="{{ $request->id }}">
-                <i class="bi bi-pencil me-2 text-warning"></i> Edit
+                <i class="bi bi-pencil me-2 text-warning"></i> {{ __('Edit') }}
             </a>
         </li>
 
@@ -23,7 +23,7 @@
             <a class="dropdown-item tombol-del-pemasukan text-danger"
                 href="#"
                 data-id="{{ $request->id }}">
-                <i class="bi bi-trash me-2"></i> Delete
+                <i class="bi bi-trash me-2"></i> {{ __('Delete') }}
             </a>
         </li>
     </ul>

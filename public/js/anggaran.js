@@ -71,7 +71,7 @@ $(document).ready(function () {
                     // Handle Exceed Message
                     const exceedMsg = $('#exceedMessage');
                     if (json.totalPersentase > 100) {
-                        exceedMsg.text('Exceeds 100%!').removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
+                        exceedMsg.text('Melebihi 100%!').removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
                     } else if (json.totalPersentase < 100 && json.totalPersentase > 0) {
                         if (json.exceedMessage) {
                             exceedMsg.text(json.exceedMessage);
@@ -89,6 +89,9 @@ $(document).ready(function () {
                 }
                 return json.data;
             }
+        },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
         },
         columns: [
             {
@@ -163,15 +166,15 @@ $(document).ready(function () {
 
     function validateForm(data) {
         if (!data.nama_anggaran) {
-            showToast('Budget Name is required!', 'danger');
+            showToast('Nama anggaran harus diisi!', 'danger');
             return false;
         }
         if (!data.persentase_anggaran) {
-            showToast('Percentage is required!', 'danger');
+            showToast('Persentase harus diisi!', 'danger');
             return false;
         }
         if (!data.id_pengeluaran || data.id_pengeluaran.length === 0) {
-            showToast('Please select at least one Expense Type!', 'danger');
+            showToast('Pilih setidaknya satu jenis pengeluaran!', 'danger');
             return false;
         }
         return true;
@@ -182,8 +185,8 @@ $(document).ready(function () {
         $('#persentase_anggaran').val('');
         if (tomSelectInstance) tomSelectInstance.clear();
         $('#anggaranModal').removeData('id');
-        $('#anggaranModalLabel').text('Add New Budget');
-        $('.tombol-simpan-anggaran').html('Save').prop('disabled', false);
+        $('#anggaranModalLabel').text('Tambah Anggaran Baru');
+        $('.tombol-simpan-anggaran').html('Simpan').prop('disabled', false);
     }
 
     function saveBudget(isUpdate = false, id = null) {
@@ -193,7 +196,7 @@ $(document).ready(function () {
         const url = isUpdate ? '/anggaran/' + id : '/anggaran';
         const type = isUpdate ? 'PUT' : 'POST';
 
-        $('.tombol-simpan-anggaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+        $('.tombol-simpan-anggaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...');
 
         $.ajax({
             url: url,
@@ -201,24 +204,24 @@ $(document).ready(function () {
             data: data,
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: function (response) {
-                showToast(response.message || 'Data saved successfully', 'success');
+                showToast(response.message || 'Data berhasil disimpan', 'success');
                 $('#anggaranModal').modal('hide');
                 table.ajax.reload();
             },
             error: function (xhr) {
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
                     const errors = xhr.responseJSON.errors;
-                    let msg = 'Validation Error';
+                    let msg = 'Kesalahan Validasi';
                     const firstKey = Object.keys(errors)[0];
                     if (firstKey) msg = errors[firstKey][0];
 
                     showToast(msg, 'danger');
                 } else {
-                    showToast('Failed to save data.', 'danger');
+                    showToast('Gagal menyimpan data.', 'danger');
                 }
             },
             complete: function () {
-                $('.tombol-simpan-anggaran').prop('disabled', false).html('Save');
+                $('.tombol-simpan-anggaran').prop('disabled', false).html('Simpan');
             }
         });
     }
@@ -237,8 +240,8 @@ $(document).ready(function () {
         $.get('/anggaran/' + id + '/edit', function (res) {
             const anggaran = res.result;
 
-            $('#anggaranModalLabel').text('Edit Budget');
-            $('.tombol-simpan-anggaran').html('Update');
+            $('#anggaranModalLabel').text('Edit Anggaran');
+            $('.tombol-simpan-anggaran').html('Perbarui');
 
             $('#nama_anggaran').val(anggaran.nama_anggaran);
             $('#persentase_anggaran').val(anggaran.persentase_anggaran);
@@ -274,14 +277,14 @@ $(document).ready(function () {
         const id = $(this).data('id');
 
         Swal.fire({
-            title: 'Delete this budget?',
-            text: "This action cannot be undone!",
+            title: 'Hapus anggaran ini?',
+            text: "Tindakan ini tidak dapat dibatalkan!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -289,11 +292,11 @@ $(document).ready(function () {
                     type: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
-                        showToast('Data deleted successfully', 'success');
+                        showToast('Data berhasil dihapus', 'success');
                         table.ajax.reload();
                     },
                     error: function () {
-                        showToast('Failed to delete data', 'danger');
+                        showToast('Gagal menghapus data', 'danger');
                     }
                 });
             }
@@ -342,18 +345,18 @@ $(document).ready(function () {
         if (ids.length === 0) return;
 
         Swal.fire({
-            title: `Delete ${ids.length} budgets?`,
-            text: "You won't be able to revert this!",
+            title: `Hapus ${ids.length} anggaran?`,
+            text: "Anda tidak akan dapat mengembalikan ini!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete selected!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Ya, hapus yang dipilih!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
 
                 $.ajax({
                     url: '/anggaran/bulk-delete',
@@ -367,7 +370,7 @@ $(document).ready(function () {
                         $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
                     },
                     error: function (xhr) {
-                        showToast('Failed to delete selected budgets.', 'danger');
+                        showToast('Gagal menghapus anggaran yang dipilih.', 'danger');
                         $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
                     }
                 });

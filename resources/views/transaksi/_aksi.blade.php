@@ -10,23 +10,23 @@ $hash = Hashids::encode($row->id);
     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
         <li>
             <a class="dropdown-item" href="{{ route('transaksi.edit', $hash) }}">
-                <i class="bi bi-pencil-square me-2 text-warning"></i> Edit
+                <i class="bi bi-pencil-square me-2 text-warning"></i> {{ __('Edit') }}
             </a>
         </li>
         <li>
             <button type="button" class="dropdown-item btn-upload" data-id="{{ $row->id }}" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <i class="bi bi-upload me-2 text-primary"></i> Upload Proof
+                <i class="bi bi-upload me-2 text-primary"></i> {{ __('Upload Proof') }}
             </button>
         </li>
         @if($row->file)
         <li>
             <a href="{{ asset('storage/uploads/' . $row->file) }}" target="_blank" class="dropdown-item">
-                <i class="bi bi-eye me-2 text-info"></i> View Proof
+                <i class="bi bi-eye me-2 text-info"></i> {{ __('View Proof') }}
             </a>
         </li>
         <li>
             <button type="button" class="dropdown-item btn-delete-file text-danger" data-id="{{ $row->id }}">
-                <i class="bi bi-x-circle me-2"></i> Delete Proof
+                <i class="bi bi-x-circle me-2"></i> {{ __('Delete Proof') }}
             </button>
         </li>
         @endif
@@ -36,7 +36,7 @@ $hash = Hashids::encode($row->id);
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="dropdown-item text-danger btn-delete">
-                    <i class="bi bi-trash me-2"></i> Delete
+                    <i class="bi bi-trash me-2"></i> {{ __('Delete') }}
                 </button>
             </form>
         </li>

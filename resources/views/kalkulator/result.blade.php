@@ -1,5 +1,5 @@
 <head>
-    <title>Budget Calculation Results</title>
+    <title>{{ __('Budget Calculation Results') }}</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,16 +8,16 @@
 @section('container')
 
 <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Budget Calculation Results</a>
+    <a class="navbar-brand" href="#">{{ __('Budget Calculation Results') }}</a>
     <ul class="nav nav-pills">
         <li class="nav-item dropdown">
             <a class="nav-link" href="/kalkulator" role="button" aria-expanded="false">
-                <span class="badge-primary">Budget Calculator</span>
+                <span class="badge-primary">{{ __('Budget Calculator') }}</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" role="button" id="downloadButton" onclick="downloadPDF()">
-                <span class="badge-pdf">Download PDF</span>
+                <span class="badge-pdf">{{ __('Download PDF') }}</span>
             </a>
         </li>
     </ul>
@@ -30,13 +30,13 @@
         <table class="customTable">
             <thead>
                 <tr>
-                    <th class="text-center">Category</th>
-                    <th class="text-center">Amount</th>
+                    <th class="text-center">{{ __('Category') }}</th>
+                    <th class="text-center">{{ __('Amount') }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Total Income</td>
+                    <td>{{ __('Total Income') }}</td>
                     <td>{{ number_format($totalIncome, 0, ',', '.') }}</td>
                 </tr>
                 @foreach ($budgetAllocations as $allocation)
@@ -46,11 +46,11 @@
                 </tr>
                 @endforeach
                 <tr>
-                    <td>Total Budget</td>
+                    <td>{{ __('Total Budget') }}</td>
                     <td>{{ number_format($totalBudget, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
-                    <td>Remaining Income</td>
+                    <td>{{ __('Remaining Income') }}</td>
                     <td>{{ number_format($remainingIncome, 0, ',', '.') }}</td>
                 </tr>
             </tbody>

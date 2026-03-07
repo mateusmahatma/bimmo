@@ -12,7 +12,7 @@
         <li>
             <a class="dropdown-item tombol-edit-pemasukan"
                 href="{{ route('dana-darurat.edit', $request->id_dana_darurat) }}">
-                <i class="bi bi-pencil me-2 text-warning"></i> Edit
+                <i class="bi bi-pencil me-2 text-warning"></i> {{ __('Edit') }}
             </a>
         </li>
 
@@ -22,7 +22,7 @@
             <a class="dropdown-item text-danger tombol-del-dana-darurat"
                 href="#"
                 data-id="{{ $request->id_dana_darurat }}">
-                <i class="bi bi-trash me-2"></i> Delete
+                <i class="bi bi-trash me-2"></i> {{ __('Delete') }}
             </a>
         </li>
     </ul>

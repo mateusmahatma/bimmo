@@ -97,17 +97,23 @@
         <h1>Laporan Arus Kas</h1>
         <p>
             Periode:
-            {{ \Carbon\Carbon::parse($start_date)->locale('id')->isoFormat('D MMMM Y') }}
+            {{ \Carbon\Carbon::parse(request('start_date', $start_date ?? ''))->locale('id')->isoFormat('D MMMM Y') }}
             -
-            {{ \Carbon\Carbon::parse($end_date)->locale('id')->isoFormat('D MMMM Y') }}
+            {{ \Carbon\Carbon::parse(request('end_date', $end_date ?? ''))->locale('id')->isoFormat('D MMMM Y') }}
         </p>
+
+        <div style="margin-bottom: 20px; font-size: 12px;">
+            <strong>Total Pemasukan:</strong> Rp {{ number_format((float)($totalPemasukan ?? 0), 0, ',', '.') }} |
+            <strong>Total Pengeluaran:</strong> Rp {{ number_format((float)($totalPengeluaran ?? 0), 0, ',', '.') }} |
+            <strong>Saldo Bersih:</strong> Rp {{ number_format((float)($netIncome ?? 0), 0, ',', '.') }}
+        </div>
     </center>
 
     <table class='table'>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Tanggal Transaksi</th>
+                <th>{{ __('Transaction Date') }}</th>
                 <th>Pemasukan</th>
                 <th>Nominal Pemasukan</th>
                 <th>Pengeluaran</th>
@@ -127,16 +133,29 @@
                 <td>{{ number_format((float)$trans->nominal, 0, ',', '.') }}</td>
                 <td>
                     @if($trans->keterangan)
-                    <table style="width:100%; border-collapse: collapse;">
-                        @foreach(explode("\n", $trans->keterangan) as $i => $line)
-                        <tr>
-                            <td style="width: 20px; vertical-align: top;">{{ $i + 1 }}</td>
-                            <td>{{ $line }}</td>
-                        </tr>
-                        @endforeach
-                    </table>
+                        @php
+                            $lines = array_filter(preg_split('/\r\n|\r|\n/', $trans->keterangan), function ($l) {
+                                return trim($l) !== '';
+                            });
+                        @endphp
+                        @if(count($lines) > 1)
+                            <table style="width: 100%; border: none; border-collapse: collapse; margin: 0; padding: 0;">
+                                @foreach($lines as $line)
+                                    <tr>
+                                        <td style="width: 15px; border: none; padding: 0 4px 2px 0; vertical-align: top; font-weight: bold; color: #666; font-size: 9px;">
+                                            {{ $loop->iteration }}.
+                                        </td>
+                                        <td style="border: none; padding: 0 0 2px 0; vertical-align: top; font-size: 10px;">
+                                            {{ trim($line) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        @else
+                            {{ $trans->keterangan }}
+                        @endif
                     @else
-                    -
+                        -
                     @endif
                 </td>
             </tr>

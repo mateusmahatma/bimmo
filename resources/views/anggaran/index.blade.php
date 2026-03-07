@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Budget List')
+@section('title', __('Budget List'))
 
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
@@ -161,11 +161,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Budget List</h1>
+    <h1 class="fw-bold mb-1">{{ __('Budget List') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Budgets</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Budgets') }}</li>
         </ol>
     </nav>
 </div>
@@ -177,12 +177,12 @@
             <div class="card card-summary shadow-sm">
                 <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">Total Budget Allocation</h5>
-                        <p class="text-muted small mb-0">Ensure the total allocation does not exceed 100%.</p>
+                        <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Total Budget Allocation') }}</h5>
+                        <p class="text-muted small mb-0">{{ __('Ensure the total allocation does not exceed 100%.') }}</p>
                     </div>
                     <div class="text-end">
                         <h2 class="fw-bold mb-0 text-primary" id="totalPersentase">0%</h2>
-                        <span id="exceedMessage" class="badge bg-danger d-none mt-2">Exceeds 100%!</span>
+                        <span id="exceedMessage" class="badge bg-danger d-none mt-2">{{ __('Exceeds 100%!') }}</span>
                     </div>
                 </div>
             </div>
@@ -192,15 +192,15 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">List of Budgets</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage your budget allocations efficiently.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('List of Budgets') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your budget allocations efficiently.') }}</p>
                     </div>
                     <div class="d-flex gap-2 w-100 w-md-auto justify-content-md-end">
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3 flex-fill flex-md-grow-0">
-                            <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
+                            <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('anggaran.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-fill flex-md-grow-0">
-                            <i class="bi bi-plus-lg me-1"></i> Add New
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add New') }}
                         </a>
                     </div>
                 </div>
@@ -216,12 +216,12 @@
                                         </div>
                                     </th>
                                     <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Budget Name</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">Percentage</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Expense Types</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">Created At</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">Last Updated</th>
-                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Budget Name') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Percentage') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Expense Types') }}</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">{{ __('Created At') }}</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">{{ __('Last Updated') }}</th>
+                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

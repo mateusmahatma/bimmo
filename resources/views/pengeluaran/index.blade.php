@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Expense')
+@section('title', __('Expense'))
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -104,11 +104,11 @@
         }
 
         /* Labeling the data based on th order */
-        #pengeluaranTable td:nth-of-type(1):before { content: "Select"; }
-        #pengeluaranTable td:nth-of-type(3):before { content: "Category Name"; }
-        #pengeluaranTable td:nth-of-type(4):before { content: "Created At"; }
-        #pengeluaranTable td:nth-of-type(5):before { content: "Last Updated"; }
-        #pengeluaranTable td:nth-of-type(6):before { content: "Action"; top: 1.5rem; }
+        #pengeluaranTable td:nth-of-type(1):before { content: "{{ __('Select') }}"; }
+        #pengeluaranTable td:nth-of-type(3):before { content: "{{ __('Category Name') }}"; }
+        #pengeluaranTable td:nth-of-type(4):before { content: "{{ __('Created At') }}"; }
+        #pengeluaranTable td:nth-of-type(5):before { content: "{{ __('Last Updated') }}"; }
+        #pengeluaranTable td:nth-of-type(6):before { content: "{{ __('Action') }}"; top: 1.5rem; }
 
         /* Special handling for the checkbox cell */
         #pengeluaranTable td:nth-of-type(1) {
@@ -147,11 +147,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Expense</h1>
+    <h1 class="fw-bold mb-1">{{ __('Expense') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Expense</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Expense') }}</li>
         </ol>
     </nav>
 </div>
@@ -162,15 +162,15 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">List of Expense</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage your expense classification and types efficiently.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('List of Expense') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your expense classification and types efficiently.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
-                            <i class="bi bi-trash me-1"></i> Delete Selected (<span id="countSelected">0</span>)
+                            <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
                         </button>
                         <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 tombol-tambah-pengeluaran shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add Category
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Category') }}
                         </button>
                     </div>
                 </div>
@@ -185,11 +185,11 @@
                                             <input class="form-check-input" type="checkbox" id="checkAll" style="cursor: pointer;">
                                         </div>
                                     </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Category Name</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Created At</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Last Updated</th>
-                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
+                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">{{ __('No') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Category Name') }}</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Created At') }}</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Last Updated') }}</th>
+                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

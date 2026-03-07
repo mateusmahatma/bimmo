@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Liability Details')
+@section('title', __('Liability Details'))
 
 @push('css')
 <style>
@@ -121,11 +121,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Liability Details</h1>
+    <h1 class="fw-bold mb-1">{{ __('Liability Details') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">Liabilitys</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">{{ __('Liabilitys') }}</a></li>
             <li class="breadcrumb-item active">Details</li>
         </ol>
     </nav>
@@ -137,37 +137,37 @@
         <div class="col-lg-12 mb-4">
             <div class="card-dashboard h-100 border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-4 text-dark" style="font-size: 1.1rem;">Liability Information</h5>
+                    <h5 class="card-title fw-bold mb-4 text-dark" style="font-size: 1.1rem;">{{ __('Liability Information') }}</h5>
                     <div class="row g-4">
                         <div class="col-md-6 border-start border-primary border-4 py-1 ps-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">Liability Name</label>
+                             <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">{{ __('Liability Name') }}</label>
                             <p class="fs-5 fw-bold text-dark mb-0">{{ $pinjaman->nama_pinjaman }}</p>
                         </div>
                         <div class="col-md-6 border-start border-success border-4 py-1 ps-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">Current Balance</label>
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">{{ __('Current Balance') }}</label>
                             <p class="fs-5 fw-bold text-primary mb-0">Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</p>
                         </div>
                         <div class="col-md-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Duration</label>
-                            <p class="mb-0 fw-semibold">{{ $pinjaman->jangka_waktu }} Months</p>
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Duration') }}</label>
+                            <p class="mb-0 fw-semibold">{{ $pinjaman->jangka_waktu }} {{ __('Months') }}</p>
                         </div>
                         <div class="col-md-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Start Date</label>
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Start Date') }}</label>
                             <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->start_date)->format('d M Y') }}</p>
                         </div>
                         <div class="col-md-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">End Date</label>
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('End Date') }}</label>
                             <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->end_date)->format('d M Y') }}</p>
                         </div>
                         <div class="col-md-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">Status</label>
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Status') }}</label>
                             @if ($pinjaman->status === 'belum_lunas')
                                 <span class="badge bg-danger-light text-danger px-3 py-2 rounded-pill">
-                                    <i class="bi bi-x-circle me-1"></i> Unpaid
+                                    <i class="bi bi-x-circle me-1"></i> {{ __('Unpaid') }}
                                 </span>
                             @elseif ($pinjaman->status === 'lunas')
                                 <span class="badge bg-success-light text-success px-3 py-2 rounded-pill">
-                                    <i class="bi bi-check-circle me-1"></i> Paid
+                                    <i class="bi bi-check-circle me-1"></i> {{ __('Paid') }}
                                 </span>
                             @endif
                         </div>
@@ -182,12 +182,12 @@
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
-                            <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">Payment History</h5>
-                            <p class="text-muted small mb-0 mt-1">Track all payments made for this Liability.</p>
+                            <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Payment History') }}</h5>
+                            <p class="text-muted small mb-0 mt-1">{{ __('Track all payments made for this Liability.') }}</p>
                         </div>
                         @if ($pinjaman->status === 'belum_lunas')
                         <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#bayarModal" data-pinjaman-id="{{ Vinkla\Hashids\Facades\Hashids::encode($pinjaman->id) }}">
-                            <i class="bi bi-wallet2 me-1"></i> Payment
+                            <i class="bi bi-wallet2 me-1"></i> {{ __('Payment') }}
                         </button>
                         @endif
                     </div>
@@ -196,11 +196,11 @@
                         <table id="paymentHistoryTable" class="table table-hover table-borderless align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 5%;">No</th>
-                                    <th>Amount</th>
-                                    <th>Payment Date</th>
-                                    <th class="text-center">Proof</th>
-                                    <th style="width: 15%; text-center">Action</th>
+                                    <th style="width: 5%;">{{ __('No') }}</th>
+                                    <th>{{ __('Amount') }}</th>
+                                    <th>{{ __('Payment Date') }}</th>
+                                    <th class="text-center">{{ __('Proof') }}</th>
+                                    <th style="width: 15%; text-center">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -211,7 +211,7 @@
                                     <td data-label="Date">{{ \Carbon\Carbon::parse($bayar_pinjaman->tgl_bayar)->format('d M Y') }}</td>
                                     <td data-label="Proof" class="text-center">
                                         @if ($bayar_pinjaman->bukti_bayar)
-                                            <a href="{{ asset('storage/' . $bayar_pinjaman->bukti_bayar) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-circle" data-bs-toggle="tooltip" title="View Proof" style="width: 32px; height: 32px; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+                                            <a href="{{ asset('storage/' . $bayar_pinjaman->bukti_bayar) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-circle" data-bs-toggle="tooltip" title="{{ __('View Proof') }}" style="width: 32px; height: 32px; padding:0; display:inline-flex; align-items:center; justify-content:center;">
                                                 <i class="bi bi-file-earmark-check"></i>
                                             </a>
                                         @else
@@ -222,13 +222,13 @@
                                         <div class="d-flex justify-content-center gap-1">
                                             <button type="button" class="btn btn-outline-primary btn-sm rounded-circle edit-bayar" 
                                                 data-id="{{ $bayar_pinjaman->id_bayar }}"
-                                                data-bs-toggle="tooltip" title="Edit Payment" style="width: 32px; height: 32px; padding:0; display:flex; align-items:center; justify-content:center;">
+                                                data-bs-toggle="tooltip" title="{{ __('Edit Payment') }}" style="width: 32px; height: 32px; padding:0; display:flex; align-items:center; justify-content:center;">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
-                                            <form action="{{ route('bayar-pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this payment record?');">
+                                            <form action="{{ route('bayar-pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this payment record?') }}');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" data-bs-toggle="tooltip" title="Delete Payment" style="width: 32px; height: 32px; padding:0; display:flex; align-items:center; justify-content:center;">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" data-bs-toggle="tooltip" title="{{ __('Delete Payment') }}" style="width: 32px; height: 32px; padding:0; display:flex; align-items:center; justify-content:center;">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -240,7 +240,7 @@
                                     <td colspan="5" class="text-center text-muted py-5">
                                         <div class="py-3">
                                             <i class="bi bi-info-circle fs-2 d-block mb-3 opacity-50"></i>
-                                            No payment history found.
+                                            {{ __('No payment history found.') }}
                                         </div>
                                     </td>
                                 </tr>

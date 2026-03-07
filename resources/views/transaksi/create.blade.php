@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Add Transaction')
+@section('title', __('Add Transaction'))
 
 @section('container')
 @push('css')
@@ -61,12 +61,12 @@
 @endpush
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Add Transaction</h1>
+    <h1 class="fw-bold mb-1">{{ __('Add Transaction') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('transaksi.index') }}">Transactions</a></li>
-            <li class="breadcrumb-item active">Add New</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('transaksi.index') }}">{{ __('Transactions') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Add New') }}</li>
         </ol>
     </nav>
 </div>
@@ -93,7 +93,7 @@
                         
                         <!-- Date Section -->
                         <div class="mb-4">
-                            <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">Transaction Date <span class="text-danger">*</span></label>
+                            <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Date') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi ?? date('Y-m-d')) }}" required>
                         </div>
 
@@ -101,12 +101,12 @@
                             <!-- Income Section -->
                             <div class="col-md-6">
                                 <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #198754 !important;">
-                                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> Income</h6>
+                                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> {{ __('Income') }}</h6>
                                     
                                     <div class="mb-3">
-                                        <label for="pemasukan" class="form-label small text-muted">Category</label>
+                                        <label for="pemasukan" class="form-label small text-muted">{{ __('Category') }}</label>
                                         <select class="form-select" id="pemasukan" name="pemasukan">
-                                            <option value="">- Select Income -</option>
+                                            <option value="">- {{ __('Select Income') }} -</option>
                                             @foreach ($pemasukan as $item)
                                             <option value="{{ $item->id }}">{{ $item->nama }}</option>
                                             @endforeach
@@ -114,7 +114,7 @@
                                     </div>
                                     
                                     <div class="mb-2">
-                                        <label for="nominal_pemasukan" class="form-label small text-muted">Amount</label>
+                                        <label for="nominal_pemasukan" class="form-label small text-muted">{{ __('Amount') }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-success text-white fw-bold">Rp</span>
                                             <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control fw-bold text-success" placeholder="0">
@@ -126,12 +126,12 @@
                             <!-- Expense Section -->
                             <div class="col-md-6">
                                 <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #dc3545 !important;">
-                                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> Expense</h6>
+                                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> {{ __('Expense') }}</h6>
                                     
                                     <div class="mb-3">
-                                        <label for="pengeluaran" class="form-label small text-muted">Category</label>
+                                        <label for="pengeluaran" class="form-label small text-muted">{{ __('Category') }}</label>
                                         <select class="form-select" id="pengeluaran" name="pengeluaran">
-                                            <option value="">- Select Expense -</option>
+                                            <option value="">- {{ __('Select Expense') }} -</option>
                                             @foreach ($pengeluaran as $item)
                                             <option value="{{ $item->id }}">{{ $item->nama }}</option>
                                             @endforeach
@@ -139,7 +139,7 @@
                                     </div>
                                     
                                     <div class="mb-2">
-                                        <label for="nominal" class="form-label small text-muted">Amount</label>
+                                        <label for="nominal" class="form-label small text-muted">{{ __('Amount') }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-danger text-white fw-bold">Rp</span>
                                             <input type="number" id="nominal" name="nominal" class="form-control fw-bold text-danger" placeholder="0">
@@ -151,20 +151,20 @@
 
                         <!-- Wallet Selection -->
                         <div class="mb-4">
-                            <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">Select Wallet <span class="text-danger">*</span></label>
+                            <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">{{ __('Select Wallet') }} <span class="text-danger">*</span></label>
                             <select class="form-select form-select-lg" id="dompet_id" name="dompet_id" required>
-                                <option value="">- Select Wallet -</option>
+                                <option value="">- {{ __('Select Wallet') }} -</option>
                                 @foreach ($dompet as $d)
                                 <option value="{{ $d->id }}">{{ $d->nama }} (Rp {{ number_format((float)$d->saldo, 0, ',', '.') }})</option>
                                 @endforeach
                             </select>
-                            <div class="form-text small">Transaction will affect the balance of the selected wallet.</div>
+                            <div class="form-text small">{{ __('Transaction will affect the balance of the selected wallet.') }}</div>
                         </div>
 
                         <!-- Description -->
                         <div class="mb-4">
-                            <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">Description / Notes</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Additional details about this transaction..."></textarea>
+                            <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">{{ __('Description / Notes') }}</label>
+                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="{{ __('Additional details about this transaction...') }}"></textarea>
                         </div>
 
                         <!-- Advanced Options -->
@@ -225,7 +225,7 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                                <i class="bi bi-check-lg me-2"></i> Save Transaction
+                                <i class="bi bi-check-lg me-2"></i> {{ __('Save Transaction') }}
                             </button>
                         </div>
 
@@ -268,9 +268,9 @@
 
         // Initialize TomSelect if validation didn't fail and elements exist
         if (typeof TomSelect !== 'undefined') {
-             if(document.getElementById('pemasukan')) new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- Select Income -' });
-             if(document.getElementById('pengeluaran')) new TomSelect('#pengeluaran', { allowEmptyOption: true, placeholder: '- Select Expense -' });
-             if(document.getElementById('barang_id')) new TomSelect('#barang_id', { allowEmptyOption: true, placeholder: '- Select Asset -' });
+             if(document.getElementById('pemasukan')) new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- {{ __('Select Income') }} -' });
+             if(document.getElementById('pengeluaran')) new TomSelect('#pengeluaran', { allowEmptyOption: true, placeholder: '- {{ __('Select Expense') }} -' });
+             if(document.getElementById('barang_id')) new TomSelect('#barang_id', { allowEmptyOption: true, placeholder: '- {{ __('Select Asset') }} -' });
         }
     });
 </script>

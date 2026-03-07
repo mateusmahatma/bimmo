@@ -168,6 +168,9 @@ const DataTableHandler = {
             autoWidth: false,
             serverSide: true,
             processing: true,
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+            },
             ajax: {
                 url: TransaksiConfig.urls.base,
                 type: "GET",
@@ -829,7 +832,7 @@ const UploadHandler = {
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Ya, upload!",
+                confirmButtonText: "Ya, unggah!",
                 cancelButtonText: "Batal"
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -837,7 +840,7 @@ const UploadHandler = {
                     const submitButton = $(this).find('button[type="submit"]');
 
                     submitButton
-                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses Upload...')
+                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses Unggah...')
                         .prop("disabled", true);
 
                     $.ajax({
@@ -853,7 +856,7 @@ const UploadHandler = {
 
                                 Swal.fire({
                                     icon: "success",
-                                    title: "Data Berhasil di Upload",
+                                    title: "Data Berhasil di Unggah",
                                     timer: 3000,
                                     showConfirmButton: false,
                                     toast: true,
@@ -870,7 +873,7 @@ const UploadHandler = {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Error!",
-                                    text: response.message || "Upload gagal.",
+                                    text: response.message || "Unggah gagal.",
                                     confirmButtonColor: "#d33"
                                 });
                             }
@@ -878,7 +881,7 @@ const UploadHandler = {
                         error: function (xhr) {
                             const errorMessage = xhr.responseJSON && xhr.responseJSON.message
                                 ? xhr.responseJSON.message
-                                : "Terjadi kesalahan saat upload.";
+                                : "Terjadi kesalahan saat unggah.";
                             Swal.fire({
                                 icon: "error",
                                 title: "Error!",
@@ -889,7 +892,7 @@ const UploadHandler = {
                         complete: function () {
                             submitButton
                                 .prop("disabled", false)
-                                .html('<i class="fa fa-upload"></i> Upload');
+                                .html('<i class="fa fa-upload"></i> Unggah');
                         }
                     });
                 }
@@ -917,7 +920,7 @@ const ImportHandler = {
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Ya, import!",
+                confirmButtonText: "Ya, impor!",
                 cancelButtonText: "Batal"
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -943,7 +946,7 @@ const ImportHandler = {
                             ToastHandler.show("Data berhasil diimpor!", "success");
                             DataTableHandler.reload();
                         } else {
-                            const message = data.message || "Terjadi kesalahan saat mengimport file.";
+                            const message = data.message || "Terjadi kesalahan saat mengimpor file.";
                             Swal.fire({
                                 title: "Error!",
                                 text: message,
@@ -966,7 +969,7 @@ const ImportHandler = {
 
                     xhr.onloadend = function () {
                         importBtn.disabled = false;
-                        importBtn.innerHTML = '<i class="fa fa-upload"></i> Import';
+                        importBtn.innerHTML = '<i class="fa fa-upload"></i> Impor';
                     };
 
                     xhr.send(formData);

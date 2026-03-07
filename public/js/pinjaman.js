@@ -19,6 +19,21 @@ $(document).ready(function () {
             autoWidth: false,
             serverSide: true,
             processing: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
+                infoFiltered: "(disaring dari _MAX_ total entri)",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                },
+                processing: "Sedang memproses...",
+                emptyTable: "Tidak ada data yang tersedia pada tabel"
+            },
             ajax: {
                 url: "/pinjaman",
                 type: "GET",
@@ -61,9 +76,9 @@ $(document).ready(function () {
                     className: "text-center",
                     render: function (data) {
                         if (data === "belum_lunas") {
-                            return `<span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i> Unpaid</span>`;
+                            return `<span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i> Belum Lunas</span>`;
                         } else if (data === "lunas") {
-                            return `<span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i> Paid</span>`;
+                            return `<span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i> Lunas</span>`;
                         }
                         return data ? data : '-';
                     }
@@ -76,15 +91,15 @@ $(document).ready(function () {
                 },
             ],
             createdRow: function (row, data, dataIndex) {
-                $('td:eq(0)', row).attr('data-label', 'Select').addClass('mobile-checkbox');
+                $('td:eq(0)', row).attr('data-label', 'Pilih').addClass('mobile-checkbox');
                 $('td:eq(1)', row).attr('data-label', 'No');
-                $('td:eq(2)', row).attr('data-label', 'Loan Name');
-                $('td:eq(3)', row).attr('data-label', 'Notes');
-                $('td:eq(4)', row).attr('data-label', 'Total Loan');
-                $('td:eq(5)', row).attr('data-label', 'Paid Amount');
-                $('td:eq(6)', row).attr('data-label', 'Remaining Balance');
+                $('td:eq(2)', row).attr('data-label', 'Nama Pinjaman');
+                $('td:eq(3)', row).attr('data-label', 'Keterangan');
+                $('td:eq(4)', row).attr('data-label', 'Total Pinjaman');
+                $('td:eq(5)', row).attr('data-label', 'Total Dibayar');
+                $('td:eq(6)', row).attr('data-label', 'Sisa Saldo');
                 $('td:eq(7)', row).attr('data-label', 'Status');
-                $('td:eq(8)', row).attr('data-label', 'Action');
+                $('td:eq(8)', row).attr('data-label', 'Aksi');
             }
         });
     }
@@ -291,18 +306,18 @@ $(document).ready(function () {
         if (ids.length === 0) return;
 
         Swal.fire({
-            title: `Delete ${ids.length} loans?`,
-            text: "You won't be able to revert this!",
+            title: `Hapus ${ids.length} pinjaman?`,
+            text: "Data yang dihapus tidak dapat dikembalikan!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete selected!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: 'Ya, hapus terpilih!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
+                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
 
                 $.ajax({
                     url: '/pinjaman/bulk-delete',
@@ -315,7 +330,7 @@ $(document).ready(function () {
                         $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
                     },
                     error: function (xhr) {
-                        showToast('Failed to delete selected loans.', 'danger');
+                        showToast('Gagal menghapus pinjaman terpilih.', 'danger');
                         $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
                     }
                 });

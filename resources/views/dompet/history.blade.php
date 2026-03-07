@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Wallet History - ' . $wallet->nama)
+@section('title', __('Wallet History') . ' - ' . $wallet->nama)
 
 @push('css')
 <style>
@@ -55,12 +55,12 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">History {{ $wallet->nama }}</h1>
+    <h1 class="fw-bold mb-1">{{ __('History') }} {{ $wallet->nama }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('dompet.index') }}">Wallet</a></li>
-            <li class="breadcrumb-item active">History</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dompet.index') }}">{{ __('Wallet') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('History') }}</li>
         </ol>
     </nav>
 </div>
@@ -86,12 +86,12 @@
                             </div>
                             <h4 class="fw-bold mb-0">{{ $wallet->nama }}</h4>
                         </div>
-                        <h6 class="text-white text-opacity-75 mb-1 small fw-medium text-uppercase" style="letter-spacing: 1px;">Current Balance</h6>
+                        <h6 class="text-white text-opacity-75 mb-1 small fw-medium text-uppercase" style="letter-spacing: 1px;">{{ __('Current Balance') }}</h6>
                         <h1 class="fw-bold mb-0">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h1>
                     </div>
                     
                     <button class="btn btn-outline-light rounded-pill w-100 mt-4 border-2" data-bs-toggle="modal" data-bs-target="#addBalanceModal">
-                        <i class="bi bi-plus-lg me-1"></i> Add Balance
+                        <i class="bi bi-plus-lg me-1"></i> {{ __('Add Balance') }}
                     </button>
                 </div>
             </div>
@@ -101,15 +101,15 @@
         <div class="col-12 col-lg-8">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0">Transaction History</h5>
+                    <h5 class="fw-bold mb-0">{{ __('Transaction History') }}</h5>
                     <div class="dropdown">
                         <button class="btn btn-light btn-sm rounded-pill" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-funnel me-1"></i> Filter
+                            <i class="bi bi-funnel me-1"></i> {{ __('Filter') }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 10px;">
-                            <li><a class="dropdown-item {{ !request()->has('type') ? 'active' : '' }}" href="{{ route('dompet.show', $wallet->id) }}">All</a></li>
-                            <li><a class="dropdown-item {{ request('type') === 'income' ? 'active' : '' }}" href="{{ route('dompet.show', [$wallet->id, 'type' => 'income']) }}">Income</a></li>
-                            <li><a class="dropdown-item {{ request('type') === 'expense' ? 'active' : '' }}" href="{{ route('dompet.show', [$wallet->id, 'type' => 'expense']) }}">Expense</a></li>
+                            <li><a class="dropdown-item {{ !request()->has('type') ? 'active' : '' }}" href="{{ route('dompet.show', $wallet->id) }}">{{ __('All') }}</a></li>
+                            <li><a class="dropdown-item {{ request('type') === 'income' ? 'active' : '' }}" href="{{ route('dompet.show', [$wallet->id, 'type' => 'income']) }}">{{ __('Income') }}</a></li>
+                            <li><a class="dropdown-item {{ request('type') === 'expense' ? 'active' : '' }}" href="{{ route('dompet.show', [$wallet->id, 'type' => 'expense']) }}">{{ __('Expense') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -118,9 +118,9 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="ps-4 py-3 border-0 small text-uppercase text-muted fw-bold">Date</th>
-                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold">Description</th>
-                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold text-end pe-4">Amount</th>
+                                    <th class="ps-4 py-3 border-0 small text-uppercase text-muted fw-bold">{{ __('Date') }}</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold">{{ __('Description') }}</th>
+                                    <th class="py-3 border-0 small text-uppercase text-muted fw-bold text-end pe-4">{{ __('Amount') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -137,7 +137,7 @@
                                                 {{ $transaction->pengeluaranRelation->nama ?? 'Expense' }}
                                             @endif
                                         </div>
-                                        <div class="small text-muted text-truncate" style="max-width: 200px;">{{ $transaction->keterangan ?? 'No description' }}</div>
+                                        <div class="small text-muted text-truncate" style="max-width: 200px;">{{ $transaction->keterangan ?? __('No description') }}</div>
                                     </td>
                                     <td class="text-end pe-4">
                                         @if($transaction->nominal_pemasukan > 0)
@@ -151,7 +151,7 @@
                                 <tr>
                                     <td colspan="3" class="text-center py-5 text-muted">
                                         <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                        No transactions found for this wallet.
+                                        {{ __('No transactions found for this wallet.') }}
                                     </td>
                                 </tr>
                                 @endforelse
@@ -172,28 +172,28 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0" style="border-radius: 15px;">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Manual Balance Top-Up</h5>
+                <h5 class="modal-title fw-bold">{{ __('Manual Balance Top-Up') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('dompet.add-balance', $wallet->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <p class="text-muted small">Current balance: <strong class="text-primary">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</strong></p>
+                    <p class="text-muted small">{{ __('Current balance') }}: <strong class="text-primary">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</strong></p>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Amount to Add</label>
+                        <label class="form-label small fw-bold text-muted">{{ __('Amount to Add') }}</label>
                         <div class="input-group">
                             <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
                             <input type="number" name="nominal" class="form-control rounded-end-3 border-start-0" placeholder="0" required>
                         </div>
                     </div>
                     <div class="mb-0">
-                        <label class="form-label small fw-bold text-muted">Description (Optional)</label>
-                        <textarea name="keterangan" class="form-control rounded-3" rows="2" placeholder="e.g. Bonus, Salary, Gift"></textarea>
+                        <label class="form-label small fw-bold text-muted">{{ __('Description (Optional)') }}</label>
+                        <textarea name="keterangan" class="form-control rounded-3" rows="2" placeholder="{{ __('e.g. Bonus, Salary, Gift') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">Add Balance</button>
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Add Balance') }}</button>
                 </div>
             </form>
         </div>

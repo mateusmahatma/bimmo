@@ -58,6 +58,9 @@ $(document).ready(function () {
         autoWidth: false,
         serverSide: true,
         processing: true,
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+        },
         ajax: {
             url: '/barang',
             type: 'GET',
@@ -147,8 +150,8 @@ $(document).ready(function () {
         $('#nama_toko').val('');
         $('#harga').val('');
         $('#barangModal').removeData('id');
-        $('#barangModalLabel').text('Add Asset');
-        $('.tombol-simpan-barang').html('Save');
+        $('#barangModalLabel').text('Tambah Aset');
+        $('.tombol-simpan-barang').html('Simpan');
     }
 
     function spinnerButton() {
@@ -156,7 +159,7 @@ $(document).ready(function () {
     }
 
     function resetTombolSimpanBarang() {
-        $('.tombol-simpan-barang').prop('disabled', false).html('Save');
+        $('.tombol-simpan-barang').prop('disabled', false).html('Simpan');
     }
 
     function onSuccessSimpanBarang() {
@@ -222,8 +225,8 @@ $(document).ready(function () {
                 $('#nama_toko').val(barang.nama_toko);
                 $('#harga').val(parseFloat(barang.harga));
                 $('#barangModal').data('id', id);
-                $('#barangModalLabel').text('Edit Asset');
-                $('.tombol-simpan-barang').html('Update');
+                $('#barangModalLabel').text('Edit Aset');
+                $('.tombol-simpan-barang').html('Perbarui');
             }
         });
     });
@@ -236,13 +239,13 @@ $(document).ready(function () {
         const id = $(this).data('id');
 
         Swal.fire({
-            title: 'Are you sure you want to delete this data?',
-            html: 'Deleted data cannot be recovered!',
+            title: 'Apakah Anda yakin ingin menghapus data ini?',
+            html: 'Data yang dihapus tidak dapat dikembalikan!',
             showCancelButton: true,
             confirmButtonColor: '#012970',
             cancelButtonColor: '#DB504A',
-            confirmButtonText: 'Yes, delete!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
             customClass: {
                 popup: 'dark-mode'
             }

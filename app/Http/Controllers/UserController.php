@@ -13,6 +13,34 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function updateLanguage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'language' => 'required|in:id,en',
+        ]);
+
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $user->language = $validated['language'];
+        $user->save();
+
+        session()->put('locale', $validated['language']);
+        session()->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bahasa berhasil diperbarui!',
+        ]);
+    }
+
     public function updateSkin(Request $request): JsonResponse
     {
         $validated = $request->validate([

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Transactions')
+@section('title', __('Transactions'))
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -211,11 +211,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Transactions</h1>
+    <h1 class="fw-bold mb-1">{{ __('Transactions') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Transactions</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Transactions') }}</li>
         </ol>
     </nav>
 </div>
@@ -232,13 +232,13 @@
                             <i class="bi bi-arrow-down-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Total Income</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Income') }}</h6>
                             <h4 class="mb-0 fw-bold text-success">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</h4>
                         </div>
                     </div>
                     <div class="text-end">
                         <a href="#" data-bs-toggle="modal" data-bs-target="#incomeDetailsModal" class="small text-decoration-none text-success fw-bold">
-                            View Details <i class="bi bi-arrow-right"></i>
+                            {{ __('View Details') }} <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -253,14 +253,14 @@
                             <i class="bi bi-arrow-up-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Total Expense</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Expense') }}</h6>
                             <h4 class="mb-0 fw-bold text-danger">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</h4>
                         </div>
                     </div>
                     
                     <div class="text-end">
                         <a href="#" data-bs-toggle="modal" data-bs-target="#expenseDetailsModal" class="small text-decoration-none text-danger fw-bold">
-                            View Details <i class="bi bi-arrow-right"></i>
+                            {{ __('View Details') }} <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -275,7 +275,7 @@
                             <i class="bi bi-wallet2 fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Net Balance</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Net Balance') }}</h6>
                             <h4 class="mb-0 fw-bold {{ $netIncome >= 0 ? 'text-success' : 'text-danger' }}">
                                 Rp {{ number_format($netIncome, 0, ',', '.') }}
                             </h4>
@@ -290,7 +290,7 @@
             <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body py-3">
                     <div class="d-flex flex-column align-items-start text-start">
-                        <h6 class="fw-bold text-dark text-uppercase mb-1" style="letter-spacing: 0.5px; font-size: 0.75rem;">Period Expense</h6>
+                        <h6 class="fw-bold text-dark text-uppercase mb-1" style="letter-spacing: 0.5px; font-size: 0.75rem;">{{ __('Period Expense') }}</h6>
                         <span class="badge bg-light text-secondary border fw-normal rounded-pill px-2 py-1 mb-2" id="avg-date-range" style="font-size: 0.7rem;">
                             <i class="bi bi-calendar3 me-1"></i> {{ $dateRange }}
                         </span>
@@ -298,7 +298,7 @@
                         <div class="d-flex align-items-center">
                              <div class="text-start">
                                 <h4 class="mb-0 fw-bold text-dark" id="avg-daily" style="font-size: 1.25rem;">Rp {{ number_format($avgDailyPengeluaran, 0, ',', '.') }}</h4>
-                                <span class="text-muted small text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Daily Average</span>
+                                <span class="text-muted small text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Daily Average') }}</span>
                             </div>
                         </div>
                     </div>
@@ -311,15 +311,15 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Transaction List</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage your income and expense data.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Transaction List') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your income and expense data.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
                             <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add Transaction
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Transaction') }}
                         </a>
                     </div>
                 </div>
@@ -335,7 +335,7 @@
                             <div class="search-bar" style="min-width: 200px;">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="searchTransaksi" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="Search transactions..." style="box-shadow: none;">
+                                    <input type="text" id="searchTransaksi" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="{{ __('Search transactions...') }}" style="box-shadow: none;">
                                 </div>
                             </div>
 
@@ -349,35 +349,35 @@
                             
                             <!-- Quick Dates -->
                             <div class="btn-group btn-group-sm ms-lg-2">
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')])) }}" class="btn btn-outline-secondary rounded-start-pill" title="Today">Today</a>
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-d', strtotime('-1 day')), 'end_date' => date('Y-m-d', strtotime('-1 day'))])) }}" class="btn btn-outline-secondary" title="Yesterday">Yesterday</a>
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')])) }}" class="btn btn-outline-secondary" title="This Month">This Month</a>
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01', strtotime('-1 month')), 'end_date' => date('Y-m-t', strtotime('-1 month'))])) }}" class="btn btn-outline-secondary" title="Last Month">Last Month</a>
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-01-01'), 'end_date' => date('Y-12-31')])) }}" class="btn btn-outline-secondary" title="This Year">This Year</a>
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-01-01', strtotime('-1 year')), 'end_date' => date('Y-12-31', strtotime('-1 year'))])) }}" class="btn btn-outline-secondary rounded-end-pill" title="Last Year">Last Year</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')])) }}" class="btn btn-outline-secondary rounded-start-pill" title="{{ __('Today') }}">{{ __('Today') }}</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-d', strtotime('-1 day')), 'end_date' => date('Y-m-d', strtotime('-1 day'))])) }}" class="btn btn-outline-secondary" title="{{ __('Yesterday') }}">{{ __('Yesterday') }}</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')])) }}" class="btn btn-outline-secondary" title="{{ __('This Month') }}">{{ __('This Month') }}</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-m-01', strtotime('-1 month')), 'end_date' => date('Y-m-t', strtotime('-1 month'))])) }}" class="btn btn-outline-secondary" title="{{ __('Last Month') }}">{{ __('Last Month') }}</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-01-01'), 'end_date' => date('Y-12-31')])) }}" class="btn btn-outline-secondary" title="{{ __('This Year') }}">{{ __('This Year') }}</a>
+                                <a href="{{ route('transaksi.index', array_merge(request()->query(), ['start_date' => date('Y-01-01', strtotime('-1 year')), 'end_date' => date('Y-12-31', strtotime('-1 year'))])) }}" class="btn btn-outline-secondary rounded-end-pill" title="{{ __('Last Year') }}">{{ __('Last Year') }}</a>
                             </div>
                         </div>
 
                         <!-- Actions -->
                         <div class="d-flex gap-2 flex-wrap">
                             <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-flex align-items-center gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
-                                <i class="bi bi-sliders"></i> Filter
+                                <i class="bi bi-sliders"></i> {{ __('Filter') }}
                             </button>
                             
                             <div class="dropdown">
                                 <button class="btn btn-outline-success btn-sm dropdown-toggle rounded-pill px-3 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-download"></i> Export
+                                    <i class="bi bi-download"></i> {{ __('Export') }}
                                 </button>
                                 <ul class="dropdown-menu shadow border-0 rounded-3">
                                     <li><a class="dropdown-item" id="btnExportExcel" href="{{ route('transaksi.export.excel', request()->all()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
                                     <li><a class="dropdown-item" id="btnExportPdf" href="{{ route('transaksi.export.pdf', request()->all()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" id="btnExportEmail" href="#" data-bs-toggle="modal" data-bs-target="#emailExportModal"><i class="bi bi-envelope me-2 text-primary"></i> Send to Email</a></li>
+                                    <li><a class="dropdown-item" id="btnExportEmail" href="#" data-bs-toggle="modal" data-bs-target="#emailExportModal"><i class="bi bi-envelope me-2 text-primary"></i> {{ __('Export to Email') }}</a></li>
                                 </ul>
                             </div>
 
                              <button type="button" class="btn btn-success btn-sm rounded-pill px-3 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#importExcelModal">
-                                <i class="bi bi-upload"></i> Import
+                                <i class="bi bi-upload"></i> {{ __('Import') }}
                             </button>
 
                              <a href="{{ route('transaksi.download.template') }}" class="btn btn-outline-secondary btn-sm rounded-circle" title="Download Template" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
@@ -395,8 +395,8 @@
                                 <input type="hidden" name="end_date" value="{{ request('end_date') }}">
 
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Income Category</label>
-                                    <select name="pemasukan[]" id="filter-pemasukan" class="form-select" multiple placeholder="Select Income Categories..." autocomplete="off">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">{{ __('Income Category') }}</label>
+                                    <select name="pemasukan[]" id="filter-pemasukan" class="form-select" multiple placeholder="{{ __('Select Income Categories...') }}" autocomplete="off">
                                         @foreach ($listPemasukan as $item)
                                             <option value="{{ $item->id }}" @selected(in_array($item->id, (array)request('pemasukan', [])))>{{ $item->nama }}</option>
                                         @endforeach
@@ -404,16 +404,16 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Expense Category</label>
-                                    <select name="pengeluaran[]" id="filter-pengeluaran" class="form-select" multiple placeholder="Select Expense Categories..." autocomplete="off">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">{{ __('Expense Category') }}</label>
+                                    <select name="pengeluaran[]" id="filter-pengeluaran" class="form-select" multiple placeholder="{{ __('Select Expense Categories...') }}" autocomplete="off">
                                         @foreach ($listPengeluaran as $item)
                                             <option value="{{ $item->id }}" @selected(in_array($item->id, (array)request('pengeluaran', [])))>{{ $item->nama }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
-                                    <a href="{{ route('transaksi.index') }}" class="btn btn-sm btn-link text-decoration-none text-muted" id="btnResetFilter">Reset Filter</a>
-                                    <button type="button" id="btnApplyFilter" class="btn btn-primary btn-sm rounded-pill px-4">Apply Filter</button>
+                                    <a href="{{ route('transaksi.index') }}" class="btn btn-sm btn-link text-decoration-none text-muted" id="btnResetFilter">{{ __('Reset Filter') }}</a>
+                                    <button type="button" id="btnApplyFilter" class="btn btn-primary btn-sm rounded-pill px-4">{{ __('Apply Filter') }}</button>
                                 </div>
                             </form>
                         </div>
@@ -442,7 +442,7 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title text-success fw-bold">Income Details</h5>
+                <h5 class="modal-title text-success fw-bold">{{ __('Income Details') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2" id="income-modal-body">
@@ -462,7 +462,7 @@
                             <div class="text-end text-muted" style="font-size: 10px;">{{ number_format($percentage, 1) }}%</div>
                         </li>
                     @empty
-                        <li class="list-group-item text-center text-muted py-3">No data available</li>
+                        <li class="list-group-item text-center text-muted py-3">{{ __('No data available') }}</li>
                     @endforelse
                 </ul>
             </div>
@@ -474,7 +474,7 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow">
              <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title text-danger fw-bold">Expense Details</h5>
+                <h5 class="modal-title text-danger fw-bold">{{ __('Expense Details') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-2" id="expense-modal-body">
@@ -494,7 +494,7 @@
                              <div class="text-end text-muted" style="font-size: 10px;">{{ number_format($percentage, 1) }}%</div>
                         </li>
                     @empty
-                         <li class="list-group-item text-center text-muted py-3">No data available</li>
+                         <li class="list-group-item text-center text-muted py-3">{{ __('No data available') }}</li>
                     @endforelse
                 </ul>
             </div>
@@ -507,24 +507,24 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">Export to Email</h5>
+                <h5 class="modal-title fw-bold">{{ __('Export to Email') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold text-uppercase">Recipient Email</label>
+                    <label class="form-label text-muted small fw-bold text-uppercase">{{ __('Recipient Email') }}</label>
                     <input type="email" id="export_recipient_email" class="form-control" value="{{ Auth::user()->email }}" required>
                 </div>
                 <div class="alert alert-info d-flex align-items-center small border-0 bg-info-light text-info-dark" role="alert">
                     <i class="bi bi-info-circle me-2 fs-5"></i>
                     <div>
-                        Current filtered data will be sent to this email.
+                        {{ __('Current filtered data will be sent to this email.') }}
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="btnConfirmExportEmail" class="btn btn-primary rounded-pill px-4">Send</button>
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="button" id="btnConfirmExportEmail" class="btn btn-primary rounded-pill px-4">{{ __('Send') }}</button>
             </div>
         </div>
     </div>
@@ -536,25 +536,25 @@
         <form action="{{ route('transaksi.importTest') }}" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
             @csrf
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">Import Excel</h5>
+                <h5 class="modal-title fw-bold">{{ __('Import Excel') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold text-uppercase">Select Excel File</label>
+                    <label class="form-label text-muted small fw-bold text-uppercase">{{ __('Select Excel File') }}</label>
                     <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
-                    <div class="form-text">Supported formats: .xlsx, .xls, .csv</div>
+                    <div class="form-text">{{ __('Supported formats: .xlsx, .xls, .csv') }}</div>
                 </div>
                 <div class="alert alert-info d-flex align-items-center small border-0 bg-info-light text-info-dark" role="alert">
                     <i class="bi bi-info-circle me-2 fs-5"></i>
                     <div>
-                        Use the provided template to ensure correct data formatting.
+                        {{ __('Use the provided template to ensure correct data formatting.') }}
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary rounded-pill px-4">Import Data</button>
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Import Data') }}</button>
             </div>
         </form>
     </div>

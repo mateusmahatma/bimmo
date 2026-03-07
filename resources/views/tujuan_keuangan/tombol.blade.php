@@ -9,23 +9,23 @@
     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
         <li>
             <a class="dropdown-item" href="#" onclick="updateProgress('{{ $goal->id_tujuan_keuangan }}', '{{ $goal->nama_target }}')">
-                <i class="bi bi-plus-circle me-2 text-success"></i> Update Progress
+                <i class="bi bi-plus-circle me-2 text-success"></i> {{ __('Update Progress') }}
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="#" onclick="simulateGoal('{{ $goal->id_tujuan_keuangan }}', '{{ $goal->nama_target }}', {{ $goal->nominal_target }}, {{ $goal->nominal_terkumpul }})">
-                <i class="bi bi-graph-up me-2 text-info"></i> Simulate
+                <i class="bi bi-graph-up me-2 text-info"></i> {{ __('Simulate') }}
             </a>
         </li>
         <li>
             <a class="dropdown-item" href="#" onclick="viewHistory('{{ $goal->id_tujuan_keuangan }}', '{{ $goal->nama_target }}', {{ $goal->nominal_target }})">
-                <i class="bi bi-clock-history me-2 text-secondary"></i> History
+                <i class="bi bi-clock-history me-2 text-secondary"></i> {{ __('History') }}
             </a>
         </li>
         <li><hr class="dropdown-divider"></li>
         <li>
             <a class="dropdown-item text-danger" href="#" onclick="deleteGoal('{{ $goal->id_tujuan_keuangan }}')">
-                <i class="bi bi-trash me-2"></i> Delete
+                <i class="bi bi-trash me-2"></i> {{ __('Delete') }}
             </a>
         </li>
     </ul>

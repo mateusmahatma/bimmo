@@ -10,6 +10,9 @@ $(document).ready(function () {
                 d.filter_prioritas = $('#filter_prioritas').val();
             }
         },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
+        },
         scrollX: true,
         autoWidth: false,
         columns: [
@@ -62,10 +65,18 @@ $(document).ready(function () {
                 className: 'text-center',
                 render: function (data) {
                     let badge = 'bg-secondary';
-                    if (data === 'High') badge = 'bg-danger';
-                    if (data === 'Medium') badge = 'bg-warning text-dark';
-                    if (data === 'Low') badge = 'bg-info text-dark';
-                    return `<span class="badge ${badge}">${data}</span>`;
+                    let label = data;
+                    if (data === 'High') {
+                        badge = 'bg-danger';
+                        label = 'Tinggi';
+                    } else if (data === 'Medium') {
+                        badge = 'bg-warning text-dark';
+                        label = 'Sedang';
+                    } else if (data === 'Low') {
+                        badge = 'bg-info text-dark';
+                        label = 'Rendah';
+                    }
+                    return `<span class="badge ${badge}">${label}</span>`;
                 }
             },
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center' }
@@ -91,14 +102,14 @@ $(document).ready(function () {
             if (months <= 0) {
                 const days = end.diff(today, 'days');
                 if (days <= 0) {
-                    recText = "Deadline must be in the future.";
+                    recText = "Tenggat waktu harus di masa depan.";
                 } else {
                     const perDay = target / days;
-                    recText = `You need to save <strong>Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perDay))}/day</strong> to reach this goal.`;
+                    recText = `Anda perlu menabung <strong>Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perDay))}/hari</strong> untuk mencapai tujuan ini.`;
                 }
             } else {
                 const perMonth = target / months;
-                recText = `You need to save <strong>Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perMonth))}/month</strong> to reach this goal.`;
+                recText = `Anda perlu menabung <strong>Rp ${new Intl.NumberFormat('id-ID').format(Math.ceil(perMonth))}/bulan</strong> untuk mencapai tujuan ini.`;
             }
 
             $('#recommendationText').html(recText);
@@ -119,7 +130,7 @@ $(document).ready(function () {
         const remaining = target - current;
 
         if (remaining <= 0) {
-            $('#simResultDate').text('Already Reached!');
+            $('#simResultDate').text('Sudah Tercapai!');
             $('#simMonthsLeft').text('');
             return;
         }
@@ -127,8 +138,8 @@ $(document).ready(function () {
         const monthsNeeded = Math.ceil(remaining / monthly);
         const finishDate = moment().add(monthsNeeded, 'months');
 
-        $('#simResultDate').text(finishDate.format('MMMM YYYY'));
-        $('#simMonthsLeft').text(`In approximately ${monthsNeeded} month(s) from now.`);
+        $('#simResultDate').text(finishDate.locale('id').format('MMMM YYYY'));
+        $('#simMonthsLeft').text(`Sekitar ${monthsNeeded} bulan lagi dari sekarang.`);
     });
 });
 
@@ -143,13 +154,13 @@ function viewHistory(id, name, target) {
     $('#historyGoalName').text(name);
     $('#historyGoalTarget').html(`Target: Rp ${new Intl.NumberFormat('id-ID').format(target)}`);
 
-    $('#historyList').html('<tr><td colspan="4" class="text-center">Loading history...</td></tr>');
+    $('#historyList').html('<tr><td colspan="4" class="text-center">Memuat riwayat...</td></tr>');
     $('#modalHistory').modal('show');
 
     $.get(`/tujuan-keuangan/${id}/history`, function (logs) {
         let html = '';
         if (logs.length === 0) {
-            html = '<tr><td colspan="4" class="text-center">No progress history found.</td></tr>';
+            html = '<tr><td colspan="4" class="text-center">Tidak ada riwayat progres ditemukan.</td></tr>';
         } else {
             logs.forEach(log => {
                 const date = moment(log.created_at).format('DD MMM YYYY, HH:mm');
@@ -174,13 +185,14 @@ function viewHistory(id, name, target) {
 
 function deleteHistoryLog(logId) {
     Swal.fire({
-        title: 'Delete this entry?',
-        text: "This will also reduce your collected amount progress.",
+        title: 'Hapus entri ini?',
+        text: "Ini juga akan mengurangi progres jumlah yang terkumpul.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
@@ -191,7 +203,7 @@ function deleteHistoryLog(logId) {
                 },
                 success: function (response) {
                     if (response.success) {
-                        Swal.fire('Deleted!', 'History entry removed and progress adjusted.', 'success');
+                        Swal.fire('Terhapus!', 'Entri riwayat dihapus dan progres disesuaikan.', 'success');
                         $('#modalHistory').modal('hide');
                         $('#goalsTable').DataTable().ajax.reload();
                     }
@@ -218,13 +230,14 @@ function simulateGoal(id, name, target, collected) {
 
 function deleteGoal(id) {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: 'Apakah Anda yakin?',
+        text: "Anda tidak akan dapat mengembalikan ini!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
@@ -235,7 +248,7 @@ function deleteGoal(id) {
                 },
                 success: function (response) {
                     if (response.success) {
-                        Swal.fire('Deleted!', 'Goal has been deleted.', 'success');
+                        Swal.fire('Terhapus!', 'Tujuan telah dihapus.', 'success');
                         $('#goalsTable').DataTable().ajax.reload();
                     }
                 }

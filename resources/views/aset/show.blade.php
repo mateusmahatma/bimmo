@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Asset Detail')
+@section('title', __('Asset Detail'))
 
 @push('css')
 <style>
@@ -55,12 +55,12 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Asset Detail: {{ $aset->nama_aset }}</h1>
+    <h1 class="fw-bold mb-1">{{ __('Asset Detail') }}: {{ $aset->nama_aset }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('aset.index') }}">Assets</a></li>
-            <li class="breadcrumb-item active">Detail</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('aset.index') }}">{{ __('Assets') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Detail') }}</li>
         </ol>
     </nav>
 </div>
@@ -91,30 +91,30 @@
                     </div>
                     <ul class="list-group list-group-flush small">
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
-                            <span class="text-muted">Code</span>
+                            <span class="text-muted">{{ __('Code') }}</span>
                             <span class="fw-bold">{{ $aset->kode_aset }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
-                            <span class="text-muted">Brand/Model</span>
+                            <span class="text-muted">{{ __('Brand/Model') }}</span>
                             <span class="fw-bold">{{ $aset->merk_model ?: '-' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
-                            <span class="text-muted">Serial No</span>
+                            <span class="text-muted">{{ __('Serial No') }}</span>
                             <span class="fw-bold">{{ $aset->nomor_seri ?: '-' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
-                            <span class="text-muted">Location</span>
+                            <span class="text-muted">{{ __('Location') }}</span>
                             <span class="fw-bold">{{ $aset->lokasi ?: '-' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
-                            <span class="text-muted">PIC</span>
+                            <span class="text-muted">{{ __('PIC') }}</span>
                             <span class="fw-bold">{{ $aset->pic ?: '-' }}</span>
                         </li>
                     </ul>
                     @if($aset->dokumen)
                     <div class="mt-3">
                         <a href="{{ asset('storage/'.$aset->dokumen) }}" target="_blank" class="btn btn-outline-info btn-sm w-100 rounded-pill">
-                            <i class="bi bi-file-earmark-text me-1"></i> View Document
+                            <i class="bi bi-file-earmark-text me-1"></i> {{ __('View Document') }}
                         </a>
                     </div>
                     @endif
@@ -127,36 +127,40 @@
             <!-- Financial Card -->
             <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
                 <div class="card-header bg-white border-0 py-3">
-                    <h5 class="card-title mb-0 fw-bold"><i class="bi bi-cash-stack me-2 text-primary"></i>Financial & Depreciation</h5>
+                    <h5 class="card-title mb-0 fw-bold"><i class="bi bi-cash-stack me-2 text-primary"></i>{{ __('Financial & Depreciation') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center mb-3">
                         <div class="col-md-4 border-end">
-                            <p class="text-muted small mb-1">Purchase Price</p>
+                            <p class="text-muted small mb-1">{{ __('Purchase Price') }}</p>
                             <h5 class="fw-bold text-dark">Rp {{ number_format($aset->harga_beli, 0, ',', '.') }}</h5>
                         </div>
                         <div class="col-md-4 border-end">
-                            <p class="text-muted small mb-1">Current Book Value</p>
+                            <p class="text-muted small mb-1">{{ __('Current Book Value') }}</p>
                             <h5 class="fw-bold text-primary">Rp {{ number_format($aset->nilai_buku, 0, ',', '.') }}</h5>
                         </div>
                         <div class="col-md-4">
-                            <p class="text-muted small mb-1">Monthly Depr.</p>
+                            <p class="text-muted small mb-1">{{ __('Monthly Depr.') }}</p>
                             <h5 class="fw-bold text-danger">Rp {{ number_format($aset->penyusutan_bulanan, 0, ',', '.') }}</h5>
                         </div>
                     </div>
                     <div class="alert bg-light border-0 small">
                         <i class="bi bi-info-circle me-1 text-info"></i>
-                        Depreciation is calculated using the <strong>Straight-Line Method</strong> over {{ $aset->masa_pakai }} years with a residual value of Rp {{ number_format($aset->nilai_sisa, 0, ',', '.') }}.
+                        {!! __('Depreciation is calculated using the :method over :years years with a residual value of Rp :residual.', [
+                            'method' => '<strong>' . __('Straight-Line Method') . '</strong>',
+                            'years' => $aset->masa_pakai,
+                            'residual' => number_format($aset->nilai_sisa, 0, ',', '.')
+                        ]) !!}
                     </div>
                     @if(!$aset->is_disposed)
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#disposeModal">
-                            <i class="bi bi-trash-fill me-1"></i> Dispose Asset
+                            <i class="bi bi-trash-fill me-1"></i> {{ __('Dispose Asset') }}
                         </button>
                     </div>
                     @else
                     <div class="alert alert-warning py-2 mb-0">
-                        <strong>Disposed:</strong> This asset was removed on {{ $aset->tanggal_disposal->format('d M Y') }} for: {{ $aset->alasan_disposal }}.
+                        <strong>{{ __('Disposed') }}:</strong> {{ __('This asset was removed on :date for: :reason.', ['date' => $aset->tanggal_disposal->format('d M Y'), 'reason' => $aset->alasan_disposal]) }}
                     </div>
                     @endif
                 </div>
@@ -165,9 +169,9 @@
             <!-- Maintenance Log -->
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0 fw-bold"><i class="bi bi-tools me-2 text-warning"></i>Maintenance History</h5>
+                    <h5 class="card-title mb-0 fw-bold"><i class="bi bi-tools me-2 text-warning"></i>{{ __('Maintenance History') }}</h5>
                     <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
-                        <i class="bi bi-plus-lg me-1"></i> Add Log
+                        <i class="bi bi-plus-lg me-1"></i> {{ __('Add Log') }}
                     </button>
                 </div>
                 <div class="card-body p-0">
@@ -175,11 +179,11 @@
                         <table class="table table-hover align-middle mb-0 small">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="px-3">Date</th>
-                                    <th>Activity</th>
-                                    <th>Technician</th>
-                                    <th>Cost</th>
-                                    <th class="text-end px-3">Action</th>
+                                    <th class="px-3">{{ __('Date') }}</th>
+                                    <th>{{ __('Activity') }}</th>
+                                    <th>{{ __('Technician') }}</th>
+                                    <th>{{ __('Cost') }}</th>
+                                    <th class="text-end px-3">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -190,12 +194,12 @@
                                     <td>{{ $log->teknisi ?: '-' }}</td>
                                     <td class="text-nowrap">Rp {{ number_format($log->biaya, 0, ',', '.') }}</td>
                                     <td class="text-end px-3">
-                                        <button class="btn btn-sm text-info" title="View details" onclick="showLogDetail('{{ $log->kegiatan }}', '{{ $log->keterangan }}')"><i class="bi bi-info-circle"></i></button>
+                                        <button class="btn btn-sm text-info" title="{{ __('View details') }}" onclick="showLogDetail('{{ $log->kegiatan }}', '{{ $log->keterangan }}')"><i class="bi bi-info-circle"></i></button>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">No maintenance records found.</td>
+                                    <td colspan="5" class="text-center py-4 text-muted">{{ __('No maintenance records found.') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -213,37 +217,37 @@
         <form action="{{ route('aset.maintenance.store', $aset->id) }}" method="POST" class="modal-content border-0">
             @csrf
             <div class="modal-header border-bottom">
-                <h5 class="modal-title fw-bold">Add Maintenance Log</h5>
+                <h5 class="modal-title fw-bold">{{ __('Add Maintenance Log') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Maintenance Date</label>
+                    <label class="form-label fw-bold small">{{ __('Maintenance Date') }}</label>
                     <input type="date" name="tanggal" class="form-control" value="{{ date('Y-m-d') }}" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Activity Name</label>
+                    <label class="form-label fw-bold small">{{ __('Activity Name') }}</label>
                     <input type="text" name="kegiatan" class="form-control" placeholder="e.g., Routine Service, Part Replacement" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Technician / Vendor</label>
+                    <label class="form-label fw-bold small">{{ __('Technician / Vendor') }}</label>
                     <input type="text" name="teknisi" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Cost</label>
+                    <label class="form-label fw-bold small">{{ __('Cost') }}</label>
                     <div class="input-group">
                         <span class="input-group-text">Rp</span>
                         <input type="number" name="biaya" class="form-control" required>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Description</label>
+                    <label class="form-label fw-bold small">{{ __('Description') }}</label>
                     <textarea name="keterangan" class="form-control" rows="3"></textarea>
                 </div>
             </div>
             <div class="modal-footer border-top">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">Save Log</button>
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">{{ __('Save Log') }}</button>
             </div>
         </form>
     </div>
@@ -255,26 +259,26 @@
         <form action="{{ route('aset.dispose', $aset->id) }}" method="POST" class="modal-content border-0">
             @csrf
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title fw-bold">Asset Disposal / Write-off</h5>
+                <h5 class="modal-title fw-bold">{{ __('Asset Disposal / Write-off') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Disposal Date</label>
+                    <label class="form-label fw-bold small">{{ __('Disposal Date') }}</label>
                     <input type="date" name="tanggal_disposal" class="form-control" value="{{ date('Y-m-d') }}" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Reason for Disposal</label>
+                    <label class="form-label fw-bold small">{{ __('Reason for Disposal') }}</label>
                     <select name="alasan_disposal" class="form-select" required>
-                        <option value="">Select Reason</option>
-                        <option value="Broken">Broken Beyond Repair</option>
-                        <option value="Sold">Sold / Traded-in</option>
-                        <option value="Donated">Donated / Gifted</option>
-                        <option value="Lost">Lost / Stolen</option>
+                        <option value="">{{ __('Select Reason') }}</option>
+                        <option value="Broken">{{ __('Broken Beyond Repair') }}</option>
+                        <option value="Sold">{{ __('Sold / Traded-in') }}</option>
+                        <option value="Donated">{{ __('Donated / Gifted') }}</option>
+                        <option value="Lost">{{ __('Lost / Stolen') }}</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Sale/Disposal Value (if any)</label>
+                    <label class="form-label fw-bold small">{{ __('Sale/Disposal Value (if any)') }}</label>
                     <div class="input-group">
                         <span class="input-group-text">Rp</span>
                         <input type="number" name="nilai_disposal" class="form-control" placeholder="0">
@@ -282,8 +286,8 @@
                 </div>
             </div>
             <div class="modal-footer border-top">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">Confirm Disposal</button>
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">{{ __('Confirm Disposal') }}</button>
             </div>
         </form>
     </div>
@@ -296,9 +300,9 @@
     function showLogDetail(title, desc) {
         Swal.fire({
             title: title,
-            text: desc || 'No description available.',
+            text: desc || "{{ __('No description available.') }}",
             icon: 'info',
-            confirmButtonText: 'OK',
+            confirmButtonText: "{{ __('OK') }}",
             confirmButtonColor: '#0d6efd',
             customClass: {
                 popup: 'rounded-4 shadow-lg'

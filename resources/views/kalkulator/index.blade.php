@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Budget Calculator')
+@section('title', __('Budget Calculator'))
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -58,11 +58,11 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Budget Monitoring</h1>
+    <h1 class="fw-bold mb-1">{{ __('Budget Monitoring') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Budget Monitoring</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Budget Monitoring') }}</li>
         </ol>
     </nav>
 </div>
@@ -74,23 +74,23 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Calculate New Budget</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Enter income and period to calculate the Budget.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Calculate New Budget') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Enter income and period to calculate the Budget.') }}</p>
                     </div>
                     <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
-                        <i class="bi bi-info-circle me-1"></i> Instructions
+                        <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                     </button>
                 </div>
 
                 <div class="collapse" id="instructionsCollapse">
                     <div class="card-body bg-light border-bottom">
                         <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                            <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-2"></i>Steps:</h6>
+                            <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-2"></i>{{ __('Steps:') }}</h6>
                             <ol class="mb-0 ps-3 small">
-                                <li>Fill in the <strong>Monthly Fixed Income</strong> field.</li>
-                                <li>Fill in the <strong>Additional Income</strong> field (if any).</li>
-                                <li>Select the <strong>Date Range</strong> for the Budget period.</li>
-                                <li>Click the <strong>Process Budget</strong> button.</li>
+                                <li>{!! __('Fill in the <strong>Monthly Fixed Income</strong> field.') !!}</li>
+                                <li>{!! __('Fill in the <strong>Additional Income</strong> field (if any).') !!}</li>
+                                <li>{!! __('Select the <strong>Date Range</strong> for the Budget period.') !!}</li>
+                                <li>{!! __('Click the <strong>Process Budget</strong> button.') !!}</li>
                             </ol>
                         </div>
                     </div>
@@ -102,28 +102,28 @@
                         <div class="row g-4">
                             <!-- Income Section -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-uppercase text-muted">Income Information</label>
+                                <label class="form-label fw-bold small text-uppercase text-muted">{{ __('Income Information') }}</label>
                                 <div class="mb-3">
-                                    <label for="monthly_income" class="form-label">Fixed Income (Monthly)</label>
+                                    <label for="monthly_income" class="form-label">{{ __('Fixed Income (Monthly)') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">Rp</span>
-                                        <input type="text" class="form-control" id="monthly_income" name="monthly_income" placeholder="Example: 5.000.000" required>
+                                        <input type="text" class="form-control" id="monthly_income" name="monthly_income" placeholder="{{ __('Example: 5.000.000') }}" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="additional_income" class="form-label">Other Income (Optional)</label>
+                                    <label for="additional_income" class="form-label">{{ __('Other Income (Optional)') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">Rp</span>
-                                        <input type="text" class="form-control" id="additional_income" name="additional_income" placeholder="Example: 1.000.000">
+                                        <input type="text" class="form-control" id="additional_income" name="additional_income" placeholder="{{ __('Example: 1.000.000') }}">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Period Section -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small text-uppercase text-muted">Budget Period</label>
+                                <label class="form-label fw-bold small text-uppercase text-muted">{{ __('Budget Period') }}</label>
                                 <div class="mb-3">
-                                    <label class="form-label">Date Range</label>
+                                    <label class="form-label">{{ __('Date Range') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i class="bi bi-calendar3"></i></span>
                                         <div id="daterange" class="form-control" style="cursor: pointer;">
@@ -132,15 +132,15 @@
                                         <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
                                         <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
                                     </div>
-                                    <div class="form-text small">Select start and end dates for budget calculation.</div>
+                                    <div class="form-text small">{{ __('Select start and end dates for budget calculation.') }}</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                            <button type="button" class="btn btn-light rounded-pill px-3 shadow-sm" id="btnReset">Reset</button>
+                            <button type="button" class="btn btn-light rounded-pill px-3 shadow-sm" id="btnReset">{{ __('Reset') }}</button>
                             <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm" id="btnProses">
-                                <i class="bi bi-Monitoring me-1"></i> Process Budget
+                                <i class="bi bi-Monitoring me-1"></i> {{ __('Process Budget') }}
                                 <span id="btnProsesSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -154,11 +154,11 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Budget Process History</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">List of your budget calculation history.</p>
+                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Process History') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('List of your budget calculation history.') }}</p>
                     </div>
                     <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
-                        <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
+                        <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                     </button>
                 </div>
                 <div class="card-body p-0">
@@ -171,15 +171,15 @@
                                             <input class="form-check-input" type="checkbox" id="checkAll">
                                         </div>
                                     </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 text-center">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Period</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Budget Name</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">Expense Type</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">Percentage</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Budget Amount</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Used</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">Remaining</th>
-                                    <th style="width: 5%;" class="text-center text-secondary small text-uppercase fw-bold py-3">Action</th>
+                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('No') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Period') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Budget Name') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Expense Type') }}</th>
+                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Percentage') }}</th>
+                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">{{ __('Budget Amount') }}</th>
+                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">{{ __('Used') }}</th>
+                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">{{ __('Remaining') }}</th>
+                                    <th style="width: 5%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

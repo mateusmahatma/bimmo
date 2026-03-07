@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Wallet')
+@section('title', __('Wallet'))
 
 @push('css')
 <style>
@@ -55,11 +55,11 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Wallet</h1>
+    <h1 class="fw-bold mb-1">{{ __('Wallet') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Wallet</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Wallet') }}</li>
         </ol>
     </nav>
 </div>
@@ -101,8 +101,8 @@
     <div class="card card-summary shadow-sm">
         <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">Total Current Balance</h5>
-                <p class="text-muted small mb-0">Combined balance from all of your active wallet accounts.</p>
+                <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Total Current Balance') }}</h5>
+                <p class="text-muted small mb-0">{{ __('Combined balance from all of your active wallet accounts.') }}</p>
             </div>
             <div class="text-end">
                 <h2 class="balance-amount mb-0">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
@@ -115,15 +115,15 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
                 <div>
-                    <h5 class="fw-bold mb-0 text-dark">Wallet Portfolio</h5>
-                    <p class="text-muted small mb-0">Manage your various funding sources here</p>
+                    <h5 class="fw-bold mb-0 text-dark">{{ __('Wallet Portfolio') }}</h5>
+                    <p class="text-muted small mb-0">{{ __('Manage your various funding sources here') }}</p>
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
-                        <i class="bi bi-info-circle me-1"></i> Instructions
+                        <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                     </button>
                     <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                        <i class="bi bi-plus-lg me-1"></i> Add Wallet
+                        <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet') }}
                     </button>
                 </div>
             </div>
@@ -132,20 +132,20 @@
             <div class="collapse mb-4" id="instructionsCollapse">
                 <div class="card-body bg-light border-bottom mb-4" style="border-radius: 12px;">
                     <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-lightbulb me-2"></i>How to Use the Wallet Page:</h6>
+                        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-lightbulb me-2"></i>{{ __('How to Use the Wallet Page') }}:</h6>
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <ul class="mb-0 ps-3 small text-muted list-unstyled">
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">1</span> Click <strong>Add Wallet</strong> to create a new account.</li>
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">2</span> Enter the wallet name, icon, and initial balance, if any.</li>
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">3</span> Activate <strong>"Input as income"</strong> if you want the opening balance to be recorded in the cash flow.</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">1</span> {!! __('Click **Add Wallet** to create a new account.') !!}</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">2</span> {{ __('Enter the wallet name, icon, and initial balance, if any.') }}</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">3</span> {!! __('Activate **"Input as income"** if you want the opening balance to be recorded in the cash flow.') !!}</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="mb-0 ps-3 small text-muted list-unstyled">
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">4</span> Click on the wallet card to view <strong>Transaction History</strong>.</li>
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">5</span> Use the <strong>Add Balance</strong> button in the history to manually top up.</li>
-                                    <li><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">6</span> Balance is automatically updated when recording income/expense transactions.</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">4</span> {!! __('Click on the wallet card to view **Transaction History**.') !!}</li>
+                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">5</span> {!! __('Use the **Add Balance** button in the history to manually top up.') !!}</li>
+                                    <li><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">6</span> {{ __('Balance is automatically updated when recording income/expense transactions.') }}</li>
                                 </ul>
                             </div>
                         </div>
@@ -177,7 +177,7 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px; z-index: 1050;">
                                             <li><a class="dropdown-item text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
-                                                <i class="bi bi-trash me-2"></i> Delete Wallet
+                                                <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
                                             </a></li>
                                         </ul>
                                     </div>
@@ -188,7 +188,7 @@
                                     <h4 class="fw-bold mb-0 text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h4>
                                     
                                     <div class="mt-4 d-flex align-items-center text-primary fw-semibold small">
-                                        View Details <i class="bi bi-arrow-right ms-2 transition-icon"></i>
+                                        {{ __('View Details') }} <i class="bi bi-arrow-right ms-2 transition-icon"></i>
                                     </div>
                                 </a>
                             </div>
@@ -200,10 +200,10 @@
                         <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
                             <i class="bi bi-wallet2 text-muted display-4"></i>
                         </div>
-                        <h5 class="fw-bold text-dark">No wallets yet</h5>
-                        <p class="text-muted">Start managing your finances by adding your first wallet.</p>
+                        <h5 class="fw-bold text-dark">{{ __('No wallets yet') }}</h5>
+                        <p class="text-muted">{{ __('Start managing your finances by adding your first wallet.') }}</p>
                         <button type="button" class="btn btn-primary rounded-pill mt-2 px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                            <i class="bi bi-plus-lg me-1"></i> Add Wallet Now
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet Now') }}
                         </button>
                     </div>
                 @endif
@@ -216,18 +216,18 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0" style="border-radius: 15px;">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Add New Wallet</h5>
+                <h5 class="modal-title fw-bold">{{ __('Add New Wallet') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('dompet.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Wallet Name</label>
-                        <input type="text" name="nama" class="form-control rounded-3" placeholder="e.g. Bank Account, PayPal, Cash" required>
+                        <label class="form-label small fw-bold text-muted">{{ __('Wallet Name') }}</label>
+                        <input type="text" name="nama" class="form-control rounded-3" placeholder="{{ __('e.g. Bank Account, PayPal, Cash') }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Initial Balance</label>
+                        <label class="form-label small fw-bold text-muted">{{ __('Initial Balance') }}</label>
                         <div class="input-group mb-2">
                             <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
                             <input type="number" name="saldo" class="form-control rounded-end-3 border-start-0" placeholder="0" required>
@@ -235,20 +235,20 @@
                         <div class="form-check form-switch small">
                             <input class="form-check-input" type="checkbox" name="record_income" id="recordIncome" value="1" checked>
                             <label class="form-check-label text-muted" for="recordIncome">
-                                Record as income in cash flow?
+                                {{ __('Record as income in cash flow?') }}
                             </label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <input type="hidden" name="ikon" value="wallet">
-                        <label class="form-label small fw-bold text-muted">Or Attach Custom Image/Icon</label>
+                        <label class="form-label small fw-bold text-muted">{{ __('Or Attach Custom Image/Icon') }}</label>
                         <input type="file" name="custom_ikon" class="form-control rounded-3" accept="image/*">
-                        <div class="form-text small">Maximum 2MB (Jpeg, Png, Svg, Gif)</div>
+                        <div class="form-text small">{{ __('Maximum 2MB (Jpeg, Png, Svg, Gif)') }}</div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">Save</button>
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Save') }}</button>
                 </div>
             </form>
         </div>
@@ -260,7 +260,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0" style="border-radius: 15px;">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Delete Wallet</h5>
+                <h5 class="modal-title fw-bold">{{ __('Delete Wallet') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="deleteWalletForm" method="POST">
@@ -270,12 +270,12 @@
                     <div class="mb-3 text-danger">
                         <i class="bi bi-exclamation-octagon display-4"></i>
                     </div>
-                    <h5 class="fw-bold mb-2">Delete Wallet <span id="deleteWalletName"></span>?</h5>
-                    <p class="text-muted small px-4">This action cannot be undone. Wallets can only be deleted if they have no transaction history.</p>
+                    <h5 class="fw-bold mb-2">{{ __('Delete Wallet') }} <span id="deleteWalletName"></span>?</h5>
+                    <p class="text-muted small px-4">{{ __('This action cannot be undone. Wallets can only be deleted if they have no transaction history.') }}</p>
                 </div>
                 <div class="modal-footer border-0 pt-0 justify-content-center">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4">Yes, Delete</button>
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">{{ __('Yes, Delete') }}</button>
                 </div>
             </form>
         </div>

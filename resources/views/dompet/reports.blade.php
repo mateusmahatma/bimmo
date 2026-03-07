@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Wallet Reports')
+@section('title', __('Wallet Reports'))
 
 @push('css')
 <style>
@@ -55,12 +55,12 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Financial Reports</h1>
+    <h1 class="fw-bold mb-1">{{ __('Financial Reports') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('dompet.index') }}">Wallet</a></li>
-            <li class="breadcrumb-item active">Reports</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dompet.index') }}">{{ __('Wallet') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Reports') }}</li>
         </ol>
     </nav>
 </div>
@@ -71,7 +71,7 @@
         <div class="col-12 col-md-6">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-3">Balance Distribution</h5>
+                    <h5 class="card-title fw-bold mb-3">{{ __('Balance Distribution') }}</h5>
                     <div id="walletDistributionChart" style="min-height: 300px;"></div>
                 </div>
             </div>
@@ -80,7 +80,7 @@
         <div class="col-12 col-md-6">
             <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-3">Income vs Expense</h5>
+                    <h5 class="card-title fw-bold mb-3">{{ __('Income vs Expense') }}</h5>
                     <div id="incomeVsExpenseChart" style="min-height: 300px;"></div>
                 </div>
             </div>

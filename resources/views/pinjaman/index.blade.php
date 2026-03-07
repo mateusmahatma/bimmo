@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Liability List')
+@section('title', __('Liability List'))
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -137,11 +137,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Liability List</h1>
+    <h1 class="fw-bold mb-1">{{ __('Liability List') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Liabilitys</li>
+            <li class="breadcrumb-item active">{{ __('Liabilitys') }}</li>
         </ol>
     </nav>
 </div>
@@ -163,7 +163,7 @@
                             <i class="bi bi-bank fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Total Liability</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Liability') }}</h6>
                             <h4 class="mb-0 fw-bold text-primary" id="statTotalOriginal">Rp {{ number_format($totalOriginal, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -179,7 +179,7 @@
                             <i class="bi bi-check-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Total Paid</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Paid') }}</h6>
                             <h4 class="mb-0 fw-bold text-success" id="statTotalPaid">Rp {{ number_format($totalPaid, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -195,7 +195,7 @@
                             <i class="bi bi-exclamation-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">Remaining Balance</h6>
+                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Remaining Balance') }}</h6>
                             <h4 class="mb-0 fw-bold text-danger" id="totalPinjaman">Rp {{ number_format($totalRemaining, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -208,19 +208,19 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">Liability List</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">Manage and track your Liability records.</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Liability List') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage and track your Liability records.') }}</p>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
-                            <i class="bi bi-info-circle me-1"></i> Instructions
+                            <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                         </button>
                         <div class="vr mx-1 d-none d-lg-block"></div>
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
                             <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-plus-lg me-1"></i> Add New Liability
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Liability') }}
                         </a>
                     </div>
                 </div>
@@ -230,23 +230,23 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>How to Pay Liability:</h6>
+                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>{{ __('How to Pay Liability:') }}</h6>
                                     <ol class="mb-0 ps-3 small">
-                                        <li>Find the Liability you want to pay in the list below.</li>
-                                        <li>Click the <strong>Blue Eye Icon</strong> (<i class="bi bi-eye"></i>) to view details.</li>
-                                        <li>Click the <strong>Pay Liability</strong> button at the top right of the history section.</li>
-                                        <li>Enter the amount, date, and optionally upload proof.</li>
+                                        <li>{{ __('Find the Liability you want to pay in the list below.') }}</li>
+                                        <li>{{ __('Click the Blue Eye Icon') }} (<strong><i class="bi bi-eye"></i></strong>) {{ __('to view details.') }}</li>
+                                        <li>{{ __('Click the Pay Liability button at the top right of the history section.') }}</li>
+                                        <li>{{ __('Enter the amount, date, and optionally upload proof.') }}</li>
                                     </ol>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="alert alert-success border-0 bg-white shadow-sm mb-0 text-dark">
-                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-upload me-2"></i>How to Upload Proof:</h6>
+                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-upload me-2"></i>{{ __('How to Upload Proof:') }}</h6>
                                     <ol class="mb-0 ps-3 small">
-                                        <li>You can upload proof while <strong>making a payment</strong>.</li>
-                                        <li>To add/update proof later, go to <strong>Details</strong> view.</li>
-                                        <li>In the History table, click the <strong>Pencil Icon</strong> (<i class="bi bi-pencil"></i>) on a payment row.</li>
-                                        <li>Choose your file (JPG, PNG, PDF) and save.</li>
+                                        <li>{{ __('You can upload proof while making a payment.') }}</li>
+                                        <li>{{ __('To add/update proof later, go to Details view.') }}</li>
+                                        <li>{{ __('In the History table, click the Pencil Icon') }} (<strong><i class="bi bi-pencil"></i></strong>) {{ __('on a payment row.') }}</li>
+                                        <li>{{ __('Choose your file (JPG, PNG, PDF) and save.') }}</li>
                                     </ol>
                                 </div>
                             </div>
@@ -265,9 +265,9 @@
                                     {{-- DataTables default search will be used, but we can style a custom one if needed. 
                                          However, JS is set to use the built-in search. Let's just keep the status filter for now. --}}
                                     <select class="form-select bg-light border-start-0 rounded-end-pill" id="filter_status" style="box-shadow: none;">
-                                        <option value="">All Status</option>
-                                        <option value="belum_lunas">Unpaid Only</option>
-                                        <option value="lunas">Paid Only</option>
+                                        <option value="">{{ __('All Status') }}</option>
+                                        <option value="belum_lunas">{{ __('Unpaid Only') }}</option>
+                                        <option value="lunas">{{ __('Paid Only') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -275,7 +275,7 @@
 
                         <div class="d-flex gap-2">
                              <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm rounded-pill px-3 d-flex align-items-center gap-2">
-                                <i class="bi bi-file-earmark-excel"></i> Export Excel
+                                <i class="bi bi-file-earmark-excel"></i> {{ __('Export Excel') }}
                             </a>
                         </div>
                     </div>
@@ -294,14 +294,14 @@
                                     <th style="width: 5%;" class="text-center">
                                         <input class="form-check-input" type="checkbox" id="checkAll">
                                     </th>
-                                    <th style="width: 5%;">No</th>
-                                    <th>Liability Name</th>
-                                    <th>Notes</th>
-                                    <th class="text-end">Total Liability</th>
-                                    <th class="text-end">Paid Amount</th>
-                                    <th class="text-end">Remaining Balance</th>
-                                    <th class="text-center">Status</th>
-                                    <th style="width: 10%;" class="text-center">Action</th>
+                                    <th style="width: 5%;">{{ __('No') }}</th>
+                                    <th>{{ __('Liability Name') }}</th>
+                                    <th>{{ __('Notes') }}</th>
+                                    <th class="text-end">{{ __('Total Liability') }}</th>
+                                    <th class="text-end">{{ __('Paid Amount') }}</th>
+                                    <th class="text-end">{{ __('Remaining Balance') }}</th>
+                                    <th class="text-center">{{ __('Status') }}</th>
+                                    <th style="width: 10%;" class="text-center">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

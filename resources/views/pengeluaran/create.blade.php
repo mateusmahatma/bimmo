@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Add Expense Category')
+@section('title', __('Add Expense Category'))
 
 @push('css')
 <style>
@@ -56,12 +56,12 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">Add Expense Category</h1>
+    <h1 class="fw-bold mb-1">{{ __('Add Expense Category') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('pengeluaran.index') }}">Expense</a></li>
-            <li class="breadcrumb-item active">Add New</li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pengeluaran.index') }}">{{ __('Expense') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Add New') }}</li>
         </ol>
     </nav>
 </div>
@@ -71,8 +71,8 @@
         <div class="col-lg-6">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">New Category Details</h5>
-                    <p class="text-muted small mb-0 mt-1">Specify the name for your new expense category.</p>
+                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('New Category Details') }}</h5>
+                    <p class="text-muted small mb-0 mt-1">{{ __('Specify the name for your new expense category.') }}</p>
                 </div>
                 <div class="card-body p-4">
                     @if ($errors->any())
@@ -90,15 +90,15 @@
                         @csrf
 
                         <div class="mb-4">
-                            <label for="nama" class="form-label fw-bold small text-uppercase text-muted">Category Name <span class="text-danger">*</span></label>
-                            <input name="nama" type="text" class="form-control form-control-lg" id="nama" placeholder="e.g. Food, Rent, Entertainment"
+                            <label for="nama" class="form-label fw-bold small text-uppercase text-muted">{{ __('Category Name') }} <span class="text-danger">*</span></label>
+                            <input name="nama" type="text" class="form-control form-control-lg" id="nama" placeholder="{{ __('e.g. Food, Rent, Entertainment') }}"
                                 value="{{ old('nama') }}" required>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{{ route('pengeluaran.index') }}" class="btn btn-light btn-lg px-4 rounded-pill">Cancel</a>
+                            <a href="{{ route('pengeluaran.index') }}" class="btn btn-light btn-lg px-4 rounded-pill">{{ __('Cancel') }}</a>
                             <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
-                                <i class="bi bi-check-lg me-2"></i> Save Category
+                                <i class="bi bi-check-lg me-2"></i> {{ __('Save Category') }}
                             </button>
                         </div>
                     </form>
