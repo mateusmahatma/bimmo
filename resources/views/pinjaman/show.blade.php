@@ -225,7 +225,7 @@
                                                 data-bs-toggle="tooltip" title="Edit Payment" style="width: 32px; height: 32px; padding:0; display:flex; align-items:center; justify-content:center;">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
-                                            <form action="{{ route('bayar_pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this payment record?');">
+                                            <form action="{{ route('bayar-pinjaman.destroy', $bayar_pinjaman->id_bayar) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this payment record?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" data-bs-toggle="tooltip" title="Delete Payment" style="width: 32px; height: 32px; padding:0; display:flex; align-items:center; justify-content:center;">
