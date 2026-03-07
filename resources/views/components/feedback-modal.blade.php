@@ -3,32 +3,32 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="feedbackModalLabel">Send Feedback</h5>
+                <h5 class="modal-title" id="feedbackModalLabel">{{ __('Send Feedback') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="feedbackForm" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="feedbackDescription" class="form-label">Description of Issue or Suggestion</label>
+                        <label for="feedbackDescription" class="form-label">{{ __('Description of Issue or Suggestion') }}</label>
                         <textarea class="form-control" id="feedbackDescription" name="description" rows="4" 
-                            placeholder="Describe the technical issue or suggestion..." required minlength="10"></textarea>
+                            placeholder="{{ __('Describe the technical issue or suggestion...') }}" required minlength="10"></textarea>
                         <div class="form-text text-muted">
-                            Minimum 10 characters.
+                            {{ __('Minimum 10 characters.') }}
                         </div>
                         <div class="invalid-feedback" id="descriptionError"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="feedbackFiles" class="form-label">Attachments (Optional)</label>
+                        <label for="feedbackFiles" class="form-label">{{ __('Attachments (Optional)') }}</label>
                         <input class="form-control" type="file" id="feedbackFiles" name="files[]" multiple accept="image/*,.pdf,.doc,.docx">
                         <div class="invalid-feedback" id="filesError"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                     <button type="submit" class="btn btn-primary" id="btnSendFeedback">
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        Send Feedback
+                        {{ __('Send Feedback') }}
                     </button>
                 </div>
             </form>

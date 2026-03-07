@@ -140,7 +140,7 @@
     <h1 class="fw-bold mb-1">{{ __('Liability List') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
             <li class="breadcrumb-item active">{{ __('Liabilitys') }}</li>
         </ol>
     </nav>

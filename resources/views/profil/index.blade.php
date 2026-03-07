@@ -3,13 +3,13 @@
 @section('container')
 <div class="row">
     <div class="col-md-12">
-        <h2 class="mb-4">User Profile</h2>
+        <h2 class="mb-4">{{ __('User Profile') }}</h2>
 
 
         <!-- Foto Profil -->
         <div class="card mb-4">
             <div class="card-header">
-                Profile Photo
+                {{ __('Profile Photo') }}
             </div>
             <div class="card-body">
                 @if(session('photo_status'))
@@ -44,18 +44,18 @@
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
-                                <label for="profile_photo" class="form-label">Select Photo</label>
+                                <label for="profile_photo" class="form-label">{{ __('Select Photo') }}</label>
                                 <input class="form-control" type="file" id="profile_photo" name="profile_photo" accept="image/*" required>
                                 <div class="form-text">Maksimum 2MB (JPG, PNG, GIF, SVG).</div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Upload New Photo</button>
+                            <button type="submit" class="btn btn-primary">{{ __('Upload New Photo') }}</button>
                         </form>
                         
                         @if(auth()->user()->profile_photo)
                             <form action="{{ route('profil.deletePhoto') }}" method="POST" class="mt-2">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?')">Remove Photo</button>
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?')">{{ __('Remove Photo') }}</button>
                             </form>
                         @endif
                     </div>
@@ -66,41 +66,41 @@
         <!-- Subscription Settings -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Subscription Details</span>
+                <span>{{ __('Subscription Details') }}</span>
                 @if(auth()->user()->isSubscribed())
-                    <span class="badge bg-success">Active</span>
+                    <span class="badge bg-success">{{ __('Active') }}</span>
                 @elseif(auth()->user()->isOnTrial())
-                    <span class="badge bg-info">Trial Period</span>
+                    <span class="badge bg-info">{{ __('Trial Period') }}</span>
                 @else
-                    <span class="badge bg-danger">Inactive</span>
+                    <span class="badge bg-danger">{{ __('Inactive') }}</span>
                 @endif
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <p class="mb-1 text-muted small text-uppercase fw-bold">Current Status</p>
+                    <p class="mb-1 text-muted small text-uppercase fw-bold">{{ __('Current Status') }}</p>
                     @if(auth()->user()->isSubscribed())
-                        <p class="mb-0">You are currently subscribed. Ends on: <strong>{{ auth()->user()->subscription_ends_at->format('d M Y') }}</strong> ({{ auth()->user()->getRemainingDays() }} days left)</p>
+                        <p class="mb-0">{{ __('You are currently subscribed. Ends on:') }} <strong>{{ auth()->user()->subscription_ends_at->format('d M Y') }}</strong> ({{ auth()->user()->getRemainingDays() }} {{ __('days') }} {{ __('left') }})</p>
                     @elseif(auth()->user()->isOnTrial())
-                        <p class="mb-0">You are on a 7-day free trial. Ends on: <strong>{{ auth()->user()->trial_ends_at->format('d M Y') }}</strong> ({{ auth()->user()->getRemainingDays() }} days left)</p>
+                        <p class="mb-0">{{ __('You are on a 7-day free trial. Ends on:') }} <strong>{{ auth()->user()->trial_ends_at->format('d M Y') }}</strong> ({{ auth()->user()->getRemainingDays() }} {{ __('days') }} {{ __('left') }})</p>
                     @else
-                        <p class="mb-0 text-danger font-italic">Your access has expired. Please subscribe to continue using all features.</p>
+                        <p class="mb-0 text-danger font-italic">{{ __('Your access has expired. Please subscribe to continue using all features.') }}</p>
                     @endif
                 </div>
 
                 <div class="d-flex gap-2">
                     @if(!auth()->user()->isSubscribed())
                         <button id="pay-button" class="btn btn-primary">
-                            <i class="bi bi-qr-code-scan me-1"></i> Subscribe Now (Rp 49.000)
+                            <i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)
                         </button>
                     @elseif(auth()->user()->subscription_auto_renew)
                         <form action="{{ route('subscription.cancel') }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to cancel your subscription?')">
-                                Cancel Subscription
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('{{ __('Are you sure you want to cancel your subscription?') }}')">
+                                {{ __('Cancel Subscription') }}
                             </button>
                         </form>
                     @else
-                        <button class="btn btn-secondary" disabled>Canceled (Access until {{ auth()->user()->subscription_ends_at->format('d M Y') }})</button>
+                        <button class="btn btn-secondary" disabled>{{ __('Canceled (Access until') }} {{ auth()->user()->subscription_ends_at->format('d M Y') }})</button>
                     @endif
                 </div>
             </div>
@@ -109,7 +109,7 @@
         <!-- Informasi Pengguna -->
         <div class="card mb-4">
             <div class="card-header">
-                Account Information
+                {{ __('Account Information') }}
             </div>
             <div class="card-body">
                 @if(session('email_status'))
@@ -132,10 +132,10 @@
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
+                        <label for="email" class="form-label">{{ __('Email Address') }}</label>
                         <div class="input-group">
                              <input type="email" class="form-control" id="email" name="email" value="{{ auth()->user()->email }}" required>
-                             <button type="submit" class="btn btn-primary">Save Email</button>
+                             <button type="submit" class="btn btn-primary">{{ __('Save Email') }}</button>
                         </div>
                     </div>
                 </form>
@@ -185,7 +185,7 @@
         <!-- Ganti Password -->
         <div class="card mb-4">
             <div class="card-header">
-                Change Password
+                {{ __('Change Password') }}
             </div>
             <div class="card-body">
                  @if(session('password_status'))
@@ -209,7 +209,7 @@
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
-                        <label for="current_password" class="form-label">Current Password</label>
+                        <label for="current_password" class="form-label">{{ __('Current Password') }}</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="current_password" name="current_password" required>
                             <button class="btn btn-outline-secondary toggle-password" type="button">
@@ -218,17 +218,17 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="new_password" class="form-label">New Password</label>
+                        <label for="new_password" class="form-label">{{ __('New Password') }}</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="new_password" name="new_password" required>
                             <button class="btn btn-outline-secondary toggle-password" type="button">
                                 <i class="bi bi-eye-slash"></i>
                             </button>
                         </div>
-                        <small class="text-muted">At least 3 characters (can be letters, numbers, or symbols).</small>
+                        <small class="text-muted">{{ __('At least 3 characters (can be letters, numbers, or symbols).') }}</small>
                     </div>
                      <div class="mb-3">
-                        <label for="new_password_confirmation" class="form-label">Confirm New Password</label>
+                        <label for="new_password_confirmation" class="form-label">{{ __('Confirm New Password') }}</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" required>
                              <button class="btn btn-outline-secondary toggle-password" type="button">
@@ -236,7 +236,7 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-warning">Save Password</button>
+                    <button type="submit" class="btn btn-warning">{{ __('Save Password') }}</button>
                 </form>
             </div>
         </div>
@@ -259,7 +259,7 @@
     if (payButton) {
         payButton.addEventListener('click', function () {
             payButton.disabled = true;
-            payButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Initializing...';
+            payButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{ __('Initializing...') }}';
             
             fetch("{{ route('subscription.subscribe') }}", {
                 method: "POST",
@@ -284,12 +284,12 @@
                         window.location.reload();
                     },
                     onError: function (result) {
-                        alert("Payment failed!");
+                        alert("{{ __('Payment failed!') }}");
                         window.location.reload();
                     },
                     onClose: function () {
                         payButton.disabled = false;
-                        payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> Subscribe Now (Rp 49.000)';
+                        payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)';
                     }
                 });
             })
@@ -297,7 +297,7 @@
                 console.error("Error:", error);
                 alert("Error: " + error.message);
                 payButton.disabled = false;
-                payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> Subscribe Now (Rp 49.000)';
+                payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)';
             });
         });
 

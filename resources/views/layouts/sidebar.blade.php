@@ -159,7 +159,7 @@
                     data-bs-target="#feedbackModal"
                     data-bs-toggle="tooltip"
                     data-bs-placement="right"
-                    title="Send suggestions or report issues to help improve the application">
+                    title="{{ __('Send suggestions or report issues to help improve the application') }}">
 
                     <i class="bi bi-bug me-2"></i>
                     <span>{{ __('Send Feedback') }}</span>

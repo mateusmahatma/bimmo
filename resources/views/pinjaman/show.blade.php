@@ -124,9 +124,9 @@
     <h1 class="fw-bold mb-1">{{ __('Liability Details') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">{{ __('Liabilitys') }}</a></li>
-            <li class="breadcrumb-item active">Details</li>
+            <li class="breadcrumb-item active">{{ __('Details') }}</li>
         </ol>
     </nav>
 </div>
@@ -206,19 +206,19 @@
                             <tbody>
                                 @forelse ($pinjaman->bayar_pinjaman as $index => $bayar_pinjaman)
                                 <tr>
-                                    <td data-label="No">{{ $index + 1 }}</td>
-                                    <td data-label="Amount" class="fw-bold text-success">Rp {{ number_format($bayar_pinjaman->jumlah_bayar, 0, ',', '.') }}</td>
-                                    <td data-label="Date">{{ \Carbon\Carbon::parse($bayar_pinjaman->tgl_bayar)->format('d M Y') }}</td>
-                                    <td data-label="Proof" class="text-center">
+                                    <td data-label="{{ __('No') }}">{{ $index + 1 }}</td>
+                                    <td data-label="{{ __('Amount') }}" class="fw-bold text-success">Rp {{ number_format($bayar_pinjaman->jumlah_bayar, 0, ',', '.') }}</td>
+                                    <td data-label="{{ __('Date') }}">{{ \Carbon\Carbon::parse($bayar_pinjaman->tgl_bayar)->format('d M Y') }}</td>
+                                    <td data-label="{{ __('Proof') }}" class="text-center">
                                         @if ($bayar_pinjaman->bukti_bayar)
                                             <a href="{{ asset('storage/' . $bayar_pinjaman->bukti_bayar) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-circle" data-bs-toggle="tooltip" title="{{ __('View Proof') }}" style="width: 32px; height: 32px; padding:0; display:inline-flex; align-items:center; justify-content:center;">
                                                 <i class="bi bi-file-earmark-check"></i>
                                             </a>
                                         @else
-                                            <span class="text-muted small">No file</span>
+                                            <span class="text-muted small">{{ __('No file') }}</span>
                                         @endif
                                     </td>
-                                    <td data-label="Action" class="text-center">
+                                    <td data-label="{{ __('Action') }}" class="text-center">
                                         <div class="d-flex justify-content-center gap-1">
                                             <button type="button" class="btn btn-outline-primary btn-sm rounded-circle edit-bayar" 
                                                 data-id="{{ $bayar_pinjaman->id_bayar }}"

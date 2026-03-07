@@ -58,9 +58,9 @@
     <h1 class="fw-bold mb-1">{{ __('Add New Loan') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('pinjaman.index') }}">{{ __('Loans') }}</a></li>
-            <li class="breadcrumb-item active">Add New</li>
+            <li class="breadcrumb-item active">{{ __('Add New') }}</li>
         </ol>
     </nav>
 </div>
