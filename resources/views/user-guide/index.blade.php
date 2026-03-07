@@ -1,116 +1,58 @@
 @extends('layouts.main')
 
 @section('container')
-<div class="container-fluid py-4">
+<div class="container-fluid py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-8">
-            <!-- Hero Section -->
-            <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 15px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
-                <div class="card-body p-5 text-white position-relative">
-                    <div class="position-relative z-index-1">
-                        <h1 class="display-5 fw-bold mb-3">Selamat Datang di Bimmo! 🚀</h1>
-                        <p class="lead mb-0 opacity-75">Panduan langkah demi langkah untuk mengelola keuangan Anda dengan lebih pintar dan teratur.</p>
-                    </div>
-                    <div class="position-absolute end-0 bottom-0 mb-n5 me-n5 opacity-25">
-                        <i class="bi bi-journal-bookmark-fill" style="font-size: 15rem;"></i>
-                    </div>
+            <!-- Corporate Header Section -->
+            <div class="text-center mb-5 pb-2">
+                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3 fw-semibold">BIMMO USER GUIDE</span>
+                <h1 class="display-5 fw-bold text-navy mb-3">Selamat Datang di Bimmo</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">Panduan komprehensif bagi Anda untuk mengoptimalkan pengelolaan keuangan pribadi dengan efisien, transparan, dan terukur.</p>
+                <div class="mt-4">
+                    <hr class="mx-auto" style="width: 60px; height: 3px; background-color: #0d6efd; border: none; border-radius: 2px;">
                 </div>
             </div>
 
             <!-- Steps Section -->
-            <div class="row g-4">
-                <!-- Step 1: Data Entry -->
-                <div class="col-md-12">
-                    <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                                    <i class="bi bi-1-circle-fill text-primary fs-3"></i>
-                                </div>
-                                <h3 class="fw-bold mb-0">Langkah Pertama: Masukkan Data Keuangan</h3>
-                            </div>
-                            
-                            <p class="text-muted mb-4">Hal terpenting dalam Bimmo adalah mencatat arus kas Anda. Mulailah dengan memasukkan data pemasukan dan pengeluaran harian Anda.</p>
-                            
-                            <div class="row g-3">
-                                <div class="col-sm-6">
-                                    <div class="p-3 border rounded-3 bg-light hover-shadow transition-all h-100">
-                                        <h5 class="fw-bold d-flex align-items-center">
-                                            <i class="bi bi-plus-circle-fill text-success me-2"></i>
-                                            <a href="{{ route('pemasukan.index') }}" target="_blank" class="text-decoration-none text-dark">Pemasukan</a>
-                                        </h5>
-                                        <p class="small text-muted mb-0">Catat semua sumber pendapatan Anda, seperti gaji, bonus, atau investasi.</p>
+            <div class="row g-4 mb-5">
+                <!-- Step 1: Core Records -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 12px; border: 1px solid #e2e8f0 !important;">
+                        <div class="card-body p-0">
+                            <div class="row g-0">
+                                <div class="col-md-4 bg-navy d-flex align-items-center justify-content-center p-4">
+                                    <div class="text-center text-white">
+                                        <div class="step-badge-white mb-3">01</div>
+                                        <h4 class="fw-bold mb-0">Fundamental</h4>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="p-3 border rounded-3 bg-light hover-shadow transition-all h-100">
-                                        <h5 class="fw-bold d-flex align-items-center">
-                                            <i class="bi bi-dash-circle-fill text-danger me-2"></i>
-                                            <a href="{{ route('pengeluaran.index') }}" target="_blank" class="text-decoration-none text-dark">Pengeluaran</a>
-                                        </h5>
-                                        <p class="small text-muted mb-0">Input belanja harian, tagihan, dan pengeluaran rutin lainnya untuk melacak kemana uang Anda pergi.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Wallet Management -->
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-info bg-opacity-10 p-2 rounded-circle me-3">
-                                    <i class="bi bi-2-circle-fill text-info fs-4"></i>
-                                </div>
-                                <h4 class="fw-bold mb-0">Kelola <a href="{{ route('dompet.index') }}" target="_blank" class="text-decoration-none text-info">Dompet</a></h4>
-                            </div>
-                            <p class="text-muted small">Pisahkan dana Anda ke dalam berbagai kategori dompet (misalnya: Tunai, Tabungan, E-Wallet) untuk pengelolaan yang lebih presisi.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Emergency Fund -->
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
-                                    <i class="bi bi-3-circle-fill text-warning fs-4"></i>
-                                </div>
-                                <h4 class="fw-bold mb-0">Siapkan <a href="{{ route('dana-darurat.index') }}" target="_blank" class="text-decoration-none text-warning">Dana Darurat</a></h4>
-                            </div>
-                            <p class="text-muted small">Lindungi diri Anda dengan menyiapkan dana cadangan. Bimmo membantu Anda menghitung berapa banyak yang Anda butuhkan dan melacak kemajuan tabungan Anda.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Budget Planning -->
-                <div class="col-md-12">
-                    <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="bg-dark bg-opacity-10 p-2 rounded-circle me-3">
-                                    <i class="bi bi-4-circle-fill text-dark fs-4"></i>
-                                </div>
-                                <h4 class="fw-bold mb-0">Perencanaan & Monitoring Anggaran</h4>
-                            </div>
-                            
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start border-start border-4 border-primary ps-3">
-                                        <div>
-                                            <h6 class="fw-bold mb-1"><a href="{{ route('anggaran.index') }}" target="_blank" class="text-decoration-none text-primary">Budget Categories</a></h6>
-                                            <p class="small text-muted mb-0">Buat rencana anggaran untuk setiap kategori pengeluaran Anda agar tidak terjadi "over-budget".</p>
+                                <div class="col-md-8 p-4 p-lg-5">
+                                    <h4 class="fw-bold text-navy mb-3">Pencatatan Arus Kas</h4>
+                                    <p class="text-muted mb-4">Langkah awal yang krusial adalah membangun disiplin dalam mencatat setiap aktivitas keuangan. Melalui fitur ini, Anda dapat memantau likuiditas Anda secara real-time.</p>
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-sm-6">
+                                            <a href="{{ route('pemasukan.index') }}" target="_blank" class="corporate-link p-3 rounded-3 border d-flex align-items-center h-100">
+                                                <div class="icon-box bg-success bg-opacity-10 text-success me-3">
+                                                    <i class="bi bi-graph-up-arrow"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="d-block fw-bold text-dark mb-0">Pemasukan</span>
+                                                    <small class="text-muted">Kelola sumber pendapatan</small>
+                                                </div>
+                                            </a>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start border-start border-4 border-success ps-3">
-                                        <div>
-                                            <h6 class="fw-bold mb-1"><a href="{{ route('kalkulator.index') }}" target="_blank" class="text-decoration-none text-success">Budget Monitoring</a></h6>
-                                            <p class="small text-muted mb-0">Lihat kalkulasi mendalam dan analisis apakah keuangan Anda sudah berjalan sesuai rencana.</p>
+                                        <div class="col-sm-6">
+                                            <a href="{{ route('pengeluaran.index') }}" target="_blank" class="corporate-link p-3 rounded-3 border d-flex align-items-center h-100">
+                                                <div class="icon-box bg-danger bg-opacity-10 text-danger me-3">
+                                                    <i class="bi bi-graph-down-arrow"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="d-block fw-bold text-dark mb-0">Pengeluaran</span>
+                                                    <small class="text-muted">Pantau beban biaya</small>
+                                                </div>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -119,71 +61,220 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Advanced Features -->
-                <div class="col-md-12">
-                    <div class="card border-0 shadow-sm mb-5" style="border-radius: 15px;">
+                <!-- Column Split -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 corporate-card">
                         <div class="card-body p-4">
-                            <h4 class="fw-bold mb-3 d-flex align-items-center">
-                                <i class="bi bi-star-fill text-warning me-2"></i>
-                                Fitur Lanjutan Lainnya
-                            </h4>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <a href="{{ route('tujuan-keuangan.index') }}" target="_blank" class="d-block p-3 border rounded-3 text-center text-decoration-none bg-light hover-primary transition-all">
-                                        <i class="bi bi-bullseye fs-3 mb-2 d-block"></i>
-                                        <span class="fw-bold text-dark">Financial Goals</span>
-                                    </a>
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="step-badge me-3">02</div>
+                                <h5 class="fw-bold text-navy mb-0">Asset Allocation</h5>
+                            </div>
+                            <h5 class="fw-bold mb-3"><a href="{{ route('dompet.index') }}" target="_blank" class="text-decoration-none text-navy hover-blue">Pengelolaan Dompet</a></h5>
+                            <p class="text-muted small mb-0">Strukturisasi aset Anda ke dalam berbagai kategori likuiditas seperti Kas, Rekening Bank, atau Digital Wallet untuk akurasi pelaporan yang lebih tinggi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 corporate-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="step-badge me-3">03</div>
+                                <h5 class="fw-bold text-navy mb-0">Risk Management</h5>
+                            </div>
+                            <h5 class="fw-bold mb-3"><a href="{{ route('dana-darurat.index') }}" target="_blank" class="text-decoration-none text-navy hover-blue">Dana Darurat</a></h5>
+                            <p class="text-muted small mb-0">Mitigasi risiko finansial dengan membangun cadangan dana. Sistem akan membantu kalkulasi target berdasarkan profil pengeluaran Anda.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm corporate-card">
+                        <div class="card-body p-4 p-lg-5">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="step-badge me-3">04</div>
+                                <h5 class="fw-bold text-navy mb-0">Financial Planning</h5>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-lg-7">
+                                    <h4 class="fw-bold text-dark mb-3">Monitoring & Budgeting</h4>
+                                    <p class="text-muted mb-4 mb-lg-0">Implementasikan kontrol anggaran yang ketat untuk memastikan operasional keuangan Anda tetap berada dalam koridor yang direncanakan.</p>
                                 </div>
-                                <div class="col-md-4">
-                                    <a href="{{ route('aset.index') }}" target="_blank" class="d-block p-3 border rounded-3 text-center text-decoration-none bg-light hover-primary transition-all">
-                                        <i class="bi bi-box-seam fs-3 mb-2 d-block"></i>
-                                        <span class="fw-bold text-dark">Inventory Assets</span>
-                                    </a>
+                                <div class="col-lg-5">
+                                    <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                                        <a href="{{ route('anggaran.index') }}" target="_blank" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center">
+                                            <span class="fw-medium">Budget Categories</span>
+                                            <i class="bi bi-chevron-right small opacity-50"></i>
+                                        </a>
+                                        <a href="{{ route('kalkulator.index') }}" target="_blank" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center">
+                                            <span class="fw-medium">Budget Monitoring</span>
+                                            <i class="bi bi-chevron-right small opacity-50"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <a href="{{ route('pinjaman.index') }}" target="_blank" class="d-block p-3 border rounded-3 text-center text-decoration-none bg-light hover-primary transition-all">
-                                        <i class="bi bi-arrow-down-up fs-3 mb-2 d-block"></i>
-                                        <span class="fw-bold text-dark">Liability</span>
-                                    </a>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Tools Grid -->
+                <div class="col-12 mt-2">
+                    <div class="p-4 bg-light rounded-4 border-style-dashed">
+                        <h5 class="fw-bold text-navy mb-4 d-flex align-items-center">
+                            <i class="bi bi-grid-fill me-2 opacity-50"></i> Fitur Ekosistem Lanjutan
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <a href="{{ route('tujuan-keuangan.index') }}" target="_blank" class="tool-card p-3 rounded-3 bg-white border text-decoration-none d-block">
+                                    <div class="mb-2 text-primary opacity-75"><i class="bi bi-bullseye fs-4"></i></div>
+                                    <span class="fw-bold text-navy d-block mb-1">Financial Goals</span>
+                                    <small class="text-muted">Perencanaan tujuan masa depan</small>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ route('aset.index') }}" target="_blank" class="tool-card p-3 rounded-3 bg-white border text-decoration-none d-block">
+                                    <div class="mb-2 text-primary opacity-75"><i class="bi bi-box-seam fs-4"></i></div>
+                                    <span class="fw-bold text-navy d-block mb-1">Inventory Assets</span>
+                                    <small class="text-muted">Manajemen aset tetap</small>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ route('pinjaman.index') }}" target="_blank" class="tool-card p-3 rounded-3 bg-white border text-decoration-none d-block">
+                                    <div class="mb-2 text-primary opacity-75"><i class="bi bi-arrow-down-up fs-4"></i></div>
+                                    <span class="fw-bold text-navy d-block mb-1">Liability</span>
+                                    <small class="text-muted">Pemantauan kewajiban & hutang</small>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer Quote -->
+            <!-- Professional Footer -->
             <div class="text-center pb-5">
-                <blockquote class="blockquote">
-                    <p class="mb-2 italic text-muted">"Keuangan yang terkontrol adalah langkah pertama menuju kebebasan finansial."</p>
-                    <footer class="blockquote-footer small">Tim Bimmo</footer>
-                </blockquote>
+                <p class="text-muted small mb-0">© {{ date('Y') }} BIMMO - Systematic Financial Management Solution.</p>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .hover-shadow:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    :root {
+        --navy: #0f172a;
+        --navy-light: #1e293b;
+    }
+
+    .text-navy { color: var(--navy); }
+    .bg-navy { background-color: var(--navy); }
+
+    .step-badge {
+        width: 42px;
+        height: 42px;
+        background-color: #f1f5f9;
+        color: #64748b;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.1rem;
+        border: 1.5px solid #e2e8f0;
+    }
+
+    .step-badge-white {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.25rem;
+        border: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .corporate-card {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0 !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .corporate-card:hover {
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .corporate-link {
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-color: #e2e8f0 !important;
+    }
+
+    .corporate-link:hover {
+        background-color: #f8fafc !important;
+        border-color: #0d6efd !important;
+        transform: translateY(-2px);
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .hover-blue:hover {
+        color: #0d6efd !important;
+    }
+
+    .border-style-dashed {
+        border: 2px dashed #e2e8f0;
+    }
+
+    .tool-card {
+        transition: all 0.2s ease;
+    }
+
+    .tool-card:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
         transform: translateY(-3px);
     }
-    .hover-primary:hover {
-        background-color: #f0f7ff !important;
-        border-color: #3b82f6 !important;
-        transform: translateY(-3px);
+
+    [data-bs-theme="dark"] .bg-light {
+        background-color: #1a1a1a !important;
     }
-    .hover-primary:hover i, .hover-primary:hover span {
-        color: #3b82f6 !important;
+
+    [data-bs-theme="dark"] .bg-white {
+        background-color: #242424 !important;
     }
-    .transition-all {
-        transition: all 0.3s ease;
+
+    [data-bs-theme="dark"] .text-navy, 
+    [data-bs-theme="dark"] .text-dark {
+        color: #f8fafc !important;
     }
-    .z-index-1 {
-        z-index: 1;
+
+    [data-bs-theme="dark"] .corporate-card,
+    [data-bs-theme="dark"] .border,
+    [data-bs-theme="dark"] .list-group-item,
+    [data-bs-theme="dark"] .border-style-dashed {
+        border-color: #333 !important;
     }
-    #main-content {
-        background-color: #f8fafc;
+
+    [data-bs-theme="dark"] .corporate-link:hover,
+    [data-bs-theme="dark"] .tool-card:hover {
+        background-color: #2d2d2d !important;
+    }
+
+    [data-bs-theme="dark"] .step-badge {
+        background-color: #333;
+        color: #94a3b8;
+        border-color: #444;
     }
 </style>
 @endsection
