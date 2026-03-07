@@ -5,6 +5,53 @@
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 <style>
+    /* Header Enhancements */
+    .pagetitle {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.75rem;
+    }
+    .pagetitle h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        color: #2d3436;
+    }
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+    .breadcrumb-item a {
+        color: #636e72;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-item a:hover {
+        color: #0984e3;
+    }
+    .breadcrumb-item.active {
+        color: #0984e3;
+        font-weight: 600;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "\F285"; /* bi-chevron-right */
+        font-family: "bootstrap-icons";
+        font-size: 0.65rem;
+        color: #b2bec3;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    [data-bs-theme="dark"] .pagetitle {
+        border-bottom: 1px solid #2d2d2d;
+    }
+    [data-bs-theme="dark"] .pagetitle h1 {
+        color: #e0e0e0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item a {
+        color: #a0a0a0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item.active {
+        color: #60a5fa;
+    }
+
     .aset-card { transition: all 0.3s ease; border: none; border-radius: 12px; }
     .aset-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
     .status-badge { border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; }
@@ -17,9 +64,9 @@
 
 @section('container')
 <div class="pagetitle mb-4">
-    <h1>Asset Inventory</h1>
+    <h1 class="fw-bold mb-1">Asset Inventory</h1>
     <nav>
-        <ol class="breadcrumb">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item active">Assets</li>
         </ol>
@@ -136,6 +183,50 @@
 
         $('#filterKondisi, #filterKategori, #filterStatus').change(function() {
             table.draw();
+        });
+
+        // AJAX Delete Handler
+        $('body').on('click', '.delete-aset', function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/aset/${id}`,
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Asset has been deleted successfully.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            table.ajax.reload(null, false);
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong while deleting the asset.'
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 </script>
