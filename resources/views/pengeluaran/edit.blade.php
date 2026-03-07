@@ -1,47 +1,115 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <title>Expenses</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-
 @extends('layouts.main')
+
+@section('title', 'Edit Expense Category')
+
+@push('css')
+<style>
+    /* Header Enhancements */
+    .pagetitle {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.75rem;
+    }
+    .pagetitle h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        color: #2d3436;
+    }
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+    .breadcrumb-item a {
+        color: #636e72;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-item a:hover {
+        color: #0984e3;
+    }
+    .breadcrumb-item.active {
+        color: #0984e3;
+        font-weight: 600;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "\F285"; /* bi-chevron-right */
+        font-family: "bootstrap-icons";
+        font-size: 0.65rem;
+        color: #b2bec3;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    [data-bs-theme="dark"] .pagetitle {
+        border-bottom: 1px solid #2d2d2d;
+    }
+    [data-bs-theme="dark"] .pagetitle h1 {
+        color: #e0e0e0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item a {
+        color: #a0a0a0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item.active {
+        color: #60a5fa;
+    }
+</style>
+@endpush
+
 @section('container')
 
-<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
-    <a class="navbar-brand" href="#">Edit Expenses</a>
-</nav>
-
-<div class="card-header">
-    <div class="card-body">
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-        <form action="{{ route('pengeluaran.update', $pengeluaran->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <div class="mt-3 mb-3">
-                <label for="nama" class="form-label required">Name of Expenses</label>
-                <input name="nama" class="form-control" placeholder="Name of Expenses"
-                    value="{{ old('nama', $pengeluaran->nama) }}">
-            </div>
-
-            <button type="submit" class="btn btn-success">Save</button>
-        </form>
-    </div>
+<div class="pagetitle mb-4">
+    <h1 class="fw-bold mb-1">Edit Expense Category</h1>
+    <nav>
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('pengeluaran.index') }}">Expense</a></li>
+            <li class="breadcrumb-item active">Edit Category</li>
+        </ol>
+    </nav>
 </div>
+
+<section class="section">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">Edit Category Details</h5>
+                    <p class="text-muted small mb-0 mt-1">Update the name for your expense category.</p>
+                </div>
+                <div class="card-body p-4">
+                    @if ($errors->any())
+                    <div class="alert alert-danger d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <ul class="mb-0 ps-3">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    <form action="{{ route('pengeluaran.update', $pengeluaran->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="mb-4">
+                            <label for="nama" class="form-label fw-bold small text-uppercase text-muted">Category Name <span class="text-danger">*</span></label>
+                            <input name="nama" type="text" class="form-control form-control-lg" id="nama" placeholder="e.g. Food, Rent, Entertainment"
+                                value="{{ old('nama', $pengeluaran->nama) }}" required>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ route('pengeluaran.index') }}" class="btn btn-light btn-lg px-4 rounded-pill">Cancel</a>
+                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                                <i class="bi bi-pencil-square me-2"></i> Update Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script src="{{ asset('js/pengeluaran.js') }}?v={{ filemtime(public_path('js/pengeluaran.js')) }}"></script>
-@endsection
+@endpush
