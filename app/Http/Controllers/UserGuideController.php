@@ -14,7 +14,7 @@ class UserGuideController extends Controller
     public function index()
     {
         return view('user-guide.index', [
-            'title' => 'Panduan Pengguna'
+            'title' => 'User Guide'
         ]);
     }
 }
