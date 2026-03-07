@@ -3,7 +3,15 @@ $(document).ready(function () {
     var table = $('#goalsTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: '/tujuan-keuangan',
+        ajax: {
+            url: '/tujuan-keuangan',
+            data: function (d) {
+                d.filter_kategori = $('#filter_kategori').val();
+                d.filter_prioritas = $('#filter_prioritas').val();
+            }
+        },
+        scrollX: true,
+        autoWidth: false,
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama_target', name: 'nama_target' },
@@ -62,6 +70,11 @@ $(document).ready(function () {
             },
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center' }
         ]
+    });
+
+    // Handle Filters
+    $('#filter_kategori, #filter_prioritas').on('change', function () {
+        table.ajax.reload();
     });
 
     // Handle interactive recommendation in Add modal

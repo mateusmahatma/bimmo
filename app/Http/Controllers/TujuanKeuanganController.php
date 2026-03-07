@@ -19,6 +19,14 @@ class TujuanKeuanganController extends Controller
         if ($request->ajax()) {
             $query = TujuanKeuangan::where('id_user', $userId);
 
+            if ($request->filled('filter_kategori')) {
+                $query->where('kategori', $request->filter_kategori);
+            }
+
+            if ($request->filled('filter_prioritas')) {
+                $query->where('prioritas', $request->filter_prioritas);
+            }
+
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->addColumn('progress', function ($goal) {

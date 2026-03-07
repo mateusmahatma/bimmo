@@ -16,15 +16,79 @@
     .priority-medium { border-left: 5px solid #ffc107; }
     .priority-low { border-left: 5px solid #0dcaf0; }
 
-    /* Improved Table Styling */
+    /* Improved Table Styling for Horizontal Scroll */
     #goalsTable th, #goalsTable td {
         white-space: nowrap;
         vertical-align: middle;
+        padding: 0.75rem 1rem;
     }
-    
+
     .table-responsive {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e0 transparent;
+        padding-bottom: 10px; /* Space for scrollbar */
+    }
+
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background-color: #cbd5e0;
+        border-radius: 20px;
+    }
+
+    /* Header Enhancements */
+    .pagetitle {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.75rem;
+    }
+    .pagetitle h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        color: #2d3436;
+    }
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+    .breadcrumb-item a {
+        color: #636e72;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-item a:hover {
+        color: #0984e3;
+    }
+    .breadcrumb-item.active {
+        color: #0984e3;
+        font-weight: 600;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "\F285"; /* bi-chevron-right */
+        font-family: "bootstrap-icons";
+        font-size: 0.65rem;
+        color: #b2bec3;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    [data-bs-theme="dark"] .pagetitle {
+        border-bottom: 1px solid #2d2d2d;
+    }
+    [data-bs-theme="dark"] .pagetitle h1 {
+        color: #e0e0e0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item a {
+        color: #a0a0a0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item.active {
+        color: #60a5fa;
     }
 </style>
 @endpush
@@ -32,9 +96,9 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Financial Goals</h1>
+    <h1 class="fw-bold mb-1">Financial Goals</h1>
     <nav>
-        <ol class="breadcrumb">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item active">Financial Goals</li>
         </ol>
@@ -42,8 +106,30 @@
 </div>
 
 <section class="section">
-    <div class="row mb-4">
-        <div class="col-md-12 text-end">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <div class="d-flex flex-wrap gap-2">
+                <div class="filter-group">
+                    <select id="filter_kategori" class="form-select border-0 shadow-sm" style="border-radius: 10px; min-width: 150px;">
+                        <option value="">All Categories</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Purchase">Purchase</option>
+                        <option value="Debt">Debt</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="filter_prioritas" class="form-select border-0 shadow-sm" style="border-radius: 10px; min-width: 150px;">
+                        <option value="">All Priorities</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
             <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAddGoal">
                 <i class="bi bi-plus-lg me-1"></i> Add New Goal
             </button>
