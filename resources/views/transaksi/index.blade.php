@@ -4,7 +4,82 @@
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css">
 <style>
+    /* Header Enhancements */
+    .pagetitle {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.75rem;
+    }
+    .pagetitle h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        color: #2d3436;
+    }
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+    .breadcrumb-item a {
+        color: #636e72;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-item a:hover {
+        color: #0984e3;
+    }
+    .breadcrumb-item.active {
+        color: #0984e3;
+        font-weight: 600;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "\F285"; /* bi-chevron-right */
+        font-family: "bootstrap-icons";
+        font-size: 0.65rem;
+        color: #b2bec3;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    [data-bs-theme="dark"] .pagetitle {
+        border-bottom: 1px solid #2d2d2d;
+    }
+    [data-bs-theme="dark"] .pagetitle h1 {
+        color: #e0e0e0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item a {
+        color: #a0a0a0;
+    }
+    [data-bs-theme="dark"] .breadcrumb-item.active {
+        color: #60a5fa;
+    }
+
+    /* TomSelect Refining */
+    .ts-control {
+        border-radius: 0.5rem !important;
+        padding: 0.5rem 0.75rem !important;
+        border-color: #dee2e6 !important;
+        box-shadow: none !important;
+    }
+    [data-bs-theme="dark"] .ts-control {
+        background-color: #2b3035 !important;
+        border-color: #495057 !important;
+        color: #e0e0e0 !important;
+    }
+    .ts-dropdown {
+        border-radius: 0.5rem !important;
+        margin-top: 5px !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    }
+    [data-bs-theme="dark"] .ts-dropdown {
+        background-color: #2b3035 !important;
+        border-color: #495057 !important;
+    }
+    [data-bs-theme="dark"] .ts-dropdown .option {
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] .ts-dropdown .active {
+        background-color: #343a40 !important;
+    }
     @media screen and (max-width: 768px) {
         /* Force table to not be like tables anymore */
         #transaksiTable, 
@@ -136,9 +211,9 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1>Transactions</h1>
+    <h1 class="fw-bold mb-1">Transactions</h1>
     <nav>
-        <ol class="breadcrumb">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item active">Transactions</li>
         </ol>
@@ -253,22 +328,6 @@
                     
                     <!-- TOOLBAR -->
                     <form action="{{ route('transaksi.index') }}" method="GET" class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 pt-3">
-                        <!-- Preserve Category Filters -->
-                        @if(is_array(request('pemasukan')))
-                            @foreach(request('pemasukan') as $p)
-                                <input type="hidden" name="pemasukan[]" value="{{ $p }}">
-                            @endforeach
-                        @else
-                            <input type="hidden" name="pemasukan" value="{{ request('pemasukan') }}">
-                        @endif
-
-                        @if(is_array(request('pengeluaran')))
-                            @foreach(request('pengeluaran') as $p)
-                                <input type="hidden" name="pengeluaran[]" value="{{ $p }}">
-                            @endforeach
-                        @else
-                            <input type="hidden" name="pengeluaran" value="{{ request('pengeluaran') }}">
-                        @endif
                         
                         <!-- Search & Date Filter Group -->
                         <div class="d-flex gap-2 flex-wrap align-items-center flex-grow-1">
@@ -337,57 +396,24 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Income Category</label>
-                                    <div class="dropdown">
-                                        <button class="btn btn-white w-100 text-start d-flex justify-content-between align-items-center border bg-white rounded-3 py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                            <span>Select Category</span>
-                                            <span class="badge bg-secondary ms-2 rounded-pill" id="count-pemasukan">0</span>
-                                        </button>
-                                        <ul class="dropdown-menu w-100 p-2 shadow border-0 rounded-3" style="max-height: 250px; overflow-y: auto;">
-                                            <li><h6 class="dropdown-header text-uppercase small fw-bold">Income Sources</h6></li>
-                                            @foreach ($listPemasukan as $item)
-                                            <li class="dropdown-item-text">
-                                                <div class="form-check">
-                                                    <input class="form-check-input filter-checkbox-pemasukan" type="checkbox" name="pemasukan[]" value="{{ $item->id }}" id="in_{{ $item->id }}" @checked(in_array($item->id, (array)request('pemasukan', [])))>
-                                                    <label class="form-check-label w-100" for="in_{{ $item->id }}">
-                                                        {{ $item->nama }}
-                                                    </label>
-                                                </div>
-                                            </li>
-                                            @endforeach
-                                            @if($listPemasukan->isEmpty())
-                                                <li class="text-muted small text-center py-2">No categories found</li>
-                                            @endif
-                                        </ul>
-                                    </div>
+                                    <select name="pemasukan[]" id="filter-pemasukan" class="form-select" multiple placeholder="Select Income Categories..." autocomplete="off">
+                                        @foreach ($listPemasukan as $item)
+                                            <option value="{{ $item->id }}" @selected(in_array($item->id, (array)request('pemasukan', [])))>{{ $item->nama }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Expense Category</label>
-                                    <div class="dropdown">
-                                        <button class="btn btn-white w-100 text-start d-flex justify-content-between align-items-center border bg-white rounded-3 py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                            <span>Select Category</span>
-                                            <span class="badge bg-secondary ms-2 rounded-pill" id="count-pengeluaran">0</span>
-                                        </button>
-                                        <ul class="dropdown-menu w-100 p-2 shadow border-0 rounded-3" style="max-height: 250px; overflow-y: auto;">
-                                            <li><h6 class="dropdown-header text-uppercase small fw-bold">Expense Types</h6></li>
-                                            @foreach ($listPengeluaran as $item)
-                                            <li class="dropdown-item-text">
-                                                <div class="form-check">
-                                                    <input class="form-check-input filter-checkbox-pengeluaran" type="checkbox" name="pengeluaran[]" value="{{ $item->id }}" id="out_{{ $item->id }}" @checked(in_array($item->id, (array)request('pengeluaran', [])))>
-                                                    <label class="form-check-label w-100" for="out_{{ $item->id }}">
-                                                        {{ $item->nama }}
-                                                    </label>
-                                                </div>
-                                            </li>
-                                            @endforeach
-                                              @if($listPengeluaran->isEmpty())
-                                                <li class="text-muted small text-center py-2">No categories found</li>
-                                            @endif
-                                        </ul>
-                                    </div>
+                                    <select name="pengeluaran[]" id="filter-pengeluaran" class="form-select" multiple placeholder="Select Expense Categories..." autocomplete="off">
+                                        @foreach ($listPengeluaran as $item)
+                                            <option value="{{ $item->id }}" @selected(in_array($item->id, (array)request('pengeluaran', [])))>{{ $item->nama }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="col-12 d-flex justify-content-end gap-2 mt-3">
-                                    <a href="{{ route('transaksi.index') }}" class="btn btn-sm btn-link text-decoration-none text-muted">Reset Filter</a>
-                                    <button class="btn btn-primary btn-sm rounded-pill px-4">Apply</button>
+                                    <a href="{{ route('transaksi.index') }}" class="btn btn-sm btn-link text-decoration-none text-muted" id="btnResetFilter">Reset Filter</a>
+                                    <button type="button" id="btnApplyFilter" class="btn btn-primary btn-sm rounded-pill px-4">Apply Filter</button>
                                 </div>
                             </form>
                         </div>
@@ -538,6 +564,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // State
@@ -549,35 +576,38 @@
         const endDateInput = document.querySelector('input[name="end_date"]');
         const applyDateBtn = document.querySelector('button[title="Apply Filter"]');
         const tableContainer = document.getElementById('transaction-table-container');
+        const btnResetFilter = document.getElementById('btnResetFilter');
         
-        // Count Badges
-        function updateCount(name, badgeId) {
-            const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
-            const badge = document.getElementById(badgeId);
-            if(checkboxes && badge) {
-                const count = Array.from(checkboxes).filter(c => c.checked).length;
-                badge.textContent = count;
-                badge.classList.toggle('bg-primary', count > 0);
-                badge.classList.toggle('bg-secondary', count === 0);
-            }
+        // Initialize TomSelect (Synchronized with anggaran/create style)
+        const tomSettings = {
+            plugins: ['remove_button'],
+            maxItems: null,
+            hideSelected: true,
+            closeAfterSelect: false,
+            persist: false,
+            create: false
+        };
+        const tomPemasukan = new TomSelect('#filter-pemasukan', tomSettings);
+        const tomPengeluaran = new TomSelect('#filter-pengeluaran', tomSettings);
+
+        // Reset Filter Button Click
+        if(btnResetFilter) {
+            btnResetFilter.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Clear inputs
+                if(searchInput) searchInput.value = '';
+                if(startDateInput) startDateInput.value = '';
+                if(endDateInput) endDateInput.value = '';
+                // Clear TomSelect
+                tomPemasukan.clear();
+                tomPengeluaran.clear();
+                // Fetch
+                fetchTransactions();
+            });
         }
 
-        // Initialize Counts
-        updateCount('pemasukan[]', 'count-pemasukan');
-        updateCount('pengeluaran[]', 'count-pengeluaran');
-
-        // Checkbox Listeners (Categories)
-        document.addEventListener('change', function(e) {
-            if (e.target.matches('.filter-checkbox-pemasukan')) {
-                updateCount('pemasukan[]', 'count-pemasukan');
-            }
-            if (e.target.matches('.filter-checkbox-pengeluaran')) {
-                updateCount('pengeluaran[]', 'count-pengeluaran');
-            }
-        });
-
         // Apply Filter Button Click
-        const applyFilterBtn = document.querySelector('#filterCollapse button.btn-primary');
+        const applyFilterBtn = document.getElementById('btnApplyFilter');
         if(applyFilterBtn) {
             applyFilterBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -630,19 +660,15 @@
             if(startDateInput && startDateInput.value) urlObj.searchParams.set('start_date', startDateInput.value);
             if(endDateInput && endDateInput.value) urlObj.searchParams.set('end_date', endDateInput.value);
             
-            // Categories (Pemasukan)
-            const pemCheckboxes = document.querySelectorAll('input[name="pemasukan[]"]:checked');
-            // Remove existing array params first to avoid duplicates
+            // Categories (TomSelect)
             urlObj.searchParams.delete('pemasukan[]'); 
-            pemCheckboxes.forEach(cb => {
-                urlObj.searchParams.append('pemasukan[]', cb.value);
+            tomPemasukan.getValue().forEach(val => {
+                if(val) urlObj.searchParams.append('pemasukan[]', val);
             });
             
-            // Categories (Pengeluaran)
-            const pengCheckboxes = document.querySelectorAll('input[name="pengeluaran[]"]:checked');
             urlObj.searchParams.delete('pengeluaran[]'); 
-            pengCheckboxes.forEach(cb => {
-                urlObj.searchParams.append('pengeluaran[]', cb.value);
+            tomPengeluaran.getValue().forEach(val => {
+                if(val) urlObj.searchParams.append('pengeluaran[]', val);
             });
 
             // Show loading
@@ -802,11 +828,11 @@
             if(endDateInput && endDateInput.value) params.append('end_date', endDateInput.value);
 
             // Categories
-            document.querySelectorAll('input[name="pemasukan[]"]:checked').forEach(cb => {
-                params.append('pemasukan[]', cb.value);
+            tomPemasukan.getValue().forEach(val => {
+                if(val) params.append('pemasukan[]', val);
             });
-            document.querySelectorAll('input[name="pengeluaran[]"]:checked').forEach(cb => {
-                params.append('pengeluaran[]', cb.value);
+            tomPengeluaran.getValue().forEach(val => {
+                if(val) params.append('pengeluaran[]', val);
             });
 
             // Helper to update href
@@ -838,11 +864,11 @@
                 if(searchInput && searchInput.value) params.append('search', searchInput.value);
                 if(startDateInput && startDateInput.value) params.append('start_date', startDateInput.value);
                 if(endDateInput && endDateInput.value) params.append('end_date', endDateInput.value);
-                document.querySelectorAll('input[name="pemasukan[]"]:checked').forEach(cb => {
-                    params.append('pemasukan[]', cb.value);
+                tomPemasukan.getValue().forEach(val => {
+                    if(val) params.append('pemasukan[]', val);
                 });
-                document.querySelectorAll('input[name="pengeluaran[]"]:checked').forEach(cb => {
-                    params.append('pengeluaran[]', cb.value);
+                tomPengeluaran.getValue().forEach(val => {
+                    if(val) params.append('pengeluaran[]', val);
                 });
                 params.append('email', recipientEmail);
 
