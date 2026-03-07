@@ -7,16 +7,18 @@
         /* matches col-md-2 */
         height: 100vh;
         z-index: 1000;
-        overflow-y: auto;
-        -ms-overflow-style: none;
-        /* IE and Edge */
-        scrollbar-width: none;
-        /* Firefox */
+        /* prevent whole sidebar from scrolling */
+        overflow-y: hidden;
     }
 
-    .sidebar::-webkit-scrollbar {
-        display: none;
-        /* Chrome, Safari and Opera */
+    .sidebar-menu-items {
+        overflow-y: auto;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .sidebar-menu-items::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
     }
 }
 
