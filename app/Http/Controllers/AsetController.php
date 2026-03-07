@@ -44,9 +44,7 @@ class AsetController extends Controller
                 return $row->tanggal_pembelian->format('d M Y');
             })
                 ->addColumn('action', function ($row) {
-                $btn = '<a href="' . route('aset.show', $row->id) . '" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> Detail</a> ';
-                $btn .= '<a href="' . route('aset.edit', $row->id) . '" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Edit</a> ';
-                return $btn;
+                return view('aset.tombol')->with('row', $row);
             })
                 ->rawColumns(['action'])
                 ->make(true);
