@@ -85,8 +85,8 @@
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">{{ __('Asset Code') }} <span class="text-danger">*</span></label>
-                                <input type="text" name="kode_aset" class="form-control" value="{{ old('kode_aset', 'AST-'.time()) }}" required>
+                                <label class="form-label fw-bold">{{ __('Asset Code') }} <small class="text-muted">({{ __('Optional - Leave AUTO to generate') }})</small></label>
+                                <input type="text" name="kode_aset" class="form-control" value="{{ old('kode_aset', 'AUTO') }}" placeholder="AUTO">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">{{ __('Asset Name') }} <span class="text-danger">*</span></label>
