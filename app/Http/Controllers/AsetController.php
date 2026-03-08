@@ -62,7 +62,7 @@ class AsetController extends Controller
     {
         $request->validate([
             'nama_aset' => 'required',
-            'kode_aset' => 'required|unique:aset,kode_aset',
+            'kode_aset' => 'nullable|unique:aset,kode_aset',
             'kategori' => 'required',
             'tanggal_pembelian' => 'required|date',
             'harga_beli' => 'required|numeric',
@@ -104,7 +104,7 @@ class AsetController extends Controller
 
         $request->validate([
             'nama_aset' => 'required',
-            'kode_aset' => 'required|unique:aset,kode_aset,' . $id,
+            'kode_aset' => 'nullable|unique:aset,kode_aset,' . $id,
             'kategori' => 'required',
             'kondisi' => 'required',
         ]);
