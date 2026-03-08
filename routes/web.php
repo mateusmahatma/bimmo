@@ -25,6 +25,7 @@ use App\Http\Controllers\AsetController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\MigrationController;
 
 // Authentication & Public Routes
 Route::get('/', function () {
@@ -181,6 +182,14 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('hasil_proses_anggaran', HasilProsesAnggaranController::class);
         Route::get('/panduan', [App\Http\Controllers\UserGuideController::class , 'index'])->name('panduan.index');
+
+        // Migration Features
+        Route::prefix('panduan/pindah')->group(function () {
+            Route::get('/', [MigrationController::class , 'index'])->name('panduan.pindah');
+            Route::get('/template/{type}', [MigrationController::class , 'downloadTemplate'])->name('panduan.pindah.template');
+            Route::post('/upload', [MigrationController::class , 'upload'])->name('panduan.pindah.upload');
+        }
+        );
     });
 
 // App Webhook
