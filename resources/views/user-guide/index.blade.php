@@ -150,6 +150,24 @@
                 </div>
             </div>
 
+            <!-- Migration Section -->
+            <div class="col-12 mb-5">
+                <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 12px; border: 2px dashed #0d6efd !important; background-color: rgba(13, 110, 253, 0.02);">
+                    <div class="card-body p-4 p-lg-5 text-center">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary mx-auto mb-4" style="width: 64px; height: 64px;">
+                            <i class="bi bi-box-arrow-in-down fs-2"></i>
+                        </div>
+                        <h3 class="fw-bold text-navy mb-3">{{ __('Migrate to Bimmo') }}</h3>
+                        <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+                            {!! __('This feature is specifically designed to facilitate your <strong class="text-danger">first-time data migration</strong> to Bimmo. Import your financial history from other platforms and manage everything in one centralized dashboard.') !!}
+                        </p>
+                        <a href="{{ route('panduan.pindah') }}" class="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-pill shadow-sm">
+                            <i class="bi bi-rocket-takeoff me-2"></i> {{ __('Migrate') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Professional Footer -->
             <div class="text-center pb-5">
                 <p class="text-muted small mb-0">© {{ date('Y') }} BIMMO - {{ __('Systematic Financial Management Solution.') }}</p>
