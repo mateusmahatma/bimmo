@@ -3,15 +3,21 @@
 @section('title', 'Dashboard')
 
 @section('container')
-<div class="pagetitle mb-4">
-    <h1>{{ __('Dashboard') }}</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active">
-                {{ __('Hai') }}, {{ auth()->user()->name }}
-            </li>
-        </ol>
-    </nav>
+<div class="pagetitle mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1>{{ __('Dashboard') }}</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">
+                    {{ __('Hai') }}, {{ auth()->user()->name }}
+                </li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ route('transaksi.create') }}" class="btn btn-danger rounded-pill px-4 shadow-sm d-flex align-items-center gap-2">
+        <i class="bi bi-plus-circle-fill fs-5"></i>
+        <span class="fw-bold">{{ __('Record Now') }}</span>
+    </a>
 </div>
 
 <section class="dashboard">
