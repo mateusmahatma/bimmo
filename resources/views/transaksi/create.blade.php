@@ -97,52 +97,68 @@
                             <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi ?? date('Y-m-d')) }}" required>
                         </div>
 
-                        <div class="row g-4 mb-4">
+                        <!-- Transaction Type Selectors -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase text-muted d-block">{{ __('Transaction Type') }} ({{ __('Select one or both') }})</label>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <button type="button" class="btn btn-outline-success w-100 py-3 fw-bold" id="togglePemasukan" data-bs-toggle="collapse" data-bs-target="#pemasukanSection" aria-expanded="true" aria-controls="pemasukanSection">
+                                        <i class="bi bi-arrow-down-circle me-2"></i> {{ __('Income') }}
+                                    </button>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn btn-outline-danger w-100 py-3 fw-bold" id="togglePengeluaran" data-bs-toggle="collapse" data-bs-target="#pengeluaranSection" aria-expanded="false" aria-controls="pengeluaranSection">
+                                        <i class="bi bi-arrow-up-circle me-2"></i> {{ __('Expense') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category & Amount Sections -->
+                        <div class="mb-4">
                             <!-- Income Section -->
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #198754 !important;">
-                                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> {{ __('Income') }}</h6>
-                                    
-                                    <div class="mb-3">
-                                        <label for="pemasukan" class="form-label small text-muted">{{ __('Category') }}</label>
-                                        <select class="form-select" id="pemasukan" name="pemasukan">
-                                            <option value="">- {{ __('Select Income') }} -</option>
-                                            @foreach ($pemasukan as $item)
-                                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="mb-2">
-                                        <label for="nominal_pemasukan" class="form-label small text-muted">{{ __('Amount') }}</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-success text-white fw-bold">Rp</span>
-                                            <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control fw-bold text-success" placeholder="0">
+                            <div class="collapse show" id="pemasukanSection">
+                                <div class="p-4 border rounded-4 bg-white shadow-sm mb-3" style="border-top: 5px solid #198754 !important;">
+                                    <div class="row g-3">
+                                        <div class="col-md-7">
+                                            <label for="pemasukan" class="form-label fw-bold small text-muted text-uppercase">{{ __('Income Category') }}</label>
+                                            <select class="form-select" id="pemasukan" name="pemasukan">
+                                                <option value="">- {{ __('Select Income') }} -</option>
+                                                @foreach ($pemasukan as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nama }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label for="nominal_pemasukan" class="form-label fw-bold small text-muted text-uppercase">{{ __('Amount') }}</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text bg-success text-white fw-bold border-0">Rp</span>
+                                                <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control fw-bold text-success border-start-0" placeholder="0">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Expense Section -->
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #dc3545 !important;">
-                                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> {{ __('Expense') }}</h6>
-                                    
-                                    <div class="mb-3">
-                                        <label for="pengeluaran" class="form-label small text-muted">{{ __('Category') }}</label>
-                                        <select class="form-select" id="pengeluaran" name="pengeluaran">
-                                            <option value="">- {{ __('Select Expense') }} -</option>
-                                            @foreach ($pengeluaran as $item)
-                                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="mb-2">
-                                        <label for="nominal" class="form-label small text-muted">{{ __('Amount') }}</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-danger text-white fw-bold">Rp</span>
-                                            <input type="number" id="nominal" name="nominal" class="form-control fw-bold text-danger" placeholder="0">
+                            <div class="collapse" id="pengeluaranSection">
+                                <div class="p-4 border rounded-4 bg-white shadow-sm" style="border-top: 5px solid #dc3545 !important;">
+                                    <div class="row g-3">
+                                        <div class="col-md-7">
+                                            <label for="pengeluaran" class="form-label fw-bold small text-muted text-uppercase">{{ __('Expense Category') }}</label>
+                                            <select class="form-select" id="pengeluaran" name="pengeluaran">
+                                                <option value="">- {{ __('Select Expense') }} -</option>
+                                                @foreach ($pengeluaran as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nama }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label for="nominal" class="form-label fw-bold small text-muted text-uppercase">{{ __('Amount') }}</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text bg-danger text-white fw-bold border-0">Rp</span>
+                                                <input type="number" id="nominal" name="nominal" class="form-control fw-bold text-danger border-start-0" placeholder="0">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -242,7 +258,8 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Toggle Logic for Advanced Options
+        // Initialize TomSelect variables
+        let incSelect, expSelect;
         
         // Assets
         const checkAsset = document.getElementById('checkAssetList');
@@ -259,17 +276,82 @@
         const checkEmergency = document.getElementById('checkEmergencyFund');
         const emergencyContainer = document.getElementById('danaDaruratContainer');
 
-        if(checkEmergency) {
+        if (checkEmergency) {
              checkEmergency.addEventListener('change', function() {
                 const isChecked = this.checked;
                 emergencyContainer.style.display = isChecked ? 'block' : 'none';
             });
         }
 
+        // Handle Active State for Toggle Buttons
+        const togglePemasukan = document.getElementById('togglePemasukan');
+        const togglePengeluaran = document.getElementById('togglePengeluaran');
+        const pemasukanSectionEl = document.getElementById('pemasukanSection');
+        const pengeluaranSectionEl = document.getElementById('pengeluaranSection');
+
+        pemasukanSectionEl.addEventListener('show.bs.collapse', () => {
+            togglePemasukan.classList.add('active', 'bg-success', 'text-white');
+        });
+        pemasukanSectionEl.addEventListener('hide.bs.collapse', () => {
+            togglePemasukan.classList.remove('active', 'bg-success', 'text-white');
+        });
+        pengeluaranSectionEl.addEventListener('show.bs.collapse', () => {
+            togglePengeluaran.classList.add('active', 'bg-danger', 'text-white');
+        });
+        pengeluaranSectionEl.addEventListener('hide.bs.collapse', () => {
+            togglePengeluaran.classList.remove('active', 'bg-danger', 'text-white');
+        });
+
+        // Initial state for active buttons if sections are expanded
+        if (pemasukanSectionEl.classList.contains('show')) togglePemasukan.classList.add('active', 'bg-success', 'text-white');
+        if (pengeluaranSectionEl.classList.contains('show')) togglePengeluaran.classList.add('active', 'bg-danger', 'text-white');
+
+        // Form Validation Logic
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const getVal = (id, ts) => {
+                const el = document.getElementById(id);
+                if (!el) return '';
+                return ts ? ts.getValue() : el.value;
+            };
+
+            const incomeCat = getVal('pemasukan', incSelect);
+            const incomeAmt = nominalPemasukan.value;
+            const expenseCat = getVal('pengeluaran', expSelect);
+            const expenseAmt = nominalPengeluaran.value;
+
+            const hasIncome = incomeCat && incomeAmt && parseFloat(incomeAmt) > 0;
+            const hasExpense = expenseCat && expenseAmt && parseFloat(expenseAmt) > 0;
+
+            const isIncomePartial = (incomeAmt && parseFloat(incomeAmt) > 0 && !incomeCat) || 
+                                    (!incomeAmt && incomeCat);
+            
+            const isExpensePartial = (expenseAmt && parseFloat(expenseAmt) > 0 && !expenseCat) || 
+                                     (!expenseAmt && expenseCat);
+
+            if (!hasIncome && !hasExpense) {
+                e.preventDefault();
+                alert("{{ __('Please fill in at least one transaction type (Income or Expense) completely with an amount greater than 0.') }}");
+                return;
+            }
+
+            if (isIncomePartial) {
+                e.preventDefault();
+                alert("{{ __('Please complete the Income section (both category and amount).') }}");
+                return;
+            }
+
+            if (isExpensePartial) {
+                e.preventDefault();
+                alert("{{ __('Please complete the Expense section (both category and amount).') }}");
+                return;
+            }
+        });
+
         // Initialize TomSelect if validation didn't fail and elements exist
         if (typeof TomSelect !== 'undefined') {
-             if(document.getElementById('pemasukan')) new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- {{ __('Select Income') }} -' });
-             if(document.getElementById('pengeluaran')) new TomSelect('#pengeluaran', { allowEmptyOption: true, placeholder: '- {{ __('Select Expense') }} -' });
+             if(document.getElementById('pemasukan')) incSelect = new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- {{ __('Select Income') }} -' });
+             if(document.getElementById('pengeluaran')) expSelect = new TomSelect('#pengeluaran', { allowEmptyOption: true, placeholder: '- {{ __('Select Expense') }} -' });
              if(document.getElementById('barang_id')) new TomSelect('#barang_id', { allowEmptyOption: true, placeholder: '- {{ __('Select Asset') }} -' });
         }
     });

@@ -271,10 +271,10 @@ class TransaksiController extends Controller
     {
         $validatedData = $request->validate([
             'tgl_transaksi' => 'required|date',
-            'pemasukan' => 'nullable|string',
-            'nominal_pemasukan' => 'nullable|numeric',
-            'pengeluaran' => 'nullable|string',
-            'nominal' => 'nullable|numeric',
+            'pemasukan' => 'required_without:pengeluaran|required_with:nominal_pemasukan|nullable|string',
+            'nominal_pemasukan' => 'required_with:pemasukan|nullable|numeric|min:0',
+            'pengeluaran' => 'required_without:pemasukan|required_with:nominal|nullable|string',
+            'nominal' => 'required_with:pengeluaran|nullable|numeric|min:0',
             'keterangan' => 'nullable|string',
             'barang_id' => 'nullable|exists:barang,id',
             'dompet_id' => 'nullable|exists:dompet,id',
@@ -339,10 +339,10 @@ class TransaksiController extends Controller
         $id = Hashids::decode($hash)[0] ?? abort(404);
         $validatedData = $request->validate([
             'tgl_transaksi' => 'required|date',
-            'pemasukan' => 'nullable|numeric',
-            'nominal_pemasukan' => 'nullable|numeric',
-            'pengeluaran' => 'nullable|numeric',
-            'nominal' => 'nullable|numeric',
+            'pemasukan' => 'required_without:pengeluaran|required_with:nominal_pemasukan|nullable|numeric',
+            'nominal_pemasukan' => 'required_with:pemasukan|nullable|numeric|min:0',
+            'pengeluaran' => 'required_without:pemasukan|required_with:nominal|nullable|numeric',
+            'nominal' => 'required_with:pengeluaran|nullable|numeric|min:0',
             'keterangan' => 'nullable|string|max:255',
             'dompet_id' => 'nullable|exists:dompet,id',
         ]);
