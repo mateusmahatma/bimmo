@@ -45,6 +45,33 @@ class Aset extends Model
         'is_disposed' => 'boolean',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($aset) {
+            if (!$aset->kode_aset || $aset->kode_aset === 'AUTO' || strpos($aset->kode_aset, 'AST-') === 0) {
+                $userId = $aset->id_user ?? Auth::id();
+
+                // Find last code for THIS user with our specific prefix format
+                $lastAset = Aset::where('id_user', $userId)
+                    ->where('kode_aset', 'like', 'A-' . $userId . '-%')
+                    ->orderBy('kode_aset', 'desc')
+                    ->first();
+
+                $lastNumber = 0;
+                if ($lastAset) {
+                    // Extract number from A-1-0001 format
+                    $parts = explode('-', $lastAset->kode_aset);
+                    $lastNumber = (int)end($parts);
+                }
+
+                $nextNumber = $lastNumber + 1;
+                $aset->kode_aset = sprintf('A-%d-%04d', $userId, $nextNumber);
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class , 'id_user');
