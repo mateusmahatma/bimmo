@@ -314,12 +314,31 @@ class TransaksiController extends Controller
                 }
             }
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data Transaksi Berhasil Disimpan!',
+                    'redirect_url' => route('transaksi.index'),
+                    'redirect_name' => __('Transactions')
+                ]);
+            }
+
             return redirect()->route('transaksi.index')->with('success', 'Data Transaksi Berhasil Disimpan!');
         } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi error: ' . $e->getMessage()
+                ], 500);
+            }
             return back()->with('error', 'Terjadi error: ' . $e->getMessage());
         }
     }
 
+    public function show($hash)
+    {
+        return redirect()->route('transaksi.edit', $hash);
+    }
     public function edit($hash)
     {
         $id = Hashids::decode($hash)[0] ?? abort(404);

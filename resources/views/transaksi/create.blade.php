@@ -57,6 +57,25 @@
         border-radius: 0.5rem !important;
         padding: 0.6rem 1rem !important;
     }
+
+    /* Migration Guide Inspired Notifications */
+    .scale-in {
+        animation: scaleIn 0.3s ease-out;
+    }
+    @keyframes scaleIn {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .bg-success-light { background-color: rgba(25, 135, 84, 0.1); }
+    .bg-danger-light { background-color: rgba(220, 53, 69, 0.1); }
 </style>
 @endpush
 
@@ -88,7 +107,9 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('transaksi.store') }}" method="POST">
+                    <div id="alertPlaceholder"></div>
+
+                    <form action="{{ route('transaksi.store') }}" method="POST" id="transactionForm">
                         @csrf
                         
                         <!-- Date Section -->
@@ -307,13 +328,18 @@
         if (pengeluaranSectionEl.classList.contains('show')) togglePengeluaran.classList.add('active', 'bg-danger', 'text-white');
 
         // Form Validation Logic
-        const form = document.querySelector('form');
+        const form = document.getElementById('transactionForm');
         form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
             const getVal = (id, ts) => {
                 const el = document.getElementById(id);
                 if (!el) return '';
                 return ts ? ts.getValue() : el.value;
             };
+
+            const nominalPemasukan = document.getElementById('nominal_pemasukan');
+            const nominalPengeluaran = document.getElementById('nominal');
 
             const incomeCat = getVal('pemasukan', incSelect);
             const incomeAmt = nominalPemasukan.value;
@@ -330,22 +356,104 @@
                                      (!expenseAmt && expenseCat);
 
             if (!hasIncome && !hasExpense) {
-                e.preventDefault();
                 alert("{{ __('Please fill in at least one transaction type (Income or Expense) completely with an amount greater than 0.') }}");
                 return;
             }
 
             if (isIncomePartial) {
-                e.preventDefault();
                 alert("{{ __('Please complete the Income section (both category and amount).') }}");
                 return;
             }
 
             if (isExpensePartial) {
-                e.preventDefault();
                 alert("{{ __('Please complete the Expense section (both category and amount).') }}");
                 return;
             }
+
+            // Ajax Submission
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnContent = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> {{ __('Saving...') }}';
+
+            const formData = new FormData(form);
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                }
+            })
+            .then(async response => {
+                const contentType = response.headers.get('content-type');
+                const isJson = contentType && contentType.includes('application/json');
+                const data = isJson ? await response.json() : null;
+
+                if (!response.ok) {
+                    let errorMsg = data?.message || '{{ __('Terjadi kesalahan pada sistem.') }}';
+                    
+                    // Handle Laravel Validation Errors (422)
+                    if (response.status === 422 && data?.errors) {
+                        const errorList = Object.values(data.errors).flat();
+                        errorMsg = errorList.map(msg => `<li>${msg}</li>`).join('');
+                        errorMsg = `<ul class="mb-0 mt-2 ps-3 small text-start">${errorMsg}</ul>`;
+                    }
+                    
+                    throw new Error(errorMsg);
+                }
+                return data;
+            })
+            .then(data => {
+                // Render Success Alert (Migration Guide Style)
+                alertPlaceholder.innerHTML = `
+                    <div class="alert alert-success border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center justify-content-between text-start scale-in">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-success-light text-success me-3">
+                                <i class="bi bi-check2-circle fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">${data.message || '{{ __('Data Berhasil Disimpan!') }}'}</h5>
+                                <p class="mb-0 text-muted small">{{ __('Data processed successfully') }}</p>
+                            </div>
+                        </div>
+                        <a href="${data.redirect_url}" class="btn btn-success px-4 py-2 rounded-pill fw-bold shadow-sm">
+                            <i class="bi bi-eye me-2"></i> {{ __('Lihat Data') }} ${data.redirect_name}
+                        </a>
+                    </div>
+                `;
+                
+                // Reset Form
+                form.reset();
+                if(incSelect) incSelect.clear();
+                if(expSelect) expSelect.clear();
+                
+                // Scroll to Top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alertPlaceholder.innerHTML = `
+                    <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center text-start scale-in">
+                        <div class="icon-box bg-danger-light text-danger me-3">
+                            <i class="bi bi-exclamation-triangle fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">{{ __('Gagal Menyimpan') }}</h5>
+                            <div class="mb-0 text-muted small">${error.message}</div>
+                        </div>
+                    </div>
+                `;
+                // Scroll to Top for visibility
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+            });
         });
 
         // Initialize TomSelect if validation didn't fail and elements exist
