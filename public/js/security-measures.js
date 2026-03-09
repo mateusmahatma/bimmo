@@ -1,93 +1,182 @@
 /**
- * Security Measures for Bimmo Login & Register Pages
+ * Extreme Security Measures for Bimmo Login & Register Pages
  * - Prevents Right-Click
  * - Blocks common DevTools shortcuts
- * - Detects DevTools opening
+ * - Detects DevTools opening (Dimension thresholds & Orientation)
  * - Prevents Screen Capture/Print
+ * - Extreme Debugger Trap
+ * - Netflix-style Black Out Protection
  */
 
 (function () {
     'use strict';
 
-    // 1. Prevent Right-Click
+    let isLocked = false;
+    const threshold = 160;
+
+    // --- 1. UI Protection Helpers ---
+
+    const hideContent = () => {
+        document.body.classList.add('protection-active');
+        const overlay = document.getElementById('protection-overlay');
+        if (overlay) overlay.style.display = 'flex';
+    };
+
+    const showContent = () => {
+        if (isLocked) return; // Never show content again if locked by capture
+        document.body.classList.remove('protection-active');
+        const overlay = document.getElementById('protection-overlay');
+        if (overlay) overlay.style.display = 'none';
+    };
+
+    const clearClipboard = () => {
+        try {
+            const dummy = document.createElement("input");
+            dummy.style.position = 'fixed';
+            dummy.style.opacity = '0';
+            document.body.appendChild(dummy);
+            dummy.value = "KONTEN DILINDUNGI - Bimmo - " + new Date().getTime();
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+        } catch (err) { }
+    };
+
+    // --- 2. Input & Shortcut Protection ---
+
+    // Prevent Right-Click
     document.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         return false;
     });
 
-    // 2. Block Keyboard Shortcuts
+    // Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
-        // F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
+        // Blurring for Modifier Keys (Preemptive)
+        if (['Meta', 'Shift', 'Control', 'Alt'].includes(e.key)) {
+            hideContent();
         }
 
-        // Ctrl+Shift+I (Inspect)
-        // Ctrl+Shift+J (Console)
-        // Ctrl+Shift+C (Elements)
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Ctrl+U (View Source)
-        if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Ctrl+S (Save)
-        if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Ctrl+P (Print)
-        if (e.ctrlKey && (e.key === 'p' || e.key === 'P' || e.keyCode === 80)) {
+        // F12, Ctrl+Shift+I/J/C, Ctrl+U, Ctrl+S, Ctrl+P, PrintScreen
+        if (
+            e.keyCode === 123 ||
+            (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
+            (e.ctrlKey && [85, 83, 80].includes(e.keyCode)) ||
+            e.key === 'PrintScreen' || e.keyCode === 44
+        ) {
+            isLocked = true;
+            hideContent();
+            clearClipboard();
             e.preventDefault();
             return false;
         }
     });
 
-    // 3. DevTools Detection via Debugger
-    // This will pause the execution if DevTools is open
-    setInterval(() => {
-        const start = performance.now();
-        debugger;
-        const end = performance.now();
-        if (end - start > 100) {
-            // If it takes more than 100ms to execute debugger, DevTools is likely open
-            // window.location.href = '/restricted'; // Uncomment to redirect
-            console.warn('Akses Dibatasi: Developer Tools terdeteksi.');
+    document.addEventListener('keyup', (e) => {
+        // Show content again if only modifier keys were pressed and no capture was triggered
+        if (['Meta', 'Shift', 'Control', 'Alt'].includes(e.key)) {
+            setTimeout(() => {
+                if (!isLocked && document.hasFocus()) {
+                    showContent();
+                }
+            }, 500);
         }
-    }, 1000);
 
-    // 4. DevTools Detection via Window Dimensions (Desktop)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (e.key === 'PrintScreen' || e.keyCode === 44) {
+            isLocked = true;
+            hideContent();
+        }
 
-    if (!isMobile) {
-        const threshold = 160;
-        const checkDimensions = () => {
-            const widthDiff = window.outerWidth - window.innerWidth;
-            const heightDiff = window.outerHeight - window.innerHeight;
+        // Win Key (Win+Shift+S attempt)
+        if (e.key === 'Meta' || e.key === 'OS' || e.key === 'Windows') {
+            clearClipboard();
+        }
+    });
 
-            if (widthDiff > threshold || heightDiff > threshold) {
-                // If the difference is large, DevTools is likely docked
-                document.body.innerHTML = `
-                    <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;text-align:center;padding:20px;background:#f8f9fa;">
-                        <h1 style="color:#dc3545;margin-bottom:10px;">Akses Dibatasi</h1>
-                        <p style="color:#6c757d;margin-bottom:20px;">Mohon tutup Developer Tools untuk melanjutkan.</p>
-                        <button onclick="window.location.reload()" style="padding:10px 20px;background:#0d6efd;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px;transition:background 0.3s;">
-                            Muat Ulang Halaman
-                        </button>
-                    </div>
-                `;
+    // --- 3. Focus & Visibility Protection ---
+
+    window.addEventListener('blur', hideContent);
+    window.addEventListener('focus', showContent);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            hideContent();
+            document.title = 'Bimmo - Protected';
+        } else {
+            if (!isLocked) {
+                showContent();
+                document.title = 'Bimmo';
             }
-        };
+        }
+    });
 
-        window.addEventListener('resize', checkDimensions);
-        setTimeout(checkDimensions, 1000);
-    }
+    // --- 4. DevTools Detection (Aggressive) ---
+
+    const blockAccess = () => {
+        isLocked = true;
+        hideContent();
+        // Specific message for DevTools
+        const overlay = document.getElementById('protection-overlay');
+        if (overlay) {
+            const subtitle = overlay.querySelector('p');
+            if (subtitle) subtitle.innerText = "Developer Tools terdeteksi. Silakan tutup Developer Tools untuk melanjutkan.";
+        }
+    };
+
+    const checkDevTools = () => {
+        const widthDiff = window.outerWidth - window.innerWidth > threshold;
+        const heightDiff = window.outerHeight - window.innerHeight > threshold;
+
+        if (widthDiff || heightDiff) {
+            blockAccess();
+        }
+    };
+
+    window.addEventListener('resize', checkDevTools);
+    setInterval(checkDevTools, 1000);
+
+    // Advanced Debugger Trap
+    const detector = function () {
+        try {
+            (function () {
+                (function a() {
+                    try {
+                        (function b(i) {
+                            if (('' + (i / i)).length !== 1 || i % 20 === 0) {
+                                (function () { }).constructor('debugger')();
+                            } else {
+                                debugger;
+                            }
+                            b(++i);
+                        })(0);
+                    } catch (e) {
+                        setTimeout(a, 50);
+                    }
+                })();
+            })();
+        } catch (e) { }
+    };
+
+    setTimeout(detector, 1000);
+
+    // Continuous console clearing
+    setInterval(() => console.clear(), 100);
+
+    // Mobile Multi-finger Touch Detection
+    document.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 2) { // 3 or more fingers
+            hideContent();
+            clearClipboard();
+            isLocked = true;
+        }
+    }, { passive: true });
+
+    // Print Protection
+    window.addEventListener('beforeprint', () => {
+        document.body.style.display = 'none';
+    });
+    window.addEventListener('afterprint', () => {
+        document.body.style.display = 'block';
+    });
 
 })();
