@@ -53,17 +53,49 @@
         color: #60a5fa;
     }
 
-    /* Custom style for summary card - clean corporate look */
+    /* PWA & Premium Enhancements (Static) */
     .card-summary {
-        border-radius: 12px;
-        border: 0;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+        border-radius: 20px;
+        border: none;
+        background: linear-gradient(135deg, #08aeea 0%, #2af598 100%);
+        color: white;
+        overflow: hidden;
+        position: relative;
+    }
+    .card-summary::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        pointer-events: none;
     }
     .check-item { cursor: pointer; }
 
-    /* Responsive Table to Card View */
-    @media (max-width: 768px) {
-        /* Force table to not be like tables anymore */
+    .fab-add {
+        position: fixed;
+        bottom: 2rem;
+        right: 1.5rem;
+        z-index: 1040;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: none; /* Desktop hidden */
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(8, 174, 234, 0.4);
+    }
+
+    @media (max-width: 767.98px) {
+        .fab-add {
+            display: flex;
+        }
+        .btn-add-desktop {
+            display: none;
+        }
+        
         #anggaranTable, 
         #anggaranTable thead, 
         #anggaranTable tbody, 
@@ -80,24 +112,29 @@
             left: -9999px;
         }
 
-        #anggaranTable tr { 
-            border: 1px solid #ccc; 
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        #anggaranTable tr {
+            border: 0;
+            margin-bottom: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             background-color: #fff;
-            padding: 10px;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-
-        #anggaranTable td { 
+        
+        #anggaranTable td {
             border: none;
-            border-bottom: 1px solid #eee; 
+            border-bottom: 1px solid #f8f9fa;
             position: relative;
             padding-left: 45%; 
             padding-top: 0.8rem;
             padding-bottom: 0.8rem;
             text-align: right;
-            white-space: normal; /* Allow text to wrap */
+            white-space: normal;
+        }
+        
+        #anggaranTable td:last-child {
+            border-bottom: 0;
         }
 
         #anggaranTable td:before { 
@@ -117,7 +154,7 @@
         #anggaranTable td:nth-of-type(3):before { content: "Budget Name"; }
         #anggaranTable td:nth-of-type(4):before { content: "Percentage"; }
         #anggaranTable td:nth-of-type(5):before { content: "Expense Types"; }
-        #anggaranTable td:nth-of-type(8):before { content: "Action"; top: 1.5rem; }
+        #anggaranTable td:nth-of-type(8):before { content: "Action"; top: 1.1rem; }
 
         /* Special handling for the checkbox cell */
         #anggaranTable td:nth-of-type(1) {
@@ -147,13 +184,20 @@
             display: none; /* Hide label for action buttons */
         }
         
-        /* Hide ID/No/Dates on mobile to save space if needed, or style them */
-        #anggaranTable td:nth-of-type(2), /* No */
-        #anggaranTable td:nth-of-type(6), /* Created At */
-        #anggaranTable td:nth-of-type(7)  /* Updated At */
-        {
+        /* Hide ID/No/Dates on mobile */
+        #anggaranTable td:nth-of-type(2), 
+        #anggaranTable td:nth-of-type(6), 
+        #anggaranTable td:nth-of-type(7) {
             display: none;
         }
+    }
+
+    [data-bs-theme="dark"] .card-summary {
+        background: linear-gradient(135deg, #1a1a1a 0%, #084e6a 100%);
+    }
+    [data-bs-theme="dark"] #anggaranTable tr {
+        background-color: #1e1e1e;
+        border-color: rgba(255,255,255,0.05);
     }
 </style>
 @endpush
@@ -174,15 +218,16 @@
     <div class="row">
         <!-- Summary / Percentage Report Card -->
         <div class="col-lg-12 mb-4">
-            <div class="card card-summary shadow-sm">
+            <div class="card card-summary shadow-lg">
                 <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Total Budget Allocation') }}</h5>
-                        <p class="text-muted small mb-0">{{ __('Ensure the total allocation does not exceed 100%.') }}</p>
+                        <h5 class="card-title mb-1 fw-bold text-white opacity-75" style="font-size: 1.1rem;">{{ __('Total Budget Allocation') }}</h5>
+                        <p class="small mb-0 text-white-50">{{ __('Ensure the total allocation does not exceed 100%.') }}</p>
                     </div>
                     <div class="text-end">
-                        <h2 class="fw-bold mb-0 text-primary" id="totalPersentase">0%</h2>
-                        <span id="exceedMessage" class="badge bg-danger d-none mt-2">{{ __('Exceeds 100%!') }}</span>
+                        <p class="small mb-0 text-white-50 d-md-none text-start">{{ __('Total Allocation') }}</p>
+                        <h2 class="fw-bold mb-0 text-white" id="totalPersentase">0%</h2>
+                        <span id="exceedMessage" class="badge bg-danger mt-2 d-none">{{ __('Exceeds 100%!') }}</span>
                     </div>
                 </div>
             </div>
@@ -199,7 +244,7 @@
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3 flex-fill flex-md-grow-0">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('anggaran.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-fill flex-md-grow-0">
+                        <a href="{{ route('anggaran.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-fill flex-md-grow-0 btn-add-desktop">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add New') }}
                         </a>
                     </div>
@@ -231,6 +276,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <a href="{{ route('anggaran.create') }}" class="btn btn-primary fab-add" title="{{ __('Add Budget') }}">
+        <i class="bi bi-plus-lg fs-2"></i>
+    </a>
 </section>
 
 <!-- Include Modal -->
