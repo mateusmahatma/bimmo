@@ -48,7 +48,7 @@
                 <button class="btn btn-outline-secondary btn-sm me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
                     <i class="bi bi-list fs-5"></i>
                 </button>
-                <img src="{{ asset('img/bimmo_2.png') }}" alt="BIMMO" style="height: 25px;">
+                <img src="{{ asset('img/bimmo_light.png') }}" alt="BIMMO" style="height: 25px;">
             </div>
 
             @yield('container')
