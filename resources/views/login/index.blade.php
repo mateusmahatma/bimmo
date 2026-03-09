@@ -16,45 +16,33 @@
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
-    <script>
-        // PWA Diagnostic Suite v3
-        window.deferredPrompt = null;
-        console.log('PWA Debug: Starting advanced diagnostics...');
+    <style>
+        /* Anti screenshot/capture CSS */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
 
-        // 1. Listen for the install prompt
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        window.deferredPrompt = null;
+
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.info('%c PWA Debug: SUCCESS! beforeinstallprompt event fired.', 'background: #222; color: #bada55');
             e.preventDefault();
             window.deferredPrompt = e;
             const btn = document.getElementById('installPwa');
             if (btn) btn.style.display = 'block';
         });
 
-        // 2. Check current mode & existence
         window.addEventListener('load', () => {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            if (isStandalone) {
-                console.warn('PWA Debug: STATUS - Aplikasi sudah berjalan dalam mode STANDALONE (sudah terinstal).');
-            }
-
-            // 3. Verify Manifest and Icons
-            const manifestLink = document.querySelector('link[rel="manifest"]');
-            if (!manifestLink) {
-                console.error('PWA Debug: ERROR - Manifest link hilang di <head>!');
-            } else {
-                console.log('PWA Debug: Manifest ditemukan:', manifestLink.href);
-                fetch(manifestLink.href)
-                    .then(r => r.json())
-                    .then(json => console.log('PWA Debug: Manifest valid & terbaca:', json.short_name))
-                    .catch(e => console.error('PWA Debug: Manifest TIDAK valid atau tidak terbaca!', e));
-            }
-
-            // 4. Trace why event might not fire
-            setTimeout(() => {
-                if (!window.deferredPrompt && !isStandalone) {
-                    console.info('PWA Debug: INFO - Event belum muncul setelah 10 detik. Kemungkinan: 1) App sudah terinstal di OS, 2) Kriteria PWA belum 100% dipenuhi di tab Application > Manifest, atau 3) Browser butuh interaksi user lebih banyak.');
-                }
-            }, 10000);
         });
     </script>
 </head>
@@ -144,6 +132,7 @@
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/security-measures.js') }}?v={{ filemtime(public_path('js/security-measures.js')) }}"></script>
     <script src="{{ asset('js/login.js') }}?v={{ filemtime(public_path('js/login.js')) }}"></script>
     <script>
         (function() {
@@ -170,18 +159,14 @@
         if (installBtn) {
             installBtn.addEventListener('click', () => {
                 if (window.deferredPrompt) {
-                    // Use the automatic prompt if available
                     window.deferredPrompt.prompt();
                     window.deferredPrompt.userChoice.then((choiceResult) => {
-                        console.log('PWA Debug: User choice outcome:', choiceResult.outcome);
                         window.deferredPrompt = null;
                         if (choiceResult.outcome === 'accepted') {
                             installBtn.style.display = 'none';
                         }
                     });
                 } else {
-                    // Show manual instructions modal as fallback
-                    console.warn('PWA Debug: Using manual fallback');
                     const modal = new bootstrap.Modal(document.getElementById('pwaInstructionModal'));
                     
                     // Detect device for specific message
@@ -204,10 +189,9 @@
                 const swPath = "{{ asset('sw.js') }}";
                 navigator.serviceWorker.register(swPath, { scope: '/' })
                     .then(reg => {
-                        console.log('PWA Debug: Service Worker registered. Path:', swPath);
-                        reg.update(); // Force update check
+                        reg.update();
                     })
-                    .catch(err => console.error('PWA Debug: Service Worker registration FAILED:', err));
+                    .catch(err => {});
             });
         }
     </script>

@@ -18,6 +18,21 @@
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet" />
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* Anti screenshot/capture CSS */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 
 @include('modal.daftar.index')
@@ -132,6 +147,7 @@
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2@10') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/security-measures.js') }}?v={{ filemtime(public_path('js/security-measures.js')) }}"></script>
     <script src="{{ asset('js/daftar.js') }}"></script>
 
     <script>

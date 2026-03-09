@@ -11,6 +11,21 @@
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* Anti screenshot/capture CSS */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+    </style>
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
@@ -122,6 +137,8 @@
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/security-measures.js') }}?v={{ filemtime(public_path('js/security-measures.js')) }}"></script>
+    <script src="{{ asset('js/login.js') }}?v={{ filemtime(public_path('js/login.js')) }}"></script>
     <script>
         (function() {
             const setTheme = (theme) => {
