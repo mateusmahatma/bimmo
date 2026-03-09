@@ -20,7 +20,6 @@
     .breadcrumb-item a {
         color: #636e72;
         text-decoration: none;
-        transition: color 0.2s;
     }
     .breadcrumb-item a:hover {
         color: #0984e3;
@@ -38,6 +37,72 @@
         padding-left: 0.5rem;
     }
 
+    /* PWA & Premium Enhancements */
+    .card-summary {
+        border-radius: 20px;
+        border: none;
+        background: linear-gradient(135deg, #4154f1 0%, #2d3436 100%);
+        color: white;
+        overflow: hidden;
+        position: relative;
+    }
+    .card-summary::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .balance-amount {
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .wallet-card {
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #fff;
+    }
+    .wallet-card:hover {
+        box-shadow: 0 15px 30px rgba(65, 84, 241, 0.1) !important;
+        border-color: #4154f1;
+    }
+    .wallet-icon-wrapper {
+        /* static icon */
+    }
+    .wallet-card:hover .wallet-icon-wrapper {
+        /* no transform */
+    }
+    .fab-add {
+        position: fixed;
+        bottom: 2rem;
+        right: 1.5rem;
+        z-index: 1040;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: none; /* Desktop hidden */
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(65, 84, 241, 0.4);
+    }
+
+    @media (max-width: 767.98px) {
+        .fab-add {
+            display: flex;
+        }
+        .btn-add-desktop {
+            display: none;
+        }
+        .balance-amount {
+            font-size: 1.75rem;
+        }
+    }
+
     [data-bs-theme="dark"] .pagetitle {
         border-bottom: 1px solid #2d2d2d;
     }
@@ -49,6 +114,13 @@
     }
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
+    }
+    [data-bs-theme="dark"] .wallet-card {
+        background: #1e1e1e;
+        border-color: rgba(255,255,255,0.05);
+    }
+    [data-bs-theme="dark"] .card-summary {
+        background: linear-gradient(135deg, #2d3436 0%, #1a1a1a 100%);
     }
 </style>
 @endpush
@@ -81,31 +153,16 @@
 
 <section class="section">
     <div class="row">
-<style>
-    /* Custom style for summary card - clean corporate look matching Budget menu */
-    .card-summary {
-        border-radius: 12px;
-        border: 0;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-        background-color: #fff;
-    }
-    .balance-amount {
-        color: #4154f1; /* primary color */
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-    }
-</style>
-
 <div class="col-lg-12 mb-4">
-    <div class="card card-summary shadow-sm">
+    <div class="card card-summary shadow-lg">
         <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Total Current Balance') }}</h5>
-                <p class="text-muted small mb-0">{{ __('Combined balance from all of your active wallet accounts.') }}</p>
+                <h5 class="card-title mb-1 fw-bold text-white opacity-75" style="font-size: 1.1rem;">{{ __('Total Current Balance') }}</h5>
+                <p class="small mb-0 text-white-50">{{ __('Combined balance from all of your active wallet accounts.') }}</p>
             </div>
             <div class="text-end">
-                <h2 class="balance-amount mb-0">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
+                <p class="small mb-0 text-white-50 d-md-none text-start">{{ __('Current Total') }}</p>
+                <h2 class="balance-amount mb-0 text-white">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
             </div>
         </div>
     </div>
@@ -119,10 +176,10 @@
                     <p class="text-muted small mb-0">{{ __('Manage your various funding sources here') }}</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
+                    <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm border" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
                         <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                     </button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addWalletModal">
+                    <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm btn-add-desktop" data-bs-toggle="modal" data-bs-target="#addWalletModal">
                         <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet') }}
                     </button>
                 </div>
@@ -157,10 +214,10 @@
                 @if(count($wallets) > 0)
                     @foreach($wallets as $wallet)
                     <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card wallet-card border-0 shadow-sm h-100 position-relative" style="border-radius: 16px; border: 1px solid rgba(0,0,0,0.05) !important;">
+                        <div class="card wallet-card border-0 shadow-sm h-100 position-relative">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-start justify-content-between mb-3">
-                                    <div class="wallet-icon-wrapper rounded-4 d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary" style="width: 56px; height: 56px;">
+                                    <div class="wallet-icon-wrapper rounded-4 d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary shadow-sm" style="width: 56px; height: 56px; border: 1px solid rgba(65, 84, 241, 0.1);">
                                         @if($wallet->ikon)
                                             @if(str_starts_with($wallet->ikon, 'uploads/'))
                                                 <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 32px; height: 32px; object-fit: contain;">
@@ -173,10 +230,10 @@
                                     </div>
                                     <div class="dropdown">
                                         <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
-                                            <i class="bi bi-three-dots-vertical"></i>
+                                            <i class="bi bi-three-dots-vertical fs-5"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px; z-index: 1050;">
-                                            <li><a class="dropdown-item text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
+                                            <li><a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
                                                 <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
                                             </a></li>
                                         </ul>
@@ -184,11 +241,12 @@
                                 </div>
                                 
                                 <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none stretched-link">
-                                    <p class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.8px;">{{ $wallet->nama }}</p>
+                                    <p class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">{{ $wallet->nama }}</p>
                                     <h4 class="fw-bold mb-0 text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h4>
                                     
                                     <div class="mt-4 d-flex align-items-center text-primary fw-semibold small">
-                                        {{ __('View Details') }} <i class="bi bi-arrow-right ms-2 transition-icon"></i>
+                                        <span>{{ __('View Details') }}</span>
+                                        <i class="bi bi-arrow-right ms-2 transition-icon"></i>
                                     </div>
                                 </a>
                             </div>
@@ -209,7 +267,12 @@
                 @endif
             </div>
         </div>
-</section>
+        
+        <!-- Floating Action Button for Mobile -->
+        <button type="button" class="btn btn-primary fab-add" data-bs-toggle="modal" data-bs-target="#addWalletModal" title="{{ __('Add Wallet') }}">
+            <i class="bi bi-plus-lg fs-2"></i>
+        </button>
+    </section>
 
 <!-- Add Wallet Modal -->
 <div class="modal fade" id="addWalletModal" tabindex="-1">
@@ -297,10 +360,6 @@
 <style>
     .cursor-pointer {
         cursor: pointer;
-    }
-    .wallet-card:hover {
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-        border-color: #4154f1 !important;
     }
 </style>
 @endsection
