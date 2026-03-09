@@ -52,8 +52,43 @@
         color: #60a5fa;
     }
 
-    @media screen and (max-width: 768px) {
-        /* Force table to not be like tables anymore */
+    /* PWA & Premium Enhancements (White Theme) */
+    .card-dashboard {
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff;
+        color: #2d3436;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: none !important;
+    }
+    
+    .card-icon {
+        transition: none !important;
+    }
+
+    .fab-add {
+        position: fixed;
+        bottom: 2rem;
+        right: 1.5rem;
+        z-index: 1040;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: none; /* Desktop hidden */
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(13, 110, 253, 0.4);
+        transition: none !important;
+    }
+
+    @media (max-width: 767.98px) {
+        .fab-add {
+            display: flex;
+        }
+        .btn-add-desktop {
+            display: none;
+        }
+        
         #pinjamanTable, 
         #pinjamanTable thead, 
         #pinjamanTable tbody, 
@@ -63,73 +98,88 @@
             display: block; 
         }
 
-        /* Hide table headers (but not display: none;, for accessibility) */
+        /* Hide table headers */
         #pinjamanTable thead tr { 
             position: absolute;
-            top: -9999px;
-            left: -9999px;
+            top: -9999px; left: -9999px;
         }
 
-        #pinjamanTable tr { 
-            border: 1px solid #eef2f7; 
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            padding: 0.5rem;
-        }
-
-        #pinjamanTable td { 
-            /* Behave  like a "row" */
-            border: none;
-            border-bottom: 1px solid #f8f9fa; 
-            position: relative;
-            padding-left: 45%; 
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            text-align: right; /* Align text to right */
-            min-height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
+        #pinjamanTable tr {
+            border: 0;
+            margin-bottom: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
         
-        #pinjamanTable td:last-child {
-            border-bottom: 0;
+        #pinjamanTable td {
+            border: none;
+            border-bottom: 1px solid #f8f9fa;
+            position: relative;
+            padding-left: 45%; 
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            text-align: right;
+            white-space: normal;
+            min-height: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
             justify-content: center;
-            padding-left: 0;
-            margin-top: 0.5rem;
+        }
+        
+        #pinjamanTable td .badge {
+            white-space: normal !important;
+            text-align: right;
+            max-width: 100%;
+        }
+
+        #pinjamanTable td:last-child {
+             padding-left: 10px;
+             text-align: center;
+             display: flex !important;
+             justify-content: center !important;
+             align-items: center !important;
+             gap: 10px;
+             border-bottom: 0;
+             margin-top: 5px;
         }
 
         #pinjamanTable td:before { 
-            /* Now like a table header */
             position: absolute;
-            /* Top/left values mimic padding */
-            left: 0.75rem; 
+            top: 50%;
+            transform: translateY(-50%);
+            left: 15px;
             width: 40%; 
             padding-right: 10px; 
             white-space: nowrap;
             text-align: left;
-            font-weight: 600;
-            font-size: 0.85rem;
+            font-weight: bold;
             color: #6c757d;
+            font-size: 0.8rem;
             text-transform: uppercase;
             content: attr(data-label);
         }
         
-        /* Actions button centering */
-        #pinjamanTable td[data-label="Action"] {
-           justify-content: flex-end;
-           padding-left: 45%;
+        #pinjamanTable td:last-child:before { 
+            display: none;
         }
         
         #pinjamanTable td[data-label="No"] {
             display: none;
         }
-        
-         .pagination {
-            justify-content: center !important;
-        }
+    }
+
+    [data-bs-theme="dark"] .card-dashboard {
+        background-color: #1a1a1a;
+        border-color: rgba(255,255,255,0.05);
+        color: #e0e0e0;
+    }
+    [data-bs-theme="dark"] #pinjamanTable tr {
+        background-color: #1a1a1a;
+        border-color: rgba(255,255,255,0.05);
     }
 </style>
 @endpush
@@ -156,14 +206,14 @@
     <div class="row">
         <!-- Summary Cards -->
         <div class="col-md-4 mb-4">
-            <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light text-primary me-3" style="width: 48px; height: 48px; background: rgba(13, 110, 253, 0.1);">
                             <i class="bi bi-bank fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Liability') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Liability') }}</h6>
                             <h4 class="mb-0 fw-bold text-primary" id="statTotalOriginal">Rp {{ number_format($totalOriginal, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -172,14 +222,14 @@
         </div>
 
         <div class="col-md-4 mb-4">
-            <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light text-success me-3" style="width: 48px; height: 48px; background: rgba(25, 135, 84, 0.1);">
                             <i class="bi bi-check-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Paid') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Paid') }}</h6>
                             <h4 class="mb-0 fw-bold text-success" id="statTotalPaid">Rp {{ number_format($totalPaid, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -188,14 +238,14 @@
         </div>
 
         <div class="col-md-4 mb-4">
-            <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light text-danger me-3" style="width: 48px; height: 48px; background: rgba(220, 53, 69, 0.1);">
                             <i class="bi bi-exclamation-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Remaining Balance') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Remaining Balance') }}</h6>
                             <h4 class="mb-0 fw-bold text-danger" id="totalPinjaman">Rp {{ number_format($totalRemaining, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -219,7 +269,7 @@
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
                             <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Liability') }}
                         </a>
                     </div>
@@ -318,6 +368,11 @@
 
 <!-- Include Modals -->
 @include('modal.pinjaman.index')
+
+<!-- Floating Action Button for Mobile -->
+<a href="{{ route('pinjaman.create') }}" class="btn btn-primary fab-add" title="{{ __('Add New Liability') }}">
+    <i class="bi bi-plus-lg fs-2"></i>
+</a>
 
 @endsection
 
