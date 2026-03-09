@@ -10,7 +10,7 @@
         </aside>
 
         {{-- MOBILE OFFCANVAS SIDEBAR --}}
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel" data-bs-theme="light">
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
             <div class="offcanvas-header border-bottom">
                 <h5 class="offcanvas-title" id="mobileSidebarLabel">Menu</h5>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -48,7 +48,7 @@
                 <button class="btn btn-outline-secondary btn-sm me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
                     <i class="bi bi-list fs-5"></i>
                 </button>
-                <img src="{{ asset('img/bimmo_light.png') }}" alt="BIMMO" style="height: 25px;">
+                <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo" alt="BIMMO" style="height: 25px;">
             </div>
 
             @yield('container')
