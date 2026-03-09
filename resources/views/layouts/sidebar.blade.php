@@ -1,10 +1,8 @@
 <aside class="sidebar d-flex flex-column">
     <div class="sidebar-header p-4 d-flex align-items-center justify-content-between border-bottom mb-2">
-        <picture>
-            <source srcset="{{ asset('img/bimmo_dark.png') }}" media="(prefers-color-scheme: dark)">
-            <source srcset="{{ asset('img/bimmo_light.png') }}" media="(prefers-color-scheme: light)">
+        <a href="/dashboard">
             <img src="{{ asset('img/bimmo_light.png') }}" class="me-2" style="height: 22px; width: auto;">
-        </picture>
+        </a>
         <div class="d-flex align-items-center gap-1">
             <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}" 
                     style="font-size: 0.65rem; border-radius: 6px;" 
