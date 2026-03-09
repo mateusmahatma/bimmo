@@ -57,22 +57,135 @@
 @section('container')
 
 <style>
-    /* Custom style for summary card - clean corporate look matching Wallet menu */
+    /* PWA & Premium Enhancements (White Theme) */
     .card-summary {
-        border-radius: 12px;
-        border: 0;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-        background-color: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff;
+        color: #2d3436;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     .balance-amount {
-        color: #4154f1; /* primary color */
+        color: #f5576c;
         font-size: 2rem;
         font-weight: 800;
         letter-spacing: -0.5px;
     }
+
+    .fab-add {
+        position: fixed;
+        bottom: 2rem;
+        right: 1.5rem;
+        z-index: 1040;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: none; /* Desktop hidden */
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(245, 87, 108, 0.4);
+    }
+
+    @media (max-width: 767.98px) {
+        .fab-add {
+            display: flex;
+        }
+        .btn-add-desktop {
+            display: none;
+        }
+        
+        #danaDaruratTable, 
+        #danaDaruratTable thead, 
+        #danaDaruratTable tbody, 
+        #danaDaruratTable th, 
+        #danaDaruratTable td, 
+        #danaDaruratTable tr { 
+            display: block; 
+        }
+
+        /* Hide table headers */
+        #danaDaruratTable thead tr { 
+            position: absolute;
+            top: -9999px; left: -9999px;
+        }
+
+        #danaDaruratTable tr {
+            border: 0;
+            margin-bottom: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        #danaDaruratTable td {
+            border: none;
+            border-bottom: 1px solid #f8f9fa;
+            position: relative;
+            padding-left: 45%; 
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            text-align: right;
+            white-space: normal;
+            min-height: 3rem;
+        }
+        
+        #danaDaruratTable td:last-child {
+            border-bottom: 0;
+        }
+
+        #danaDaruratTable td:before { 
+            position: absolute;
+            top: 1rem;
+            left: 15px;
+            width: 40%; 
+            padding-right: 10px; 
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+            color: #6c757d;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* Column Labels */
+        #danaDaruratTable td:nth-of-type(1):before { content: "Select"; }
+        #danaDaruratTable td:nth-of-type(2):before { content: "No"; }
+        #danaDaruratTable td:nth-of-type(3):before { content: "Date"; }
+        #danaDaruratTable td:nth-of-type(4):before { content: "Type"; }
+        #danaDaruratTable td:nth-of-type(5):before { content: "Amount"; }
+        #danaDaruratTable td:nth-of-type(6):before { content: "Note"; }
+        #danaDaruratTable td:nth-of-type(9):before { content: "Action"; top: 1.1rem; }
+
+        #danaDaruratTable td:nth-of-type(9) {
+             padding-left: 10px;
+             text-align: center;
+             display: flex;
+             justify-content: center;
+             gap: 10px;
+             border-bottom: 0;
+        }
+        #danaDaruratTable td:nth-of-type(9):before { 
+            display: none;
+        }
+        
+        /* Hide ID/Created/Updated on mobile */
+        #danaDaruratTable td:nth-of-type(2), 
+        #danaDaruratTable td:nth-of-type(7), 
+        #danaDaruratTable td:nth-of-type(8) {
+            display: none;
+        }
+    }
+
     [data-bs-theme="dark"] .card-summary {
-        background-color: #1a1d20;
-        border: 1px solid #2d2d2d;
+        background: linear-gradient(135deg, #3d0b0b 0%, #611124 100%);
+    }
+    [data-bs-theme="dark"] #danaDaruratTable tr {
+        background-color: #1e1e1e;
+        border-color: rgba(255,255,255,0.05);
     }
 </style>
 
@@ -90,12 +203,11 @@
     <div class="row">
         <div class="col-lg-12">
             
-             <!-- Total Card - Synchronized with Wallet style -->
-             <div class="card card-summary mb-4 shadow-sm">
+             <div class="card card-summary mb-4">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                         <div>
-                            <h5 class="card-title mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Total Emergency Fund') }}</h5>
+                            <h5 class="card-title mb-1 fw-bold text-dark opacity-75" style="font-size: 1.1rem;">{{ __('Total Emergency Fund') }}</h5>
                             <p class="text-muted small mb-0">{{ __('Prepared funds for your unexpected financial needs.') }}</p>
                         </div>
                         <div class="text-end">
@@ -108,8 +220,8 @@
                             <span class="text-muted small fw-medium">{{ __('Target achievement progress') }}</span>
                             <span class="text-dark small fw-bold"><span id="targetPercentage">{{ $percentage }}</span>%</span>
                         </div>
-                        <div class="progress rounded-pill bg-light" style="height: 8px;">
-                            <div class="progress-bar bg-success rounded-pill" id="progressBar" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress rounded-pill bg-light" style="height: 10px;">
+                            <div class="progress-bar bg-danger rounded-pill" id="progressBar" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <small class="text-muted">{{ __('Target') }}: <span class="text-dark fw-semibold" id="targetDanaDaruratAmount">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</span></small>
@@ -130,9 +242,9 @@
                             <i class="bi bi-gear me-1"></i> {{ __('Set Target') }}
                         </button>
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
-                            <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
+                            <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('dana-darurat.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <a href="{{ route('dana-darurat.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Data') }}
                         </a>
                     </div>
@@ -165,6 +277,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <a href="{{ route('dana-darurat.create') }}" class="btn btn-primary fab-add" title="{{ __('Add Data') }}">
+        <i class="bi bi-plus-lg fs-2"></i>
+    </a>
 </section>
 
 @include('modal.dana_darurat.index')

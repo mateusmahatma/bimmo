@@ -53,24 +53,15 @@
         color: #60a5fa;
     }
 
-    /* PWA & Premium Enhancements (Static) */
+    /* PWA & Premium Enhancements (White Theme) */
     .card-summary {
         border-radius: 20px;
-        border: none;
-        background: linear-gradient(135deg, #08aeea 0%, #2af598 100%);
-        color: white;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff;
+        color: #2d3436;
         overflow: hidden;
         position: relative;
-    }
-    .card-summary::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        pointer-events: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     .check-item { cursor: pointer; }
 
@@ -234,16 +225,30 @@
     <div class="row">
         <!-- Summary / Percentage Report Card -->
         <div class="col-lg-12 mb-4">
-            <div class="card card-summary shadow-lg">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div>
-                        <h5 class="card-title mb-1 fw-bold text-white opacity-75" style="font-size: 1.1rem;">{{ __('Total Budget Allocation') }}</h5>
-                        <p class="small mb-0 text-white-50">{{ __('Ensure the total allocation does not exceed 100%.') }}</p>
+            <div class="card card-summary">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                        <div>
+                            <h5 class="card-title mb-1 fw-bold text-dark opacity-75" style="font-size: 1.1rem;">{{ __('Total Budget Allocation') }}</h5>
+                            <p class="text-muted small mb-0">{{ __('Percentage allocation across all your budget categories.') }}</p>
+                        </div>
+                        <div class="text-end">
+                            <h2 class="fw-bold mb-0 text-primary" id="totalPersentase">0%</h2>
+                        </div>
                     </div>
-                    <div class="text-end">
-                        <p class="small mb-0 text-white-50 d-md-none text-start">{{ __('Total Allocation') }}</p>
-                        <h2 class="fw-bold mb-0 text-white" id="totalPersentase">0%</h2>
-                        <span id="exceedMessage" class="badge bg-danger mt-2 d-none">{{ __('Exceeds 100%!') }}</span>
+
+                    <div class="mt-2 pt-3 border-top">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small fw-medium">{{ __('Total distributed percentage') }}</span>
+                            <span class="text-dark small fw-bold" id="totalPersentaseLabel">0% / 100%</span>
+                        </div>
+                        <div class="progress rounded-pill bg-light" style="height: 10px;">
+                            <div class="progress-bar bg-primary rounded-pill" id="totalAllocationBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 align-items-center">
+                            <small class="text-muted italic small">{{ __('Manage your allocation properly to avoid overspending.') }}</small>
+                            <span id="exceedMessage" class="badge bg-danger d-none"></span>
+                        </div>
                     </div>
                 </div>
             </div>

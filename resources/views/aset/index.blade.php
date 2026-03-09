@@ -52,24 +52,15 @@
         color: #60a5fa;
     }
 
-    /* PWA & Premium Enhancements (Static) */
+    /* PWA & Premium Enhancements (White Theme) */
     .card-summary {
         border-radius: 20px;
-        border: none;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff;
+        color: #2d3436;
         overflow: hidden;
         position: relative;
-    }
-    .card-summary::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        pointer-events: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     
     .status-badge { border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
@@ -203,15 +194,15 @@
     <div class="row">
         <!-- Summary Card -->
         <div class="col-lg-12 mb-4">
-            <div class="card card-summary shadow-lg">
+            <div class="card card-summary">
                 <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <h5 class="card-title mb-1 fw-bold text-white opacity-75" style="font-size: 1.1rem;">{{ __('Asset Summary') }}</h5>
-                        <p class="small mb-0 text-white-50">{{ __('Overview of your physical and digital belongings.') }}</p>
+                        <h5 class="card-title mb-1 fw-bold text-dark opacity-75" style="font-size: 1.1rem;">{{ __('Asset Summary') }}</h5>
+                        <p class="text-muted small mb-0">{{ __('Overview of your physical and digital belongings.') }}</p>
                     </div>
                     <div class="text-end">
-                        <p class="small mb-0 text-white-50 d-md-none text-start">{{ __('Total Items') }}</p>
-                        <h2 class="fw-bold mb-0 text-white" id="totalAssetCount">--</h2>
+                        <p class="small mb-0 text-muted d-md-none text-start">{{ __('Total Items') }}</p>
+                        <h2 class="fw-bold mb-0 text-primary" id="totalAssetCount">--</h2>
                     </div>
                 </div>
             </div>

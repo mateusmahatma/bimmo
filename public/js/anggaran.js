@@ -66,20 +66,28 @@ $(document).ready(function () {
             dataSrc: function (json) {
                 // Update Summary Card
                 if (json.totalPersentase !== undefined) {
-                    $('#totalPersentase').text(json.totalPersentase + '%');
+                    const total = json.totalPersentase;
+                    $('#totalPersentase').text(total + '%');
+                    $('#totalPersentaseLabel').text(total + '% / 100%');
+
+                    const progressBar = $('#totalAllocationBar');
+                    if (progressBar.length) {
+                        progressBar.css('width', Math.min(total, 100) + '%');
+                        progressBar.attr('aria-valuenow', total);
+                        if (total > 100) {
+                            progressBar.removeClass('bg-primary').addClass('bg-danger');
+                        } else {
+                            progressBar.removeClass('bg-danger').addClass('bg-primary');
+                        }
+                    }
 
                     // Handle Exceed Message
                     const exceedMsg = $('#exceedMessage');
-                    if (json.totalPersentase > 100) {
+                    if (total > 100) {
                         exceedMsg.text('Melebihi 100%!').removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
-                    } else if (json.totalPersentase < 100 && json.totalPersentase > 0) {
+                    } else if (total < 100 && total > 0) {
                         if (json.exceedMessage) {
-                            exceedMsg.text(json.exceedMessage);
-                            if (json.totalPersentase > 100) {
-                                exceedMsg.removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
-                            } else {
-                                exceedMsg.removeClass('d-none bg-danger text-white').addClass('bg-warning text-dark');
-                            }
+                            exceedMsg.text(json.exceedMessage).removeClass('d-none bg-danger text-white').addClass('bg-warning text-dark');
                         } else {
                             exceedMsg.addClass('d-none');
                         }

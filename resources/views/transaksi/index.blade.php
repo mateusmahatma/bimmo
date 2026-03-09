@@ -80,8 +80,43 @@
     [data-bs-theme="dark"] .ts-dropdown .active {
         background-color: #343a40 !important;
     }
-    @media screen and (max-width: 768px) {
-        /* Force table to not be like tables anymore */
+    /* PWA & Premium Enhancements (White Theme) */
+    .card-dashboard {
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff;
+        color: #2d3436;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: none !important;
+    }
+    
+    .card-icon {
+        transition: none !important;
+    }
+
+    .fab-add {
+        position: fixed;
+        bottom: 2rem;
+        right: 1.5rem;
+        z-index: 1040;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: none; /* Desktop hidden */
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(13, 110, 253, 0.4);
+        transition: none !important;
+    }
+
+    @media (max-width: 767.98px) {
+        .fab-add {
+            display: flex;
+        }
+        .btn-add-desktop {
+            display: none;
+        }
+        
         #transaksiTable, 
         #transaksiTable thead, 
         #transaksiTable tbody, 
@@ -91,119 +126,80 @@
             display: block; 
         }
 
-        /* Hide table headers (but not display: none;, for accessibility) */
+        /* Hide table headers */
         #transaksiTable thead tr { 
             position: absolute;
-            top: -9999px;
-            left: -9999px;
+            top: -9999px; left: -9999px;
         }
 
-        #transaksiTable tr { 
-            border: 1px solid #eef2f7; 
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            padding: 0.5rem;
+        #transaksiTable tr {
+            border: 0;
+            margin-bottom: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-
-        [data-bs-theme="dark"] #transaksiTable tr {
-            background: #1e1e1e;
-            border-color: #333;
-        }
-
-        #transaksiTable td { 
-            /* Behave  like a "row" */
+        
+        #transaksiTable td {
             border: none;
-            border-bottom: 1px solid #f8f9fa; 
+            border-bottom: 1px solid #f8f9fa;
             position: relative;
             padding-left: 45%; 
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            text-align: right; /* Align text to right */
-            min-height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        [data-bs-theme="dark"] #transaksiTable td {
-            border-bottom-color: #2c2c2c;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            text-align: right;
+            white-space: normal;
+            min-height: 3rem;
+            display: block;
         }
         
         #transaksiTable td:last-child {
             border-bottom: 0;
-            justify-content: center;
-            padding-left: 0;
-            margin-top: 0.5rem;
         }
 
         #transaksiTable td:before { 
-            /* Now like a table header */
             position: absolute;
-            /* Top/left values mimic padding */
-            left: 0.75rem; 
+            top: 1rem;
+            left: 15px;
             width: 40%; 
             padding-right: 10px; 
             white-space: nowrap;
             text-align: left;
-            font-weight: 600;
-            font-size: 0.85rem;
+            font-weight: bold;
             color: #6c757d;
+            font-size: 0.8rem;
             text-transform: uppercase;
             content: attr(data-label);
         }
-        
-        /* Specific adjustments */
-        #transaksiTable td.mobile-checkbox {
-            padding-left: 0;
-            display: flex;
-            justify-content: flex-start;
-            background: #f8f9fa;
-            border-radius: 8px 8px 0 0;
-            margin: -0.5rem -0.5rem 0.5rem -0.5rem;
-            padding: 0.5rem 1rem;
-            border-bottom: 1px solid #eef2f7;
-        }
 
-        [data-bs-theme="dark"] #transaksiTable td.mobile-checkbox {
-            background: #2c2c2c;
-            border-bottom-color: #333;
+        #transaksiTable td:last-child {
+             padding-left: 10px;
+             text-align: center;
+             display: flex !important;
+             justify-content: center !important;
+             gap: 10px;
+             border-bottom: 0;
+             margin-top: 5px;
         }
-        
-        #transaksiTable td.mobile-checkbox:before {
+        #transaksiTable td:last-child:before { 
             display: none;
         }
         
-        #transaksiTable td.mobile-checkbox .form-check {
-            margin: 0;
-        }
-        
-        /* Adjust Description to allow wrapping */
-        #transaksiTable td[data-label="Description"] {
-            height: auto;
-            align-items: flex-start;
-        }
-        
-         /* No Column - maybe hide it or style it */
-        #transaksiTable td[data-label="No"] {
+        /* Hide ID/Extra on mobile */
+        #transaksiTable td:nth-of-type(2) {
             display: none;
         }
-        
-        /* Category Badge alignment */
-        #transaksiTable td[data-label="Category"] {
-            align-items: center;
-        }
-        
-        /* Action buttons */
-        #transaksiTable td[data-label="Action"] {
-           justify-content: flex-end;
-           padding-left: 45%;
-        }
-        
-         .pagination {
-            justify-content: center !important;
-        }
+    }
+
+    [data-bs-theme="dark"] .card-dashboard {
+        background-color: #1e1e1e;
+        border-color: rgba(255,255,255,0.05);
+    }
+    [data-bs-theme="dark"] #transaksiTable tr {
+        background-color: #1a1a1a;
+        border-color: rgba(255,255,255,0.05);
     }
 </style>
 @endpush
@@ -225,14 +221,14 @@
 
         <!-- SUMMARY CARDS -->
         <div class="col-md-4 mb-4">
-            <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center mb-2">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light text-success me-3" style="width: 48px; height: 48px; background: rgba(25, 135, 84, 0.1);">
                             <i class="bi bi-arrow-down-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Income') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Income') }}</h6>
                             <h4 class="mb-0 fw-bold text-success">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -246,14 +242,14 @@
         </div>
 
         <div class="col-md-4 mb-4">
-            <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center mb-2">
                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light text-danger me-3" style="width: 48px; height: 48px; background: rgba(220, 53, 69, 0.1);">
                             <i class="bi bi-arrow-up-circle fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Total Expense') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Expense') }}</h6>
                             <h4 class="mb-0 fw-bold text-danger">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -268,14 +264,14 @@
         </div>
 
         <div class="col-md-4 mb-4">
-             <div class="card-dashboard h-100 d-flex flex-column justify-content-center border-0 shadow-sm" style="border-radius: 12px;">
+             <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light text-primary me-3" style="width: 48px; height: 48px; background: rgba(13, 110, 253, 0.1);">
                             <i class="bi bi-wallet2 fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1">{{ __('Net Balance') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Net Balance') }}</h6>
                             <h4 class="mb-0 fw-bold {{ $netIncome >= 0 ? 'text-success' : 'text-danger' }}">
                                 Rp {{ number_format($netIncome, 0, ',', '.') }}
                             </h4>
@@ -287,7 +283,7 @@
 
         <!-- Period Expense Row -->
         <div class="col-12 mb-3">
-            <div class="card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard">
                 <div class="card-body py-3">
                     <div class="d-flex flex-column align-items-start text-start">
                         <h6 class="fw-bold text-dark text-uppercase mb-1" style="letter-spacing: 0.5px; font-size: 0.75rem;">{{ __('Period Expense') }}</h6>
@@ -318,7 +314,7 @@
                         <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
                             <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Transaction') }}
                         </a>
                     </div>
@@ -561,6 +557,11 @@
 </div>
 
 @include('modal.transaksi.upload')
+
+<!-- Floating Action Button for Mobile -->
+<a href="{{ route('transaksi.create') }}" class="btn btn-primary fab-add" title="{{ __('Add Transaction') }}">
+    <i class="bi bi-plus-lg fs-2"></i>
+</a>
 @endsection
 
 @push('scripts')

@@ -37,30 +37,21 @@
         padding-left: 0.5rem;
     }
 
-    /* PWA & Premium Enhancements */
+    /* PWA & Premium Enhancements (White Theme) */
     .card-summary {
         border-radius: 20px;
-        border: none;
-        background: linear-gradient(135deg, #4154f1 0%, #2d3436 100%);
-        color: white;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #ffffff;
+        color: #2d3436;
         overflow: hidden;
         position: relative;
-    }
-    .card-summary::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        pointer-events: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     .balance-amount {
+        color: #4154f1;
         font-size: 2.25rem;
         font-weight: 800;
         letter-spacing: -1px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .wallet-card {
         border-radius: 20px;
@@ -154,15 +145,17 @@
 <section class="section">
     <div class="row">
 <div class="col-lg-12 mb-4">
-    <div class="card card-summary shadow-lg">
-        <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h5 class="card-title mb-1 fw-bold text-white opacity-75" style="font-size: 1.1rem;">{{ __('Total Current Balance') }}</h5>
-                <p class="small mb-0 text-white-50">{{ __('Combined balance from all of your active wallet accounts.') }}</p>
-            </div>
-            <div class="text-end">
-                <p class="small mb-0 text-white-50 d-md-none text-start">{{ __('Current Total') }}</p>
-                <h2 class="balance-amount mb-0 text-white">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
+    <div class="card card-summary mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h5 class="card-title mb-1 fw-bold text-dark opacity-75" style="font-size: 1.1rem;">{{ __('Total Balance') }}</h5>
+                    <p class="text-muted small mb-0">{{ __('Combined balance from all your active wallets.') }}</p>
+                </div>
+                <div class="text-end">
+                    <p class="small mb-0 text-muted d-md-none text-start">{{ __('Current Total') }}</p>
+                    <h2 class="balance-amount mb-0 text-dark">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
+                </div>
             </div>
         </div>
     </div>
