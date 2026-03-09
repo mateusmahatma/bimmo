@@ -151,17 +151,27 @@
             padding-bottom: 1rem;
             text-align: right;
             white-space: normal;
-            min-height: 3rem;
-            display: block;
+            min-height: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
         }
         
+        #transaksiTable td .badge {
+            white-space: normal !important;
+            text-align: right;
+            max-width: 100%;
+        }
+
         #transaksiTable td:last-child {
             border-bottom: 0;
         }
 
         #transaksiTable td:before { 
             position: absolute;
-            top: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
             left: 15px;
             width: 40%; 
             padding-right: 10px; 
@@ -179,6 +189,7 @@
              text-align: center;
              display: flex !important;
              justify-content: center !important;
+             align-items: center !important;
              gap: 10px;
              border-bottom: 0;
              margin-top: 5px;
