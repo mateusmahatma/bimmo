@@ -127,33 +127,49 @@
             border-bottom: 1px solid #f8f9fa;
             position: relative;
             padding-left: 45%; 
-            padding-top: 0.8rem;
-            padding-bottom: 0.8rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
             text-align: right;
             white-space: normal;
+            min-height: 3rem;
         }
         
         #anggaranTable td:last-child {
             border-bottom: 0;
         }
 
+        /* Stacked Layout for Expense Types (nth-of-type 5) */
+        #anggaranTable td:nth-of-type(5) {
+            text-align: left;
+            padding-left: 15px;
+            padding-top: 2.5rem;
+        }
+
         #anggaranTable td:before { 
             position: absolute;
-            top: 0.8rem;
-            left: 10px;
+            top: 1rem;
+            left: 15px;
             width: 40%; 
             padding-right: 10px; 
             white-space: nowrap;
             text-align: left;
             font-weight: bold;
             color: #6c757d;
+            font-size: 0.8rem;
+            text-transform: uppercase;
         }
 
-        /* Labeling the data */
+        /* Column Labels */
         #anggaranTable td:nth-of-type(1):before { content: "Select"; }
         #anggaranTable td:nth-of-type(3):before { content: "Budget Name"; }
         #anggaranTable td:nth-of-type(4):before { content: "Percentage"; }
-        #anggaranTable td:nth-of-type(5):before { content: "Expense Types"; }
+        #anggaranTable td:nth-of-type(5):before { 
+            content: "Expense Types"; 
+            width: 100%;
+            border-bottom: 1px solid #f8f9fa;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
         #anggaranTable td:nth-of-type(8):before { content: "Action"; top: 1.1rem; }
 
         /* Special handling for the checkbox cell */
