@@ -248,10 +248,12 @@
                 } catch (err) {}
             };
 
-            // Preemptive Blurring for Modifier Keys (Win, Shift, Ctrl, Alt)
+            // Preemptive Blurring for Modifier Combinations (Win+Shift, Ctrl+Shift, Cmd+Shift)
             document.addEventListener('keydown', (e) => {
-                // If user starts pressing modifier keys (often used for screenshots like Win+Shift+S)
-                if (['Meta', 'Shift', 'Control', 'Alt'].includes(e.key)) {
+                // If user starts pressing modifier combinations (often used for screenshots like Win+Shift+S or Cmd+Shift+4)
+                const isModCombo = (e.ctrlKey && e.shiftKey) || (e.metaKey && e.shiftKey);
+                
+                if (isModCombo) {
                     hideContent();
                 }
 

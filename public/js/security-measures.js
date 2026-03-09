@@ -52,8 +52,11 @@
 
     // Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
-        // Blurring for Modifier Keys (Preemptive)
-        if (['Meta', 'Shift', 'Control', 'Alt'].includes(e.key)) {
+        // Blurring for Modifier Combinations (Preemptive)
+        // Block Ctrl+Shift or Cmd+Shift (Mac)
+        const isModCombo = (e.ctrlKey && e.shiftKey) || (e.metaKey && e.shiftKey);
+
+        if (isModCombo) {
             hideContent();
         }
 
