@@ -12,11 +12,9 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('PWA Debug: Service Worker caching assets');
             return Promise.allSettled(
                 ASSETS_TO_CACHE.map(url => {
                     return cache.add(url).catch(err => {
-                        console.warn(`PWA Debug: Failed to cache ${url}:`, err);
                     });
                 })
             );
@@ -32,7 +30,6 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
-                        console.log('PWA Debug: Service Worker clearing old cache');
                         return caches.delete(cache);
                     }
                 })
