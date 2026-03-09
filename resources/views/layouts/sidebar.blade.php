@@ -1,7 +1,7 @@
 <aside class="sidebar d-flex flex-column">
     <div class="sidebar-header p-4 d-flex align-items-center justify-content-between border-bottom mb-2">
         <a href="/dashboard">
-            <img src="{{ asset('img/bimmo_light.png') }}" class="me-2" style="height: 22px; width: auto;">
+            <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo me-2" style="height: 22px; width: auto;" alt="BIMMO">
         </a>
         <div class="d-flex align-items-center gap-1">
             <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}" 
@@ -14,7 +14,7 @@
     </div>
 
     <div class="sidebar-menu-items flex-grow-1 py-2">
-        <ul class="nav flex-column gap-1">
+        <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
                     href="{{ url('dashboard') }}">
@@ -133,7 +133,7 @@
     </div>
 
     <div class="sidebar-bottom mt-auto border-top pt-2">
-        <ul class="nav flex-column gap-1">
+        <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('panduan*') ? 'active' : '' }}"
                     href="{{ route('panduan.index') }}">
