@@ -69,7 +69,12 @@
                 }
             };
 
+            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isPWAMode = window.matchMedia('(display-mode: standalone)').matches;
+            const isMobileOrPWA = isMobileDevice || isPWAMode;
+
             const blockAccess = () => {
+                if (isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
                 document.body.innerHTML = `
                     <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#f8f9fa;">
                         <h1 style="color:#dc3545;">Akses Dibatasi</h1>
@@ -167,14 +172,27 @@
 
             let isLocked = false;
 
+            let protectionTimeout;
+
             // Netflix-style Black Out Protection
-            const hideContent = () => {
-                document.body.classList.add('protection-active');
-                const overlay = document.getElementById('protection-overlay');
-                if (overlay) overlay.style.display = 'flex';
+            const hideContent = (isInstant = false) => {
+                const triggerHide = () => {
+                    document.body.classList.add('protection-active');
+                    const overlay = document.getElementById('protection-overlay');
+                    if (overlay) overlay.style.display = 'flex';
+                };
+
+                if (isInstant || !isMobileOrPWA) {
+                    triggerHide();
+                } else {
+                    // 1s Grace period for mobile/PWA to avoid false positives during system gestures
+                    clearTimeout(protectionTimeout);
+                    protectionTimeout = setTimeout(triggerHide, 1000);
+                }
             };
 
             const showContent = () => {
+                clearTimeout(protectionTimeout); // Cancel pending hide
                 if (isLocked) return; // Never show content again if locked by capture
                 document.body.classList.remove('protection-active');
                 const overlay = document.getElementById('protection-overlay');
@@ -226,7 +244,7 @@
             // Mobile Multi-finger Touch Detection (Common screenshot gestures)
             document.addEventListener('touchstart', (e) => {
                 if (e.touches.length > 2) { // 3 or more fingers
-                    hideContent();
+                    hideContent(true); // Instant hide for multi-finger gestures
                     clearClipboard();
                     isLocked = true;
                 }
@@ -265,7 +283,7 @@
                     e.key === 'PrintScreen' || e.keyCode === 44
                 ) {
                     isLocked = true; // Permanent lock
-                    hideContent();
+                    hideContent(true); // Instant hide for shortcuts
                     clearClipboard();
 
                     if (e.key === 'PrintScreen' || e.keyCode === 44) {
