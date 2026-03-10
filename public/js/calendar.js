@@ -5,13 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Use dynamic URL provided from Blade, fallback to '/events'
     const eventsBaseUrl = window.eventsUrl || '/events';
 
+    const isMobile = window.innerWidth < 768;
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: isMobile ? 'listMonth' : 'dayGridMonth',
         firstDay: 1, // Start week on Monday
         headerToolbar: {
-            left: 'prev,next today',
+            left: isMobile ? 'prev,next' : 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+            right: isMobile ? 'dayGridMonth,listMonth' : 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
         },
         themeSystem: 'bootstrap5',
         editable: true,
@@ -48,6 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth < 768 && calendar.view.type !== 'listMonth' && calendar.view.type !== 'dayGridMonth') {
+            calendar.changeView('listMonth');
+        }
+    });
 
     // New Event Button
     document.getElementById('btnNewEvent').addEventListener('click', function () {
