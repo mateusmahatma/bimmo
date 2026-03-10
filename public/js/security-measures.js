@@ -14,16 +14,6 @@
     let isLocked = false;
     const threshold = 160;
 
-    // Robust PWA Detection
-    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone === true ||
-        document.referrer.includes('android-app://');
-
-    if (isPWAMode) {
-        console.log('PWA mode detected. Protection system disabled for native experience.');
-        return; // Bypass all protections
-    }
-
     // --- 1. UI Protection Helpers ---
 
     const hideContent = () => {
