@@ -423,11 +423,22 @@
             </div>
         </div>
 
-        <div class="col-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                 <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Performance') }}</h5>
-                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Track your budget usage.') }}</p>
+                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Performance') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Track your budget usage.') }}</p>
+                    </div>
+                    <div class="m-0">
+                        <select id="filterTanggal" class="form-select form-select-sm rounded-pill shadow-sm" style="width: 150px;">
+                            <option value="">{{ __('All Data') }}</option>
+                            @foreach($filterOptions as $row)
+                            <option value="{{ $row->tanggal_mulai }}_{{ $row->tanggal_selesai }}">
+                                {{ $row->tanggal_mulai }} s/d {{ $row->tanggal_selesai }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body p-3 p-md-4">
                     @include('dashboard.anggaran')
@@ -435,7 +446,6 @@
                     @stack('anggaran.scripts')
                 </div>
             </div>
-        </div>
 
         @include('modal.dashboard.detail')
         @include('modal.dashboard.rasio')

@@ -2,20 +2,7 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard/anggaran.css') }}?v={{ filemtime(public_path('css/dashboard/anggaran.css')) }}">
 @endpush
 
-<div class="mb-3 d-flex gap-3 align-items-center flex-wrap">
-    <label class="fw-semibold">Filter Periode Anggaran:</label>
-
-    <select id="filterTanggal" class="form-control" style="max-width: 300px;">
-        <option value="">Semua Data</option>
-        @foreach($filterOptions as $row)
-        <option value="{{ $row->tanggal_mulai }}_{{ $row->tanggal_selesai }}">
-            {{ $row->tanggal_mulai }} s/d {{ $row->tanggal_selesai }}
-        </option>
-        @endforeach
-    </select>
-</div>
-
-<div id="chartAnggaran"></div>
+<div id="chartAnggaran" style="min-height: 350px;"></div>
 
 
 @push('anggaran.scripts')
@@ -26,21 +13,17 @@
             fetch("{{ route('anggaran.chart') }}?filter=" + filter)
                 .then(res => res.json())
                 .then(data => {
-
+                    const isMobile = window.innerWidth < 768;
 
                     if (!data.labels.length) {
                         document.querySelector("#chartAnggaran").innerHTML =
-                            "<p class='text-muted text-center'>Tidak ada data anggaran.</p>";
+                            "<div class='d-flex align-items-center justify-content-center' style='height: 200px;'><p class='text-muted'>Tidak ada data anggaran.</p></div>";
                         return;
                     }
-
-
-
 
                     const anggaran = data.datasets[0].data;
                     const realisasiRaw = data.datasets[1].data;
 
-                    // Realisasi tidak boleh lebih dari anggaran (untuk stacked)
                     const realisasi = realisasiRaw.map((v, i) =>
                         Math.min(v, anggaran[i])
                     );
@@ -59,16 +42,17 @@
                         chart: {
                             type: 'bar',
                             stacked: true,
-                            height: 420,
+                            height: isMobile ? 350 : 420,
                             toolbar: {
-                                show: true
+                                show: !isMobile
                             },
                             foreColor: isDark ? '#e0e0e0' : '#333'
                         },
                         plotOptions: {
                             bar: {
                                 horizontal: true,
-                                barHeight: "45%"
+                                barHeight: isMobile ? "65%" : "45%",
+                                borderRadius: 4
                             }
                         },
                         stroke: {
@@ -94,22 +78,31 @@
                         xaxis: {
                             categories: data.labels,
                             labels: {
-                                style: { colors: isDark ? '#e0e0e0' : '#333' },
-                                formatter: value =>
-                                    "Rp " + new Intl.NumberFormat("id-ID").format(value)
+                                show: !isMobile || data.labels.length < 5,
+                                style: { 
+                                    colors: isDark ? '#e0e0e0' : '#333',
+                                    fontSize: '10px'
+                                },
+                                formatter: value => {
+                                    if (isMobile && value >= 1000000) return "Rp " + (value / 1000000).toFixed(1) + "jt";
+                                    return "Rp " + new Intl.NumberFormat("id-ID").format(value)
+                                }
                             }
                         },
                         yaxis: {
                             labels: {
-                                style: { colors: isDark ? '#e0e0e0' : '#333' }
+                                style: { 
+                                    colors: isDark ? '#e0e0e0' : '#333',
+                                    fontSize: isMobile ? '10px' : '12px'
+                                },
+                                maxWidth: isMobile ? 100 : 200
                             }
                         },
                         dataLabels: {
-                            enabled: true,
+                            enabled: !isMobile,
                             style: {
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                                colors: ['#fff']
+                                fontSize: '10px',
+                                fontWeight: 'bold'
                             },
                             formatter: value => {
                                 if (value === 0) return "";
@@ -117,7 +110,7 @@
                             }
                         },
                         legend: {
-                            position: "top",
+                            position: isMobile ? "bottom" : "top",
                             markers: {
                                 radius: 8
                             }
@@ -130,7 +123,10 @@
                             }
                         },
                         grid: {
-                            borderColor: isDark ? '#444' : '#e0e0e0'
+                            borderColor: isDark ? '#444' : '#e0e0e0',
+                            padding: {
+                                left: isMobile ? 0 : 20
+                            }
                         }
                     };
 
