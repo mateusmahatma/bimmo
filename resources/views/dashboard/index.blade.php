@@ -201,8 +201,8 @@
 
                     <div class="progress mb-4" style="height: 12px; border-radius: 10px; background-color: #f0f2f5;">
                         @php
-                            $totalVal = $totalAset + $totalHutang;
-                            $assetPct = $totalVal > 0 ? ($totalAset / $totalVal) * 100 : 0;
+                            $totalVal = ($totalAset + $totalDanaDarurat) + $totalHutang;
+                            $assetPct = $totalVal > 0 ? (($totalAset + $totalDanaDarurat) / $totalVal) * 100 : 0;
                             $debtPct = $totalVal > 0 ? ($totalHutang / $totalVal) * 100 : 0;
                         @endphp
                         <div class="progress-bar bg-success shadow-sm"
@@ -224,8 +224,8 @@
                     <div class="row g-3">
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
-                                <p class="text-muted small mb-1">{{ __('Total Assets') }}</p>
-                                <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalAset, 0, ',', '.') }}</h6>
+                                <p class="text-muted small mb-1">{{ __('Total Assets') }} + {{ __('Emergency Fund') }}</p>
+                                <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalAset + $totalDanaDarurat, 0, ',', '.') }}</h6>
                             </div>
                         </div>
                         <div class="col-6">

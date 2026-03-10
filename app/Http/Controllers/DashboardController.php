@@ -116,7 +116,7 @@ class DashboardController extends Controller
                 ];
             })->sortBy('bulan')->values();
 
-        
+
 
         $totalPendapatan = $cashflow->sum('total_pemasukan');
         $totalPengeluaranAll = $cashflow->sum('total_pengeluaran');
@@ -203,8 +203,9 @@ class DashboardController extends Controller
         $persenPengeluaran = $numbers['persen_pengeluaran'];
 
         $totalAset = (float)$totalAsetPhysical;
+        $totalDanaDarurat = (float)$totalDanaDarurat;
         $totalHutang = (float)$totalPinjaman;
-        $netWorthRatio = $totalHutang > 0 ? round($totalAset / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
+        $netWorthRatio = $totalHutang > 0 ? round(($totalAset + $totalDanaDarurat) / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
 
         return view('dashboard.index', compact(
             'totalPinjaman',
@@ -336,20 +337,20 @@ class DashboardController extends Controller
         Auth::logout();
         return redirect('/bimmo')->with('success', 'Successful Log out');
     }
-        public function filter(Request $request)
+    public function filter(Request $request)
     {
         if ($request->has('periode')) {
             $periode = (int)$request->periode;
             if (!in_array($periode, [2, 6, 12])) $periode = 6;
-            
+
             $cashflow = Transaksi::where('id_user', Auth::id())
                 ->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())
                 ->get()
                 ->groupBy(fn($t) => \Carbon\Carbon::parse($t->tgl_transaksi)->format('Y-m'))
                 ->map(fn($items, $bulan) => (object)[
-                    'bulan' => $bulan, 
-                    'total_pemasukan' => $items->sum(fn($t) => (float)$t->nominal_pemasukan), 
-                    'total_pengeluaran' => $items->sum(fn($t) => (float)$t->nominal), 
+                    'bulan' => $bulan,
+                    'total_pemasukan' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+                    'total_pengeluaran' => $items->sum(fn($t) => (float)$t->nominal),
                     'selisih' => $items->sum(fn($t) => (float)$t->nominal_pemasukan) - $items->sum(fn($t) => (float)$t->nominal)
                 ])
                 ->sortBy('bulan')
@@ -372,7 +373,7 @@ class DashboardController extends Controller
         if ($request->has(['bulan', 'tahun'])) {
             $bulan = (int)$request->bulan;
             $tahun = (int)$request->tahun;
-            
+
             $pengeluaranKategori = Transaksi::with('pengeluaranRelation')
                 ->where('id_user', Auth::id())
                 ->whereMonth('tgl_transaksi', $bulan)
@@ -381,7 +382,7 @@ class DashboardController extends Controller
                 ->filter(fn($t) => !empty($t->pengeluaran))
                 ->groupBy('pengeluaran')
                 ->map(fn($items) => (object)[
-                    'kategori' => $items->first()->pengeluaranRelation->nama ?? 'Unknown', 
+                    'kategori' => $items->first()->pengeluaranRelation->nama ?? 'Unknown',
                     'total' => $items->sum(fn($t) => (float)$t->nominal)
                 ])
                 ->sortByDesc('total')
@@ -394,7 +395,7 @@ class DashboardController extends Controller
             });
 
             return response()->json([
-                'expenseBar' => view('dashboard.partials.expense-bar-table', compact('pengeluaranKategori', 'totalPengeluaranBulan'))->render(), 
+                'expenseBar' => view('dashboard.partials.expense-bar-table', compact('pengeluaranKategori', 'totalPengeluaranBulan'))->render(),
                 'totalPengeluaran' => number_format((float)$totalPengeluaranBulan, 0, ',', '.')
             ]);
         }
