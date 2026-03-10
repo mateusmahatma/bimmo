@@ -2,8 +2,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const el = document.querySelector('#cashflowChart');
     if (!el) return;
 
+    // Helper to format currency
+    const formatCurrency = (val) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(val);
+    };
+
     window.renderCashflowChart = function (data) {
-        if (!data) return;
+        if (!data || !Array.isArray(data)) {
+            console.warn("Invalid Cashflow data provided:", data);
+            return;
+        }
+
         const labels = data.map(item => item.bulan);
         const pemasukan = data.map(item => Number(item.total_pemasukan));
         const pengeluaran = data.map(item => Number(item.total_pengeluaran));
@@ -13,17 +26,31 @@ document.addEventListener('DOMContentLoaded', function () {
         const options = {
             chart: {
                 type: 'bar',
-                height: 300,
+                height: 350,
                 toolbar: { show: false },
-                foreColor: isDark ? '#e0e0e0' : '#333'
-            },
-            tooltip: {
-                theme: isDark ? 'dark' : 'light'
+                foreColor: isDark ? '#e0e0e0' : '#333',
+                fontFamily: 'inherit'
             },
             series: [
-                { name: 'Pendapatan', data: pemasukan },
-                { name: 'Pengeluaran', data: pengeluaran }
+                { name: 'Income', data: pemasukan },
+                { name: 'Expense', data: pengeluaran }
             ],
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    borderRadius: 6,
+                    dataLabels: { position: 'top' }
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
             xaxis: {
                 categories: labels,
                 labels: {
@@ -36,11 +63,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     formatter: (val) => val.toLocaleString("id-ID")
                 }
             },
-            colors: ['#198754', '#dc3545'],
-            dataLabels: { enabled: false },
+            fill: { opacity: 1 },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light',
+                y: {
+                    formatter: (val) => formatCurrency(val)
+                }
+            },
+            colors: ['#198754', '#dc3545'], // Green and Red
             legend: { position: 'top' },
             grid: {
-                borderColor: isDark ? '#444' : '#e0e0e0'
+                borderColor: isDark ? '#444' : '#e0e0e0',
+                strokeDashArray: 4
             }
         };
 
@@ -49,9 +83,52 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         window.cashflowChartInstance = new ApexCharts(el, options);
         window.cashflowChartInstance.render();
-    }
+    };
 
+    // Initial render
     if (window.cashflowData) {
         window.renderCashflowChart(window.cashflowData);
     }
+
+    // Filter Handler
+    const filterPeriode = document.getElementById('filterPeriode');
+    if (filterPeriode) {
+        filterPeriode.addEventListener('change', function () {
+            const periode = this.value;
+            const label = document.getElementById('cashFlowPeriodeLabel');
+            if (label) label.textContent = `(${periode} months ago)`;
+
+            // Show loading state if needed
+            const tableContainer = document.getElementById('cashflowTableContainer');
+            if (tableContainer) tableContainer.style.opacity = '0.5';
+
+            fetch(`${window.dashboardFilterUrl}?periode=${periode}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Update Table
+                    if (tableContainer && data.cashflow) {
+                        tableContainer.innerHTML = data.cashflow;
+                        tableContainer.style.opacity = '1';
+                    }
+
+                    // Update Chart
+                    if (data.chartData && data.chartData.cashflow) {
+                        window.renderCashflowChart(data.chartData.cashflow);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching filtered cashflow:", err);
+                    if (tableContainer) tableContainer.style.opacity = '1';
+                });
+        });
+    }
+
+    // Theme Change Handler
+    document.addEventListener('themeChanged', function () {
+        if (window.cashflowChartInstance && window.lastRenderedData) {
+            window.renderCashflowChart(window.lastRenderedData);
+        } else if (window.cashflowData) {
+            window.renderCashflowChart(window.cashflowData);
+        }
+    });
 });

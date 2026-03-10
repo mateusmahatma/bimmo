@@ -176,33 +176,12 @@
                     </div>
                 </div>
                 <div class="card-body p-3 p-md-4">
-
-                <div id="cashflowChart" style="height: 300px;"></div>
-
-                <div id="cashflowTableContainer" class="table-responsive mt-3">
-                    @include('dashboard.partials.cashflow-table', ['cashflow' => $cashflow])
-                </div>
+                    <div id="cashflowChart" style="height: 300px;"></div>
+                    <div id="cashflowTableContainer" class="table-responsive mt-3">
+                        @include('dashboard.partials.cashflow-table', ['cashflow' => $cashflow])
+                    </div>
                 </div>
             </div>
-
-
-
-            <!-- <div class="card-dashboard">
-                <div class="card-header d-flex justify-content-between align-items-center mb-3">
-                    <h3>Rasio Tabungan</h3>
-                    <select id="filterPeriodSavingRate" class="filter-dropdown">
-                        <option value="2">2 Bulan</option>
-                        <option value="4">4 Bulan</option>
-                        <option value="6" selected>6 Bulan</option>
-                        <option value="12">1 Tahun</option>
-                        <option value="all">Semua</option>
-                    </select>
-                </div>
-
-                <div class="alert alert-secondary mb-0">
-                    Rasio tabungan sedang disiapkan.
-                </div>
-            </div> -->
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3">
                      <div>
@@ -473,7 +452,7 @@
 
 @push('scripts')
 <script src="{{ asset('vendor/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ asset('js/dashboard-cashflow.js') }}"></script>
-<script src="{{ asset('js/dashboard.js') }}"></script>
+<script src="{{ asset('js/dashboard-cashflow.js') }}?v={{ filemtime(public_path('js/dashboard-cashflow.js')) }}"></script>
+<script src="{{ asset('js/dashboard.js') }}?v={{ filemtime(public_path('js/dashboard.js')) }}"></script>
 <script src="{{ asset('js/calendar.js') }}?v={{ filemtime(public_path('js/calendar.js')) }}"></script>
 @endpush

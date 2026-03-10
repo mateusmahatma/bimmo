@@ -10,22 +10,22 @@
     <tbody>
         @forelse ($cashflow as $row)
         <tr>
-            <td>{{ \Carbon\Carbon::parse($row->bulan.'-01')->translatedFormat('F Y') }}</td>
+            <td>{{ $row->bulan }}</td>
             <td class="text-end">
-                Rp {{ number_format((float)$row->total_pemasukan,0,',','.') }}
+                Rp {{ number_format((float)$row->total_pemasukan, 0, ',', '.') }}
             </td>
             <td class="text-end">
-                Rp {{ number_format((float)$row->total_pengeluaran,0,',','.') }}
+                Rp {{ number_format((float)$row->total_pengeluaran, 0, ',', '.') }}
             </td>
             <td class="text-end fw-bold">
-                Rp {{ number_format((float)$row->selisih,0,',','.') }}
+                Rp {{ number_format((float)$row->selisih, 0, ',', '.') }}
                 @if($row->selisih < 0)
-                    <span class="badge bg-danger ms-1">Defisit</span>
-                    @elseif($row->selisih < 1000000)
-                        <span class="badge bg-warning text-dark ms-1">Tipis</span>
-                        @else
-                        <span class="badge bg-success ms-1">Aman</span>
-                        @endif
+                <span class="badge bg-danger ms-1">Defisit</span>
+                @elseif($row->selisih < 1000000)
+                <span class="badge bg-warning text-dark ms-1">Tipis</span>
+                @else
+                <span class="badge bg-success ms-1">Aman</span>
+                @endif
             </td>
         </tr>
         @empty

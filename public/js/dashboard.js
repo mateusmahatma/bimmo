@@ -1,1163 +1,137 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Theme Switcher Removed - Managed Globally
     const csrfToken = window.csrfToken;
 
-    const charts = {};
-    const chartData = {};
+    // ==== DASHBOARD FILTER HANDLER (Global elements that aren't specific to Cash Flow) ====
+    // Note: Cash Flow specific filtering is now in dashboard-cashflow.js
 
-    function isValidChartData(data) {
-        return data && Array.isArray(data.labels);
-    }
-
-    function filterData(data, months) {
-        if (!isValidChartData(data)) {
-            return {
-                labels: [],
-                pemasukan: [],
-                pengeluaran: [],
-                data_pemasukan: [],
-                data_pengeluaran: [],
-            };
-        }
-
-        if (months === "all") return data;
-
-        const startIndex = Math.max(data.labels.length - months, 0);
-        const filtered = { labels: data.labels.slice(startIndex) };
-
-        Object.keys(data).forEach((key) => {
-            if (Array.isArray(data[key])) {
-                filtered[key] = data[key].slice(startIndex);
-            }
-        });
-
-        return filtered;
-    }
-
-    function renderChart(type, selector, data, options) {
-        const theme = document.documentElement.getAttribute("data-bs-theme") || "light";
-        const isDark = theme === "dark";
-
-        const defaultOptions = {
-            chart: {
-                type: type,
-                height: 350,
-                toolbar: { show: true, tools: { download: false } },
-                foreColor: isDark ? "#fff" : "#333",
-            },
-            xaxis: {
-                categories: data.labels,
-                labels: {
-                    style: { colors: isDark ? "#ccc" : "#555" }
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: isDark ? "#ccc" : "#555" },
-                    formatter: (val) => val.toLocaleString("id-ID")
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            tooltip: {
-                theme: isDark ? "dark" : "light"
-            },
-            series: [],
-            ...options,
-        };
-
-        const el = document.querySelector(selector);
-        if (!el) return;
-
-        if (charts[selector]) {
-            charts[selector].updateOptions(defaultOptions);
-        } else {
-            charts[selector] = new ApexCharts(el, defaultOptions);
-            charts[selector].render();
-        }
-    }
-
-    // old
-    // function renderCashFlowChart(data, months = "all") {
-    //     const filteredData = filterData(data, months);
-
-    //     if (!Array.isArray(filteredData.pemasukan) || !Array.isArray(filteredData.pengeluaran)) {
-    //         console.warn("Data cash flow tidak lengkap:", filteredData);
-    //         return;
-    //     }
-
-    //     renderChart("bar", "#columnChart", filteredData, {
-    //         colors: ["var(--bs-green)", "var(--bs-red)"],
-    //         plotOptions: {
-    //             bar: {
-    //                 columnWidth: "30%",
-    //                 borderRadius: 4,
-    //                 dataLabels: {
-    //                     position: "top",
-    //                 },
-    //                 border: { color: 'var(--bs-gray)', width: 1 }
-    //             },
-    //         },
-    //         series: [
-    //             { name: "Income", data: filteredData.pemasukan },
-    //             { name: "Expense", data: filteredData.pengeluaran },
-    //         ],
-    //         legend: {
-    //             position: "top",
-    //             horizontalAlign: "center",
-    //         },
-    //     });
-    // }
-
-    // new
-    function renderCashFlowChart(data, months = "all") {
-        const filteredData = filterData(data, months);
-
-        if (!Array.isArray(filteredData.pemasukan) || !Array.isArray(filteredData.pengeluaran)) {
-            console.warn("Data cash flow tidak lengkap:", filteredData);
-            return;
-        }
-
-        renderChart("line", "#columnChart", filteredData, {
-            series: [
-                {
-                    name: "Income",
-                    type: "column",
-                    data: filteredData.pemasukan
-                },
-                {
-                    name: "Expense",
-                    type: "column",
-                    data: filteredData.pengeluaran
-                },
-                {
-                    name: "Net Flow",
-                    type: "line",
-                    data: filteredData.pemasukan.map((v, i) => v - (filteredData.pengeluaran[i] || 0))
-                },
-            ],
-            colors: ["#008FFB", "#00E396", "#FEB019"],
-            stroke: {
-                width: [1, 1, 3],
-            },
-            plotOptions: {
-                bar: {
-                    columnWidth: "35%",
-                    borderRadius: 4,
-                },
-            },
-            dataLabels: { enabled: false },
-            xaxis: {
-                categories: filteredData.labels,
-            },
-            yaxis: [
-                {
-                    seriesName: "Income",
-                    axisTicks: { show: true },
-                    axisBorder: { show: true, color: "#008FFB" },
-                    labels: { style: { colors: "#008FFB" } },
-                    title: {
-                        text: "Income",
-                        style: { color: "#008FFB" },
-                    },
-                },
-                {
-                    seriesName: "Expense",
-                    opposite: true,
-                    axisTicks: { show: true },
-                    axisBorder: { show: true, color: "#00E396" },
-                    labels: { style: { colors: "#00E396" } },
-                    title: {
-                        text: "Expense",
-                        style: { color: "#00E396" },
-                    },
-                },
-                {
-                    seriesName: "Net Flow",
-                    opposite: true,
-                    show: false,
-                },
-            ],
-            tooltip: {
-                fixed: {
-                    enabled: true,
-                    position: "topLeft",
-                    offsetY: 30,
-                    offsetX: 60,
-                },
-            },
-            legend: {
-                horizontalAlign: "left",
-                offsetX: 40,
-            },
-        });
-    }
-
-
-    function renderIncomeExpenseChart(data, months = "all") {
-        const filteredData = filterData(data, months);
-
-        if (!Array.isArray(filteredData.data_pemasukan) || !Array.isArray(filteredData.data_pengeluaran)) {
-            console.warn("Data income/expense tidak lengkap:", filteredData);
-            return;
-        }
-
-        renderChart("line", "#barChart", filteredData, {
-            colors: ["var(--bs-green)", "var(--bs-red)"],
-            stroke: {
-                curve: "smooth",
-                width: 2,
-                colors: ["var(--bs-green)", "var(--bs-red)"],
-                dashArray: [0, 4],
-                lineCap: "round",
-            },
-            markers: { size: 0 },
-            series: [
-                { name: "Income", data: filteredData.data_pemasukan },
-                { name: "Expense", data: filteredData.data_pengeluaran },
-            ],
-            legend: {
-                position: "top",
-                horizontalAlign: "center",
-            },
-        });
-    }
-
-    function handleFilterChange(e) {
-        const months = e.target.value === "all" ? "all" : parseInt(e.target.value);
-        renderCashFlowChart(chartData["cashFlow"], months);
-        renderIncomeExpenseChart(chartData["incomeExpense"], months);
-    }
-
-    // Ambil data awal
-    Promise.all([
-        fetch("/dashboard/line-data").then(res => res.json()),
-        fetch("/dashboard/chart-data").then(res => res.json())
-    ]).then(([cashFlowData, incomeExpenseData]) => {
-        chartData["cashFlow"] = cashFlowData;
-        chartData["incomeExpense"] = incomeExpenseData;
-
-        renderCashFlowChart(cashFlowData, 6);
-        renderIncomeExpenseChart(incomeExpenseData, 6);
-
-
-        const filterPeriode = document.getElementById("filterPeriode");
-        if (filterPeriode) {
-            filterPeriode.addEventListener("change", function () {
-                const periode = this.value;
-
-                // Update Label
-                const cashFlowLabel = document.getElementById("cashFlowPeriodeLabel");
-                const savingRateLabel = document.getElementById("savingRatePeriodeLabel");
-                if (cashFlowLabel) cashFlowLabel.textContent = `(${periode} months ago)`;
-                if (savingRateLabel) savingRateLabel.textContent = `(${periode} bulan terakhir)`;
-
-                // AJAX Update Table & Charts
-                fetch(`${window.dashboardFilterUrl}?periode=${periode}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        document.getElementById("cashflowTableContainer").innerHTML = data.cashflow;
-                        document.getElementById("savingRateTableContainer").innerHTML = data.savingRate;
-
-                        // Update Charts
-                        if (window.renderCashflowChart && data.chartData && data.chartData.cashflow) {
-                            window.renderCashflowChart(data.chartData.cashflow);
-                        }
-                        if (window.renderSavingRateChart && data.chartData && data.chartData.savingRate) {
-                            window.renderSavingRateChart(data.chartData.savingRate);
-                        }
-                    })
-                    .catch(err => console.error("Error fetching filtered data:", err));
-            });
-        }
-    }).catch(err => {
-        console.error("Gagal memuat data chart:", err);
-    });
-
-    // Theme switching
-    // document.addEventListener("themeChanged", () => {
-    //     const filter = document.getElementById("filterPeriod");
-    //     const months = filter?.value === "all" ? "all" : parseInt(filter?.value || "6");
-
-    //     renderCashFlowChart(chartData["cashFlow"], months);
-    //     renderIncomeExpenseChart(chartData["incomeExpense"], months);
-    // });
-
-    // Chart switch toggle
-    document.getElementById("chartType")?.addEventListener("change", () => {
-        const chartType = document.getElementById("chartType").value;
-        const columnChart = document.getElementById("columnChart");
-        const barChart = document.getElementById("barChart");
-
-        columnChart.classList.remove("show");
-        barChart.classList.remove("show");
-
-        setTimeout(() => {
-            columnChart.style.display = "none";
-            barChart.style.display = "none";
-
-            if (chartType === "cashFlow") {
-                columnChart.style.display = "block";
-                setTimeout(() => columnChart.classList.add("show"), 50);
-                window.dispatchEvent(new Event("resize"));
-            } else {
-                barChart.style.display = "block";
-                setTimeout(() => barChart.classList.add("show"), 50);
-                window.dispatchEvent(new Event("resize"));
-            }
-        }, 300);
-    });
-
-    // Set default chart saat halaman pertama dimuat
-    window.onload = () => {
-        const chartType = document.getElementById("chartType")?.value || "cashFlow";
-        const columnChart = document.getElementById("columnChart");
-        const barChart = document.getElementById("barChart");
-
-        if (chartType === "cashFlow") {
-            columnChart.style.display = "block";
-            columnChart.classList.add("show");
-            barChart.style.display = "none";
-        } else {
-            barChart.style.display = "block";
-            barChart.classList.add("show");
-            columnChart.style.display = "none";
-        }
-    };
-});
-
-// Toggle Nominal Visibility
-document.addEventListener('DOMContentLoaded', function () {
-
-    const btn = document.getElementById('toggleNominalBtn');
-    if (!btn) return;
-
-    btn.addEventListener('click', async () => {
-
-        btn.disabled = true;
-
-        const response = await fetch(btn.dataset.url, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document
-                    .querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            }
-        });
-
-        const res = await response.json();
-
-        // update angka
-        document.getElementById('summary-saldo').textContent = res.data.saldo;
-        document.getElementById('summary-pemasukan').textContent = res.data.pemasukan;
-        document.getElementById('summary-pengeluaran').textContent = res.data.pengeluaran;
-        document.getElementById('summary-hari-ini').textContent = res.data.hari_ini;
-
-        // update icon
-        btn.innerHTML = res.show
-            ? '<i class="bi bi-eye-slash"></i>'
-            : '<i class="bi bi-eye"></i>';
-
-        btn.disabled = false;
-    });
-
-});
-
-// Expenses Bar
-document.addEventListener("DOMContentLoaded", function () {
-    let barChart = null;
-    let chartData = null;
-    let chartLabels = null;
-    let chartPengeluaranIds = null;
-
-    function isDarkMode() {
-        return document.documentElement.getAttribute("data-bs-theme") === "dark";
-    }
-
-    function fetchDataAndRenderChart(month, year) {
-        fetch(`/dashboard/jenis-pengeluaran?month=${month}&year=${year}`)
-            .then(response => response.json())
-            .then(data => {
-                const chartElement = document.querySelector("#barJenisPengeluaran");
-
-                if (!data || data.length === 0 || !chartElement) {
-                    if (barChart) {
-                        barChart.destroy();
-                        barChart = null;
-                    }
-
-                    if (chartElement) {
-                        const dark = isDarkMode();
-                        chartElement.innerHTML = "";
-                        chartElement.className = "empty-state-container";
-                        chartElement.style.cssText = `
-                            width: 100%;
-                            height: 200px;
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            background: ${dark ? '#2b2d31' : '#f8f9fa'};
-                            border-radius: 12px;
-                            transition: all 0.3s ease;
-                        `;
-
-                        chartElement.innerHTML = `
-                            <div class="empty-state">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${dark ? '#6c757d' : '#adb5bd'}" stroke-width="2">
-                                    <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    <path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 005.5 1"/>
-                                </svg>
-                                <p class="mt-3 ${dark ? 'text-light' : 'text-muted'}" style="font-size: 0.9rem;">
-                                    No data available for this period
-                                </p>
-                            </div>
-                        `;
-                    }
-                    return;
-                } else {
-                    chartElement.innerHTML = "";
-                }
-
-                const filteredData = data.filter(item => item.pengeluaran_id !== null);
-                if (filteredData.length === 0) return;
-
-                chartLabels = filteredData.map(item => item.pengeluaran_nama);
-                chartPengeluaranIds = filteredData.map(item => item.pengeluaran_id);
-                chartData = filteredData.map(item => parseFloat(item.total) || 0);
-
-                if (barChart) {
-                    barChart.destroy();
-                    barChart = null;
-                }
-
-                const chartHeight = Math.min(600, Math.max(350, filteredData.length * 45));
-                const maxXValue = Math.max(...chartData) * 1.2;
-                const dark = isDarkMode();
-
-                const options = {
-                    series: [{
-                        name: 'Total Pengeluaran',
-                        data: chartData
-                    }],
-                    chart: {
-                        type: 'bar',
-                        height: chartHeight,
-                        foreColor: dark ? '#ddd' : '#333',
-                        background: 'transparent',
-                        events: {
-                            dataPointSelection: function (event, chartContext, config) {
-                                const selectedPengeluaranId = chartPengeluaranIds[config.dataPointIndex];
-                                if (selectedPengeluaranId) {
-                                    fetchTransactionDetails(selectedPengeluaranId, month, year);
-                                }
-                            }
-                        }
-                    },
-                    plotOptions: {
-                        bar: {
-                            borderRadius: 6,
-                            horizontal: true,
-                            barHeight: "45%",
-                            distributed: false
-                        }
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        style: {
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            colors: [dark ? '#ffffff' : '#ffffff']
-                        },
-                        formatter: value => new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR',
-                            minimumFractionDigits: 0
-                        }).format(value)
-                    },
-                    xaxis: {
-                        categories: chartLabels,
-                        max: maxXValue,
-                        labels: {
-                            show: false,
-                            style: { fontSize: '12px', colors: dark ? '#bbb' : '#444' },
-                            formatter: value => new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(value)
-                        }
-                    },
-                    yaxis: {
-                        labels: {
-                            style: { fontSize: '12px', colors: dark ? '#bbb' : '#444' }
-                        }
-                    },
-                    colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
-                    tooltip: {
-                        theme: dark ? 'dark' : 'light',
-                        y: {
-                            formatter: value => new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(value)
-                        }
-                    },
-                    grid: {
-                        borderColor: dark ? '#444' : '#eee',
-                        xaxis: { lines: { show: true } },
-                        yaxis: { lines: { show: false } },
-                    },
-                    states: {
-                        hover: {
-                            filter: { type: 'lighten', value: 0.15 }
-                        },
-                        active: {
-                            filter: { type: 'darken', value: 0.2 }
-                        }
-                    },
-
-                };
-
-                barChart = new ApexCharts(chartElement, options);
-                barChart.render();
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error);
-            });
-    }
-
-    function fetchTransactionDetails(pengeluaranId, month, year) {
-        if (!pengeluaranId || !month || !year) {
-            alert("Data tidak valid");
-            return;
-        }
-
-        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-
-        const modalEl = document.getElementById('detailModalBarPengeluaran');
-        if (modalEl) {
-            const dialog = modalEl.querySelector('.modal-dialog');
-            if (dialog) dialog.classList.add('modal-dialog-scrollable');
-
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
-
-            const closeBtn = modalEl.querySelector('.btn-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => modal.hide());
-            }
-
-            modalEl.addEventListener('click', (e) => {
-                if (e.target === modalEl) modal.hide();
-            });
-        }
-
-        fetch(`/dashboard/transaksi?pengeluaran=${pengeluaranId}&month=${month}&year=${year}`)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                if (isDarkMode()) {
-                    modalBody.classList.add('bg-dark', 'text-light');
-                } else {
-                    modalBody.classList.remove('bg-dark', 'text-light');
-                }
-                displayTransactionData(data);
-            })
-            .catch(error => displayError(error.message));
-    }
-
-    function displayTransactionData(data) {
-        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-        const modalTitle = document.querySelector("#modalTitle");
-
-        if (!modalBody) return;
-        modalBody.innerHTML = "";
-
-        const isDark = isDarkMode();
-
-        if (!data || data.length === 0) {
-            modalBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center ${isDark ? 'text-light' : 'text-muted'}">
-                        <i class="fas fa-inbox"></i><br>
-                        Tidak ada transaksi ditemukan
-                    </td>
-                </tr>`;
-        } else {
-            let html = data.map((item, index) => {
-                const tgl = new Date(item.tgl_transaksi).toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'short', year: 'numeric'
-                });
-
-                const ket = (item.keterangan || 'Tidak ada keterangan')
-                    .split("\n")
-                    .filter(line => line.trim())
-                    .map((line, i) => `${i + 1}. ${line}`)
-                    .join("<br>");
-
-                return `
-                    <tr class="transaction-row">
-                        <td class="fw-semibold">${tgl}</td>
-                        <td>${ket}</td>
-                        <td class="text-end fw-bold text-primary">
-                            ${new Intl.NumberFormat('id-ID', {
-                    style: 'currency', currency: 'IDR', minimumFractionDigits: 0
-                }).format(item.nominal)}
-                        </td>
-                    </tr>`;
-            }).join("");
-
-            modalBody.innerHTML = html;
-
-            if (modalTitle && data[0]) {
-                modalTitle.textContent = "Detail Transaksi";
-                const modalSubTitle = document.querySelector("#modalSubTitle");
-                if (modalSubTitle) {
-                    modalSubTitle.textContent = `Pengeluaran: ${data[0].pengeluaran_nama}`;
-                    modalSubTitle.className = isDark ? "text-light opacity-75" : "text-muted";
-                }
-            }
-        }
-    }
-
-    function displayError(msg) {
-        const modalBody = document.querySelector("#modalBodyBarPengeluaran");
-        if (modalBody) {
-            modalBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-danger">
-                        <i class="fas fa-exclamation-triangle"></i><br>
-                        <strong>Error:</strong> ${msg}
-                    </td>
-                </tr>`;
-        }
-    }
-
-    function updateChartTheme() {
-        if (!barChart) return;
-        const dark = isDarkMode();
-
-        barChart.updateOptions({
-            chart: {
-                foreColor: dark ? '#ddd' : '#333'
-            },
-            dataLabels: {
-                style: {
-                    colors: [dark ? '#ffffff' : '#ffffff']
-                }
-            },
-            xaxis: {
-                labels: {
-                    style: { colors: dark ? '#bbb' : '#444' }
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: dark ? '#bbb' : '#444' }
-                }
-            },
-            tooltip: {
-                theme: dark ? 'dark' : 'light'
-            }
-        });
-    }
-
-    // Inisialisasi
+    // Expenses Bar & Table Initial Load
     const filterBulan = document.getElementById("filterBulan");
     const filterTahun = document.getElementById("filterTahun");
 
-    function updateExpenseTable(month, year) {
-        if (!month || !year) return;
+    function updateExpenseBar(month, year) {
+        if (window.fetchDataAndRenderChart) window.fetchDataAndRenderChart(month, year);
+
         fetch(`${window.dashboardFilterUrl}?bulan=${month}&tahun=${year}`)
             .then(res => res.json())
             .then(data => {
-                document.getElementById("expenseBarTableContainer").innerHTML = data.expenseBar;
-                document.getElementById("totalPengeluaranValue").textContent = "Rp " + data.totalPengeluaran;
+                const tableContainer = document.getElementById("expenseBarTableContainer");
+                const totalValue = document.getElementById("totalPengeluaranValue");
+                if (tableContainer) tableContainer.innerHTML = data.expenseBar;
+                if (totalValue) totalValue.textContent = "Rp " + data.totalPengeluaran;
             })
-            .catch(err => console.error("Error fetching expense bar table:", err));
+            .catch(err => console.error("Error updating expense bar:", err));
     }
 
     if (filterBulan && filterTahun) {
-        // Initial load
-        fetchDataAndRenderChart(filterBulan.value, filterTahun.value);
-        // Table is already loaded by blade, but we could reload it to be safe, or just leave it.
+        const handleExpenseFilter = () => updateExpenseBar(filterBulan.value, filterTahun.value);
+        filterBulan.addEventListener("change", handleExpenseFilter);
+        filterTahun.addEventListener("change", handleExpenseFilter);
+    }
 
-        const updateAll = () => {
-            const m = filterBulan.value;
-            const y = filterTahun.value;
-            fetchDataAndRenderChart(m, y);
-            updateExpenseTable(m, y);
+    // ==== PERFORMANCE RATIO RADAR/BAR CHART ====
+    const chartElement = document.getElementById("chartKompas");
+    if (chartElement) {
+        let chart;
+        const rasio = parseFloat(chartElement.dataset.rasio);
+        const rasio_inflasi = parseFloat(chartElement.dataset.rasioInflasi);
+        const rasio_dana_darurat = parseFloat(chartElement.dataset.rasioDanaDarurat);
+        const rasio_pengeluaran_pendapatan = parseFloat(chartElement.dataset.rasioPengeluaranPendapatan);
+
+        const getTextColor = () => document.documentElement.getAttribute("data-bs-theme") === "dark" ? "#ffffff" : "#000000";
+
+        const getColor = (val, target, inverse = false) => {
+            if (inverse) return val >= target ? "var(--bs-success)" : "var(--bs-danger)";
+            return val <= target ? "var(--bs-success)" : "var(--bs-danger)";
         };
 
-        filterBulan.addEventListener("change", updateAll);
-        filterTahun.addEventListener("change", updateAll);
-    } else {
-        console.error("Filter elements tidak ditemukan!");
-    }
-
-    // Saat ganti tema, update chart langsung tanpa fetch ulang
-    document.addEventListener("themeChanged", () => {
-        updateChartTheme();
-    });
-});
-
-// Performance Ratio
-document.addEventListener("DOMContentLoaded", function () {
-    const chartElement = document.getElementById("chartKompas");
-    let chart;
-
-    const totalPinjaman = parseFloat(chartElement.dataset.totalPinjaman);
-    const totalBarang = parseFloat(chartElement.dataset.totalBarang);
-    const rasio = parseFloat(chartElement.dataset.rasio);
-    const rasio_inflasi = parseFloat(chartElement.dataset.rasioInflasi);
-    const rasio_dana_darurat = parseFloat(chartElement.dataset.rasioDanaDarurat);
-    const rasio_pengeluaran_pendapatan = parseFloat(chartElement.dataset.rasioPengeluaranPendapatan);
-
-    const getColorByTarget = (value, target) => {
-        if (value < 0) return "#800080";
-        if (value < target) return "var(--bs-green)";
-        if (value > target) return "var(--bs-red)";
-        return "#FFA500";
-    };
-
-    const getColorDanaDarurat = (value, target) => {
-        if (value < target) return "var(--bs-red)";
-        return "var(--bs-green)";
-    };
-
-    const getColorInflasiGayaHidup = (value, target) => {
-        if (value > target) return "#FF4560";
-        return "#00E396";
-    };
-
-    function AnalisisRasio(rasio) {
-        if (rasio < 20) return "Sangat Sehat...";
-        if (rasio >= 20 && rasio <= 40) return "Cukup Sehat...";
-        return "Waspadai...";
-    }
-
-    function AnalisisRasioDanaDarurat(rasio) {
-        if (rasio < 100) return "Kurang Aman...";
-        if (rasio === 100) return "Ideal...";
-        return "Lebih dari Cukup...";
-    }
-
-    function AnalisisRasioInflasi(rasio) {
-        if (rasio < 0) return "Sangat Ideal...";
-        if (rasio >= 50 && rasio <= 80) return "Masih Aman...";
-        if (rasio > 80 && rasio <= 100) return "Perlu Waspada...";
-        return "Warning...";
-    }
-
-    function AnalisisRasioPengeluaranPendapatan(rasio) {
-        if (rasio <= 50) return "Sangat Sehat...";
-        if (rasio >= 50 && rasio <= 70) return "Cukup Sehat...";
-        return "Perlu Waspada...";
-    }
-
-    function getTextColor() {
-        const theme = document.documentElement.getAttribute("data-bs-theme") || "light";
-        return theme === "dark" ? "#ffffff" : "#000000";
-    }
-
-    function getChartOptions() {
-        const textColor = getTextColor();
-
-        return {
-            chart: {
-                type: "bar",
-                height: 250,
-                events: {
-                    dataPointSelection: function (event, chartContext, config) {
-                        const idx = config.dataPointIndex;
-                        let title = "", rumus = "", nominal = "", target = "", analisis = "";
-
-                        if (idx === 0) {
-                            title = "Rasio Utang terhadap Aset";
-                            rumus = "Total Pinjaman / Total Aset";
-                            target = '<20.00%';
-                            nominal = rasio.toFixed(2) + '%';
-                            analisis = AnalisisRasio(rasio);
-                        } else if (idx === 1) {
-                            title = "Rasio Inflasi Gaya Hidup";
-                            rumus = "(Pengeluaran Bulan Ini - Bulan Lalu)/(Pemasukan Bulan Ini - Lalu) x 100%";
-                            target = '0%';
-                            nominal = rasio_inflasi.toFixed(2) + '%';
-                            analisis = AnalisisRasioInflasi(rasio_inflasi);
-                        } else if (idx === 2) {
-                            title = "Rasio Dana Darurat";
-                            rumus = "Total Dana Darurat / (Pengeluaran Bulanan * 6)";
-                            target = '100%';
-                            nominal = rasio_dana_darurat.toFixed(2) + '%';
-                            analisis = AnalisisRasioDanaDarurat(rasio_dana_darurat);
-                        } else if (idx === 3) {
-                            title = "Rasio Pengeluaran terhadap Pendapatan";
-                            rumus = "Pengeluaran / Pendapatan";
-                            target = '100%';
-                            nominal = rasio_pengeluaran_pendapatan.toFixed(2) + '%';
-                            analisis = AnalisisRasioPengeluaranPendapatan(rasio_pengeluaran_pendapatan);
-                        }
-
-                        showModal(title, rumus, nominal, target, analisis);
-                    }
-                }
-            },
+        const options = {
+            chart: { type: "bar", height: 300, toolbar: { show: false }, foreColor: getTextColor() },
+            plotOptions: { bar: { horizontal: true, borderRadius: 8 } },
             series: [{
-                name: "Rasio",
+                name: "Value",
                 data: [
-                    {
-                        x: ["Rasio Utang", "terhadap Aset"],
-                        y: rasio > 0 ? rasio : 0.5,
-                        fillColor: getColorByTarget(rasio, 20),
-                        goals: [{ name: "Target", value: 20, strokeWidth: 4, strokeColor: "#9B59B6" }]
-                    },
-                    {
-                        x: "Rasio Inflasi Gaya Hidup",
-                        y: rasio_inflasi > 0 ? rasio_inflasi : 0.5,
-                        fillColor: getColorInflasiGayaHidup(rasio_inflasi, 0),
-                        goals: [{ name: "Target", value: 0.5, strokeWidth: 4, strokeColor: "#9B59B6" }]
-                    },
-                    {
-                        x: ["Rasio Dana", "Darurat"],
-                        y: rasio_dana_darurat > 0 ? rasio_dana_darurat : 0.5,
-                        fillColor: getColorDanaDarurat(rasio_dana_darurat, 100),
-                        goals: [{ name: "Target", value: 100, strokeWidth: 4, strokeColor: "#9B59B6" }]
-                    },
-                    {
-                        x: ["Rasio Pengeluaran", "Terhadap Pendapatan"],
-                        y: rasio_pengeluaran_pendapatan > 0 ? rasio_pengeluaran_pendapatan : 0.5,
-                        fillColor: getColorByTarget(rasio_pengeluaran_pendapatan, 100),
-                        goals: [{ name: "Target", value: 100, strokeWidth: 4, strokeColor: "#9B59B6" }]
-                    }
+                    { x: "Debt Ratio", y: rasio, fillColor: getColor(rasio, 20) },
+                    { x: "Lifestyle Inflation", y: rasio_inflasi, fillColor: getColor(rasio_inflasi, 0) },
+                    { x: "Emergency Fund", y: rasio_dana_darurat, fillColor: getColor(rasio_dana_darurat, 100, true) },
+                    { x: "Exp/Inc Ratio", y: rasio_pengeluaran_pendapatan, fillColor: getColor(rasio_pengeluaran_pendapatan, 70) }
                 ]
             }],
-            plotOptions: {
-                bar: {
-                    horizontal: true,
-                    borderRadius: 8
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: val => `${val.toFixed(2)}%`,
-                style: {
-                    colors: [textColor]
-                }
-            },
-            tooltip: { enabled: false },
-            xaxis: {
-                title: {
-                    text: "%",
-                    style: { colors: textColor }
-                },
-                labels: {
-                    style: { colors: textColor }
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: textColor }
-                }
-            }
+            xaxis: { labels: { formatter: v => v + '%' } },
+            tooltip: { theme: document.documentElement.getAttribute("data-bs-theme") === 'dark' ? 'dark' : 'light' }
         };
-    }
 
-    function updateChartTheme() {
-        const textColor = getTextColor();
-        if (chart) {
-            chart.updateOptions({
-                dataLabels: {
-                    style: {
-                        colors: [textColor]
-                    }
-                },
-                xaxis: {
-                    title: {
-                        style: { colors: textColor }
-                    },
-                    labels: {
-                        style: { colors: textColor }
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        style: { colors: textColor }
-                    }
-                }
-            });
-        }
-    }
+        chart = new ApexCharts(chartElement, options);
+        chart.render();
 
-    function isDarkMode() {
-        return document.documentElement.getAttribute("data-bs-theme") === "dark";
-    }
-
-    function updateModalTheme() {
-        const dark = isDarkMode();
-        const modalContent = document.querySelector("#detailModal .modal-content");
-        if (!modalContent) return;
-
-        modalContent.classList.toggle("bg-dark", dark);
-        modalContent.classList.toggle("text-white", dark);
-        modalContent.classList.toggle("bg-white", !dark);
-        modalContent.classList.toggle("text-dark", !dark);
-    }
-
-    function showModal(title, rumus, nominal, target, analisis) {
-        const modal = document.getElementById("detailModal");
-        document.getElementById("modalTitle").innerText = title;
-        document.getElementById("modalRumus").innerText = rumus;
-        document.getElementById("modalNominal").innerText = nominal;
-        document.getElementById("modalTarget").innerText = target;
-        document.getElementById("modalAnalisis").innerText = analisis;
-
-        updateModalTheme(); // Terapkan tema modal
-
-        const bootstrapModal = new bootstrap.Modal(modal);
-        bootstrapModal.show();
-    }
-
-
-    // Buat chart awal
-    chart = new ApexCharts(chartElement, getChartOptions());
-    chart.render();
-
-    // Saat tema berubah, update chart
-    document.addEventListener("themeChanged", function () {
-        updateChartTheme();
-    });
-
-    // Expose jika perlu manual trigger
-    window.updateChartTheme = updateChartTheme;
-});
-
-// Theme is managed globally by main.js
-// Legacy theme logic removed to prevent conflicts
-
-// ==== NOMINAL DISPLAY HANDLER ====
-document.addEventListener("DOMContentLoaded", function () {
-    function updateNominalDisplay(isHidden) {
-        document.querySelectorAll(".box-info h3").forEach(h3 => {
-            h3.textContent = isHidden ? "****" : h3.getAttribute("data-value");
+        document.addEventListener("themeChanged", () => {
+            chart.updateOptions({ chart: { foreColor: getTextColor() } });
         });
     }
 
-    function initializeNominalDisplay() {
-        const isHidden = localStorage.getItem("nominalHidden") === "true";
-        updateNominalDisplay(isHidden);
-    }
-
-    function toggleNominal() {
-        const isHidden = localStorage.getItem("nominalHidden") === "true";
-        const newState = !isHidden;
-        localStorage.setItem("nominalHidden", newState);
-        updateNominalDisplay(newState);
-    }
-
-    // Eksekusi awal nominal
-    initializeNominalDisplay();
-    window.toggleNominal = toggleNominal;
-});
-
-// Saving rate
-document.addEventListener("DOMContentLoaded", function () {
-    const charts = {};           // Menyimpan semua instance chart
-    const chartData = {};        // Menyimpan data untuk tiap chart
-
-    const theme = () => document.documentElement.getAttribute("data-bs-theme") || "light";
-
-    /**
-     * Fungsi validasi data chart
-     */
-    function isValidChartData(data) {
-        return data && Array.isArray(data.labels);
-    }
-
-    /**
-     * Fungsi dasar konfigurasi chart Apex
-     */
-    function getBaseChartOptions(type, series, categories, customOptions = {}) {
-        const isDark = theme() === "dark";
-
-        return {
-            chart: {
-                type: type,
-                height: 350,
-                toolbar: { show: true, tools: { download: false } },
-                foreColor: isDark ? '#fff' : '#333'
-            },
-            xaxis: {
-                categories: categories,
-                labels: {
-                    style: { colors: isDark ? '#ccc' : '#555' }
-                },
-                title: {
-                    style: { color: isDark ? '#ccc' : '#555' }
-                }
-            },
-            yaxis: {
-                labels: {
-                    formatter: val => val.toLocaleString('id-ID'),
-                    style: { colors: isDark ? '#ccc' : '#555' }
-                },
-                title: {
-                    text: "Nominal (Rp)",
-                    style: { color: isDark ? '#ccc' : '#555' }
-                }
-            },
-            tooltip: {
-                theme: isDark ? 'dark' : 'light',
-                y: {
-                    formatter: val => "Rp " + val.toLocaleString('id-ID')
-                }
-            },
-            stroke: { curve: "smooth", width: 2 },
-            markers: { size: 5 },
-            colors: ['#28a745'],
-            legend: {
-                position: "top",
-                horizontalAlign: "center"
-            },
-            series: series,
-            ...customOptions
-        };
-    }
-
-    /**
-     * Fungsi untuk memfilter data berdasarkan jumlah bulan terakhir
-     */
-    function filterData(data, months) {
-        if (!isValidChartData(data)) {
-            console.warn("filterData error: data.labels tidak valid", data);
-            return { labels: [], pemasukan: [], pengeluaran: [] };
-        }
-
-        if (months === "all") return data;
-
-        const startIndex = Math.max(data.labels.length - months, 0);
-        const filtered = { labels: data.labels.slice(startIndex) };
-
-        Object.keys(data).forEach((key) => {
-            if (Array.isArray(data[key])) {
-                filtered[key] = data[key].slice(startIndex);
-            }
-        });
-
-        return filtered;
-    }    /**
-     * Fungsi umum render chart
-     */
-    function renderChart(selector, type, series, categories, options = {}) {
-        const el = document.querySelector(selector);
-        if (!el) return;
-
-        const config = getBaseChartOptions(type, series, categories, options);
-
-        if (charts[selector]) {
-            charts[selector].updateOptions(config);
-        } else {
-            charts[selector] = new ApexCharts(el, config);
-            charts[selector].render();
-        }
-    }
-
-    /**
-     * FETCH & RENDER saving rate chart
-     */
-    function loadSavingRateChart(period = '6') {
-        const url = `/dashboard/saving-rate-data?periode=${period}`;
-
-        const loader = document.getElementById("savingRateLoader");
-        if (loader) loader.style.display = "inline-block";
-
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                if (!isValidChartData(data)) throw new Error("Invalid chart data");
-
-                chartData.savingRate = data;
-                renderChart("#savingRateChart", "line", [
-                    { name: "Saving Rate", data: data.data }
-                ], data.labels, {
-                    markers: {
-                        size: 5,
-                        strokeColors: '#28a745',
-                        strokeWidth: 2,
-                        hover: { size: 7 }
+    // ==== TOGGLE NOMINAL VISIBILITY AJAX ====
+    const toggleBtn = document.getElementById('toggleNominalBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', async () => {
+            toggleBtn.disabled = true;
+            try {
+                const response = await fetch(toggleBtn.dataset.url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
                     }
                 });
-            })
-            .catch(err => console.error("Gagal memuat saving rate:", err))
-            .finally(() => {
-                if (loader) loader.style.display = "none";
+                const res = await response.json();
+                document.getElementById('summary-saldo').textContent = res.data.saldo;
+                document.getElementById('summary-pemasukan').textContent = res.data.pemasukan;
+                document.getElementById('summary-pengeluaran').textContent = res.data.pengeluaran;
+                document.getElementById('summary-hari-ini').textContent = res.data.hari_ini;
+                toggleBtn.innerHTML = res.show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            } catch (e) { console.error(e); }
+            toggleBtn.disabled = false;
+        });
+    }
+});
+
+// ==== EXPENSES BAR DETAILED CHART (Managed by own listener) ====
+document.addEventListener("DOMContentLoaded", function () {
+    let barChart = null;
+    const isDark = () => document.documentElement.getAttribute("data-bs-theme") === "dark";
+
+    window.fetchDataAndRenderChart = function (month, year) {
+        const chartElement = document.querySelector("#barJenisPengeluaran");
+        if (!chartElement) return;
+
+        fetch(`/dashboard/jenis-pengeluaran?month=${month}&year=${year}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    if (barChart) barChart.destroy();
+                    chartElement.innerHTML = '<div class="text-center p-5 text-muted">No data available</div>';
+                    return;
+                }
+
+                const labels = data.map(item => item.pengeluaran_nama);
+                const values = data.map(item => parseFloat(item.total));
+
+                const options = {
+                    chart: { type: 'bar', height: 350, foreColor: isDark() ? '#ddd' : '#333' },
+                    series: [{ name: 'Total', data: values }],
+                    plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+                    xaxis: { categories: labels },
+                    colors: ['#667eea'],
+                    tooltip: { theme: isDark() ? 'dark' : 'light' }
+                };
+
+                if (barChart) barChart.destroy();
+                barChart = new ApexCharts(chartElement, options);
+                barChart.render();
             });
-    }
-
-    /**
-     * ON FILTER CHANGE
-     */
-    const filterSaving = document.getElementById("filterPeriodSavingRate");
-    if (filterSaving) {
-        loadSavingRateChart(filterSaving.value);
-
-        filterSaving.addEventListener("change", function () {
-            loadSavingRateChart(this.value);
-        });
-
-        document.addEventListener("themeChanged", function () {
-            loadSavingRateChart(filterSaving.value);
-        });
-    }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const avgPemasukan = parseFloat(document.getElementById("rataPemasukan").dataset.value);
-    const avgPengeluaran = parseFloat(document.getElementById("rataPengeluaran").dataset.value);
-
-    console.log("Pemasukan:", avgPemasukan, "Pengeluaran:", avgPengeluaran);
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    // Hapus chart lama jika stack reload
-    let chartContainer = document.querySelector("#chart");
-    if (chartContainer.innerHTML.trim() !== "") {
-        chartContainer.innerHTML = "";
-    }
-
-    var options = {
-        series: [{
-            data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
-        }],
-        chart: {
-            type: 'bar',
-            height: 350
-        },
-        plotOptions: {
-            bar: {
-                borderRadius: 4,
-                borderRadiusApplication: 'end',
-                horizontal: true,
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        xaxis: {
-            categories: [
-                'South Korea', 'Canada', 'United Kingdom', 'Netherlands',
-                'Italy', 'France', 'Japan', 'United States', 'China', 'Germany'
-            ],
-        }
     };
 
-    var chart = new ApexCharts(chartContainer, options);
-    chart.render();
-
+    const filterBulan = document.getElementById("filterBulan");
+    const filterTahun = document.getElementById("filterTahun");
+    if (filterBulan && filterTahun) {
+        window.fetchDataAndRenderChart(filterBulan.value, filterTahun.value);
+    }
 });
-
