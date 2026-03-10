@@ -60,9 +60,7 @@
                              document.referrer.includes('android-app://');
 
             if (isPWAMode) {
-                console.log('PWA mode detected. Protection system disabled for native experience.');
                 document.documentElement.classList.add('pwa-mode');
-                return; // Bypass all protections
             }
 
             // Disable right-click
