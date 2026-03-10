@@ -204,26 +204,72 @@
                 </div>
             </div> -->
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="card-header bg-white border-bottom py-3">
                      <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
-                             {{ __('Saving Rate') }}
-                            <span class="text-muted small fw-normal ms-1" id="savingRatePeriodeLabel">
-                                ({{ request('periode', 6) }} {{ __('months ago') }})
-                            </span>
+                             {{ __('Net Worth Ratio') }}
                         </h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Track your savings performance.') }}</p>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Your solvency and wealth status.') }}</p>
                     </div>
                 </div>
-                <div class="card-body p-3 p-md-4">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <h2 class="fw-bold mb-0 {{ $netWorthRatio >= 1 ? 'text-success' : 'text-danger' }}" style="font-size: 2.5rem;">{{ $netWorthRatio }}x</h2>
+                            <p class="text-muted small fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">{{ __('Asset-to-Debt Ratio') }}</p>
+                        </div>
+                    </div>
 
-                {{-- CHART --}}
-                <div id="savingRateChart" style="height: 300px;"></div>
+                    <div class="progress mb-4" style="height: 12px; border-radius: 10px; background-color: #f0f2f5;">
+                        @php
+                            $totalVal = $totalAset + $totalHutang;
+                            $assetPct = $totalVal > 0 ? ($totalAset / $totalVal) * 100 : 0;
+                            $debtPct = $totalVal > 0 ? ($totalHutang / $totalVal) * 100 : 0;
+                        @endphp
+                        <div class="progress-bar bg-success shadow-sm"
+                             role="progressbar"
+                             style="width: {{ $assetPct }}%; border-radius: 10px 0 0 10px;"
+                             aria-valuenow="{{ $assetPct }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                        <div class="progress-bar bg-danger shadow-sm"
+                             role="progressbar"
+                             style="width: {{ $debtPct }}%; border-radius: 0 10px 10px 0;"
+                             aria-valuenow="{{ $debtPct }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
 
-                {{-- FALLBACK TABLE --}}
-                <div id="savingRateTableContainer" class="table-responsive mt-3">
-                    @include('dashboard.partials.saving-rate-table', ['savingRate' => $savingRate])
-                </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
+                                <p class="text-muted small mb-1">{{ __('Total Assets') }}</p>
+                                <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalAset, 0, ',', '.') }}</h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
+                                <p class="text-muted small mb-1">{{ __('Total Debt') }}</p>
+                                <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalHutang, 0, ',', '.') }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        @if($netWorthRatio >= 1)
+                        <div class="alert alert-success border-0 shadow-sm py-2 mb-0" style="border-radius: 10px;">
+                            <i class="bi bi-shield-check-fill me-2"></i>
+                            <span class="small fw-bold">{{ __('Your assets comfortably cover your debts.') }}</span>
+                        </div>
+                        @else
+                        <div class="alert alert-warning border-0 shadow-sm py-2 mb-0" style="border-radius: 10px;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span class="small fw-bold">{{ __('Your debt level is higher than your current assets.') }}</span>
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -232,37 +278,58 @@
         <!-- Kolom Kanan -->
         <div class="col-12 col-lg-4 d-flex flex-column gap-4">
 
-            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
                 <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Financial Ratio') }}</h5>
-                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Key financial health indicators.') }}</p>
+                    <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Emergency Fund Progress') }}</h5>
+                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Track your safety net status.') }}</p>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <h2 class="fw-bold mb-0 text-primary" style="font-size: 2.5rem;">{{ $persentaseDanaDarurat }}%</h2>
+                            <p class="text-muted small fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">{{ __('Achieved') }}</p>
+                        </div>
+                    </div>
 
-                <ul class="list-group list-group-flush">
+                    <div class="progress mb-4" style="height: 12px; border-radius: 10px; background-color: #f0f2f5;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary shadow-sm"
+                             role="progressbar"
+                             style="width: {{ $persentaseDanaDarurat }}%; border-radius: 10px;"
+                             aria-valuenow="{{ $persentaseDanaDarurat }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
 
-                    {{-- Expense Ratio --}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        {{ __('Expense / Income') }}
-                        <span class="badge bg-{{ $expenseStatus['class'] }}">
-                            {{ $expenseRatio }}% – {{ $expenseStatus['label'] }}
-                        </span>
-                    </li>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
+                                <p class="text-muted small mb-1">{{ __('Actual') }}</p>
+                                <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
+                                <p class="text-muted small mb-1">{{ __('Target') }}</p>
+                                <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</h6>
+                            </div>
+                        </div>
+                    </div>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        {{ __('Saving Rate') }}
-                        <span class="badge bg-{{ $savingStatus['class'] }}">
-                            {{ $savingRateLatest }}% – {{ $savingStatus['label'] }}
-                        </span>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        {{ __('Emergency Fund') }}
-                        <span class="badge bg-{{ $emergencyStatus['class'] }}">
-                            {{ $danaDaruratBulan }} months – {{ $emergencyStatus['label'] }}
-                        </span>
-                    </li>
-                </ul>
+                    @if($persentaseDanaDarurat >= 100)
+                    <div class="alert alert-success border-0 shadow-sm mt-4 mb-0 py-2 text-center" style="border-radius: 10px;">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span class="small fw-bold">{{ __('Goal Reached! You are financially safe.') }}</span>
+                    </div>
+                    @else
+                    <div class="mt-4 text-center">
+                        <p class="text-muted small mb-0">
+                            {{ __('Keep up the good work! Just') }}
+                            <span class="fw-bold text-primary">Rp {{ number_format(max(0, $targetDanaDarurat - $totalDanaDarurat), 0, ',', '.') }}</span>
+                            {{ __('left to reach your target.') }}
+                        </p>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -399,7 +466,6 @@
 @push('scripts')
 <script>
     window.cashflowData = @json($cashflow ?? []);
-    window.savingRateData = @json($savingRate ?? []);
     window.dashboardFilterUrl = "{{ route('dashboard.filter') }}";
     window.eventsUrl = "{{ url('events') }}";
 </script>
@@ -408,7 +474,6 @@
 @push('scripts')
 <script src="{{ asset('vendor/apexcharts/apexcharts.min.js') }}"></script>
 <script src="{{ asset('js/dashboard-cashflow.js') }}"></script>
-<script src="{{ asset('js/dashboard-saving-rate.js') }}"></script>
 <script src="{{ asset('js/dashboard.js') }}"></script>
 <script src="{{ asset('js/calendar.js') }}?v={{ filemtime(public_path('js/calendar.js')) }}"></script>
 @endpush

@@ -157,12 +157,22 @@ class DashboardController extends Controller
         $totalKeluarDD = DanaDarurat::where('id_user', $userId)->where('jenis_transaksi_dana_darurat', 2)->sum('nominal_dana_darurat');
         $totalDanaDarurat = $totalMasukDD - $totalKeluarDD;
 
-        $allTrx = Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
-        $totalPengeluaranTotal = $allTrx->where('status', '1')->sum(fn($t) => (float)$t->nominal);
-        $selisihBulan = ($allTrx->count() > 1) ? (Carbon::parse($allTrx->first()->tgl_transaksi)->startOfMonth()->diffInMonths(Carbon::parse($allTrx->last()->tgl_transaksi)->startOfMonth()) + 1) : 1;
-        $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaranTotal / $selisihBulan : 0;
-        $targetDanaDarurat = $rataRataPengeluaran * 6;
-        $rasio_dana_darurat = $targetDanaDarurat > 0 ? ($totalDanaDarurat / $targetDanaDarurat) * 100 : 0;
+        $user = Auth::user();
+        $targetDanaDarurat = 0;
+        if ($user->metode_target_dana_darurat === 'manual') {
+            $targetDanaDarurat = $user->nominal_target_dana_darurat ?? 0;
+        } else {
+            $allTrx = Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
+            $totalPengeluaranTotal = $allTrx->where('status', '1')->sum(fn($t) => (float)$t->nominal);
+            $selisihBulan = ($allTrx->count() > 1) ? (Carbon::parse($allTrx->first()->tgl_transaksi)->startOfMonth()->diffInMonths(Carbon::parse($allTrx->last()->tgl_transaksi)->startOfMonth()) + 1) : 1;
+            $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaranTotal / $selisihBulan : 0;
+            $kelipatan = $user->kelipatan_target_dana_darurat ?? 6;
+            $targetDanaDarurat = $rataRataPengeluaran * $kelipatan;
+        }
+
+        $persentaseDanaDarurat = $targetDanaDarurat > 0 ? ($totalDanaDarurat / $targetDanaDarurat) * 100 : 0;
+        $persentaseDanaDarurat = round(min($persentaseDanaDarurat, 100), 1);
+        $rasio_dana_darurat = $danaDaruratBulan;
 
         $totalPemasukanMonth = Transaksi::where('id_user', $userId)->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal_pemasukan);
         $totalPengeluaranMonth = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal);
@@ -209,7 +219,11 @@ class DashboardController extends Controller
         $persenPemasukan = $numbers['persen_pemasukan'];
         $persenPengeluaran = $numbers['persen_pengeluaran'];
 
-        return view('dashboard.index', compact('totalPinjaman', 'totalBarang', 'rasio', 'rasio_inflasi', 'rasio_dana_darurat', 'rasio_pengeluaran_pendapatan', 'totalNominalToday', 'totalNominalMonthExp', 'totalNominalMonthInc', 'totalNominalSisa', 'filterOptions', 'cashflow', 'savingRate', 'expenseRatio', 'savingRateLatest', 'danaDaruratBulan', 'expenseStatus', 'savingStatus', 'emergencyStatus', 'pengeluaranKategori', 'bulan', 'tahun', 'totalPengeluaranBulan', 'transaksiHariIni', 'totalMasukHariIni', 'totalKeluarHariIni', 'saldoView', 'pemasukanView', 'pengeluaranView', 'showNominal', 'pengeluaranHariIni', 'persenSaldo', 'persenPemasukan', 'persenPengeluaran'));
+        $totalAset = $totalBarang + $totalDanaDarurat + $numbers['saldo'];
+        $totalHutang = $totalPinjaman;
+        $netWorthRatio = $totalHutang > 0 ? round($totalAset / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
+
+        return view('dashboard.index', compact('totalPinjaman', 'totalBarang', 'rasio', 'rasio_inflasi', 'rasio_dana_darurat', 'rasio_pengeluaran_pendapatan', 'totalNominalToday', 'totalNominalMonthExp', 'totalNominalMonthInc', 'totalNominalSisa', 'filterOptions', 'cashflow', 'savingRate', 'expenseRatio', 'savingRateLatest', 'danaDaruratBulan', 'expenseStatus', 'savingStatus', 'emergencyStatus', 'pengeluaranKategori', 'bulan', 'tahun', 'totalPengeluaranBulan', 'transaksiHariIni', 'totalMasukHariIni', 'totalKeluarHariIni', 'saldoView', 'pemasukanView', 'pengeluaranView', 'showNominal', 'pengeluaranHariIni', 'persenSaldo', 'persenPemasukan', 'persenPengeluaran', 'totalDanaDarurat', 'targetDanaDarurat', 'persentaseDanaDarurat', 'totalAset', 'totalHutang', 'netWorthRatio'));
     }
 
     public function lineData()
@@ -284,31 +298,6 @@ class DashboardController extends Controller
         }
     }
 
-    public function getSavingRateData(Request $request)
-    {
-        $userId = Auth::id();
-        $periode = $request->query('periode', '6');
-        if ($periode === 'all') {
-            $startDate = Transaksi::where('id_user', $userId)->where('status', 2)->min('tgl_transaksi');
-            $start = $startDate ? Carbon::parse($startDate)->startOfMonth() : Carbon::now()->startOfMonth();
-        } else {
-            $start = Carbon::now()->subMonthsNoOverflow(intval($periode) - 1)->startOfMonth();
-        }
-        $end = Carbon::now()->endOfMonth();
-        $transaksi = Transaksi::where('id_user', $userId)->where('status', 2)->whereBetween('tgl_transaksi', [$start, $end])->get();
-        $data = [];
-        $current = $start->copy();
-        while ($current <= $end) {
-            $label = $current->format('F Y');
-            $data[$label] = 0;
-            $current->addMonth();
-        }
-        foreach ($transaksi as $item) {
-            $label = Carbon::parse($item->tgl_transaksi)->format('F Y');
-            if (isset($data[$label])) $data[$label] += (float)$item->nominal;
-        }
-        return response()->json(['labels' => array_keys($data), 'data' => array_values($data)]);
-    }
 
     public function AnggaranChart(Request $request)
     {
@@ -358,15 +347,10 @@ class DashboardController extends Controller
                     'total_pemasukan' => $row->total_pemasukan,
                     'total_pengeluaran' => $row->total_pengeluaran
                 ]),
-                'savingRate' => $savingRate->map(fn($row) => [
-                    'bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
-                    'saving_rate' => $row->saving_rate
-                ])
             ];
 
             return response()->json([
                 'cashflow' => view('dashboard.partials.cashflow-table', compact('cashflow'))->render(),
-                'savingRate' => view('dashboard.partials.saving-rate-table', compact('savingRate'))->render(),
                 'chartData' => $chartData
             ]);
         }
