@@ -14,15 +14,11 @@
     let isLocked = false;
     const threshold = 160;
 
-    // Robust PWA Detection
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true ||
         document.referrer.includes('android-app://');
-
-    if (isPWAMode) {
-        console.log('PWA mode detected. Protection system disabled for native experience.');
-        return; // Bypass all protections
-    }
+    const isMobileOrPWA = isMobileDevice || isPWAMode;
 
     // --- 1. UI Protection Helpers ---
 
@@ -126,6 +122,7 @@
     // --- 4. DevTools Detection (Aggressive) ---
 
     const blockAccess = () => {
+        if (isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
         isLocked = true;
         hideContent();
         // Specific message for DevTools
