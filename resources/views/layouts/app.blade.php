@@ -54,11 +54,15 @@
 
         // Extreme Source Code Protection
         (function() {
-            // Disable all protections if running as a standalone PWA
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            // Robust PWA Detection
+            const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true || 
+                             document.referrer.includes('android-app://');
+
+            if (isPWAMode) {
                 console.log('PWA mode detected. Protection system disabled for native experience.');
                 document.documentElement.classList.add('pwa-mode');
-                return;
+                return; // Bypass all protections
             }
 
             // Disable right-click
