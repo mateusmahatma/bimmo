@@ -74,7 +74,7 @@
             e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44
         ) {
             if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
-                blockAccess();
+                blockAccess(true);
             } else {
                 isLocked = true;
                 hideContent();
@@ -96,7 +96,7 @@
         }
 
         if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
-            blockAccess();
+            blockAccess(true);
         }
 
         // Win Key (Win+Shift+S attempt)
@@ -124,16 +124,23 @@
 
     // --- 4. DevTools Detection (Aggressive) ---
 
-    const blockAccess = () => {
-        if (isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
+    const blockAccess = (force = false) => {
+        if (isLocked && force !== true) return;
+        if (!force && isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
+        
         isLocked = true;
-        hideContent();
-        // Specific message for DevTools
-        const overlay = document.getElementById('protection-overlay');
-        if (overlay) {
-            const subtitle = overlay.querySelector('p');
-            if (subtitle) subtitle.innerText = "Developer Tools terdeteksi. Silakan tutup Developer Tools untuk melanjutkan.";
-        }
+        document.body.innerHTML = `
+            <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#000;color:white;text-align:center;padding:20px;">
+                <h1 style="color:#dc3545;font-size:3rem;margin-bottom:20px;"><i class="bi bi-camera-fill"></i></h1>
+                <h2 style="margin-bottom:15px;">Akses Dibatasi Permanen</h2>
+                <p style="color:#aaa;max-width:500px;line-height:1.6;margin-bottom:30px;">
+                    Sistem mendeteksi upaya pengambilan gambar (screenshot/capture). Untuk melindungi data sensitif Anda, sesi ini telah dikunci secara permanen.
+                </p>
+                <button onclick="window.location.reload()" style="padding:12px 30px;border:none;background:#0984e3;color:white;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s ease;">Muat Ulang Halaman</button>
+            </div>
+        `;
+        document.body.style.overflow = 'hidden';
+        clearClipboard();
     };
 
     const checkDevTools = () => {

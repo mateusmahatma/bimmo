@@ -81,16 +81,23 @@
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isMobileOrPWA = isMobileDevice || isPWAMode;
 
-            const blockAccess = () => {
-                if (isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
+            const blockAccess = (force = false) => {
+                if (isLocked && force !== true) return;
+                if (!force && isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
+                
+                isLocked = true;
                 document.body.innerHTML = `
-                    <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#f8f9fa;">
-                        <h1 style="color:#dc3545;">Akses Dibatasi</h1>
-                        <p style="color:#6c757d;">Developer Tools terdeteksi. Silakan tutup Developer Tools untuk melanjutkan.</p>
-                        <button onclick="window.location.reload()" style="padding:10px 20px;border:none;background:#007bff;color:white;border-radius:5px;cursor:pointer;">Muat Ulang Halaman</button>
+                    <div style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#000;color:white;text-align:center;padding:20px;">
+                        <h1 style="color:#dc3545;font-size:3rem;margin-bottom:20px;"><i class="bi bi-camera-fill"></i></h1>
+                        <h2 style="margin-bottom:15px;">Akses Dibatasi Permanen</h2>
+                        <p style="color:#aaa;max-width:500px;line-height:1.6;margin-bottom:30px;">
+                            Sistem mendeteksi upaya pengambilan gambar (screenshot/capture). Untuk melindungi data sensitif Anda, sesi ini telah dikunci secara permanen.
+                        </p>
+                        <button onclick="window.location.reload()" style="padding:12px 30px;border:none;background:#0984e3;color:white;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s ease;">Muat Ulang Halaman</button>
                     </div>
                 `;
                 document.body.style.overflow = 'hidden';
+                clearClipboard();
             };
 
             // Detect DevTools by monitoring window dimensions
@@ -291,7 +298,7 @@
                     e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44
                 ) {
                     if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
-                        blockAccess(); // Permanent hard block for Prt Sc
+                        blockAccess(true); // Permanent forced hard block for Prt Sc
                     } else {
                         isLocked = true; // Permanent lock
                         hideContent(true); // Instant hide for shortcuts
@@ -312,7 +319,7 @@
                 }
 
                 if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
-                    blockAccess();
+                    blockAccess(true);
                 }
             });
 
