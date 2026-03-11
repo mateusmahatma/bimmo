@@ -29,7 +29,11 @@
     };
 
     const showContent = () => {
-        if (isLocked) return; // Never show content again if locked by capture
+        if (isLocked) {
+            const overlay = document.getElementById('protection-overlay');
+            if (overlay) overlay.style.display = 'flex';
+            return;
+        }
         document.body.classList.remove('protection-active');
         const overlay = document.getElementById('protection-overlay');
         if (overlay) overlay.style.display = 'none';
