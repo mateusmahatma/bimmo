@@ -288,15 +288,16 @@
                     e.keyCode === 123 ||
                     (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
                     (e.ctrlKey && [85, 83, 80].includes(e.keyCode)) || // U, S, P (Print)
-                    e.key === 'PrintScreen' || e.keyCode === 44
+                    e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44
                 ) {
-                    isLocked = true; // Permanent lock
-                    hideContent(true); // Instant hide for shortcuts
-                    clearClipboard();
-
-                    if (e.key === 'PrintScreen' || e.keyCode === 44) {
-                        e.preventDefault();
+                    if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
+                        blockAccess(); // Permanent hard block for Prt Sc
+                    } else {
+                        isLocked = true; // Permanent lock
+                        hideContent(true); // Instant hide for shortcuts
                     }
+                    clearClipboard();
+                    e.preventDefault();
                 }
             });
 
@@ -310,9 +311,8 @@
                     }, 500);
                 }
 
-                if (e.key === 'PrintScreen' || e.keyCode === 44) {
-                    isLocked = true;
-                    hideContent();
+                if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
+                    blockAccess();
                 }
             });
 

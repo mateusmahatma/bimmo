@@ -71,10 +71,14 @@
             e.keyCode === 123 ||
             (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
             (e.ctrlKey && [85, 83, 80].includes(e.keyCode)) ||
-            e.key === 'PrintScreen' || e.keyCode === 44
+            e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44
         ) {
-            isLocked = true;
-            hideContent();
+            if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
+                blockAccess();
+            } else {
+                isLocked = true;
+                hideContent();
+            }
             clearClipboard();
             e.preventDefault();
             return false;
@@ -91,9 +95,8 @@
             }, 500);
         }
 
-        if (e.key === 'PrintScreen' || e.keyCode === 44) {
-            isLocked = true;
-            hideContent();
+        if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
+            blockAccess();
         }
 
         // Win Key (Win+Shift+S attempt)
