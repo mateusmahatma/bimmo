@@ -84,6 +84,14 @@
             let isNavigating = false;
             window.addEventListener('beforeunload', () => isNavigating = true);
             window.addEventListener('pagehide', () => isNavigating = true);
+            window.addEventListener('popstate', () => {
+                isNavigating = true;
+                setTimeout(() => isNavigating = false, 1000); // Temporary suppression for back navigation
+            });
+            window.addEventListener('hashchange', () => {
+                isNavigating = true;
+                setTimeout(() => isNavigating = false, 1000);
+            });
 
             const blockAccess = (force = false) => {
                 if (isLocked && force !== true) return;
@@ -197,6 +205,7 @@
             // Netflix-style Black Out Protection
             const hideContent = (isInstant = false) => {
                 const triggerHide = () => {
+                    if (isNavigating) return; // Re-check navigation status right before hiding
                     document.body.classList.add('protection-active');
                     const overlay = document.getElementById('protection-overlay');
                     if (overlay) overlay.style.display = 'flex';
