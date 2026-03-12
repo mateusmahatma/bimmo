@@ -20,15 +20,34 @@
         document.referrer.includes('android-app://');
     const isMobileOrPWA = isMobileDevice || isPWAMode;
 
+    let isNavigating = false;
+    let protectionTimeout;
+    window.addEventListener('beforeunload', () => isNavigating = true);
+    window.addEventListener('pagehide', () => isNavigating = true);
+
     // --- 1. UI Protection Helpers ---
 
-    const hideContent = () => {
-        document.body.classList.add('protection-active');
-        const overlay = document.getElementById('protection-overlay');
-        if (overlay) overlay.style.display = 'flex';
+    const hideContent = (isInstant = false) => {
+        const triggerHide = () => {
+            document.body.classList.add('protection-active');
+            const overlay = document.getElementById('protection-overlay');
+            if (overlay) overlay.style.display = 'flex';
+        };
+
+        if (isInstant || !isMobileOrPWA) {
+            triggerHide();
+        } else {
+            // Suppression for legitimate navigation (Back button on mobile)
+            if (isNavigating) return;
+
+            // 2s Grace period for mobile/PWA to avoid false positives during system gestures/navigation transitions
+            clearTimeout(protectionTimeout);
+            protectionTimeout = setTimeout(triggerHide, 2000);
+        }
     };
 
     const showContent = () => {
+        clearTimeout(protectionTimeout);
         if (isLocked) {
             const overlay = document.getElementById('protection-overlay');
             if (overlay) overlay.style.display = 'flex';
@@ -131,7 +150,7 @@
     const blockAccess = (force = false) => {
         if (isLocked && force !== true) return;
         if (!force && isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
-        
+
         isLocked = true;
         document.body.classList.remove('protection-active');
         document.body.innerHTML = `
