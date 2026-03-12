@@ -81,6 +81,10 @@
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isMobileOrPWA = isMobileDevice || isPWAMode;
 
+            let isNavigating = false;
+            window.addEventListener('beforeunload', () => isNavigating = true);
+            window.addEventListener('pagehide', () => isNavigating = true);
+
             const blockAccess = (force = false) => {
                 if (isLocked && force !== true) return;
                 if (!force && isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
@@ -201,9 +205,12 @@
                 if (isInstant || !isMobileOrPWA) {
                     triggerHide();
                 } else {
-                    // 1s Grace period for mobile/PWA to avoid false positives during system gestures
+                    // Suppression for legitimate navigation (Back button on mobile)
+                    if (isNavigating) return;
+
+                    // 2s Grace period for mobile/PWA to avoid false positives during system gestures/navigation transitions
                     clearTimeout(protectionTimeout);
-                    protectionTimeout = setTimeout(triggerHide, 1000);
+                    protectionTimeout = setTimeout(triggerHide, 2000);
                 }
             };
 
