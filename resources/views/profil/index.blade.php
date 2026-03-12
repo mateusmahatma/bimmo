@@ -305,14 +305,7 @@
 </script>
 
 <script>
-    document.getElementById('daily_notification')?.addEventListener('change', function() {
-        const intervalSettings = document.getElementById('interval_settings');
-        if (this.checked) {
-            intervalSettings.classList.remove('d-none');
-        } else {
-            intervalSettings.classList.add('d-none');
-        }
-    });
+
 
     document.querySelectorAll('.toggle-password').forEach(button => {
         button.addEventListener('click', function() {

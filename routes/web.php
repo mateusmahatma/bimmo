@@ -78,7 +78,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [DashboardController::class , 'index'])->name('dashboard');
             Route::get('/chart-data', [DashboardController::class , 'getChartData']);
             Route::get('/pie-data', [DashboardController::class , 'getPieData']);
-            Route::get('/todayTransactions', [DashboardController::class , 'TodayTransactions']);
+
             Route::get('/line-data', [DashboardController::class , 'lineData']);
             Route::get('/jenis-pengeluaran', [DashboardController::class , 'getJenisPengeluaran']);
             Route::get('/transaksi', [DashboardController::class , 'getTransaksiByPengeluaran']);
