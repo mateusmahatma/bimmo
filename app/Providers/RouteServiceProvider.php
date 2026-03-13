@@ -45,8 +45,18 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function configureRateLimiting()
     {
+        // RateLimiter::for('api', function (Request $request) {
+        //     return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        // });
+
+        // Membatasi akses API untuk pengguna yang tidak terautentikasi berdasarkan alamat IP
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            return Limit::perMinute(60)->by($request->ip());
+        });
+
+        // Contoh untuk login Bimmo yang lebih ketat (5 request per menit)
+        RateLimiter::for('bimmo-login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
         });
     }
 }
