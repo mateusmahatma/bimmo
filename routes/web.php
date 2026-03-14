@@ -132,6 +132,7 @@ Route::middleware(['auth'])->group(function () {
         // Pemasukan, Pengeluaran, Anggaran
         Route::resource('pemasukan', PemasukanController::class);
         Route::resource('pengeluaran', PengeluaranController::class);
+        Route::delete('/anggaran/bulk-delete', [AnggaranController::class , 'bulkDelete'])->name('anggaran.bulkDelete');
         Route::resource('anggaran', AnggaranController::class);
 
         // Dompet (Wallet)
