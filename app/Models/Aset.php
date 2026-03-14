@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Services\GoldPriceService;
 
 class Aset extends Model
 {
@@ -21,6 +22,7 @@ class Aset extends Model
         'nomor_seri',
         'tanggal_pembelian',
         'harga_beli',
+        'berat',
         'masa_pakai',
         'nilai_sisa',
         'garansi_sampai',
@@ -91,6 +93,15 @@ class Aset extends Model
             return 0;
         }
 
+        if ($this->kategori === 'Investasi / Emas' && $this->berat > 0) {
+            $livePrice = GoldPriceService::getPricePerGram();
+            if ($livePrice) {
+                return $this->berat * $livePrice;
+            }
+            // Fallback to purchase price if API fails completely
+            return $this->harga_beli;
+        }
+
         $tanggalPembelian = Carbon::parse($this->tanggal_pembelian);
         $sekarang = Carbon::now();
 
@@ -122,6 +133,10 @@ class Aset extends Model
      */
     public function getPenyusutanBulananAttribute()
     {
+        if ($this->kategori === 'Investasi / Emas') {
+            return 0;
+        }
+
         $totalPenyusutan = $this->harga_beli - $this->nilai_sisa;
         $totalBulan = $this->masa_pakai * 12;
 

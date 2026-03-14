@@ -110,6 +110,12 @@
                             <span class="text-muted">{{ __('PIC') }}</span>
                             <span class="fw-bold">{{ $aset->pic ?: '-' }}</span>
                         </li>
+                        @if($aset->kategori === 'Investasi / Emas')
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 mt-2 border-top">
+                            <span class="text-muted"><i class="bi bi-heptagon-half text-warning me-1"></i> {{ __('Weight') }}</span>
+                            <span class="fw-bold fs-5 text-dark">{{ $aset->berat }} g</span>
+                        </li>
+                        @endif
                     </ul>
                     @if($aset->dokumen)
                     <div class="mt-3">
@@ -146,11 +152,17 @@
                     </div>
                     <div class="alert bg-light border-0 small">
                         <i class="bi bi-info-circle me-1 text-info"></i>
-                        {!! __('Depreciation is calculated using the :method over :years years with a residual value of Rp :residual.', [
-                            'method' => '<strong>' . __('Straight-Line Method') . '</strong>',
-                            'years' => $aset->masa_pakai,
-                            'residual' => number_format($aset->nilai_sisa, 0, ',', '.')
-                        ]) !!}
+                        @if($aset->kategori === 'Investasi / Emas')
+                            {!! __('Gold Book Value is updated automatically based on current live market price (Rp :livePrice / gram). No depreciation applied.', [
+                                'livePrice' => number_format(\App\Services\GoldPriceService::getPricePerGram(), 0, ',', '.')
+                            ]) !!}
+                        @else
+                            {!! __('Depreciation is calculated using the :method over :years years with a residual value of Rp :residual.', [
+                                'method' => '<strong>' . __('Straight-Line Method') . '</strong>',
+                                'years' => $aset->masa_pakai,
+                                'residual' => number_format($aset->nilai_sisa, 0, ',', '.')
+                            ]) !!}
+                        @endif
                     </div>
                     @if(!$aset->is_disposed)
                     <div class="d-flex justify-content-end">

@@ -60,15 +60,23 @@ class AsetController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'nama_aset' => 'required',
             'kode_aset' => 'nullable|unique:aset,kode_aset',
             'kategori' => 'required',
             'tanggal_pembelian' => 'required|date',
             'harga_beli' => 'required|numeric',
-            'masa_pakai' => 'required|integer',
             'kondisi' => 'required',
-        ]);
+        ];
+
+        if ($request->kategori === 'Investasi / Emas') {
+            $rules['berat'] = 'required|numeric|min:0.01';
+            $request->merge(['masa_pakai' => 0, 'nilai_sisa' => $request->harga_beli]);
+        } else {
+            $rules['masa_pakai'] = 'required|integer';
+        }
+
+        $request->validate($rules);
 
         $data = $request->all();
         $data['id_user'] = Auth::id();
@@ -102,12 +110,21 @@ class AsetController extends Controller
     {
         $aset = Aset::where('id_user', Auth::id())->findOrFail($id);
 
-        $request->validate([
+        $rules = [
             'nama_aset' => 'required',
             'kode_aset' => 'nullable|unique:aset,kode_aset,' . $id,
             'kategori' => 'required',
             'kondisi' => 'required',
-        ]);
+        ];
+
+        if ($request->kategori === 'Investasi / Emas') {
+            $rules['berat'] = 'required|numeric|min:0.01';
+            $request->merge(['masa_pakai' => 0, 'nilai_sisa' => $request->harga_beli ?? $aset->harga_beli]);
+        } else {
+            $rules['masa_pakai'] = 'required|integer';
+        }
+
+        $request->validate($rules);
 
         $data = $request->all();
 

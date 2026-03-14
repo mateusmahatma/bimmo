@@ -225,6 +225,7 @@
                             <option value="Kendaraan">{{ __('Vehicle') }}</option>
                             <option value="Furnitur">{{ __('Furniture') }}</option>
                             <option value="Elektronik">{{ __('Electronic') }}</option>
+                            <option value="Investasi / Emas">{{ __('Investment / Gold') }}</option>
                             <option value="Lainnya">{{ __('Others') }}</option>
                         </select>
                         <select id="filterStatus" class="form-select form-select-sm" style="width: auto; min-width: 140px;">

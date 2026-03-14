@@ -101,8 +101,16 @@
                                     <option value="Kendaraan" {{ (old('kategori', $aset->kategori) == 'Kendaraan') ? 'selected' : '' }}>{{ __('Vehicle') }}</option>
                                     <option value="Furnitur" {{ (old('kategori', $aset->kategori) == 'Furnitur') ? 'selected' : '' }}>{{ __('Furniture') }}</option>
                                     <option value="Elektronik" {{ (old('kategori', $aset->kategori) == 'Elektronik') ? 'selected' : '' }}>{{ __('Electronic') }}</option>
+                                    <option value="Investasi / Emas" {{ (old('kategori', $aset->kategori) == 'Investasi / Emas') ? 'selected' : '' }}>{{ __('Investment / Gold') }}</option>
                                     <option value="Lainnya" {{ (old('kategori', $aset->kategori) == 'Lainnya') ? 'selected' : '' }}>{{ __('Others') }}</option>
                                 </select>
+                            </div>
+                            <div class="col-md-4" id="berat_container" style="display: none;">
+                                <label class="form-label fw-bold">{{ __('Weight (Grams)') }} <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" name="berat" id="berat" class="form-control" value="{{ old('berat', $aset->berat) }}">
+                                    <span class="input-group-text">g</span>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">{{ __('Brand / Model') }}</label>
@@ -123,11 +131,11 @@
                                     <input type="number" name="harga_beli" class="form-control" value="{{ old('harga_beli', (int)$aset->harga_beli) }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" id="masa_pakai_container">
                                 <label class="form-label fw-bold">{{ __('Useful Life (Years)') }} <span class="text-danger">*</span></label>
-                                <input type="number" name="masa_pakai" class="form-control" value="{{ old('masa_pakai', $aset->masa_pakai) }}" required>
+                                <input type="number" name="masa_pakai" id="masa_pakai" class="form-control" value="{{ old('masa_pakai', $aset->masa_pakai) }}" required>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" id="nilai_sisa_container">
                                 <label class="form-label fw-bold">{{ __('Residual Value (Nilai Sisa)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
@@ -194,6 +202,43 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const kategoriSelect = document.querySelector('select[name="kategori"]');
+        const beratContainer = document.getElementById('berat_container');
+        const masaPakaiContainer = document.getElementById('masa_pakai_container');
+        const nilaiSisaContainer = document.getElementById('nilai_sisa_container');
+        const beratInput = document.getElementById('berat');
+        const masaPakaiInput = document.getElementById('masa_pakai');
+
+        function toggleFields() {
+            if (kategoriSelect.value === 'Investasi / Emas') {
+                beratContainer.style.display = 'block';
+                beratInput.setAttribute('required', 'required');
+                
+                masaPakaiContainer.style.display = 'none';
+                masaPakaiInput.removeAttribute('required');
+                nilaiSisaContainer.style.display = 'none';
+            } else {
+                beratContainer.style.display = 'none';
+                beratInput.removeAttribute('required');
+                
+                masaPakaiContainer.style.display = 'block';
+                masaPakaiInput.setAttribute('required', 'required');
+                nilaiSisaContainer.style.display = 'block';
+            }
+        }
+
+        // Run on load to handle old() values or page refresh
+        toggleFields();
+
+        // Run on change
+        kategoriSelect.addEventListener('change', toggleFields);
+    });
+</script>
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
