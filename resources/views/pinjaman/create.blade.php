@@ -90,7 +90,7 @@
                                 <label for="jumlah_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Amount (Rp)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light">Rp</span>
-                                    <input type="number" class="form-control @error('jumlah_pinjaman') is-invalid @enderror" id="jumlah_pinjaman" name="jumlah_pinjaman" value="{{ old('jumlah_pinjaman') }}" placeholder="0" min="0" step="1000" required>
+                                    <input type="number" class="form-control @error('jumlah_pinjaman') is-invalid @enderror" id="jumlah_pinjaman" name="jumlah_pinjaman" value="{{ old('jumlah_pinjaman') }}" placeholder="0" min="0" step="any" required>
                                 </div>
                                 @error('jumlah_pinjaman')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
