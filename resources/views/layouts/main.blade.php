@@ -145,6 +145,8 @@
             observer.observe(document.documentElement, { attributes: true });
             
             document.body.addEventListener('click', function(e) {
+                if (e.defaultPrevented) return;
+
                 const link = e.target.closest('a');
                 if (!link) return;
                 
@@ -176,6 +178,8 @@
             });
 
             document.body.addEventListener('submit', function(e) {
+                if (e.defaultPrevented) return;
+                
                 const form = e.target;
                 if (form.getAttribute('target') !== '_blank' && !form.classList.contains('no-loader')) {
                     loader.classList.add('d-flex');
