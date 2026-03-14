@@ -164,6 +164,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('transaksi', TransaksiController::class)->parameters(['transaksi' => 'hash']);
 
     // Pinjaman & More
+    Route::delete('/pinjaman/bulk-delete', [PinjamanController::class, 'bulkDelete'])->name('pinjaman.bulkDelete');
     Route::get('/pinjaman/export/excel', [PinjamanController::class, 'exportExcel'])->name('pinjaman.export.excel');
     Route::resource('pinjaman', PinjamanController::class)->parameters(['pinjaman' => 'hash']);
     Route::post('/pinjaman/{hash}/bayar', [BayarPinjamanController::class, 'bayar'])->name('pinjaman.bayar');
