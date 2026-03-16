@@ -186,7 +186,7 @@
                 <div class="card-header bg-white border-bottom py-3">
                      <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
-                             {{ __('Net Worth Ratio') }}
+                             {{ __('Net Worth') }}
                         </h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Your solvency and wealth status.') }}</p>
                     </div>
@@ -194,8 +194,8 @@
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
-                            <h2 class="fw-bold mb-0 {{ $netWorthRatio >= 1 ? 'text-success' : 'text-danger' }}" style="font-size: 2.5rem;">{{ $netWorthRatio }}x</h2>
-                            <p class="text-muted small fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">{{ __('Asset-to-Debt Ratio') }}</p>
+                            <h2 class="fw-bold mb-0 {{ $netWorth >= 1 ? 'text-success' : 'text-danger' }}" style="font-size: 2.5rem;">{{ $netWorth }}</h2>
+                            {{-- <p class="text-muted small fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">{{ __('Asset-to-Debt Ratio') }}</p> --}}
                         </div>
                     </div>
 
@@ -224,20 +224,21 @@
                     <div class="row g-3">
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
-                                <p class="text-muted small mb-1">{{ __('Total Assets') }} + {{ __('Emergency Fund') }}</p>
+                                <p class="text-muted small mb-1"><a href="{{ url($prefix ?? 'aset') }}" target="_blank" class="text-decoration-underline">{{ __('Total Assets') }}</a></p>+
+                                <p class="text-muted small mb-1"><a href="{{ url($prefix ?? 'dana-darurat') }}" target="_blank" class="text-decoration-underline">{{ __('Emergency Fund') }}</a></p>
                                 <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalAset + $totalDanaDarurat, 0, ',', '.') }}</h6>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border-0 shadow-none">
-                                <p class="text-muted small mb-1">{{ __('Total Debt') }}</p>
+                                <p class="text-muted small mb-1"><a href="{{ url($prefix ?? 'pinjaman') }}" target="_blank" class="text-decoration-underline">{{ __('Total Debt') }}</a></p>
                                 <h6 class="fw-bold mb-0 text-dark">Rp {{ number_format($totalHutang, 0, ',', '.') }}</h6>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-4 text-center">
-                        @if($netWorthRatio >= 1)
+                        @if($netWorth >= 1)
                         <div class="alert alert-success border-0 shadow-sm py-2 mb-0" style="border-radius: 10px;">
                             <i class="bi bi-shield-check-fill me-2"></i>
                             <span class="small fw-bold">{{ __('Your assets comfortably cover your debts.') }}</span>
