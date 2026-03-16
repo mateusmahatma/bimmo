@@ -538,5 +538,8 @@
     "Select one or both": "Pilih salah satu atau keduanya",
     "Please fill in at least one transaction type (Income or Expense) completely with an amount greater than 0.": "Silakan isi minimal satu jenis transaksi (Pemasukan atau Pengeluaran) dengan lengkap dan nominal lebih dari 0.",
     "Please complete the Income section (both category and amount).": "Silakan lengkapi bagian Pemasukan (kategori dan nominal).",
-    "Please complete the Expense section (both category and amount).": "Silakan lengkapi bagian Pengeluaran (kategori dan nominal)."
+    "Please complete the Expense section (both category and amount).": "Silakan lengkapi bagian Pengeluaran (kategori dan nominal).",
+    "Net Worth": "Kekayaan Bersih",
+    "Your overall financial position.": "Posisi keuangan keseluruhan Anda.",
+    "Liabilities": "Kewajiban"
 }
