@@ -205,7 +205,8 @@ class DashboardController extends Controller
         $totalAset = (float)$totalAsetPhysical;
         $totalDanaDarurat = (float)$totalDanaDarurat;
         $totalHutang = (float)$totalPinjaman;
-        $netWorthRatio = $totalHutang > 0 ? round(($totalAset + $totalDanaDarurat) / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
+        // $netWorthRatio = $totalHutang > 0 ? round(($totalAset + $totalDanaDarurat) / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
+        $netWorth = ($totalAset + $totalDanaDarurat) - $totalHutang;
 
         return view('dashboard.index', compact(
             'totalPinjaman',
@@ -244,7 +245,8 @@ class DashboardController extends Controller
             'persentaseDanaDarurat',
             'totalAset',
             'totalHutang',
-            'netWorthRatio'
+            // 'netWorthRatio',
+            'netWorth'
         ));
     }
 
