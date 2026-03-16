@@ -156,6 +156,17 @@
                             {!! __('Gold Book Value is updated automatically based on current live market price (Rp :livePrice / gram). No depreciation applied.', [
                                 'livePrice' => number_format(\App\Services\GoldPriceService::getPricePerGram(), 0, ',', '.')
                             ]) !!}
+                            <hr class="my-2">
+                            <div class="d-flex align-items-center opacity-75" style="font-size: 0.75rem;">
+                                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                                <span>
+                                    {{ __('Note: This value is based on global spot prices (XAU/USD) from') }} 
+                                    <a href="https://www.goldapi.io" target="_blank" class="text-decoration-none fw-bold">GoldAPI.io</a> 
+                                    {{ __('and converted to IDR via') }}
+                                    <a href="https://open.er-api.com" target="_blank" class="text-decoration-none fw-bold">Exchange Rate API</a>.
+                                    {{ __('Prices may vary from local physical gold stores (e.g., Antam, Pegadaian).') }}
+                                </span>
+                            </div>
                         @else
                             {!! __('Depreciation is calculated using the :method over :years years with a residual value of Rp :residual.', [
                                 'method' => '<strong>' . __('Straight-Line Method') . '</strong>',
