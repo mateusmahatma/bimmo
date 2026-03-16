@@ -93,12 +93,14 @@ class Aset extends Model
             return 0;
         }
 
-        if ($this->kategori === 'Investasi / Emas' && $this->berat > 0) {
-            $livePrice = GoldPriceService::getPricePerGram();
-            if ($livePrice) {
-                return $this->berat * $livePrice;
+        if ($this->kategori === 'Investasi / Emas') {
+            if ($this->berat > 0) {
+                $livePrice = GoldPriceService::getPricePerGram();
+                if ($livePrice) {
+                    return $this->berat * $livePrice;
+                }
             }
-            // Fallback to purchase price if API fails completely
+            // Fallback to purchase price if weight is 0 or API fails completely
             return $this->harga_beli;
         }
 
@@ -112,6 +114,10 @@ class Aset extends Model
         $bulanTerpakai = $tanggalPembelian->diffInMonths($sekarang);
 
         if ($bulanTerpakai <= 0) {
+            return $this->harga_beli;
+        }
+
+        if ($totalBulan <= 0) {
             return $this->harga_beli;
         }
 
