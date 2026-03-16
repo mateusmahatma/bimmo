@@ -194,7 +194,7 @@
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
-                            <h2 class="fw-bold mb-0 {{ $netWorth >= 1 ? 'text-success' : 'text-danger' }}" style="font-size: 2.5rem;">{{ $netWorth }}</h2>
+                            <h2 class="fw-bold mb-0 {{ $netWorthFormatted >= 1 ? 'text-success' : 'text-danger' }}" style="font-size: 2.5rem;">{{ $netWorthFormatted }}</h2>
                             {{-- <p class="text-muted small fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">{{ __('Asset-to-Debt Ratio') }}</p> --}}
                         </div>
                     </div>

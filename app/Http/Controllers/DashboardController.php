@@ -207,6 +207,7 @@ class DashboardController extends Controller
         $totalHutang = (float)$totalPinjaman;
         // $netWorthRatio = $totalHutang > 0 ? round(($totalAset + $totalDanaDarurat) / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
         $netWorth = ($totalAset + $totalDanaDarurat) - $totalHutang;
+        $netWorthFormatted = number_format($netWorth, 0, ',', '.');
 
         return view('dashboard.index', compact(
             'totalPinjaman',
@@ -246,7 +247,8 @@ class DashboardController extends Controller
             'totalAset',
             'totalHutang',
             // 'netWorthRatio',
-            'netWorth'
+            'netWorth',
+            'netWorthFormatted'
         ));
     }
 
