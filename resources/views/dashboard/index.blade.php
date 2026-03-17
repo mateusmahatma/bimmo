@@ -14,10 +14,16 @@
             </ol>
         </nav>
     </div>
-    <a href="{{ route('transaksi.create') }}" class="btn btn-danger rounded-pill px-4 shadow-sm d-flex align-items-center gap-2">
-        <i class="bi bi-plus-circle-fill fs-5"></i>
-        <span class="fw-bold">{{ __('Record Now') }}</span>
-    </a>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-light rounded-pill px-4 border shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#notesModal">
+            <i class="bi bi-sticky fs-5 text-primary"></i>
+            <span class="fw-bold text-dark">{{ __('Reminders') }}</span>
+        </button>
+        <a href="{{ route('transaksi.create') }}" class="btn btn-danger rounded-pill px-4 shadow-sm d-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle-fill fs-5"></i>
+            <span class="fw-bold">{{ __('Record Now') }}</span>
+        </a>
+    </div>
 </div>
 
 <section class="dashboard">
@@ -450,6 +456,7 @@
 
         @include('modal.dashboard.detail')
         @include('modal.dashboard.rasio')
+        @include('modal.dashboard.notes')
 </section>
 @endsection
 
