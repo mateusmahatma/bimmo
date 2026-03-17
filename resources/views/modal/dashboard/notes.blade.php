@@ -3,9 +3,7 @@
         <div class="modal-content border-0 shadow-lg p-0" style="border-radius: 20px; overflow: hidden; background-color: #000000;">
             <div class="modal-header border-0 py-4 px-4 align-items-center" style="background-color: #0a0a0a;">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="icon-box bg-primary bg-opacity-20 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="bi bi-journal-check fs-4"></i>
-                    </div>
+                    <i class="bi bi-journal-check-fill fs-2" style="color: #3b82f6;"></i>
                     <div>
                         <h5 class="modal-title fw-bold mb-0 text-white" id="notesModalLabel">{{ __('Personal Reminders') }}</h5>
                         <p class="text-secondary small mb-0">{{ __('Manage your daily tasks and notes.') }}</p>
