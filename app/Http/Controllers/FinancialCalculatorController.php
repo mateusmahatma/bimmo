@@ -17,26 +17,31 @@ class FinancialCalculatorController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $userId = Auth::id();
-            $data = HasilProsesAnggaran::where('id_user', $userId)->orderBy('created_at', 'desc')->get();
+        $userId = Auth::id();
+        $query = HasilProsesAnggaran::where('id_user', $userId);
 
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('hash', fn ($row) => Hashids::encode($row->id_proses_anggaran))
-                ->addColumn('nama_jenis_pengeluaran', function ($row) {
-                    $ids = $row->jenis_pengeluaran ?? [];
-                    return Pengeluaran::whereIn('id', $ids)->pluck('nama')->toArray();
-                })
-                ->addColumn('sisa_anggaran', function ($row) {
-                    $sisa = floatval($row->nominal_anggaran) - floatval($row->anggaran_yang_digunakan);
-                    $row->sisa_anggaran = $sisa; $row->save();
-                    return number_format($sisa, 0, ',', '.');
-                })
-                ->addColumn('aksi', fn ($request) => view('kalkulator.tombol')->with('request', $request))
-                ->rawColumns(['aksi'])->toJson();
+        // Search
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_anggaran', 'like', "%{$search}%")
+                    ->orWhere('tanggal_mulai', 'like', "%{$search}%")
+                    ->orWhere('tanggal_selesai', 'like', "%{$search}%");
+            });
         }
-        return view('kalkulator.index', ['hasilProses' => HasilProsesAnggaran::where('id_user', Auth::id())->get()]);
+
+        // Sort
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+        $query->orderBy($sort, $direction);
+
+        $hasilProses = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('kalkulator._table_list', compact('hasilProses'))->render();
+        }
+
+        return view('kalkulator.index', compact('hasilProses'));
     }
 
     public function store(Request $request)
@@ -52,10 +57,21 @@ class FinancialCalculatorController extends Controller
             $jenisPengeluaran = is_array($anggaran->id_pengeluaran) ? $anggaran->id_pengeluaran : json_decode($anggaran->id_pengeluaran, true);
             if (!is_array($jenisPengeluaran)) $jenisPengeluaran = [$anggaran->id_pengeluaran];
 
-            $totalTransaksi = Transaksi::where('id_user', $userId)->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])->get()->filter(fn($t)=>in_array($t->pengeluaran, $jenisPengeluaran))->sum(fn($t)=>(float)$t->nominal);
+            $allTrxInRange = Transaksi::where('id_user', $userId)->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])->get();
+            $totalTransaksi = $allTrxInRange->filter(fn($t)=>in_array((string)$t->pengeluaran, array_map('strval', $jenisPengeluaran)))->sum(fn($t)=>(float)$t->nominal);
+            
             $nominal = ($anggaran->persentase_anggaran / 100) * $totalIncome;
 
-            HasilProsesAnggaran::create(['tanggal_mulai' => $tanggal_mulai, 'tanggal_selesai' => $tanggal_selesai, 'nama_anggaran' => $anggaran->nama_anggaran, 'jenis_pengeluaran' => $anggaran->id_pengeluaran, 'persentase_anggaran' => $anggaran->persentase_anggaran, 'nominal_anggaran' => $nominal, 'anggaran_yang_digunakan' => $totalTransaksi, 'id_user' => $userId]);
+            HasilProsesAnggaran::create([
+                'tanggal_mulai' => $tanggal_mulai, 
+                'tanggal_selesai' => $tanggal_selesai, 
+                'nama_anggaran' => $anggaran->nama_anggaran, 
+                'jenis_pengeluaran' => $anggaran->id_pengeluaran, 
+                'persentase_anggaran' => $anggaran->persentase_anggaran, 
+                'nominal_anggaran' => $nominal, 
+                'anggaran_yang_digunakan' => $totalTransaksi, 
+                'id_user' => $userId
+            ]);
         }
         return response()->json(['success' => true, 'message' => 'Data anggaran berhasil diproses.', 'redirect' => url('/kalkulator')]);
     }
@@ -69,11 +85,20 @@ class FinancialCalculatorController extends Controller
             $prosesAnggaran->fill($request->all());
 
             $jenisPengeluaran = $prosesAnggaran->jenis_pengeluaran;
-            if (is_string($jenisPengeluaran)) { $decoded = json_decode($jenisPengeluaran, true); $jenisPengeluaran = is_array($decoded) ? $decoded : [$jenisPengeluaran]; }
-            elseif (is_int($jenisPengeluaran)) $jenisPengeluaran = [$jenisPengeluaran];
+            if (!is_array($jenisPengeluaran)) {
+                if (is_string($jenisPengeluaran)) {
+                    $decoded = json_decode($jenisPengeluaran, true);
+                    $jenisPengeluaran = is_array($decoded) ? $decoded : [$jenisPengeluaran];
+                } else {
+                    $jenisPengeluaran = [$jenisPengeluaran];
+                }
+            }
 
-            $totalTransaksi = Transaksi::where('id_user', $prosesAnggaran->id_user)->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])->get()->filter(fn($t)=>in_array($t->pengeluaran, $jenisPengeluaran))->sum(fn($t)=>(float)$t->nominal);
-            $prosesAnggaran->anggaran_yang_digunakan = $totalTransaksi; $prosesAnggaran->save();
+            $allTrxInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])->get();
+            $totalTransaksi = $allTrxInRange->filter(fn($t)=>in_array((string)$t->pengeluaran, array_map('strval', $jenisPengeluaran)))->sum(fn($t)=>(float)$t->nominal);
+            
+            $prosesAnggaran->anggaran_yang_digunakan = $totalTransaksi; 
+            $prosesAnggaran->save();
 
             return response()->json(['id' => Hashids::encode($prosesAnggaran->id_proses_anggaran), 'anggaran_digunakan_terkini' => number_format($totalTransaksi, 0, ',', '.'), 'sisa_anggaran' => number_format(floatval($prosesAnggaran->nominal_anggaran) - $totalTransaksi, 0, ',', '.')]);
         }
@@ -128,16 +153,61 @@ class FinancialCalculatorController extends Controller
         $id = Hashids::decode($hash)[0] ?? abort(404);
         $HasilProsesAnggaran = HasilProsesAnggaran::with('user')->findOrFail($id);
         $idPengeluaranList = $HasilProsesAnggaran->jenis_pengeluaran ?? [];
+        
         if (!is_array($idPengeluaranList)) {
-            if (is_string($idPengeluaranList)) { $decoded = json_decode($idPengeluaranList, true); $idPengeluaranList = is_array($decoded) ? $decoded : [$idPengeluaranList]; }
-            else { $idPengeluaranList = [$idPengeluaranList]; }
+            if (is_string($idPengeluaranList)) {
+                $decoded = json_decode($idPengeluaranList, true);
+                $idPengeluaranList = is_array($decoded) ? $decoded : [$idPengeluaranList];
+            } else {
+                $idPengeluaranList = [$idPengeluaranList];
+            }
         }
 
-        if ($request->ajax()) {
-            $transaksiColl = Transaksi::with('pengeluaranRelation')->where('id_user', $HasilProsesAnggaran->id_user)->whereDate('tgl_transaksi', '>=', $HasilProsesAnggaran->tanggal_mulai)->whereDate('tgl_transaksi', '<=', $HasilProsesAnggaran->tanggal_selesai)->get()->filter(fn($t)=>in_array($t->pengeluaran, $idPengeluaranList))->sortBy('tgl_transaksi')->values();
-            return DataTables::of($transaksiColl)->addIndexColumn()->addColumn('nama', fn($trx)=>$trx->pengeluaranRelation->nama??'-')->editColumn('tgl_transaksi', fn($trx)=>$trx->tgl_transaksi)->editColumn('nominal', fn($trx)=>$trx->nominal)->editColumn('keterangan', fn($trx)=>$trx->keterangan??'-')->make(true);
+        $allTransactions = Transaksi::with('pengeluaranRelation')
+            ->where('id_user', $HasilProsesAnggaran->id_user)
+            ->whereBetween('tgl_transaksi', [$HasilProsesAnggaran->tanggal_mulai, $HasilProsesAnggaran->tanggal_selesai])
+            ->get();
+
+        $filteredTransactions = $allTransactions->filter(function ($t) use ($idPengeluaranList) {
+            return in_array((string)$t->pengeluaran, array_map('strval', $idPengeluaranList));
+        });
+
+        // Search in details
+        if ($request->has('search') && !empty($request->search)) {
+            $search = strtolower($request->search);
+            $filteredTransactions = $filteredTransactions->filter(function ($t) use ($search) {
+                $categoryName = strtolower($t->pengeluaranRelation->nama ?? '');
+                $keterangan = strtolower($t->keterangan ?? '');
+                return str_contains($categoryName, $search) || str_contains($keterangan, $search);
+            });
         }
-        $namaPengeluaran = Pengeluaran::whereIn('id', $idPengeluaranList)->pluck('nama')->toArray(); $total = count($namaPengeluaran);
-        return view('kalkulator.show', compact('HasilProsesAnggaran', 'total', 'namaPengeluaran'));
+
+        // Sort in details
+        $sort = $request->get('sort', 'tgl_transaksi');
+        $direction = $request->get('direction', 'asc');
+        
+        if ($direction === 'asc') {
+            $filteredTransactions = $filteredTransactions->sortBy($sort);
+        } else {
+            $filteredTransactions = $filteredTransactions->sortByDesc($sort);
+        }
+
+        // Manual Pagination
+        $page = $request->get('page', 1);
+        $perPage = 10;
+        $items = $filteredTransactions->forPage($page, $perPage)->values();
+        $transaksi = new \Illuminate\Pagination\LengthAwarePaginator($items, $filteredTransactions->count(), $perPage, $page, [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]);
+
+        if ($request->ajax()) {
+            return view('kalkulator._transaction_table', compact('transaksi', 'HasilProsesAnggaran'))->render();
+        }
+
+        $namaPengeluaran = Pengeluaran::whereIn('id', $idPengeluaranList)->pluck('nama')->toArray();
+        $total = count($namaPengeluaran);
+        
+        return view('kalkulator.show', compact('HasilProsesAnggaran', 'total', 'namaPengeluaran', 'transaksi'));
     }
 }
