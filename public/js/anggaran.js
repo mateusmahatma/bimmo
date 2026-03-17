@@ -6,11 +6,12 @@ $(document).ready(function () {
         }
     });
 
-    const csrfToken = window.csrfToken;
+    let currentSort = 'created_at';
+    let currentDirection = 'desc';
+    let currentSearch = '';
 
     // Toast Notification
     function showToast(message, type) {
-
         let toastContainer = document.querySelector('.toast-container');
         if (!toastContainer) {
             toastContainer = document.createElement('div');
@@ -45,122 +46,97 @@ $(document).ready(function () {
 
     // Initialize TomSelect
     let tomSelectInstance;
-    if ($('#id_pengeluaran').length) {
-        tomSelectInstance = new TomSelect('#id_pengeluaran', {
-            plugins: ['remove_button'],
-            create: false,
-            maxItems: null,
-            hideSelected: true,
-            closeAfterSelect: false,
-            persist: false
+    function initTomSelect() {
+        if ($('#id_pengeluaran').length && !$('#id_pengeluaran')[0].tomselect) {
+            tomSelectInstance = new TomSelect('#id_pengeluaran', {
+                plugins: ['remove_button'],
+                create: false,
+                maxItems: null,
+                hideSelected: true,
+                closeAfterSelect: false,
+                persist: false
+            });
+        }
+    }
+    initTomSelect();
+
+    // Fetch Data Function
+    function fetchAnggaran(url = '/anggaran') {
+        const urlObj = new URL(url, window.location.origin);
+        if (currentSearch) urlObj.searchParams.set('search', currentSearch);
+        urlObj.searchParams.set('sort', currentSort);
+        urlObj.searchParams.set('direction', currentDirection);
+
+        $('#tableContainer').addClass('opacity-50');
+
+        $.ajax({
+            url: urlObj.toString(),
+            type: 'GET',
+            success: function (response) {
+                $('#tableContainer').html(response.html).removeClass('opacity-50');
+                updateSummary(response.totalPersentase, response.exceedMessage);
+                updateBulkButton();
+            },
+            error: function () {
+                showToast('Gagal mengambil data.', 'danger');
+                $('#tableContainer').removeClass('opacity-50');
+            }
         });
     }
 
-    // DataTable Initialization
-    const table = $('#anggaranTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '/anggaran',
-            type: 'GET',
-            dataSrc: function (json) {
-                // Update Summary Card
-                if (json.totalPersentase !== undefined) {
-                    const total = json.totalPersentase;
-                    $('#totalPersentase').text(total + '%');
-                    $('#totalPersentaseLabel').text(total + '% / 100%');
+    function updateSummary(total, exceedMessage) {
+        $('#totalPersentase').text(total + '%');
+        $('#totalPersentaseLabel').text(total + '% / 100%');
 
-                    const progressBar = $('#totalAllocationBar');
-                    if (progressBar.length) {
-                        progressBar.css('width', Math.min(total, 100) + '%');
-                        progressBar.attr('aria-valuenow', total);
-                        if (total > 100) {
-                            progressBar.removeClass('bg-primary').addClass('bg-danger');
-                        } else {
-                            progressBar.removeClass('bg-danger').addClass('bg-primary');
-                        }
-                    }
-
-                    // Handle Exceed Message
-                    const exceedMsg = $('#exceedMessage');
-                    if (total > 100) {
-                        exceedMsg.text('Melebihi 100%!').removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
-                    } else if (total < 100 && total > 0) {
-                        if (json.exceedMessage) {
-                            exceedMsg.text(json.exceedMessage).removeClass('d-none bg-danger text-white').addClass('bg-warning text-dark');
-                        } else {
-                            exceedMsg.addClass('d-none');
-                        }
-                    } else {
-                        exceedMsg.addClass('d-none');
-                    }
-                }
-                return json.data;
+        const progressBar = $('#totalAllocationBar');
+        if (progressBar.length) {
+            progressBar.css('width', Math.min(total, 100) + '%');
+            progressBar.attr('aria-valuenow', total);
+            if (total > 100) {
+                progressBar.removeClass('bg-primary').addClass('bg-danger');
+            } else {
+                progressBar.removeClass('bg-danger').addClass('bg-primary');
             }
-        },
-        language: {
-            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
-        },
-        columns: [
-            {
-                data: 'id_anggaran', // Use id_anggaran !!
-                orderable: false,
-                searchable: false,
-                className: 'text-center',
-                render: function (data, type, row) {
-                    return `<input class="form-check-input check-item" type="checkbox" value="${data}">`;
-                }
-            },
-            { data: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center d-none d-md-table-cell' },
-            { data: 'nama_anggaran' },
-            {
-                data: 'persentase_anggaran',
-                className: 'text-center',
-                render: function (data) {
-                    return data + '%';
-                }
-            },
-            {
-                data: 'list_pengeluaran',
-                orderable: false,
-                render: function (data) {
-                    if (!data || data.length === 0) return '<span class="text-muted">-</span>';
-                    if (!Array.isArray(data)) return data;
+        }
 
-                    let display = data.slice(0, 3).map((item, i) =>
-                        `<span class="badge bg-light text-dark border me-1 mb-1">${item}</span>`
-                    ).join('');
-
-                    if (data.length > 3) {
-                        display += `<span class="badge bg-light text-muted border mb-1">+${data.length - 3} more</span>`;
-                    }
-                    return display;
-                }
-            },
-            {
-                data: 'created_at',
-                className: 'align-middle text-center text-muted small d-none d-md-table-cell',
-                render: function (data) {
-                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
-                }
-            },
-            {
-                data: 'updated_at',
-                className: 'align-middle text-center text-muted small d-none d-md-table-cell',
-                render: function (data) {
-                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
-                }
-            },
-            {
-                data: 'aksi',
-                orderable: false,
-                searchable: false,
-                className: 'align-middle text-center',
-                render: function (data) {
-                    return data;
-                }
+        const exceedMsg = $('#exceedMessage');
+        if (total > 100) {
+            exceedMsg.text('Melebihi 100%!').removeClass('d-none bg-warning text-dark').addClass('bg-danger text-white');
+        } else if (total < 100 && total > 0) {
+            if (exceedMessage) {
+                exceedMsg.text(exceedMessage).removeClass('d-none bg-danger text-white').addClass('bg-warning text-dark');
+            } else {
+                exceedMsg.addClass('d-none');
             }
-        ]
+        } else {
+            exceedMsg.addClass('d-none');
+        }
+    }
+
+    // Search with Debounce
+    let searchTimer;
+    $(document).on('input', '#entrySearch', function () {
+        clearTimeout(searchTimer);
+        currentSearch = $(this).val();
+        searchTimer = setTimeout(() => {
+            fetchAnggaran();
+        }, 500);
+    });
+
+    // Sorting
+    $('#tableContainer').on('click', '.sort-link', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        currentSort = $(this).data('sort');
+        currentDirection = $(this).data('direction');
+        fetchAnggaran();
+    });
+
+    // Pagination
+    $('#tableContainer').on('click', '.ajax-pagination a', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        fetchAnggaran($(this).attr('href'));
     });
 
     // CRUD Functions
@@ -210,20 +186,16 @@ $(document).ready(function () {
             url: url,
             type: type,
             data: data,
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: function (response) {
                 showToast(response.message || 'Data berhasil disimpan', 'success');
                 $('#anggaranModal').modal('hide');
-                table.ajax.reload();
+                fetchAnggaran();
             },
             error: function (xhr) {
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
                     const errors = xhr.responseJSON.errors;
-                    let msg = 'Kesalahan Validasi';
                     const firstKey = Object.keys(errors)[0];
-                    if (firstKey) msg = errors[firstKey][0];
-
-                    showToast(msg, 'danger');
+                    showToast(errors[firstKey][0], 'danger');
                 } else {
                     showToast('Gagal menyimpan data.', 'danger');
                 }
@@ -241,8 +213,9 @@ $(document).ready(function () {
         $('#anggaranModal').modal('show');
     });
 
-    $('body').on('click', '.tombol-edit-anggaran', function (e) {
+    $('#tableContainer').on('click', '.tombol-edit-anggaran', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         $.get('/anggaran/' + id + '/edit', function (res) {
@@ -256,23 +229,28 @@ $(document).ready(function () {
 
             if (tomSelectInstance) {
                 tomSelectInstance.clear();
-                // Add and select options
-                Object.entries(anggaran.id_pengeluaran).forEach(([key, val]) => {
-                    if (!tomSelectInstance.options[key]) {
-                        tomSelectInstance.addOption({ value: key, text: val });
+                let selectedIds = [];
+                if (Array.isArray(anggaran.id_pengeluaran)) {
+                    selectedIds = anggaran.id_pengeluaran.map(id => String(id));
+                } else if (typeof anggaran.id_pengeluaran === 'string') {
+                    try {
+                        const parsed = JSON.parse(anggaran.id_pengeluaran);
+                        selectedIds = Array.isArray(parsed) ? parsed.map(id => String(id)) : [];
+                    } catch (e) {
+                        selectedIds = [];
                     }
-                });
-                tomSelectInstance.setValue(Object.keys(anggaran.id_pengeluaran));
+                }
+                tomSelectInstance.setValue(selectedIds);
             }
 
             $('#anggaranModal').data('id', id);
             $('#anggaranModal').modal('show');
         }).fail(function () {
-            showToast('Failed to fetch data', 'danger');
+            showToast('Gagal mengambil data anggaran.', 'danger');
         });
     });
 
-    $('body').on('click', '.tombol-simpan-anggaran', function (e) {
+    $(document).on('click', '.tombol-simpan-anggaran', function (e) {
         e.preventDefault();
         const id = $('#anggaranModal').data('id');
         saveBudget(!!id, id);
@@ -280,8 +258,9 @@ $(document).ready(function () {
 
     $('#anggaranModal').on('hidden.bs.modal', resetForm);
 
-    $('body').on('click', '.tombol-del-anggaran', function (e) {
+    $('#tableContainer').on('click', '.tombol-del-anggaran', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         Swal.fire({
@@ -298,10 +277,9 @@ $(document).ready(function () {
                 $.ajax({
                     url: '/anggaran/' + id,
                     type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function () {
                         showToast('Data berhasil dihapus', 'success');
-                        table.ajax.reload();
+                        fetchAnggaran();
                     },
                     error: function () {
                         showToast('Gagal menghapus data', 'danger');
@@ -311,39 +289,30 @@ $(document).ready(function () {
         });
     });
 
-    // ----------------------------------------------------------------
-    // BULK DELETE LOGIC
-    // ----------------------------------------------------------------
-
-    // Check All
+    // Bulk Delete
     $(document).on('change', '#checkAll', function () {
-        const isChecked = $(this).is(':checked');
-        $('.check-item').prop('checked', isChecked);
+        $('.check-item').prop('checked', $(this).is(':checked'));
         updateBulkButton();
     });
 
-    // Check Item
     $(document).on('change', '.check-item', function () {
-        var total = $('.check-item').length;
-        var checked = $('.check-item:checked').length;
-
-        $('#checkAll').prop('checked', total === checked);
-        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
+        const all = $('.check-item').length;
+        const checked = $('.check-item:checked').length;
+        $('#checkAll').prop('checked', all === checked);
+        $('#checkAll').prop('indeterminate', checked > 0 && checked < all);
         updateBulkButton();
     });
 
-    // Update Button Visibility
     function updateBulkButton() {
-        const checkedCount = $('.check-item:checked').length;
-        $('#countSelected').text(checkedCount);
-        if (checkedCount > 0) {
+        const count = $('.check-item:checked').length;
+        $('#countSelected').text(count);
+        if (count > 0) {
             $('#btnBulkDelete').removeClass('d-none');
         } else {
             $('#btnBulkDelete').addClass('d-none');
         }
     }
 
-    // Handle Bulk Delete Click
     $('#btnBulkDelete').on('click', function () {
         const ids = [];
         $('.check-item:checked').each(function () {
@@ -354,42 +323,29 @@ $(document).ready(function () {
 
         Swal.fire({
             title: `Hapus ${ids.length} anggaran?`,
-            text: "Anda tidak akan dapat mengembalikan ini!",
+            text: "Tindakan ini tidak dapat dibatalkan!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus yang dipilih!',
+            confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
-
                 $.ajax({
                     url: '/anggaran/bulk-delete',
                     type: 'DELETE',
                     data: { ids: ids },
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
                         showToast(response.message, 'success');
-                        table.ajax.reload();
+                        fetchAnggaran();
                         $('#checkAll').prop('checked', false);
-                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
                     },
-                    error: function (xhr) {
-                        showToast('Gagal menghapus anggaran yang dipilih.', 'danger');
-                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                    error: function () {
+                        showToast('Gagal menghapus data yang dipilih.', 'danger');
                     }
                 });
             }
         });
-    });
-
-    // Reset check all on page change
-    table.on('draw', function () {
-        $('#checkAll').prop('checked', false);
-        $('#checkAll').prop('indeterminate', false);
-        updateBulkButton();
     });
 });

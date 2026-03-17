@@ -18,7 +18,6 @@ class HasilProsesAnggaran extends Model
         'jenis_pengeluaran' => 'array',
         'nominal_anggaran' => 'encrypted',
         'anggaran_yang_digunakan' => 'encrypted',
-        'sisa_anggaran' => 'encrypted',
     ];
 
     protected $fillable = [
@@ -33,7 +32,7 @@ class HasilProsesAnggaran extends Model
         'id_user',
     ];
 
-    protected $appends = ['nama_jenis_pengeluaran'];
+    protected $appends = ['nama_jenis_pengeluaran', 'remaining_budget'];
 
     public function user()
     {
@@ -61,5 +60,12 @@ class HasilProsesAnggaran extends Model
             ->toArray();
 
         return implode(', ', $namaList);
+    }
+
+    public function getRemainingBudgetAttribute()
+    {
+        $nominal = (float)$this->nominal_anggaran;
+        $used = (float)$this->anggaran_yang_digunakan;
+        return $nominal - $used;
     }
 }

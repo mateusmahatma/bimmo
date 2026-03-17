@@ -13,70 +13,56 @@ class AnggaranController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
+        $query = Anggaran::where('id_user', $userId);
 
-        if ($request->ajax()) {
-            $query = Anggaran::where('id_user', $userId);
-
-            $totalPersentase = (clone $query)->sum('persentase_anggaran');
-
-            $exceedMessage = null;
-            if ($totalPersentase > 100) {
-                $exceedMessage = 'Persentase anggaran melebihi 100%!';
-            }
-            elseif ($totalPersentase < 100) {
-                $exceedMessage = 'Persentase anggaran kurang dari 100%!';
-            }
-
-            return DataTables::eloquent($query)
-                ->addIndexColumn()
-                ->addColumn('nama_anggaran', fn($row) => $row->nama_anggaran)
-                ->addColumn('persentase_anggaran', fn($row) => $row->persentase_anggaran)
-                ->addColumn('list_pengeluaran', function ($row) {
-                if (empty($row->id_pengeluaran))
-                    return [];
-                return Pengeluaran::whereIn('id', $row->id_pengeluaran)
-                    ->pluck('nama')
-                    ->toArray();
-            })
-                ->editColumn('created_at', function ($row) {
-                return $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '-';
-            })
-                ->editColumn('updated_at', function ($row) {
-                return $row->updated_at ? $row->updated_at->format('Y-m-d H:i:s') : '-';
-            })
-                ->addColumn('aksi', fn($row) => view('anggaran.tombol', ['request' => $row])->render())
-                ->rawColumns(['aksi'])
-                ->with('totalPersentase', $totalPersentase)
-                ->with('exceedMessage', $exceedMessage)
-                ->toJson();
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama_anggaran', 'LIKE', "%{$search}%");
         }
 
-        // ambil id pengeluaran yang sudah dipakai
-        $usedPengeluaranIds = Anggaran::where('id_user', $userId)
-            ->whereNotNull('id_pengeluaran')
-            ->pluck('id_pengeluaran')
-            ->map(function ($val) {
-            // kalau tersimpan JSON array → decode dulu
-            if (is_string($val) && str_starts_with($val, '[')) {
-                return json_decode($val, true);
-            }
-            return $val;
-        })
-            ->flatten() // ratakan nested array
-            ->filter(fn($id) => is_numeric($id)) // hanya angka
-            ->unique()
-            ->values()
-            ->toArray();
+        // Summary calculations (before sorting/pagination)
+        $totalPersentase = (clone $query)->sum('persentase_anggaran');
+        $exceedMessage = null;
+        if ($totalPersentase > 100) {
+            $exceedMessage = 'Persentase anggaran melebihi 100%!';
+        }
+        elseif ($totalPersentase < 100 && $totalPersentase > 0) {
+            $exceedMessage = 'Persentase anggaran kurang dari 100%!';
+        }
 
-        $pengeluarans = Pengeluaran::where('id_user', $userId)
-            ->when(!empty($usedPengeluaranIds), function ($q) use ($usedPengeluaranIds) {
-            $q->whereNotIn('id', $usedPengeluaranIds);
-        })
-            ->get();
+        // Sort
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        $allowedSort = ['nama_anggaran', 'persentase_anggaran', 'created_at', 'updated_at'];
+        if (in_array($sort, $allowedSort)) {
+            $query->orderBy($sort, $direction);
+        }
+        else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $anggarans = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('anggaran._table_list', [
+                    'anggarans' => $anggarans,
+                    'sort' => $sort,
+                    'direction' => $direction
+                ])->render(),
+                'totalPersentase' => $totalPersentase,
+                'exceedMessage' => $exceedMessage,
+            ]);
+        }
+
+        // Ambil semua pengeluaran user (tidak difilter agar edit modal bisa menampilkan yang sudah terpilih)
+        $pengeluarans = Pengeluaran::where('id_user', $userId)->get();
 
         $anggaran = new Anggaran();
 
-        return view('anggaran.index', compact('anggaran', 'pengeluarans'));
+        return view('anggaran.index', compact('anggarans', 'anggaran', 'pengeluarans', 'totalPersentase', 'exceedMessage', 'sort', 'direction'));
     }
 
     public function store(Request $request)
@@ -164,6 +150,10 @@ class AnggaranController extends Controller
 
         // Tampilkan semua pengeluaran user agar bisa diubah
         $pengeluarans = Pengeluaran::where('id_user', $userId)->get();
+
+        if (request()->ajax()) {
+            return response()->json(['result' => $anggaran]);
+        }
 
         return view('anggaran.edit', compact('anggaran', 'pengeluarans', 'selectedIds'));
     }

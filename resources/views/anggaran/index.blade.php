@@ -4,7 +4,7 @@
 
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
 <style>
     /* Header Enhancements */
     .pagetitle {
@@ -64,20 +64,25 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     .check-item { cursor: pointer; }
+    .progress { height: 10px !important; }
+    .progress-bar { transition: width 0.6s ease-in-out, background-color 0.3s ease !important; }
 
     .fab-add {
         position: fixed;
-        bottom: 2rem;
+        bottom: 2.5rem;
         right: 1.5rem;
         z-index: 1040;
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         display: none; /* Desktop hidden */
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 16px rgba(8, 174, 234, 0.4);
+        box-shadow: 0 4px 15px rgba(1, 41, 112, 0.3);
+        transition: all 0.3s ease;
+        padding: 0;
     }
+    .fab-add i { font-size: 1.5rem !important; }
 
     @media (max-width: 767.98px) {
         .fab-add {
@@ -233,17 +238,17 @@
                             <p class="text-muted small mb-0">{{ __('Percentage allocation across all your budget categories.') }}</p>
                         </div>
                         <div class="text-end">
-                            <h2 class="fw-bold mb-0 text-primary" id="totalPersentase">0%</h2>
+                            <h2 class="fw-bold mb-0 text-primary" id="totalPersentase">{{ $totalPersentase }}%</h2>
                         </div>
                     </div>
 
                     <div class="mt-2 pt-3 border-top">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="text-muted small fw-medium">{{ __('Total distributed percentage') }}</span>
-                            <span class="text-dark small fw-bold" id="totalPersentaseLabel">0% / 100%</span>
+                            <span class="text-dark small fw-bold" id="totalPersentaseLabel">{{ $totalPersentase }}% / 100%</span>
                         </div>
                         <div class="progress rounded-pill bg-light" style="height: 10px;">
-                            <div class="progress-bar bg-primary rounded-pill" id="totalAllocationBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar {{ $totalPersentase > 100 ? 'bg-danger' : 'bg-primary' }} rounded-pill" id="totalAllocationBar" role="progressbar" style="width: {{ min($totalPersentase, 100) }}%;" aria-valuenow="{{ $totalPersentase }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between mt-2 align-items-center">
                             <small class="text-muted italic small">{{ __('Manage your allocation properly to avoid overspending.') }}</small>
@@ -256,42 +261,34 @@
 
         <div class="col-lg-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('List of Budgets') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your budget allocations efficiently.') }}</p>
                     </div>
-                    <div class="d-flex gap-2 w-100 w-md-auto justify-content-md-end">
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3 flex-fill flex-md-grow-0">
-                            <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
+                    <div class="d-flex gap-2">
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('anggaran.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-fill flex-md-grow-0 btn-add-desktop">
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill shadow-sm tombol-tambah-anggaran btn-add-desktop" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add New') }}
-                        </a>
+                        </button>
                     </div>
                 </div>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table id="anggaranTable" class="table table-hover align-middle mb-0" style="width:100%">
-                            <thead class="bg-light">
-                                <tr style="border-bottom: 2px solid #edf2f9;">
-                                    <th style="width: 5%;" class="text-center py-3">
-                                        <div class="form-check d-flex justify-content-center">
-                                            <input class="form-check-input" type="checkbox" id="checkAll" style="cursor: pointer;">
-                                        </div>
-                                    </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">No</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Budget Name') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Percentage') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Expense Types') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">{{ __('Created At') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3 d-none d-md-table-cell">{{ __('Last Updated') }}</th>
-                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                <div class="card-body">
+                    <!-- SEARCH BAR -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+                        <div class="search-bar" style="min-width: 200px;">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" id="entrySearch" class="form-control bg-light border-start-0 rounded-end-pill shadow-none" style="font-size: 0.8rem;" placeholder="{{ __('Search budget...') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tableContainer">
+                        @include('anggaran._table_list')
                     </div>
                 </div>
             </div>
@@ -299,8 +296,8 @@
     </div>
 
     <!-- Floating Action Button for Mobile -->
-    <a href="{{ route('anggaran.create') }}" class="btn btn-primary fab-add" title="{{ __('Add Budget') }}">
-        <i class="bi bi-plus-lg fs-2"></i>
+    <a href="javascript:void(0)" class="btn btn-primary fab-add tombol-tambah-anggaran" title="{{ __('Add Budget') }}">
+        <i class="bi bi-plus-lg"></i>
     </a>
 </section>
 
@@ -311,8 +308,7 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/anggaran.js') }}?v={{ filemtime(public_path('js/anggaran.js')) }}"></script>
