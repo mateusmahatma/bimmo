@@ -296,10 +296,7 @@ class TransaksiController extends Controller
             }
 
             if (!empty($transaksi->pengeluaran) && $transaksi->nominal > 0) {
-                $hasil = HasilProsesAnggaran::whereJsonContains('jenis_pengeluaran', (string)$transaksi->pengeluaran)
-                    ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
-                    ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)->first();
-                if ($hasil) $hasil->increment('anggaran_yang_digunakan', (float)$transaksi->nominal);
+                $this->syncBudget($transaksi, true);
             }
 
             if ($transaksi->dompet_id) {
@@ -382,6 +379,9 @@ class TransaksiController extends Controller
                 }
             }
 
+            // Revert old budget impact
+            $this->syncBudget($transaksi, false);
+
             $transaksi->update($validatedData);
 
             // Apply new wallet balance
@@ -397,6 +397,17 @@ class TransaksiController extends Controller
                 }
             }
 
+            // Apply new budget impact
+            $this->syncBudget($transaksi, true);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data Transaksi Berhasil Diperbarui!',
+                    'redirect_url' => route('transaksi.index'),
+                    'redirect_name' => __('Transactions')
+                ]);
+            }
             return redirect()->route('transaksi.index')->with('success', 'Data Transaksi Berhasil Diperbarui!');
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi error: ' . $e->getMessage());
@@ -420,6 +431,9 @@ class TransaksiController extends Controller
                 $dompet->save();
             }
         }
+
+        // Revert budget impact before deleting
+        $this->syncBudget($transaksi, false);
 
         $transaksi->delete();
 
@@ -553,8 +567,52 @@ class TransaksiController extends Controller
     {
         $ids = $request->ids;
         if (!is_array($ids) || count($ids) === 0) return response()->json(['message' => 'No items selected'], 400);
-        $deleted = Transaksi::where('id_user', Auth::id())->whereIn('id', $ids)->delete();
-        return response()->json(['message' => $deleted . ' transactions deleted successfully']);
+        
+        $transactions = Transaksi::where('id_user', Auth::id())->whereIn('id', $ids)->get();
+        $deletedCount = 0;
+        foreach($transactions as $transaksi) {
+            // Revert wallet balance before deleting
+            if ($transaksi->dompet_id) {
+                $dompet = Dompet::find($transaksi->dompet_id);
+                if ($dompet) {
+                    if ($transaksi->nominal_pemasukan > 0) {
+                        $dompet->saldo = (float)$dompet->saldo - (float)$transaksi->nominal_pemasukan;
+                    } else if ($transaksi->nominal > 0) {
+                        $dompet->saldo = (float)$dompet->saldo + (float)$transaksi->nominal;
+                    }
+                    $dompet->save();
+                }
+            }
+            // Revert budget impact
+            $this->syncBudget($transaksi, false);
+            
+            $transaksi->delete();
+            $deletedCount++;
+        }
+        return response()->json(['message' => $deletedCount . ' transactions deleted successfully']);
+    }
+
+    private function syncBudget(Transaksi $transaksi, $isIncrement = true)
+    {
+        if (empty($transaksi->pengeluaran) || (float)$transaksi->nominal <= 0) return;
+
+        $hasil = HasilProsesAnggaran::where('id_user', $transaksi->id_user)
+            ->whereJsonContains('jenis_pengeluaran', (string)$transaksi->pengeluaran)
+            ->where('tanggal_mulai', '<=', $transaksi->tgl_transaksi)
+            ->where('tanggal_selesai', '>=', $transaksi->tgl_transaksi)
+            ->first();
+
+        if ($hasil) {
+            $currentUsed = (float)$hasil->getRawOriginal('anggaran_yang_digunakan') ? (float)$hasil->anggaran_yang_digunakan : 0;
+            $nominal = (float)$transaksi->nominal;
+            
+            if ($isIncrement) {
+                $hasil->anggaran_yang_digunakan = $currentUsed + $nominal;
+            } else {
+                $hasil->anggaran_yang_digunakan = max(0, $currentUsed - $nominal);
+            }
+            $hasil->save();
+        }
     }
 
     public function toggleStatus($id)
