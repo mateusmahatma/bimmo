@@ -6,64 +6,48 @@ $(document).ready(function () {
         }
     });
 
-    const csrfToken = window.csrfToken;
+    let debounceTimer;
+    const searchInput = $('#searchPengeluaran');
+    const tableContainer = $('#pengeluaran-table-container');
 
-    const table = $('#pengeluaranTable').DataTable({
-        paging: true,
-        responsive: true,
-        lengthChange: true,
-        autoWidth: false,
-        serverSide: true,
-        processing: true,
-        ajax: {
-            url: '/pengeluaran',
-            type: 'GET',
-        },
-        language: {
-            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
-        },
-        columns: [
-            {
-                data: 'id',
-                orderable: false,
-                searchable: false,
-                className: 'align-middle text-center',
-                render: function (data, type, row) {
-                    return `<div class="form-check d-flex justify-content-center"><input class="form-check-input check-item" type="checkbox" value="${data}" style="cursor: pointer;"></div>`;
-                }
-            },
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'align-middle text-center text-secondary fw-medium' },
-            {
-                data: 'nama',
-                className: 'align-middle fw-semibold text-dark',
-                render: function (data) {
-                    return `<span style="font-size: 0.95rem;">${data}</span>`;
-                }
-            },
-            {
-                data: 'created_at',
-                className: 'align-middle text-center text-muted small',
-                render: function (data) {
-                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
-                }
-            },
-            {
-                data: 'updated_at',
-                className: 'align-middle text-center text-muted small',
-                render: function (data) {
-                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
-                }
-            },
-            {
-                data: 'aksi',
-                orderable: false,
-                searchable: false,
-                className: "align-middle text-center",
-                render: function (data) {
-                    return data;
-                },
-            }
-        ]
+    // Main Fetch Function
+    function fetchPengeluaran(url = window.location.href) {
+        const urlObj = new URL(url, window.location.origin);
+
+        const searchQuery = searchInput.val();
+        if (searchQuery) urlObj.searchParams.set('search', searchQuery);
+
+        tableContainer.css('opacity', '0.5');
+
+        fetch(urlObj.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                tableContainer.css('opacity', '1');
+                tableContainer.html(data.html);
+                initBulkDelete();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tableContainer.css('opacity', '1');
+            });
+    }
+
+    // Search Input
+    searchInput.on('keyup', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetchPengeluaran();
+        }, 500);
+    });
+
+    // Pagination & Sorting Delegation
+    tableContainer.on('click', '.pagination a, .sort-link', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = $(this).attr('href');
+        if (url) fetchPengeluaran(url);
     });
 
     // Toast Notification
@@ -83,41 +67,30 @@ $(document).ready(function () {
             info: '#17a2b8',
             primary: '#007bff',
         };
-
         const bgColor = colors[type] || '#6c757d';
 
         const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="${toastId}" class="toast align-items-center text-white border-0" style="background-color: ${bgColor};" role="alert">
                 <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
-            </div>
-        `;
+            </div>`;
 
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-
         const toastElement = document.getElementById(toastId);
         const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
         toast.show();
-
-        toastElement.addEventListener('hidden.bs.toast', function () {
-            toastElement.remove();
-        });
+        toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
     }
 
-    // Function to handle Save & Update
+    // Submit Form
     function simpanPengeluaran(id = '') {
-        var url = id ? '/pengeluaran/' + id : '/pengeluaran';
-        var type = id ? 'PUT' : 'POST';
+        const url = id ? `/pengeluaran/${id}` : '/pengeluaran';
+        const method = id ? 'PUT' : 'POST';
+        const nama = $('#nama').val().trim();
 
-        var formData = {
-            nama: $('#nama').val().trim()
-        };
-
-        if (formData.nama === '') {
+        if (nama === '') {
             showToast('Nama kategori harus diisi!', 'danger');
             return;
         }
@@ -126,49 +99,54 @@ $(document).ready(function () {
 
         $.ajax({
             url: url,
-            type: type,
-            data: formData,
-            success: function () {
-                showToast('Data berhasil disimpan', 'success');
+            type: method,
+            data: { nama: nama },
+            success: (response) => {
+                showToast(response.message || 'Data berhasil disimpan', 'success');
                 $('#pengeluaranModal').modal('hide');
-                table.ajax.reload();
+                fetchPengeluaran(); // Reload table
             },
-            complete: function () {
+            error: (xhr) => {
+                const msg = xhr.responseJSON?.message || 'Gagal menyimpan data';
+                showToast(msg, 'danger');
+            },
+            complete: () => {
                 $('.tombol-simpan-pengeluaran').prop('disabled', false).html('Simpan');
             }
         });
     }
 
-    // Handle Create Pengeluaran
+    // Tambah Event
     $('body').on('click', '.tombol-tambah-pengeluaran', function (e) {
         e.preventDefault();
-        $('#nama').val(''); // Clear input
+        $('#nama').val('');
         $('#pengeluaranModal').modal('show');
 
+        $('#pengeluaranModal .modal-title').text('Tambah Kategori Pengeluaran');
         $('#pengeluaranModal').off('click', '.tombol-simpan-pengeluaran')
             .on('click', '.tombol-simpan-pengeluaran', () => simpanPengeluaran());
     });
 
-    // Handle Edit Pengeluaran
-    $('body').on('click', '.tombol-edit-pengeluaran', function (e) {
-        var id = $(this).data('id');
+    // Edit Event
+    tableContainer.on('click', '.tombol-edit-pengeluaran', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = $(this).data('id');
 
-        $.ajax({
-            url: '/pengeluaran/' + id + '/edit',
-            type: 'GET',
-            success: function (response) {
-                $('#nama').val(response.result.nama);
-                $('#pengeluaranModal').modal('show');
+        $.get(`/pengeluaran/${id}/edit`, function (response) {
+            $('#nama').val(response.result.nama);
+            $('#pengeluaranModal').modal('show');
+            $('#pengeluaranModal .modal-title').text('Edit Kategori Pengeluaran');
 
-                $('#pengeluaranModal').off('click', '.tombol-simpan-pengeluaran')
-                    .on('click', '.tombol-simpan-pengeluaran', () => simpanPengeluaran(id));
-            }
+            $('#pengeluaranModal').off('click', '.tombol-simpan-pengeluaran')
+                .on('click', '.tombol-simpan-pengeluaran', () => simpanPengeluaran(id));
         });
     });
 
-    // Single Delete (using SweetAlert now)
-    $('body').on('click', '.tombol-del-pengeluaran', function (e) {
+    // Hapus Single Event
+    tableContainer.on('click', '.tombol-del-pengeluaran', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         Swal.fire({
@@ -179,100 +157,96 @@ $(document).ready(function () {
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            customClass: { popup: 'dark-mode' }
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
                     url: `/pengeluaran/${id}`,
                     type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: () => {
                         showToast('Data berhasil dihapus', 'success');
-                        table.ajax.reload();
+                        fetchPengeluaran();
                     },
                     error: () => {
                         showToast('Gagal menghapus, data mungkin sedang digunakan', 'danger');
-                        table.ajax.reload();
                     }
                 });
             }
         });
     });
 
-    // Bulk Delete Logic
-    $(document).on('change', '#checkAll', function () {
-        const isChecked = $(this).is(':checked');
-        $('.check-item').prop('checked', isChecked);
-        updateBulkButton();
-    });
+    // ----------------------------------------------------------------
+    // BULK DELETE LOGIC
+    // ----------------------------------------------------------------
+    function initBulkDelete() {
+        const checkAll = $('#checkAll');
+        const btnBulkDelete = $('#btnBulkDelete');
+        const countSelected = $('#countSelected');
 
-    $(document).on('change', '.check-item', function () {
-        var total = $('.check-item').length;
-        var checked = $('.check-item:checked').length;
+        function updateUI() {
+            const checked = $('.check-item:checked');
+            const count = checked.length;
+            countSelected.text(count);
+            if (count > 0) btnBulkDelete.removeClass('d-none');
+            else btnBulkDelete.addClass('d-none');
 
-        $('#checkAll').prop('checked', total === checked);
-        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
-        updateBulkButton();
-    });
-
-    function updateBulkButton() {
-        const checkedCount = $('.check-item:checked').length;
-        $('#countSelected').text(checkedCount);
-        if (checkedCount > 0) {
-            $('#btnBulkDelete').removeClass('d-none');
-        } else {
-            $('#btnBulkDelete').addClass('d-none');
+            const allItems = $('.check-item');
+            if (checkAll.length && allItems.length) {
+                checkAll.prop('checked', checked.length === allItems.length && allItems.length > 0);
+                checkAll.prop('indeterminate', checked.length > 0 && checked.length < allItems.length);
+            }
         }
-    }
 
-    $('#btnBulkDelete').on('click', function () {
-        const ids = [];
-        $('.check-item:checked').each(function () {
-            ids.push($(this).val());
+        checkAll.off('change').on('change', function () {
+            $('.check-item').prop('checked', this.checked);
+            updateUI();
         });
 
-        if (ids.length === 0) return;
+        $('.check-item').off('change').on('change', function () {
+            updateUI();
+        });
+
+        updateUI();
+    }
+
+    // Bulk Delete Action Event
+    $('#btnBulkDelete').on('click', function () {
+        const ids = $('.check-item:checked').map(function () { return $(this).val(); }).get();
+        if (!ids.length) return;
 
         Swal.fire({
-            title: `Hapus ${ids.length} kategori?`,
-            text: "Anda tidak akan dapat mengembalikan ini!",
+            title: 'Apakah Anda yakin?',
+            text: `Anda akan menghapus ${ids.length} kategori pengeluaran!`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus yang dipilih!',
+            confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
                 $.ajax({
-                    url: '/pengeluaran/bulk-delete',
+                    url: "/pengeluaran/bulk-delete",
                     type: 'DELETE',
                     data: { ids: ids },
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
-                        showToast(response.message, 'success');
-                        table.ajax.reload();
-                        $('#checkAll').prop('checked', false);
-                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                        showToast(response.message || 'Berhasil dihapus', 'success');
+                        fetchPengeluaran();
+                        btn.addClass('d-none').prop('disabled', false).html(originalHtml);
                     },
-                    error: function (xhr) {
+                    error: function () {
                         showToast('Gagal menghapus kategori yang dipilih.', 'danger');
-                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                        btn.prop('disabled', false).html(originalHtml);
                     }
                 });
             }
         });
     });
 
-    // Reset check all on page change
-    table.on('draw', function () {
-        $('#checkAll').prop('checked', false);
-        $('#checkAll').prop('indeterminate', false);
-        updateBulkButton();
-    });
-
+    // Initial load
+    initBulkDelete();
 });

@@ -3,7 +3,6 @@
 @section('title', __('Expense'))
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 <style>
     .check-item { cursor: pointer; }
 
@@ -160,41 +159,27 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('List of Expense') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your expense classification and types efficiently.') }}</p>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <div class="search-container position-relative">
+                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" id="searchPengeluaran" class="form-control form-control-sm rounded-pill ps-5" placeholder="{{ __('Search Categories...') }}" style="min-width: 200px; font-size: 0.8rem;">
+                        </div>
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 tombol-tambah-pengeluaran shadow-sm">
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill shadow-sm tombol-tambah-pengeluaran" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Category') }}
                         </button>
                     </div>
                 </div>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table id="pengeluaranTable" class="table table-hover align-middle mb-0" style="width:100%">
-                            <thead class="bg-light">
-                                <tr style="border-bottom: 2px solid #edf2f9;">
-                                    <th style="width: 5%;" class="text-center py-3">
-                                        <div class="form-check d-flex justify-content-center">
-                                            <input class="form-check-input" type="checkbox" id="checkAll" style="cursor: pointer;">
-                                        </div>
-                                    </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">{{ __('No') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Category Name') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Created At') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Last Updated') }}</th>
-                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                <div class="card-body p-0" id="pengeluaran-table-container">
+                    @include('pengeluaran._table_list')
                 </div>
             </div>
         </div>
@@ -209,8 +194,6 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/pengeluaran.js') }}?v={{ filemtime(public_path('js/pengeluaran.js')) }}"></script>
 @endpush

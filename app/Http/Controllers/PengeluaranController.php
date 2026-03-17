@@ -13,25 +13,37 @@ class PengeluaranController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $userId = Auth::id();
+        $userId = Auth::id();
+        $query = Pengeluaran::where('id_user', $userId);
 
-            $query = Pengeluaran::where('id_user', $userId);
-
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->editColumn('created_at', function ($row) {
-                return $row->created_at ? $row->created_at->format('d M Y H:i') : '-';
-            })
-                ->editColumn('updated_at', function ($row) {
-                return $row->updated_at ? $row->updated_at->format('d M Y H:i') : '-';
-            })
-                ->addColumn('aksi', function ($request) {
-                return view('pengeluaran.tombol')->with('request', $request);
-            })
-                ->toJson();
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama', 'LIKE', "%{$search}%");
         }
-        return view('pengeluaran.index');
+
+        // Sort
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        // Allowed sort columns
+        $allowedSort = ['nama', 'created_at', 'updated_at'];
+        if (in_array($sort, $allowedSort)) {
+            $query->orderBy($sort, $direction);
+        }
+        else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $pengeluaran = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pengeluaran._table_list', compact('pengeluaran'))->render(),
+            ]);
+        }
+
+        return view('pengeluaran.index', compact('pengeluaran'));
     }
 
     public function create()
