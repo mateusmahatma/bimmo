@@ -196,12 +196,6 @@
     </nav>
 </div>
 
-@php
-    $totalRemaining = $pinjaman->sum('jumlah_pinjaman');
-    $totalPaid = $pinjaman->sum(fn($p) => $p->bayar_pinjaman->sum('jumlah_bayar'));
-    $totalOriginal = $totalRemaining + $totalPaid;
-@endphp
-
 <section class="section dashboard">
     <div class="row">
         <!-- Summary Cards -->
@@ -266,10 +260,10 @@
                             <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                         </button>
                         <div class="vr mx-1 d-none d-lg-block"></div>
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
-                            <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop">
+                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill shadow-sm btn-add-desktop" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Liability') }}
                         </a>
                     </div>
@@ -307,24 +301,23 @@
                 <div class="card-body">
                     
                     <!-- Toolbar -->
-                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 pt-3">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 pt-4">
                         <div class="d-flex gap-2 align-items-center flex-grow-1">
                              <div class="search-bar" style="min-width: 250px;">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
-                                    {{-- DataTables default search will be used, but we can style a custom one if needed. 
-                                         However, JS is set to use the built-in search. Let's just keep the status filter for now. --}}
-                                    <select class="form-select bg-light border-start-0 rounded-end-pill" id="filter_status" style="box-shadow: none;">
+                                    <input type="text" id="searchPinjaman" class="form-control bg-light border-start-0 border-end-0 ps-1 shadow-none" placeholder="{{ __('Search by name...') }}" style="font-size: 0.8rem;">
+                                    <select class="form-select bg-light border-start-1 rounded-end-pill shadow-none" id="filter_status" style="max-width: 100px; font-size: 0.8rem;">
                                         <option value="">{{ __('All Status') }}</option>
-                                        <option value="belum_lunas">{{ __('Unpaid Only') }}</option>
-                                        <option value="lunas">{{ __('Paid Only') }}</option>
+                                        <option value="belum_lunas">{{ __('Unpaid') }}</option>
+                                        <option value="lunas">{{ __('Paid') }}</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-flex gap-2">
-                             <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm rounded-pill px-3 d-flex align-items-center gap-2">
+                             <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm rounded-pill d-flex align-items-center gap-2" style="padding: 2px 10px; font-size: 0.75rem;">
                                 <i class="bi bi-file-earmark-excel"></i> {{ __('Export Excel') }}
                             </a>
                         </div>
@@ -337,27 +330,8 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
-                        <table id="pinjamanTable" class="table table-hover table-borderless align-middle" style="width:100%">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 5%;" class="text-center">
-                                        <input class="form-check-input" type="checkbox" id="checkAll">
-                                    </th>
-                                    <th style="width: 5%;">{{ __('No') }}</th>
-                                    <th>{{ __('Liability Name') }}</th>
-                                    <th>{{ __('Notes') }}</th>
-                                    <th class="text-end">{{ __('Total Liability') }}</th>
-                                    <th class="text-end">{{ __('Paid Amount') }}</th>
-                                    <th class="text-end">{{ __('Remaining Balance') }}</th>
-                                    <th class="text-center">{{ __('Status') }}</th>
-                                    <th style="width: 10%;" class="text-center">{{ __('Action') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- DataTables will populate this --}}
-                            </tbody>
-                        </table>
+                    <div id="pinjaman-table-container">
+                        @include('pinjaman._table_list')
                     </div>
 
                 </div>
@@ -378,8 +352,6 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
 @endpush

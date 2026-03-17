@@ -9,112 +9,71 @@ $(document).ready(function () {
         }
     });
 
-    // DataTable Initialization
-    let table;
-    if ($("#pinjamanTable").length > 0) {
-        table = $("#pinjamanTable").DataTable({
-            paging: true,
-            responsive: false, // Using custom CSS for responsiveness
-            lengthChange: true,
-            autoWidth: false,
-            serverSide: true,
-            processing: true,
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ entri",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
-                infoFiltered: "(disaring dari _MAX_ total entri)",
-                paginate: {
-                    first: "Pertama",
-                    last: "Terakhir",
-                    next: "Selanjutnya",
-                    previous: "Sebelumnya"
-                },
-                processing: "Sedang memproses...",
-                emptyTable: "Tidak ada data yang tersedia pada tabel"
-            },
-            ajax: {
-                url: "/pinjaman",
-                type: "GET",
-                data: function (d) {
-                    d.filter_status = $('#filter_status').val();
-                },
-                dataSrc: function (json) {
-                    // Update Summary Cards
-                    if (json.totalPinjaman) {
-                        $("#totalPinjaman").text(json.totalPinjaman);
-                    }
-                    if (json.totalPaid) {
-                        $("#statTotalPaid").text(json.totalPaid);
-                    }
-                    if (json.totalOriginal) {
-                        $("#statTotalOriginal").text(json.totalOriginal);
-                    }
-                    return json.data;
-                }
-            },
-            columns: [
-                {
-                    data: 'id',
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        return `<input class="form-check-input check-item" type="checkbox" value="${row.hash}">`;
-                    }
-                },
-                { data: "DT_RowIndex", name: "DT_RowIndex", orderable: false, searchable: false, className: "text-center" },
-                { data: "nama_pinjaman", name: "nama_pinjaman" },
-                { data: "keterangan", name: "keterangan", defaultContent: "-" },
-                { data: "total_loan", name: "total_loan", className: "text-end" },
-                { data: "paid_amount", name: "paid_amount", className: "text-end" },
-                { data: "jumlah_pinjaman", name: "jumlah_pinjaman", className: "text-end" },
-                {
-                    data: "status",
-                    name: "status",
-                    className: "text-center",
-                    render: function (data) {
-                        if (data === "belum_lunas") {
-                            return `<span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i> Belum Lunas</span>`;
-                        } else if (data === "lunas") {
-                            return `<span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i> Lunas</span>`;
-                        }
-                        return data ? data : '-';
-                    }
-                },
-                {
-                    data: "aksi",
-                    orderable: false,
-                    searchable: false,
-                    className: "text-center"
-                },
-            ],
-            createdRow: function (row, data, dataIndex) {
-                $('td:eq(0)', row).attr('data-label', 'Pilih').addClass('mobile-checkbox');
-                $('td:eq(1)', row).attr('data-label', 'No');
-                $('td:eq(2)', row).attr('data-label', 'Nama Pinjaman');
-                $('td:eq(3)', row).attr('data-label', 'Keterangan');
-                $('td:eq(4)', row).attr('data-label', 'Total Pinjaman');
-                $('td:eq(5)', row).attr('data-label', 'Total Dibayar');
-                $('td:eq(6)', row).attr('data-label', 'Sisa Saldo');
-                $('td:eq(7)', row).attr('data-label', 'Status');
-                $('td:eq(8)', row).attr('data-label', 'Aksi');
-            }
-        });
+    let debounceTimer;
+    const searchInput = $('#searchPinjaman');
+    const tableContainer = $('#pinjaman-table-container');
+    const filterStatus = $('#filter_status');
+
+    // Main Fetch Function
+    function fetchPinjaman(url = window.location.href) {
+        const urlObj = new URL(url, window.location.origin);
+
+        const searchQuery = searchInput.val();
+        if (searchQuery) urlObj.searchParams.set('search', searchQuery);
+
+        const statusValue = filterStatus.val();
+        if (statusValue) urlObj.searchParams.set('filter_status', statusValue);
+
+        tableContainer.css('opacity', '0.5');
+
+        fetch(urlObj.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                tableContainer.css('opacity', '1');
+                tableContainer.html(data.html);
+
+                // Update Summary Cards
+                if (data.totalPinjaman) $("#totalPinjaman").text(data.totalPinjaman);
+                if (data.totalPaid) $("#statTotalPaid").text(data.totalPaid);
+                if (data.totalOriginal) $("#statTotalOriginal").text(data.totalOriginal);
+
+                initBulkDelete();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tableContainer.css('opacity', '1');
+            });
     }
 
-    // Reload Table on Filter Change
-    $('#filter_status').on('change', function () {
-        if (table) table.ajax.reload();
+    // Search Input Listener
+    searchInput.on('keyup', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetchPinjaman();
+        }, 500);
+    });
+
+    // Filter Status Listener
+    filterStatus.on('change', function () {
+        fetchPinjaman();
 
         // Update export Excel link
-        const filterStatus = $(this).val();
+        const statusVal = $(this).val();
         let exportUrl = "/pinjaman/export/excel";
-        if (filterStatus) {
-            exportUrl += "?filter_status=" + filterStatus;
+        if (statusVal) {
+            exportUrl += "?filter_status=" + statusVal;
         }
         $('#btnExportExcel').attr('href', exportUrl);
+    });
+
+    // Pagination & Sorting Delegation
+    tableContainer.on('click', '.pagination a, .sort-link', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = $(this).attr('href');
+        if (url) fetchPinjaman(url);
     });
 
     // Toast Notification
@@ -180,7 +139,7 @@ $(document).ready(function () {
             success: function () {
                 showToast('Data Berhasil disimpan', 'success');
                 $('#pinjamanModal').modal('hide');
-                if (table) table.ajax.reload();
+                fetchPinjaman();
             },
             error: function (xhr) {
                 console.error(xhr.responseText);
@@ -195,17 +154,18 @@ $(document).ready(function () {
     // Handle Add Button
     $('body').on('click', '.tombol-tambah-pinjaman', function (e) {
         e.preventDefault();
-        $('#pinjamanModal').find('form')[0].reset(); // Reset form
+        e.stopPropagation();
+        $('#pinjamanModal').find('form')[0].reset();
         $('#pinjamanModal').modal('show');
 
-        // Remove previous handlers to avoid duplicates
         $('#pinjamanModal').off('click', '.tombol-simpan-pinjaman')
             .on('click', '.tombol-simpan-pinjaman', () => simpanPinjaman());
     });
 
     // Handle Edit Button
-    $('body').on('click', '.tombol-edit-pinjaman', function (e) {
+    tableContainer.on('click', '.tombol-edit-pinjaman', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         $.ajax({
@@ -233,8 +193,9 @@ $(document).ready(function () {
     });
 
     // Handle Single Delete Button
-    $('body').on('click', '.tombol-del-pinjaman', function (e) {
+    tableContainer.on('click', '.tombol-del-pinjaman', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         Swal.fire({
@@ -253,11 +214,10 @@ $(document).ready(function () {
                     type: 'DELETE',
                     success: function () {
                         showToast('Data Berhasil dihapus', 'success');
-                        if (table) table.ajax.reload();
+                        fetchPinjaman();
                     },
                     error: function () {
                         showToast('Gagal menghapus data', 'danger');
-                        if (table) table.ajax.reload();
                     }
                 });
             }
@@ -267,42 +227,40 @@ $(document).ready(function () {
     // ----------------------------------------------------------------
     // BULK DELETE LOGIC
     // ----------------------------------------------------------------
+    function initBulkDelete() {
+        const checkAll = $('#checkAll');
+        const btnBulkDelete = $('#btnBulkDelete');
+        const countSelected = $('#countSelected');
 
-    // Check All
-    $(document).on('change', '#checkAll', function () {
-        const isChecked = $(this).is(':checked');
-        $('.check-item').prop('checked', isChecked);
-        updateBulkButton();
-    });
+        function updateUI() {
+            const checked = $('.check-item:checked');
+            const count = checked.length;
+            countSelected.text(count);
+            if (count > 0) btnBulkDelete.removeClass('d-none');
+            else btnBulkDelete.addClass('d-none');
 
-    // Check Item
-    $(document).on('change', '.check-item', function () {
-        var total = $('.check-item').length;
-        var checked = $('.check-item:checked').length;
-
-        $('#checkAll').prop('checked', total === checked);
-        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
-        updateBulkButton();
-    });
-
-    // Update Button Visibility
-    function updateBulkButton() {
-        const checkedCount = $('.check-item:checked').length;
-        $('#countSelected').text(checkedCount);
-        if (checkedCount > 0) {
-            $('#btnBulkDelete').removeClass('d-none');
-        } else {
-            $('#btnBulkDelete').addClass('d-none');
+            const allItems = $('.check-item');
+            if (checkAll.length && allItems.length) {
+                checkAll.prop('checked', checked.length === allItems.length && allItems.length > 0);
+                checkAll.prop('indeterminate', checked.length > 0 && checked.length < allItems.length);
+            }
         }
+
+        checkAll.off('change').on('change', function () {
+            $('.check-item').prop('checked', this.checked);
+            updateUI();
+        });
+
+        $('.check-item').off('change').on('change', function () {
+            updateUI();
+        });
+
+        updateUI();
     }
 
     // Handle Bulk Delete Click
     $('#btnBulkDelete').on('click', function () {
-        const ids = [];
-        $('.check-item:checked').each(function () {
-            ids.push($(this).val());
-        });
-
+        const ids = $('.check-item:checked').map(function () { return $(this).val(); }).get();
         if (ids.length === 0) return;
 
         Swal.fire({
@@ -316,8 +274,9 @@ $(document).ready(function () {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...');
 
                 $.ajax({
                     url: '/pinjaman/bulk-delete',
@@ -325,30 +284,24 @@ $(document).ready(function () {
                     data: { ids: ids },
                     success: function (response) {
                         showToast(response.message, 'success');
-                        if (table) table.ajax.reload();
-                        $('#checkAll').prop('checked', false);
-                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                        fetchPinjaman();
+                        btn.addClass('d-none').prop('disabled', false).html(originalHtml);
                     },
                     error: function (xhr) {
                         showToast('Gagal menghapus pinjaman terpilih.', 'danger');
-                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                        btn.prop('disabled', false).html(originalHtml);
                     }
                 });
             }
         });
     });
 
-    // Reset check all on page change
-    if (table) {
-        table.on('draw', function () {
-            $('#checkAll').prop('checked', false);
-            $('#checkAll').prop('indeterminate', false);
-            updateBulkButton();
-        });
-    }
+    // Initial load
+    initBulkDelete();
 
     // Handle Payment Modal (Create)
-    $('body').on("click", "[data-bs-target='#bayarModal']", function () {
+    tableContainer.on("click", "[data-bs-target='#bayarModal']", function (e) {
+        e.stopPropagation();
         var button = $(this);
         var pinjamanId = button.data("pinjaman-id");
         var modal = $("#bayarModal");
@@ -368,7 +321,8 @@ $(document).ready(function () {
     });
 
     // Handle Payment Edit Button
-    $('body').on('click', '.edit-bayar', function () {
+    tableContainer.on('click', '.edit-bayar', function (e) {
+        e.stopPropagation();
         var id = $(this).data('id');
         var modal = $("#bayarModal");
         var form = modal.find("#bayarForm");
