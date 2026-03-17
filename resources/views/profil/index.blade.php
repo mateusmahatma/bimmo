@@ -106,6 +106,46 @@
             </div>
         </div>
 
+        <!-- Pengaturan Tema -->
+        <div class="card mb-4">
+            <div class="card-header">
+                {{ __('Theme Settings') }}
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">{{ __('Choose your preferred theme for the application.') }}</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-check theme-option p-3 border rounded cursor-pointer" onclick="document.getElementById('theme_light').click()">
+                            <input class="form-check-input" type="radio" name="theme_preference" id="theme_light" value="light">
+                            <label class="form-check-label d-flex align-items-center cursor-pointer" for="theme_light">
+                                <i class="bi bi-sun fs-4 me-2 text-warning"></i>
+                                <span>{{ __('Light Mode') }}</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check theme-option p-3 border rounded cursor-pointer" onclick="document.getElementById('theme_dark').click()">
+                            <input class="form-check-input" type="radio" name="theme_preference" id="theme_dark" value="dark">
+                            <label class="form-check-label d-flex align-items-center cursor-pointer" for="theme_dark">
+                                <i class="bi bi-moon-stars fs-4 me-2 text-primary"></i>
+                                <span>{{ __('Dark Mode') }}</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check theme-option p-3 border rounded cursor-pointer" onclick="document.getElementById('theme_auto').click()">
+                            <input class="form-check-input" type="radio" name="theme_preference" id="theme_auto" value="auto">
+                            <label class="form-check-label d-flex align-items-center cursor-pointer" for="theme_auto">
+                                <i class="bi bi-circle-half fs-4 me-2 text-secondary"></i>
+                                <span>{{ __('Auto (System)') }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Informasi Pengguna -->
         <div class="card mb-4">
             <div class="card-header">
@@ -321,6 +361,32 @@
                 icon.classList.remove('bi-eye');
                 icon.classList.add('bi-eye-slash');
             }
+        });
+    });
+
+    // Theme Switcher Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        // Prioritize server-side skin, then localStorage, default to 'auto'
+        const savedTheme = "{{ auth()->user()->skin ?? '' }}" || localStorage.getItem('theme') || 'auto';
+        const radio = document.querySelector(`input[name="theme_preference"][value="${savedTheme}"]`);
+        if (radio) {
+            radio.checked = true;
+            radio.closest('.theme-option').classList.add('border-primary', 'bg-light-subtle');
+        }
+
+        document.querySelectorAll('input[name="theme_preference"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const theme = e.target.value;
+                if (window.applyTheme) {
+                    window.applyTheme(theme);
+                    
+                    // Update UI states
+                    document.querySelectorAll('.theme-option').forEach(opt => {
+                        opt.classList.remove('border-primary', 'bg-light-subtle');
+                    });
+                    e.target.closest('.theme-option').classList.add('border-primary', 'bg-light-subtle');
+                }
+            });
         });
     });
 </script>

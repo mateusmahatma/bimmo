@@ -31,26 +31,54 @@
 
     <script>
         (function() {
-            const setTheme = (theme) => {
+            window.applyTheme = (theme, persist = true) => {
                 const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
 
-                // Dynamic Favicon Switching
                 const favicon = document.getElementById('favicon');
                 if (favicon) {
                     favicon.setAttribute('href', isDark ? "{{ asset('img/bimmo_dark_favicon.png') }}" : "{{ asset('img/bimmo_favicon.png') }}");
                 }
+                
+                localStorage.setItem('theme', theme);
+
+                if (persist) {
+                    fetch("{{ route('user.update.skin') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ skin: theme })
+                    }).then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    }).then(data => {
+                        console.log('Theme synced successfully:', theme);
+                    }).catch(err => {
+                        console.error('Failed to sync theme to database:', err);
+                    });
+                }
             }
 
-            // Check system preference on load
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-            setTheme(prefersDark.matches ? 'dark' : 'light');
+            // Initialization priority: 1. Server Skin 2. LocalStorage 3. Default Auto
+            const serverSkin = "{{ auth()->user()->skin ?? '' }}";
+            const localSkin = localStorage.getItem('theme');
+            const initialTheme = serverSkin || localSkin || 'auto';
+            
+            applyTheme(initialTheme, false);
 
-            // Monitor system changes
-            prefersDark.addEventListener('change', event => {
-                setTheme(event.matches ? 'dark' : 'light');
+            // Monitor system preference changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (localStorage.getItem('theme') === 'auto') {
+                    applyTheme('auto', false);
+                }
             });
         })();
+
+        // Legacy/Shortcut function
+        window.setTheme = (theme) => applyTheme(theme);
 
         // Extreme Source Code Protection
         (function() {

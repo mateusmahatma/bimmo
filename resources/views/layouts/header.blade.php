@@ -63,9 +63,9 @@
                         <i class="bi bi-lightbulb-fill" style="color: orange; font-size: 1.3em;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2"></i> Light</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon me-2"></i> Dark</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="setTheme('auto')"><i class="bi bi-circle-half me-2"></i> Auto (System)</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="if(window.applyTheme){window.applyTheme('light')}else{setTheme('light')}"><i class="bi bi-sun me-2"></i> Light</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="if(window.applyTheme){window.applyTheme('dark')}else{setTheme('dark')}"><i class="bi bi-moon me-2"></i> Dark</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="if(window.applyTheme){window.applyTheme('auto')}else{setTheme('auto')}"><i class="bi bi-circle-half me-2"></i> Auto (System)</a></li>
                     </ul>
                 </li>
 
