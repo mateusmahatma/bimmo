@@ -21,72 +21,52 @@ class PinjamanController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $userId = Auth::id();
-            $data = Pinjaman::where('id_user', $userId);
-            $totalPinjaman = $data->sum('jumlah_pinjaman');
+        $userId = Auth::id();
+        $query = Pinjaman::where('id_user', $userId)->with('bayar_pinjaman');
 
-            // filter status
-            if ($request->has('filter_status') && !empty($request->filter_status)) {
-                // pastikan selalu array
-                $filterStatus = (array)$request->filter_status;
-                $data->whereIn('status', $filterStatus);
-            }
-
-            // total dihitung setelah filter diterapkan
-            $totalRemaining = $data->sum('jumlah_pinjaman');
-
-            // Hitung total bayar untuk pinjaman yang difilter
-            $ids = (clone $data)->pluck('id');
-            $totalPaid = \App\Models\BayarPinjaman::whereIn('id_pinjaman', $ids)->sum('jumlah_bayar');
-            $totalOriginal = $totalRemaining + $totalPaid;
-
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->setRowAttr([
-                'data-hash' => function ($pinjaman) {
-                return Hashids::encode($pinjaman->id);
-            }
-            ])
-                ->addColumn('total_loan', function ($pinjaman) {
-                $paid = $pinjaman->bayar_pinjaman->sum('jumlah_bayar');
-                return 'Rp ' . number_format($pinjaman->jumlah_pinjaman + $paid, 0, ',', '.');
-            })
-                ->addColumn('paid_amount', function ($pinjaman) {
-                $paid = $pinjaman->bayar_pinjaman->sum('jumlah_bayar');
-                return 'Rp ' . number_format($paid, 0, ',', '.');
-            })
-                ->editColumn('jumlah_pinjaman', function ($pinjaman) {
-                return 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
-            })
-                ->editColumn('jangka_waktu', function ($pinjaman) {
-                return $pinjaman->jangka_waktu . ' bulan';
-            })
-                ->addColumn('hash', function ($pinjaman) {
-                return Hashids::encode($pinjaman->id);
-            })
-                ->addColumn('aksi', function ($pinjaman) {
-                $pinjaman->hash = Hashids::encode($pinjaman->id);
-                return view('pinjaman.tombol', ['pinjaman' => $pinjaman])->with('request', $pinjaman);
-            })
-
-                ->with('totalPinjaman', 'Rp ' . number_format($totalRemaining, 0, ',', '.'))
-                ->with('totalPaid', 'Rp ' . number_format($totalPaid, 0, ',', '.'))
-                ->with('totalOriginal', 'Rp ' . number_format($totalOriginal, 0, ',', '.'))
-                ->rawColumns(['aksi'])
-                ->toJson();
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama_pinjaman', 'LIKE', "%{$search}%");
         }
 
-        // Ambil data unik status pinjaman untuk dropdown filter
-        // $statusList = Pinjaman::select('status')
-        //     ->where('id_user', Auth::id())
-        //     ->distinct()
-        //     ->pluck('status');
+        // Filter Status
+        if ($request->filled('filter_status')) {
+            $query->where('status', $request->filter_status);
+        }
 
-        return view('pinjaman.index', [
-            'pinjaman' => Pinjaman::where('id_user', Auth::id())->get(),
-            // 'statusList' => $statusList,
-        ]);
+        // Summary calculations (before pagination but after filter)
+        // Note: sum counts all rows in the query
+        $totalRemaining = (clone $query)->sum('jumlah_pinjaman');
+        $ids = (clone $query)->pluck('id');
+        $totalPaid = \App\Models\BayarPinjaman::whereIn('id_pinjaman', $ids)->sum('jumlah_bayar');
+        $totalOriginal = $totalRemaining + $totalPaid;
+
+        // Sort
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        // Allowed sort columns
+        $allowedSort = ['nama_pinjaman', 'jumlah_pinjaman', 'created_at', 'status'];
+        if (in_array($sort, $allowedSort)) {
+            $query->orderBy($sort, $direction);
+        }
+        else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $pinjaman = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pinjaman._table_list', compact('pinjaman'))->render(),
+                'totalPinjaman' => 'Rp ' . number_format($totalRemaining, 0, ',', '.'),
+                'totalPaid' => 'Rp ' . number_format($totalPaid, 0, ',', '.'),
+                'totalOriginal' => 'Rp ' . number_format($totalOriginal, 0, ',', '.'),
+            ]);
+        }
+
+        return view('pinjaman.index', compact('pinjaman', 'totalRemaining', 'totalPaid', 'totalOriginal'));
     }
 
     public function create()

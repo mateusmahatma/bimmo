@@ -13,26 +13,37 @@ class PemasukanController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            // Mendapatkan ID pengguna yang sedang login
-            $userId = Auth::id();
+        $userId = Auth::id();
+        $query = Pemasukan::where('id_user', $userId);
 
-            $query = Pemasukan::where('id_user', $userId);
-
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->editColumn('created_at', function ($row) {
-                return $row->created_at->format('Y-m-d H:i:s');
-            })
-                ->editColumn('updated_at', function ($row) {
-                return $row->updated_at->format('Y-m-d H:i:s');
-            })
-                ->addColumn('aksi', function ($pemasukan) {
-                return view('pemasukan.tombol')->with('request', $pemasukan);
-            })
-                ->toJson();
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nama', 'LIKE', "%{$search}%");
         }
-        return view('pemasukan.index');
+
+        // Sort
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        // Allowed sort columns
+        $allowedSort = ['nama', 'created_at', 'updated_at'];
+        if (in_array($sort, $allowedSort)) {
+            $query->orderBy($sort, $direction);
+        }
+        else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $pemasukan = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pemasukan._table_list', compact('pemasukan'))->render(),
+            ]);
+        }
+
+        return view('pemasukan.index', compact('pemasukan'));
     }
 
     public function store(Request $request)

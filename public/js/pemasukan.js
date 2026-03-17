@@ -6,65 +6,48 @@ $(document).ready(function () {
         }
     });
 
-    const csrfToken = window.csrfToken;
+    let debounceTimer;
+    const searchInput = $('#searchPemasukan');
+    const tableContainer = $('#pemasukan-table-container');
 
+    // Main Fetch Function
+    function fetchPemasukan(url = window.location.href) {
+        const urlObj = new URL(url, window.location.origin);
 
-    const table = $('#pemasukanTable').DataTable({
-        paging: true,
-        responsive: true,
-        lengthChange: true,
-        autoWidth: false,
-        serverSide: true,
-        processing: true,
-        ajax: {
-            url: '/pemasukan',
-            type: 'GET',
-        },
-        language: {
-            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
-        },
-        columns: [
-            {
-                data: 'id',
-                orderable: false,
-                searchable: false,
-                className: 'align-middle text-center',
-                render: function (data, type, row) {
-                    return `<div class="form-check d-flex justify-content-center"><input class="form-check-input check-item" type="checkbox" value="${data}" style="cursor: pointer;"></div>`;
-                }
-            },
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'align-middle text-center text-secondary fw-medium' },
-            {
-                data: 'nama',
-                className: 'align-middle fw-semibold text-dark',
-                render: function (data) {
-                    return `<span style="font-size: 0.95rem;">${data}</span>`;
-                }
-            },
-            {
-                data: 'created_at',
-                className: 'align-middle text-center text-muted small',
-                render: function (data) {
-                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
-                }
-            },
-            {
-                data: 'updated_at',
-                className: 'align-middle text-center text-muted small',
-                render: function (data) {
-                    return `<span style="font-family: 'Consolas', monospace;">${data}</span>`;
-                }
-            },
-            {
-                data: 'aksi',
-                orderable: false,
-                searchable: false,
-                className: "align-middle text-center",
-                render: function (data) {
-                    return data;
-                },
-            }
-        ]
+        const searchQuery = searchInput.val();
+        if (searchQuery) urlObj.searchParams.set('search', searchQuery);
+
+        tableContainer.css('opacity', '0.5');
+
+        fetch(urlObj.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                tableContainer.css('opacity', '1');
+                tableContainer.html(data.html);
+                initBulkDelete();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tableContainer.css('opacity', '1');
+            });
+    }
+
+    // Search Input
+    searchInput.on('keyup', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetchPemasukan();
+        }, 500);
+    });
+
+    // Pagination & Sorting Delegation
+    tableContainer.on('click', '.pagination a, .sort-link', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = $(this).attr('href');
+        if (url) fetchPemasukan(url);
     });
 
     // Toast Notification
@@ -118,10 +101,14 @@ $(document).ready(function () {
             url,
             type: method,
             data: { nama },
-            success: () => {
-                showToast('Data berhasil disimpan', 'success');
+            success: (response) => {
+                showToast(response.message || 'Data berhasil disimpan', 'success');
                 $('#pemasukanModal').modal('hide');
-                table.ajax.reload();
+                fetchPemasukan(); // Reload table
+            },
+            error: (xhr) => {
+                const msg = xhr.responseJSON?.message || 'Gagal menyimpan data';
+                showToast(msg, 'danger');
             },
             complete: () => {
                 $('.tombol-simpan-pemasukan').prop('disabled', false).html('Simpan');
@@ -129,34 +116,37 @@ $(document).ready(function () {
         });
     }
 
-    // Tambah
+    // Tambah Event
     $('body').on('click', '.tombol-tambah-pemasukan', function (e) {
         e.preventDefault();
         $('#nama').val('');
         $('#pemasukanModal').modal('show');
 
-        // Note: Removing previous event handlers to prevent duplicates
+        $('#pemasukanModal .modal-title').text('Tambah Kategori Income');
         $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan')
             .on('click', '.tombol-simpan-pemasukan', () => simpanPemasukan());
     });
 
-    // Edit
-    $('body').on('click', '.tombol-edit-pemasukan', function (e) {
+    // Edit Event
+    tableContainer.on('click', '.tombol-edit-pemasukan', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         $.get(`/pemasukan/${id}/edit`, function (response) {
             $('#nama').val(response.result.nama);
             $('#pemasukanModal').modal('show');
+            $('#pemasukanModal .modal-title').text('Edit Kategori Income');
 
             $('#pemasukanModal').off('click', '.tombol-simpan-pemasukan')
                 .on('click', '.tombol-simpan-pemasukan', () => simpanPemasukan(id));
         });
     });
 
-    // Hapus Single
-    $('body').on('click', '.tombol-del-pemasukan', function (e) {
+    // Hapus Single Event
+    tableContainer.on('click', '.tombol-del-pemasukan', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         const id = $(this).data('id');
 
         Swal.fire({
@@ -167,21 +157,18 @@ $(document).ready(function () {
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            customClass: { popup: 'dark-mode' }
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
                     url: `/pemasukan/${id}`,
                     type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: () => {
                         showToast('Data berhasil dihapus', 'success');
-                        table.ajax.reload();
+                        fetchPemasukan();
                     },
                     error: () => {
                         showToast('Gagal menghapus, data mungkin sedang digunakan', 'danger');
-                        table.ajax.reload();
                     }
                 });
             }
@@ -191,83 +178,77 @@ $(document).ready(function () {
     // ----------------------------------------------------------------
     // BULK DELETE LOGIC
     // ----------------------------------------------------------------
+    function initBulkDelete() {
+        const checkAll = $('#checkAll');
+        const btnBulkDelete = $('#btnBulkDelete');
+        const countSelected = $('#countSelected');
 
-    // Check All
-    $(document).on('change', '#checkAll', function () {
-        const isChecked = $(this).is(':checked');
-        $('.check-item').prop('checked', isChecked);
-        updateBulkButton();
-    });
+        function updateUI() {
+            const checked = $('.check-item:checked');
+            const count = checked.length;
+            countSelected.text(count);
+            if (count > 0) btnBulkDelete.removeClass('d-none');
+            else btnBulkDelete.addClass('d-none');
 
-    // Check Item
-    $(document).on('change', '.check-item', function () {
-        var total = $('.check-item').length;
-        var checked = $('.check-item:checked').length;
-
-        $('#checkAll').prop('checked', total === checked);
-        $('#checkAll').prop('indeterminate', checked > 0 && checked < total);
-        updateBulkButton();
-    });
-
-    // Update Button Visibility
-    function updateBulkButton() {
-        const checkedCount = $('.check-item:checked').length;
-        $('#countSelected').text(checkedCount);
-        if (checkedCount > 0) {
-            $('#btnBulkDelete').removeClass('d-none');
-        } else {
-            $('#btnBulkDelete').addClass('d-none');
+            const allItems = $('.check-item');
+            if (checkAll.length && allItems.length) {
+                checkAll.prop('checked', checked.length === allItems.length && allItems.length > 0);
+                checkAll.prop('indeterminate', checked.length > 0 && checked.length < allItems.length);
+            }
         }
-    }
 
-    // Handle Bulk Delete Click
-    $('#btnBulkDelete').on('click', function () {
-        const ids = [];
-        $('.check-item:checked').each(function () {
-            ids.push($(this).val());
+        // Use standard event listeners (non-delegated here since initBulkDelete is called after HTML update)
+        checkAll.off('change').on('change', function () {
+            $('.check-item').prop('checked', this.checked);
+            updateUI();
         });
 
-        if (ids.length === 0) return;
+        $('.check-item').off('change').on('change', function () {
+            updateUI();
+        });
+
+        // Initialize UI state
+        updateUI();
+    }
+
+    // Bulk Delete Action Event
+    $('#btnBulkDelete').on('click', function () {
+        const ids = $('.check-item:checked').map(function () { return $(this).val(); }).get();
+        if (!ids.length) return;
 
         Swal.fire({
-            title: `Hapus ${ids.length} kategori?`,
-            text: "Anda tidak akan dapat mengembalikan ini!",
+            title: 'Apakah Anda yakin?',
+            text: `Anda akan menghapus ${ids.length} kategori income!`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus yang dipilih!',
+            confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Show loading on button
-                const OriginalBtnText = $(this).html();
-                $(this).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...').prop('disabled', true);
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
                 $.ajax({
-                    url: '/pemasukan/bulk-delete',
+                    url: "/pemasukan/bulk-delete",
                     type: 'DELETE',
                     data: { ids: ids },
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
-                        showToast(response.message, 'success');
-                        table.ajax.reload();
-                        $('#checkAll').prop('checked', false);
-                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                        showToast(response.message || 'Berhasil dihapus', 'success');
+                        fetchPemasukan();
+                        btn.addClass('d-none').prop('disabled', false).html(originalHtml);
                     },
-                    error: function (xhr) {
+                    error: function () {
                         showToast('Gagal menghapus kategori yang dipilih.', 'danger');
-                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                        btn.prop('disabled', false).html(originalHtml);
                     }
                 });
             }
         });
     });
 
-    // Reset check all on page change
-    table.on('draw', function () {
-        $('#checkAll').prop('checked', false);
-        $('#checkAll').prop('indeterminate', false);
-        updateBulkButton();
-    });
+    // Initial load
+    initBulkDelete();
 });

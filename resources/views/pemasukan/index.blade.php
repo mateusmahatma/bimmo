@@ -3,7 +3,6 @@
 @section('title', __('Income Categories'))
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 <style>
     .check-item { cursor: pointer; }
 
@@ -166,34 +165,28 @@
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your income classification and sources efficiently.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 tombol-tambah-pemasukan shadow-sm">
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill tombol-tambah-pemasukan shadow-sm" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Income') }}
                         </button>
                     </div>
                 </div>
 
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table id="pemasukanTable" class="table table-hover align-middle mb-0" style="width:100%">
-                            <thead class="bg-light">
-                                <tr style="border-bottom: 2px solid #edf2f9;">
-                                    <th style="width: 5%;" class="text-center py-3">
-                                        <div class="form-check d-flex justify-content-center">
-                                            <input class="form-check-input" type="checkbox" id="checkAll" style="cursor: pointer;">
-                                        </div>
-                                    </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3">{{ __('No') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Income Name') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Created At') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Last Updated') }}</th>
-                                    <th style="width: 10%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                <div class="card-body">
+                    <!-- SEARCH BAR -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+                        <div class="search-bar" style="min-width: 200px;">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" id="searchPemasukan" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="{{ __('Search categories...') }}" style="box-shadow: none; font-size: 0.8rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pemasukan-table-container">
+                        @include('pemasukan._table_list')
                     </div>
                 </div>
             </div>
@@ -207,8 +200,6 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/pemasukan.js') }}?v={{ filemtime(public_path('js/pemasukan.js')) }}"></script>
 @endpush
