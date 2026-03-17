@@ -75,133 +75,122 @@ $(document).ready(function () {
         cb(start, end);
     }
 
-    function initDataTable() {
-        hasilAnggaranTable = $('#hasilAnggaranTable').DataTable({
-            paging: true,
-            responsive: true,
-            lengthChange: true,
-            autoWidth: false,
-            serverSide: true,
-            processing: true,
-            language: {
-                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
-            },
-            ajax: { url: '/kalkulator', type: 'GET' },
-            columns: [
-                {
-                    data: 'hash',
-                    orderable: false,
-                    searchable: false,
-                    className: "text-center",
-                    responsivePriority: 1,
-                    render: function (data, type, row) {
-                        return `<div class="form-check d-flex justify-content-center">
-                                    <input class="form-check-input check-item" type="checkbox" value="${data}">
-                                </div>`;
-                    }
-                },
-                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center", responsivePriority: 1 },
-                {
-                    data: "tanggal_mulai",
-                    responsivePriority: 2,
-                    render: function (data, type, row) {
-                        const start = new Date(row.tanggal_mulai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
-                        const end = new Date(row.tanggal_selesai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' });
-                        return `<span class="fw-medium">${start}</span> <br> <span class="text-muted small">sampai ${end}</span>`;
-                    },
-                },
-                { data: "nama_anggaran", className: "text-center fw-bold", render: d => d || "-", responsivePriority: 1 },
-                {
-                    data: 'nama_jenis_pengeluaran',
-                    name: 'nama_jenis_pengeluaran',
-                    className: 'text-left',
-                    responsivePriority: 10,
-                    render: function (data, type, row) {
-                        if (type !== "display" || !Array.isArray(data) || data.length === 0) return "-";
-
-                        // Simple list implementation
-                        let limit = 3;
-                        let output = '<ul class="list-unstyled mb-0 small">';
-                        data.slice(0, limit).forEach((name, i) => {
-                            output += `<li><i class="bi bi-dot"></i> ${name}</li>`;
-                        });
-                        if (data.length > limit) {
-                            output += `<li class="text-muted ms-3">+${data.length - limit} lainnya</li>`;
-                        }
-                        output += '</ul>';
-                        return output;
-                    }
-                },
-                { data: "persentase_anggaran", className: "text-center", render: d => `<span class="badge bg-light text-dark border">${d}%</span>`, responsivePriority: 4 },
-                { data: "nominal_anggaran", className: "text-end", render: d => 'Rp ' + parseFloat(d).toLocaleString("id-ID"), responsivePriority: 5 },
-                { data: "anggaran_yang_digunakan", className: "text-end", render: d => 'Rp ' + parseFloat(d).toLocaleString("id-ID"), responsivePriority: 6 },
-                {
-                    data: "sisa_anggaran",
-                    className: "text-end",
-                    responsivePriority: 3,
-                    render: function (data, type, row) {
-                        const raw = (data ?? row.sisa_anggaran);
-                        const numeric = parseNumber(raw);
-                        const formatted = 'Rp ' + numeric.toLocaleString("id-ID");
-
-                        if (numeric < 0) {
-                            return `<span class="text-danger fw-bold">${formatted}</span><br><span class="badge bg-danger-subtle text-danger" style="font-size:10px;">Melebihi Anggaran</span>`;
-                        } else {
-                            return `<span class="text-success fw-bold">${formatted}</span><br><span class="badge bg-success-subtle text-success" style="font-size:10px;">Dalam Anggaran</span>`;
-                        }
-                    }
-                },
-                { data: "aksi", orderable: false, searchable: false, className: "text-center", responsivePriority: 1 },
-            ],
-            language: {
-                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json",
-                emptyTable: "Belum ada data proses anggaran."
-            },
-            drawCallback: function () {
-                $('#checkAll').prop('checked', false);
+    function fetchData(url = window.location.href, containerSelector = '#history-table-container') {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                $(containerSelector).html(response);
                 updateBulkDeleteUI();
+            },
+            error: function (err) {
+                console.error('Error fetching data:', err);
+                showToast('Gagal memuat data history', 'danger');
             }
         });
     }
 
+    // Detail fetchData
+    function fetchDetailData(url = window.location.href) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                $('#detail-table-container').html(response);
+            },
+            error: function (err) {
+                console.error('Error fetching detail data:', err);
+                showToast('Gagal memuat data transaksi', 'danger');
+            }
+        });
+    }
+
+    // Standard Search Logic
+    let searchTimer;
+    $('#historySearch').on('keyup', function () {
+        clearTimeout(searchTimer);
+        const search = $(this).val();
+        searchTimer = setTimeout(function () {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', search);
+            url.searchParams.set('page', 1);
+            fetchData(url.toString());
+        }, 500);
+    });
+
+    $('#detailSearch').on('keyup', function () {
+        clearTimeout(searchTimer);
+        const search = $(this).val();
+        searchTimer = setTimeout(function () {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', search);
+            url.searchParams.set('page', 1);
+            fetchDetailData(url.toString());
+        }, 500);
+    });
+
+    // Pagination Click
+    $(document).on('click', '.pagination a', function (e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+        const isDetail = $(this).closest('#detail-table-container').length > 0;
+        if (isDetail) {
+            fetchDetailData(url);
+        } else {
+            fetchData(url);
+        }
+    });
+
+    // Sorting Click
+    $(document).on('click', '.sort-link', function (e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+        const isDetail = $(this).closest('#detail-table-container').length > 0;
+        if (isDetail) {
+            fetchDetailData(url);
+        } else {
+            fetchData(url);
+        }
+    });
+
+    function initDataTable() {
+        // DataTables removed in favor of manual AJAX
+        if ($('#history-table-container').length > 0) fetchData();
+    }
+
     // Bulk Delete Logic
-    const checkAll = document.getElementById('checkAll');
-    const btnBulkDelete = document.getElementById('btnBulkDelete');
-    const countSelected = document.getElementById('countSelected');
-
     function updateBulkDeleteUI() {
-        const checked = document.querySelectorAll('.check-item:checked');
+        const checked = $('.check-item:checked');
         const count = checked.length;
+        const btnBulkDelete = $('#btnBulkDelete');
+        const countSelected = $('#countSelected');
+        const checkAll = $('#checkAll');
 
-        if (countSelected) countSelected.textContent = count;
+        if (countSelected.length > 0) countSelected.text(count);
 
-        if (btnBulkDelete) {
+        if (btnBulkDelete.length > 0) {
             if (count > 0) {
-                btnBulkDelete.classList.remove('d-none');
+                btnBulkDelete.removeClass('d-none');
             } else {
-                btnBulkDelete.classList.add('d-none');
+                btnBulkDelete.classList ? btnBulkDelete[0].classList.add('d-none') : btnBulkDelete.addClass('d-none');
             }
         }
 
         // Update checkAll state
-        const allItems = document.querySelectorAll('.check-item');
-        if (checkAll && allItems.length > 0) {
-            checkAll.checked = checked.length === allItems.length;
-            checkAll.indeterminate = checked.length > 0 && checked.length < allItems.length;
+        const allItems = $('.check-item');
+        if (checkAll.length > 0 && allItems.length > 0) {
+            checkAll.prop('checked', checked.length === allItems.length);
+            checkAll.prop('indeterminate', checked.length > 0 && checked.length < allItems.length);
         }
     }
 
-    if (checkAll) {
-        checkAll.addEventListener('change', function () {
-            const isChecked = this.checked;
-            document.querySelectorAll('.check-item').forEach(item => {
-                item.checked = isChecked;
-            });
-            updateBulkDeleteUI();
-        });
-    }
+    $(document).on('change', '#checkAll', function () {
+        const isChecked = this.checked;
+        $('.check-item').prop('checked', isChecked);
+        updateBulkDeleteUI();
+    });
 
-    $('body').on('change', '.check-item', function () {
+    $(document).on('change', '.check-item', function () {
         updateBulkDeleteUI();
     });
 
@@ -237,7 +226,7 @@ $(document).ready(function () {
                         data: { ids: ids },
                         success: (response) => {
                             showToast(response.message || 'Data deleted successfully', 'success');
-                            hasilAnggaranTable?.ajax.reload(null, false);
+                            fetchData(); // Manual reload
 
                             // Reset button
                             this.innerHTML = originalText;
@@ -316,7 +305,7 @@ $(document).ready(function () {
             .then(data => {
                 if (data.success) {
                     showToast(data.message || 'Budget processed successfully!', 'success');
-                    if (hasilAnggaranTable) hasilAnggaranTable.ajax.reload(null, false);
+                    fetchData(); // Manual reload
                     // Don't reset date range, keep it for user convenience or reset partial
                     $('#monthly_income').val('');
                     $('#additional_income').val('');
@@ -367,7 +356,7 @@ $(document).ready(function () {
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: () => {
                         showToast('Data deleted successfully', 'success');
-                        hasilAnggaranTable?.ajax.reload(null, false);
+                        fetchData(); // Manual reload
                     },
                     error: () => {
                         showToast('Gagal menghapus data', 'danger');
@@ -388,70 +377,7 @@ $(document).ready(function () {
     function initDetailTable() {
         const kalkulatorId = $('#kalkulator-id').val();
         if (!kalkulatorId) return;
-
-        $('#detailAnggaran').DataTable({
-            processing: true,
-            serverSide: true,
-            paging: true,
-            responsive: true,
-            ajax: {
-                url: "/kalkulator/" + kalkulatorId,
-                type: "GET",
-                headers: { "X-Requested-With": "XMLHttpRequest" },
-                error: function (xhr, error, thrown) {
-                    console.error('DataTables Error:', error, thrown);
-                    console.log('Response:', xhr.responseText);
-                }
-            },
-            columns: [
-                { data: "DT_RowIndex", orderable: false, searchable: false, className: "text-center", responsivePriority: 3 },
-                {
-                    data: "tgl_transaksi",
-                    className: "text-center",
-                    responsivePriority: 2,
-                    render: function (data) {
-                        return new Date(data).toLocaleDateString("id-ID", {
-                            day: "numeric", month: "short", year: "numeric"
-                        });
-                    },
-                },
-                { data: "nama", responsivePriority: 1 }, // Nama Pengeluaran
-                {
-                    data: "nominal",
-                    className: "text-end",
-                    responsivePriority: 1,
-                    render: data => "Rp " + parseFloat(data).toLocaleString("id-ID")
-                },
-                {
-                    data: "keterangan",
-                    responsivePriority: 10,
-                    render: (data, type, row) => {
-                        if (type !== "display") return data || "-";
-                        if (!data) return "-";
-
-                        // Split by newlines and create an ordered list
-                        const items = data.split('\n').filter(item => item.trim() !== '');
-                        if (items.length > 1) {
-                            let list = '<ol class="mb-0 ps-3 small text-muted">';
-                            items.forEach(item => {
-                                list += `<li>${item}</li>`;
-                            });
-                            list += '</ol>';
-                            return list;
-                        } else {
-                            // If there's only one item, adding a number is optional but might be cleaner if user wants it
-                            // But usually single item doesn't need numbering inside description.
-                            // Let's assume they want it "tidy", maybe just a span
-                            return `<span class="text-muted small">${items[0]}</span>`;
-                        }
-                    }
-                },
-            ],
-            language: {
-                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json",
-                emptyTable: "Tidak ada transaksi pada periode ini."
-            }
-        });
+        // Detail data initially rendered by Blade @include in show.blade.php
     }
 
     // Init

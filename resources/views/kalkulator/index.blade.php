@@ -3,8 +3,6 @@
 @section('title', __('Budget Calculator'))
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap5.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <style>
     /* Header Enhancements */
@@ -77,9 +75,11 @@
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Calculate New Budget') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Enter income and period to calculate the Budget.') }}</p>
                     </div>
-                    <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
-                        <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
+                        </button>
+                    </div>
                 </div>
 
                 <div class="collapse" id="instructionsCollapse">
@@ -138,9 +138,9 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                            <button type="button" class="btn btn-light rounded-pill px-3 shadow-sm" id="btnReset">{{ __('Reset') }}</button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm" id="btnProses">
-                                <i class="bi bi-Monitoring me-1"></i> {{ __('Process Budget') }}
+                            <button type="button" class="btn btn-light rounded-pill shadow-sm" id="btnReset" style="padding: 2px 15px; font-size: 0.8rem;">{{ __('Reset') }}</button>
+                            <button type="submit" class="btn btn-primary rounded-pill shadow-sm" id="btnProses" style="padding: 2px 15px; font-size: 0.8rem;">
+                                <i class="bi bi-gear me-1"></i> {{ __('Process Budget') }}
                                 <span id="btnProsesSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -157,33 +157,25 @@
                          <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Process History') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('List of your budget calculation history.') }}</p>
                     </div>
-                    <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
-                        <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill" id="btnBulkDelete" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
+                        </button>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table id="hasilAnggaranTable" class="table table-hover align-middle mb-0" style="width:100%">
-                            <thead class="bg-light">
-                                <tr style="border-bottom: 2px solid #edf2f9;">
-                                    <th style="width: 5%;" class="text-center">
-                                        <div class="form-check d-flex justify-content-center">
-                                            <input class="form-check-input" type="checkbox" id="checkAll">
-                                        </div>
-                                    </th>
-                                    <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('No') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Period') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Budget Name') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Expense Type') }}</th>
-                                    <th class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Percentage') }}</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">{{ __('Budget Amount') }}</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">{{ __('Used') }}</th>
-                                    <th class="text-end text-secondary small text-uppercase fw-bold py-3">{{ __('Remaining') }}</th>
-                                    <th style="width: 5%;" class="text-center text-secondary small text-uppercase fw-bold py-3">{{ __('Action') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                <div class="card-body">
+                    <!-- SEARCH BAR -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+                        <div class="search-bar" style="min-width: 200px;">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" id="historySearch" class="form-control bg-light border-start-0 rounded-end-pill shadow-none" style="font-size: 0.8rem;" placeholder="{{ __('Search history...') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="history-table-container">
+                        @include('kalkulator._table_list')
                     </div>
                 </div>
             </div>
@@ -194,10 +186,7 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/responsive.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

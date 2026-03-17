@@ -3,8 +3,6 @@
 @section('title', __('Budget Monitoring Detail'))
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap5.min.css">
 <style>
     /* Header Enhancements */
     .pagetitle {
@@ -75,9 +73,9 @@
             <div class="card-dashboard mb-4">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title fw-bold mb-0">{{ __('Budget Information') }}</h5>
-                        <a href="{{ route('kalkulator.index') }}" class="btn btn-light btn-sm">
-                            <i class="bi bi-arrow-left me-1"></i> {{ __('Back') }}
+                        <h5 class="card-title fw-bold mb-0 text-dark">{{ __('Budget Information') }}</h5>
+                        <a href="{{ route('kalkulator.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill d-flex align-items-center gap-2" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <i class="bi bi-arrow-left"></i> {{ __('Back') }}
                         </a>
                     </div>
 
@@ -131,7 +129,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span>{{ __('Remaining Budget') }}:</span>
                                         <div class="text-end">
-                                            @php $sisa = $HasilProsesAnggaran->sisa_anggaran; @endphp
+                                            @php $sisa = $HasilProsesAnggaran->remaining_budget; @endphp
                                             <h5 class="mb-0 fw-bold {{ $sisa < 0 ? 'text-danger' : 'text-success' }}">
                                                 Rp {{ number_format($sisa, 0, ',', '.') }}
                                             </h5>
@@ -154,23 +152,20 @@
         <div class="col-lg-12">
             <div class="card-dashboard">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-bold mb-4">{{ __('Related Transaction Details') }}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+                        <h5 class="card-title fw-bold mb-0 text-dark">{{ __('Related Transaction Details') }}</h5>
+                        <div class="search-bar" style="min-width: 200px;">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" id="detailSearch" class="form-control bg-light border-start-0 rounded-end-pill shadow-none" style="font-size: 0.8rem;" placeholder="{{ __('Search transactions...') }}">
+                            </div>
+                        </div>
+                    </div>
                     
                     <input type="hidden" id="kalkulator-id" value="{{ $HasilProsesAnggaran->hash }}">
 
-                    <div class="table-responsive">
-                        <table id="detailAnggaran" class="table table-hover table-borderless align-middle" style="width:100%">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 5%;">{{ __('No') }}</th>
-                                    <th>{{ __('Date') }}</th>
-                                    <th>{{ __('Expense Category') }}</th>
-                                    <th class="text-end">{{ __('Amount') }}</th>
-                                    <th>{{ __('Description') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                    <div id="detail-table-container">
+                        @include('kalkulator._transaction_table', ['transaksi' => $transaksi])
                     </div>
                 </div>
             </div>
@@ -182,9 +177,6 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/kalkulator.js') }}?v={{ filemtime(public_path('js/kalkulator.js')) }}"></script>
 @endpush
