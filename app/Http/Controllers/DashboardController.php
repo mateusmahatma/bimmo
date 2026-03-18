@@ -53,11 +53,14 @@ class DashboardController extends Controller
         $persenPengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : 0;
         $persenSaldo = $saldoBulanLalu != 0 ? (($saldo - $saldoBulanLalu) / abs($saldoBulanLalu)) * 100 : 0;
 
+        $cicilanBesok = Pinjaman::where('id_user', $userId)->where('status', 'belum_lunas')->get()->sum(fn($p) => min($p->nominal_angsuran, $p->jumlah_pinjaman));
+
         return [
             'saldo' => $saldo,
             'pemasukan' => $pemasukanBulanIni,
             'pengeluaran' => $pengeluaranBulanIni,
             'hari_ini' => $pengeluaranHariIni,
+            'cicilan_besok' => $cicilanBesok,
             'persen_saldo' => round($persenSaldo, 1),
             'persen_pemasukan' => round($persenPemasukan, 1),
             'persen_pengeluaran' => round($persenPengeluaran, 1),
@@ -79,6 +82,7 @@ class DashboardController extends Controller
                 'pemasukan' => $this->maskNominal($numbers['pemasukan'], $newState),
                 'pengeluaran' => $this->maskNominal($numbers['pengeluaran'], $newState),
                 'hari_ini' => $this->maskNominal($numbers['hari_ini'], $newState),
+                'cicilan_besok' => $this->maskNominal($numbers['cicilan_besok'] ?? 0, $newState),
             ]
         ]);
     }
@@ -148,7 +152,13 @@ class DashboardController extends Controller
         } else {
             $allTrx = Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
             $totalPengeluaranTotal = $allTrx->where('status', '1')->sum(fn($t) => (float)$t->nominal);
-            $selisihBulan = ($allTrx->count() > 1) ? (Carbon::parse($allTrx->first()->tgl_transaksi)->startOfMonth()->diffInMonths(Carbon::parse($allTrx->last()->tgl_transaksi)->startOfMonth()) + 1) : 1;
+            if ($allTrx->count() > 1) {
+                $firstDate = Carbon::parse($allTrx->first()->tgl_transaksi)->startOfMonth();
+                $lastDate = Carbon::parse($allTrx->last()->tgl_transaksi)->startOfMonth();
+                $selisihBulan = $firstDate->diffInMonths($lastDate) + 1;
+            } else {
+                $selisihBulan = 1;
+            }
             $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaranTotal / $selisihBulan : 0;
             $kelipatan = $user->kelipatan_target_dana_darurat ?? 6;
             $targetDanaDarurat = $rataRataPengeluaran * $kelipatan;
@@ -197,6 +207,7 @@ class DashboardController extends Controller
         $pemasukanView = $this->maskNominal($numbers['pemasukan'], $showNominal);
         $pengeluaranView = $this->maskNominal($numbers['pengeluaran'], $showNominal);
         $pengeluaranHariIni = $this->maskNominal($numbers['hari_ini'], $showNominal);
+        $cicilanBesokView = $this->maskNominal($numbers['cicilan_besok'] ?? 0, $showNominal);
 
         $persenSaldo = $numbers['persen_saldo'];
         $persenPemasukan = $numbers['persen_pemasukan'];
@@ -236,6 +247,7 @@ class DashboardController extends Controller
             'saldoView',
             'pemasukanView',
             'pengeluaranView',
+            'cicilanBesokView',
             'showNominal',
             'pengeluaranHariIni',
             'persenSaldo',

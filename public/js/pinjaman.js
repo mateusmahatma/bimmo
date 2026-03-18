@@ -119,6 +119,7 @@ $(document).ready(function () {
             nama_pinjaman: $('#nama_pinjaman').val().trim(),
             jumlah_pinjaman: $('#jumlah_pinjaman').val().trim(),
             jangka_waktu: $('#jangka_waktu').val().trim(),
+            nominal_angsuran: $('#nominal_angsuran').val() ? $('#nominal_angsuran').val().trim() : null,
             start_date: $('#start_date').val().trim(),
             end_date: $('#end_date').val().trim(),
             status: $('#status').val().trim(),
@@ -178,6 +179,7 @@ $(document).ready(function () {
                 $('#nama_pinjaman').val(response.result.nama_pinjaman);
                 $('#jumlah_pinjaman').val(response.result.jumlah_pinjaman);
                 $('#jangka_waktu').val(response.result.jangka_waktu);
+                $('#nominal_angsuran').val(response.result.nominal_angsuran);
                 $('#start_date').val(response.result.start_date);
                 $('#end_date').val(response.result.end_date);
                 $('#status').val(response.result.status);
@@ -300,7 +302,7 @@ $(document).ready(function () {
     initBulkDelete();
 
     // Handle Payment Modal (Create)
-    tableContainer.on("click", "[data-bs-target='#bayarModal']", function (e) {
+    $(document).on("click", "[data-bs-target='#bayarModal']", function (e) {
         e.stopPropagation();
         var button = $(this);
         var pinjamanId = button.data("pinjaman-id");
@@ -321,7 +323,7 @@ $(document).ready(function () {
     });
 
     // Handle Payment Edit Button
-    tableContainer.on('click', '.edit-bayar', function (e) {
+    $(document).on('click', '.edit-bayar', function (e) {
         e.stopPropagation();
         var id = $(this).data('id');
         var modal = $("#bayarModal");

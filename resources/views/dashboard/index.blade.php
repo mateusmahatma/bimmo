@@ -54,7 +54,7 @@
                 <div class="card-body p-3 p-md-4">
                 <div class="row g-3 mb-4">
                     <!-- BALANCE -->
-                    <div class="col-12 col-md-6 col-xl-3">
+                    <div class="col-12 col-md-6 col-xl">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
@@ -81,7 +81,7 @@
                     </div>
 
                     <!-- INCOME -->
-                    <div class="col-12 col-md-6 col-xl-3">
+                    <div class="col-12 col-md-6 col-xl">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
@@ -108,7 +108,7 @@
                     </div>
 
                     <!-- EXPENSE -->
-                    <div class="col-12 col-md-6 col-xl-3">
+                    <div class="col-12 col-md-6 col-xl">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
@@ -135,8 +135,28 @@
                         </div>
                     </div>
 
+                    <!-- NEXT INSTALLMENT -->
+                    <div class="col-12 col-md-6 col-xl">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Next Installment') }}</h6>
+                                        <h4 class="mb-2 fw-bold text-primary" id="summary-cicilan-besok">{{ $cicilanBesokView }}</h4>
+                                    </div>
+                                    <div class="icon-shape bg-light text-primary rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-calendar-check fs-5"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2 small">
+                                    <span class="text-muted" style="font-size: 0.8rem;">{{ __('Next repayment goal') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- TODAY -->
-                    <div class="col-12 col-md-6 col-xl-3">
+                    <div class="col-12 col-md-6 col-xl">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">

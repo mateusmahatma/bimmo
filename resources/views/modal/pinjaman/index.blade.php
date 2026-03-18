@@ -20,6 +20,7 @@
                 
                 {{-- Hidden fields kept for functional consistency --}}
                 <input type="number" id="jangka_waktu" name='jangka_waktu' value="0" hidden>
+                <input type="number" id="nominal_angsuran" name='nominal_angsuran' value="0" hidden>
                 <input type="date" id="start_date" name='start_date' value="{{ date('Y-m-d') }}" hidden>
                 <input type="date" id="end_date" name='end_date' value="{{ date('Y-m-d') }}" hidden>
                 <input type="text" id="status" name='status' value="belum_lunas" hidden>

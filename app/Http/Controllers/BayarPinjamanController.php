@@ -27,7 +27,8 @@ class BayarPinjamanController extends Controller
         $tgl_bayar = $request->input('tgl_bayar');
 
         if ($jumlah_bayar > $pinjaman->jumlah_pinjaman) {
-            return redirect()->back()->with('error', 'Nominal pembayaran melebihi jumlah pinjaman');
+            $currentBalance = 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
+            return redirect()->back()->with('error', "Pinjaman anda $currentBalance sesuaikan nominal pembayaran anda");
         }
 
         try {
@@ -111,7 +112,8 @@ class BayarPinjamanController extends Controller
         $selisih = $request->jumlah_bayar - $bayar->jumlah_bayar;
 
         if ($selisih > $pinjaman->jumlah_pinjaman) {
-            return redirect()->back()->with('error', 'Nominal pembayaran melebihi sisa pinjaman');
+            $currentBalance = 'Rp ' . number_format($pinjaman->jumlah_pinjaman, 0, ',', '.');
+            return redirect()->back()->with('error', "Pinjaman anda $currentBalance sesuaikan nominal pembayaran anda");
         }
 
         try {

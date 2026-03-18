@@ -19,6 +19,7 @@ class Pinjaman extends Model
         'nominal_awal',
         'nominal_sisa',
         'jumlah_angsuran',
+        'nominal_angsuran',
         'angsuran_ke',
         'sisa_angsuran',
         'keterangan',
@@ -31,13 +32,13 @@ class Pinjaman extends Model
     // Relasi ke model User
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class , 'id_user');
     }
 
     // Relasi ke model BayarPinjaman
     public function bayar_pinjaman()
     {
-        return $this->hasMany(BayarPinjaman::class, 'id_pinjaman');
+        return $this->hasMany(BayarPinjaman::class , 'id_pinjaman');
     }
 
     // Tambahkan boot method untuk menghapus bayar_pinjaman terkait

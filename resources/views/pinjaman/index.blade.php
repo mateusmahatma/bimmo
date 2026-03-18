@@ -199,7 +199,7 @@
 <section class="section dashboard">
     <div class="row">
         <!-- Summary Cards -->
-        <div class="col-md-4 mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
             <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
@@ -215,7 +215,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
             <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
@@ -231,7 +231,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
             <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
@@ -241,6 +241,22 @@
                         <div>
                             <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Remaining Balance') }}</h6>
                             <h4 class="mb-0 fw-bold text-danger" id="totalPinjaman">Rp {{ number_format($totalRemaining, 0, ',', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
+                <div class="card-body py-4">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning-light text-warning me-3" style="width: 48px; height: 48px; background: rgba(255, 193, 7, 0.1);">
+                            <i class="bi bi-calendar-event fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Next Installment') }}</h6>
+                            <h4 class="mb-0 fw-bold text-warning" id="statNextInstallment">Rp {{ number_format($totalNextMonthInstallment, 0, ',', '.') }}</h4>
                         </div>
                     </div>
                 </div>
@@ -330,6 +346,13 @@
                         </div>
                     @endif
 
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     <div id="pinjaman-table-container">
                         @include('pinjaman._table_list')
                     </div>
@@ -348,10 +371,9 @@
     <i class="bi bi-plus-lg fs-2"></i>
 </a>
 
-@endsection
-
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
 @endpush
+@endsection

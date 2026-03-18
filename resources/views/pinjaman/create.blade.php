@@ -86,7 +86,7 @@
                             </div>
 
                             <!-- Amount -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label for="jumlah_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Amount (Rp)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light">Rp</span>
@@ -98,13 +98,27 @@
                             </div>
 
                             <!-- Duration -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label for="jangka_waktu" class="form-label fw-bold small text-uppercase text-muted">{{ __('Duration (Months)') }}</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control @error('jangka_waktu') is-invalid @enderror" id="jangka_waktu" name="jangka_waktu" value="{{ old('jangka_waktu') }}" placeholder="e.g., 12" min="1" required>
                                     <span class="input-group-text bg-light">{{ __('Months') }}</span>
                                 </div>
+                                <div class="form-text small text-muted">{{ __('Auto-calculated if installment is set') }}</div>
                                 @error('jangka_waktu')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Monthly Installment -->
+                            <div class="col-md-4">
+                                <label for="nominal_angsuran" class="form-label fw-bold small text-uppercase text-muted">{{ __('Monthly Installment (Rp)') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">Rp</span>
+                                    <input type="number" class="form-control @error('nominal_angsuran') is-invalid @enderror" id="nominal_angsuran" name="nominal_angsuran" value="{{ old('nominal_angsuran') }}" placeholder="0" min="0" step="any">
+                                </div>
+                                <div class="form-text small text-muted">{{ __('Auto-calculated or enter manually') }}</div>
+                                @error('nominal_angsuran')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -169,9 +183,36 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const amountInput = document.getElementById('jumlah_pinjaman');
         const startDateInput = document.getElementById('start_date');
         const durationInput = document.getElementById('jangka_waktu');
+        const installmentInput = document.getElementById('nominal_angsuran');
         const endDateInput = document.getElementById('end_date');
+
+        let isManuallyEditingInstallment = false;
+
+        function calculateInstallment() {
+            if (isManuallyEditingInstallment) return;
+            const amount = parseFloat(amountInput.value);
+            const duration = parseInt(durationInput.value);
+            
+            if (!isNaN(amount) && !isNaN(duration) && duration > 0) {
+                const installment = amount / duration;
+                // Don't use toFixed if it ends with .00 to make it cleaner
+                installmentInput.value = installment % 1 === 0 ? installment : installment.toFixed(2);
+            }
+        }
+
+        function calculateDuration() {
+            const amount = parseFloat(amountInput.value);
+            const installment = parseFloat(installmentInput.value);
+            
+            if (!isNaN(amount) && !isNaN(installment) && installment > 0) {
+                const duration = Math.ceil(amount / installment);
+                durationInput.value = duration;
+                calculateEndDate();
+            }
+        }
 
         function calculateEndDate() {
             const startDate = new Date(startDateInput.value);
@@ -190,10 +231,28 @@
             }
         }
 
-        if (startDateInput && durationInput && endDateInput) {
+        if (startDateInput && durationInput && endDateInput && amountInput && installmentInput) {
             startDateInput.addEventListener('change', calculateEndDate);
-            durationInput.addEventListener('input', calculateEndDate);
+            
+            amountInput.addEventListener('input', () => {
+                isManuallyEditingInstallment = false;
+                calculateInstallment();
+            });
+
+            durationInput.addEventListener('input', () => {
+                isManuallyEditingInstallment = false;
+                calculateInstallment();
+                calculateEndDate();
+            });
+
+            installmentInput.addEventListener('input', () => {
+                isManuallyEditingInstallment = true;
+                calculateDuration();
+            });
+
             // Initial calc
+            isManuallyEditingInstallment = false;
+            calculateInstallment();
             calculateEndDate();
         }
     });

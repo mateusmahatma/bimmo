@@ -131,6 +131,20 @@
     </nav>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+        <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <section class="section">
     <div class="row">
         <!-- Liability Information Card -->
@@ -147,19 +161,15 @@
                             <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px;">{{ __('Current Balance') }}</label>
                             <p class="fs-5 fw-bold text-primary mb-0">Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }}</p>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Duration') }}</label>
                             <p class="mb-0 fw-semibold">{{ $pinjaman->jangka_waktu }} {{ __('Months') }}</p>
                         </div>
-                        <div class="col-md-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Start Date') }}</label>
-                            <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->start_date)->format('d M Y') }}</p>
+                        <div class="col-md-4">
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Monthly Installment') }}</label>
+                            <p class="mb-0 fw-semibold text-warning">Rp {{ number_format($pinjaman->nominal_angsuran, 0, ',', '.') }}</p>
                         </div>
-                        <div class="col-md-3">
-                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('End Date') }}</label>
-                            <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->end_date)->format('d M Y') }}</p>
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Status') }}</label>
                             @if ($pinjaman->status === 'belum_lunas')
                                 <span class="badge bg-danger-light text-danger px-3 py-2 rounded-pill">
@@ -171,10 +181,69 @@
                                 </span>
                             @endif
                         </div>
+                        <div class="col-md-6 border-top pt-3 mt-3">
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('Start Date') }}</label>
+                            <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->start_date)->format('d M Y') }}</p>
+                        </div>
+                        <div class="col-md-6 border-top pt-3 mt-3">
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('End Date') }}</label>
+                            <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->end_date)->format('d M Y') }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Installment Schedule Summary -->
+        @if ($pinjaman->status === 'belum_lunas' && $pinjaman->nominal_angsuran > 0)
+        <div class="col-lg-12 mb-4">
+            <div class="card card-dashboard border-0 shadow-sm overflow-hidden" style="border-radius: 12px; border-top: 3px solid #4154f1 !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3">
+                            <i class="bi bi-calendar-check fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Future Installment Schedule') }}</h5>
+                            <p class="text-muted small mb-0">{{ __('Projected repayment metrics based on current balance.') }}</p>
+                        </div>
+                    </div>
+
+                    @php
+                        $sisaJangkaWaktu = ceil($pinjaman->jumlah_pinjaman / $pinjaman->nominal_angsuran);
+                    @endphp
+
+                    <div class="row g-4 mb-3">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px; font-size: 0.7rem;">{{ __('Estimated Remaining') }}</label>
+                                <div class="d-flex align-items-center">
+                                    <h4 class="mb-0 fw-bold text-dark me-2">{{ $sisaJangkaWaktu }}</h4>
+                                    <span class="text-muted small">{{ __('Months') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <label class="small text-muted text-uppercase fw-bold mb-1 d-block" style="letter-spacing: 0.5px; font-size: 0.7rem;">{{ __('Next Installment') }}</label>
+                                <h4 class="mb-0 fw-bold text-primary">Rp {{ number_format(min($pinjaman->nominal_angsuran, $pinjaman->jumlah_pinjaman), 0, ',', '.') }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 d-none d-lg-block">
+                             <div class="p-3 h-100 d-flex align-items-center justify-content-center text-center">
+                                <i class="bi bi-graph-down-arrow-fill text-primary opacity-25" style="font-size: 2.5rem;"></i>
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center p-2 rounded-2" style="background: rgba(65, 84, 241, 0.05);">
+                        <i class="bi bi-info-circle text-primary me-2"></i>
+                        <span class="small text-muted">{{ __('Note: This is an estimation based on your current balance and monthly installment amount.') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- Payment History Card -->
         <div class="col-lg-12">
@@ -256,8 +325,6 @@
 
 @include('modal.pinjaman.bayar')
 
-@endsection
-
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -269,3 +336,4 @@
     })
 </script>
 @endpush
+@endsection

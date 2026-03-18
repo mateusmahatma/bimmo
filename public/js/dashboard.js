@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById('summary-saldo').textContent = res.data.saldo;
                 document.getElementById('summary-pemasukan').textContent = res.data.pemasukan;
                 document.getElementById('summary-pengeluaran').textContent = res.data.pengeluaran;
+                document.getElementById('summary-cicilan-besok').textContent = res.data.cicilan_besok;
                 document.getElementById('summary-hari-ini').textContent = res.data.hari_ini;
                 toggleBtn.innerHTML = res.show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
             } catch (e) { console.error(e); }

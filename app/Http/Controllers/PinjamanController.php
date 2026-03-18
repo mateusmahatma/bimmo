@@ -41,6 +41,9 @@ class PinjamanController extends Controller
         $ids = (clone $query)->pluck('id');
         $totalPaid = \App\Models\BayarPinjaman::whereIn('id_pinjaman', $ids)->sum('jumlah_bayar');
         $totalOriginal = $totalRemaining + $totalPaid;
+        $totalNextMonthInstallment = (clone $query)->where('status', 'belum_lunas')->get()->sum(function ($p) {
+            return min($p->nominal_angsuran, $p->jumlah_pinjaman);
+        });
 
         // Sort
         $sort = $request->get('sort', 'created_at');
@@ -63,10 +66,11 @@ class PinjamanController extends Controller
                 'totalPinjaman' => 'Rp ' . number_format($totalRemaining, 0, ',', '.'),
                 'totalPaid' => 'Rp ' . number_format($totalPaid, 0, ',', '.'),
                 'totalOriginal' => 'Rp ' . number_format($totalOriginal, 0, ',', '.'),
+                'totalNextMonthInstallment' => 'Rp ' . number_format($totalNextMonthInstallment, 0, ',', '.'),
             ]);
         }
 
-        return view('pinjaman.index', compact('pinjaman', 'totalRemaining', 'totalPaid', 'totalOriginal'));
+        return view('pinjaman.index', compact('pinjaman', 'totalRemaining', 'totalPaid', 'totalOriginal', 'totalNextMonthInstallment'));
     }
 
     public function create()
@@ -79,6 +83,7 @@ class PinjamanController extends Controller
         $validatedData = $request->validate([
             'nama_pinjaman' => 'required',
             'jumlah_pinjaman' => 'numeric',
+            'nominal_angsuran' => 'nullable|numeric',
             'jangka_waktu' => 'integer',
             'start_date' => 'date',
             'end_date' => 'date',
@@ -119,6 +124,7 @@ class PinjamanController extends Controller
         $validasi = Validator::make($request->all(), [
             'nama_pinjaman' => 'required',
             'jumlah_pinjaman' => 'numeric',
+            'nominal_angsuran' => 'nullable|numeric',
             'jangka_waktu' => 'integer',
             'start_date' => 'date',
             'end_date' => 'date',
@@ -135,6 +141,7 @@ class PinjamanController extends Controller
         $data = [
             'nama_pinjaman' => $request->nama_pinjaman,
             'jumlah_pinjaman' => $request->jumlah_pinjaman,
+            'nominal_angsuran' => $request->nominal_angsuran,
             'jangka_waktu' => $request->jangka_waktu,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
