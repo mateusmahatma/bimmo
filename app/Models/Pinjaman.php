@@ -26,7 +26,12 @@ class Pinjaman extends Model
         'jangka_waktu',
         'start_date',
         'end_date',
-        'status'
+        'status',
+        'simulasi_cicilan'
+    ];
+
+    protected $casts = [
+        'simulasi_cicilan' => 'array',
     ];
 
     // Relasi ke model User

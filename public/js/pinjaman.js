@@ -306,6 +306,9 @@ $(document).ready(function () {
         e.stopPropagation();
         var button = $(this);
         var pinjamanId = button.data("pinjaman-id");
+        var nominal = button.data("nominal");
+        var tanggal = button.data("tanggal");
+
         var modal = $("#bayarModal");
         var form = modal.find("#bayarForm");
 
@@ -317,6 +320,13 @@ $(document).ready(function () {
 
         form.attr("action", "/pinjaman/" + pinjamanId + "/bayar");
         modal.find("#pinjamanId").val(pinjamanId);
+
+        if (nominal !== undefined) {
+            modal.find("#jumlah_bayar").val(nominal);
+        }
+        if (tanggal !== undefined) {
+            modal.find("#tgl_bayar").val(tanggal);
+        }
 
         // Remove method spoofing if it exists
         form.find('input[name="_method"]').remove();

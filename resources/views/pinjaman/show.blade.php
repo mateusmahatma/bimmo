@@ -245,6 +245,72 @@
         </div>
         @endif
 
+        @if ($pinjaman->simulasi_cicilan)
+        <!-- Simulasi Cicilan Card -->
+        <div class="col-lg-12 mb-4">
+            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+                        <div class="bg-success bg-opacity-10 text-success rounded-3 p-2 me-3">
+                            <i class="bi bi-calendar3 fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem;">{{ __('Simulasi Cicilan (Rencana Awal)') }}</h5>
+                            <p class="text-muted small mb-0">{{ __('Jadwal cicilan yang direncanakan saat pembuatan pinjaman.') }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm text-center align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 10%">{{ __('Bulan') }}</th>
+                                    <th>{{ __('Tanggal Jatuh Tempo') }}</th>
+                                    <th class="text-end pe-4">{{ __('Nominal (Rp)') }}</th>
+                                    <th class="text-center" style="width: 15%">{{ __('Aksi') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $total_paid = $pinjaman->bayar_pinjaman->sum('jumlah_bayar');
+                                    $cumulative_simulasi = 0;
+                                @endphp
+                                @foreach($pinjaman->simulasi_cicilan as $simulasi)
+                                @php
+                                    $cumulative_simulasi += $simulasi['nominal'];
+                                    // Consider paid if total paid so far covers or is very close (floating points) to this expected cumulative amount
+                                    $is_paid = $total_paid >= ($cumulative_simulasi - 0.01);
+                                @endphp
+                                <tr>
+                                    <td>{{ $simulasi['bulan_ke'] }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($simulasi['tanggal'])->format('d M Y') }}</td>
+                                    <td class="fw-bold text-end pe-4">Rp {{ number_format($simulasi['nominal'], 0, ',', '.') }}</td>
+                                    <td class="text-center">
+                                        @if ($is_paid)
+                                            <span class="badge bg-success-light text-success px-3 py-2 rounded-pill">
+                                                <i class="bi bi-check-circle-fill me-1"></i> {{ __('Lunas') }}
+                                            </span>
+                                        @elseif ($pinjaman->status === 'belum_lunas')
+                                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#bayarModal" 
+                                                data-pinjaman-id="{{ Vinkla\Hashids\Facades\Hashids::encode($pinjaman->id) }}"
+                                                data-nominal="{{ $simulasi['nominal'] }}"
+                                                data-tanggal="{{ $simulasi['tanggal'] }}">
+                                                <i class="bi bi-wallet2 me-1"></i> {{ __('Bayar') }}
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Payment History Card -->
         <div class="col-lg-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">

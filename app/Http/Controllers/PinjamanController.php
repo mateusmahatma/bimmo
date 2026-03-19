@@ -89,9 +89,14 @@ class PinjamanController extends Controller
             'end_date' => 'date',
             'status' => 'in:lunas,belum_lunas',
             'keterangan' => 'nullable|string',
+            'simulasi_cicilan' => 'nullable|string',
         ]);
 
         $validatedData['id_user'] = Auth::id();
+
+        if (isset($validatedData['simulasi_cicilan'])) {
+            $validatedData['simulasi_cicilan'] = json_decode($validatedData['simulasi_cicilan'], true);
+        }
 
         Pinjaman::create($validatedData);
 
@@ -130,6 +135,7 @@ class PinjamanController extends Controller
             'end_date' => 'date',
             'status' => 'in:lunas,belum_lunas',
             'keterangan' => 'nullable|string',
+            'simulasi_cicilan' => 'nullable|string',
         ], [
             'nama_pinjaman.required' => 'Nama wajib diisi',
         ]);
@@ -148,6 +154,10 @@ class PinjamanController extends Controller
             'status' => $request->status,
             'keterangan' => $request->keterangan,
         ];
+
+        if ($request->has('simulasi_cicilan')) {
+            $data['simulasi_cicilan'] = json_decode($request->simulasi_cicilan, true);
+        }
 
         Pinjaman::where('id', $id)->update($data);
         return response()->json(['success' => "Berhasil melakukan update data"]);
