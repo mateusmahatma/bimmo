@@ -181,6 +181,14 @@
         background-color: #1a1a1a;
         border-color: rgba(255,255,255,0.05);
     }
+    
+    .rich-text-index p {
+        margin-bottom: 0.25rem;
+    }
+    .rich-text-index ul, .rich-text-index ol {
+        margin-bottom: 0.25rem;
+        padding-left: 1.25rem;
+    }
 </style>
 @endpush
 

@@ -189,6 +189,14 @@
                             <label class="small text-muted text-uppercase fw-bold mb-1 d-block">{{ __('End Date') }}</label>
                             <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($pinjaman->end_date)->format('d M Y') }}</p>
                         </div>
+                        @if($pinjaman->keterangan)
+                        <div class="col-12 border-top pt-3 mt-3">
+                            <label class="small text-muted text-uppercase fw-bold mb-1 d-block text-primary" style="letter-spacing: 0.5px;">{{ __('Keterangan') }}</label>
+                            <div class="mt-2 rich-text-content">
+                                {!! $pinjaman->keterangan !!}
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

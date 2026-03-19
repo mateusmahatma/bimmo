@@ -218,6 +218,18 @@
         const installmentInput = document.getElementById('nominal_angsuran');
         const endDateInput = document.getElementById('end_date');
 
+        let editor;
+        ClassicEditor
+            .create(document.querySelector('#keterangan'), {
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote' ],
+            })
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         let isManuallyEditingInstallment = false;
 
         function calculateInstallment() {

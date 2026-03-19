@@ -14,6 +14,18 @@ $(document).ready(function () {
     const tableContainer = $('#pinjaman-table-container');
     const filterStatus = $('#filter_status');
 
+    let modalEditor;
+    ClassicEditor
+        .create(document.querySelector('#pinjamanModal #keterangan'), {
+            toolbar: ['heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote'],
+        })
+        .then(editor => {
+            modalEditor = editor;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
     // Main Fetch Function
     function fetchPinjaman(url = window.location.href) {
         const urlObj = new URL(url, window.location.origin);
@@ -123,7 +135,7 @@ $(document).ready(function () {
             start_date: $('#start_date').val().trim(),
             end_date: $('#end_date').val().trim(),
             status: $('#status').val().trim(),
-            keterangan: $('#keterangan').val().trim()
+            keterangan: modalEditor ? modalEditor.getData() : $('#keterangan').val().trim()
         };
 
         if (formData.nama_pinjaman === '') {
@@ -157,6 +169,7 @@ $(document).ready(function () {
         e.preventDefault();
         e.stopPropagation();
         $('#pinjamanModal').find('form')[0].reset();
+        if (modalEditor) modalEditor.setData('');
         $('#pinjamanModal').modal('show');
 
         $('#pinjamanModal').off('click', '.tombol-simpan-pinjaman')
@@ -183,7 +196,11 @@ $(document).ready(function () {
                 $('#start_date').val(response.result.start_date);
                 $('#end_date').val(response.result.end_date);
                 $('#status').val(response.result.status);
-                $('#keterangan').val(response.result.keterangan);
+                if (modalEditor) {
+                    modalEditor.setData(response.result.keterangan || '');
+                } else {
+                    $('#keterangan').val(response.result.keterangan);
+                }
 
                 $('#pinjamanModal').off('click', '.tombol-simpan-pinjaman')
                     .on('click', '.tombol-simpan-pinjaman', () => simpanPinjaman(id));

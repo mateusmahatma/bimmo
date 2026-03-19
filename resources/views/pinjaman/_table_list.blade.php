@@ -50,7 +50,7 @@
                     </td>
                     <td class="text-secondary fw-medium">{{ $loop->iteration + ($pinjaman->currentPage() - 1) * $pinjaman->perPage() }}</td>
                     <td class="fw-semibold text-dark">{{ $row->nama_pinjaman }}</td>
-                    <td class="text-muted small">{{ $row->keterangan ?: '-' }}</td>
+                    <td class="text-muted small rich-text-index">{!! $row->keterangan ?: '-' !!}</td>
                     <td class="text-end fw-bold text-primary">Rp {{ number_format($total_loan, 0, ',', '.') }}</td>
                     <td class="text-end fw-bold text-success">Rp {{ number_format($paid, 0, ',', '.') }}</td>
                     <td class="text-end fw-bold text-danger">Rp {{ number_format($row->jumlah_pinjaman, 0, ',', '.') }}</td>
