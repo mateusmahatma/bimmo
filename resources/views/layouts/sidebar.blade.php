@@ -123,7 +123,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
-                                {{ __('Liability') }}
+                                {{ __('Loan') }}
                             </a>
                         </li>
                     </ul>
