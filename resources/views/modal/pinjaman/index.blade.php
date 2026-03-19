@@ -14,7 +14,7 @@
                     <label for="jumlah_pinjaman" class="form-label small fw-bold text-muted text-uppercase">{{ __('Loan Amount') }}</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0 rounded-start-3">Rp</span>
-                        <input type="number" id="jumlah_pinjaman" class="form-control border-start-0 rounded-end-3" name='jumlah_pinjaman' placeholder="0" required>
+                        <input type="text" id="jumlah_pinjaman" class="form-control border-start-0 rounded-end-3" name='jumlah_pinjaman' placeholder="0" required>
                     </div>
                 </div>
                 

@@ -90,7 +90,7 @@
                                 <label for="jumlah_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Amount (Rp)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light">Rp</span>
-                                    <input type="number" class="form-control @error('jumlah_pinjaman') is-invalid @enderror" id="jumlah_pinjaman" name="jumlah_pinjaman" value="{{ old('jumlah_pinjaman') }}" placeholder="0" min="0" step="any" required>
+                                    <input type="text" class="form-control @error('jumlah_pinjaman') is-invalid @enderror" id="jumlah_pinjaman" name="jumlah_pinjaman" value="{{ old('jumlah_pinjaman') }}" placeholder="0" required>
                                 </div>
                                 @error('jumlah_pinjaman')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -115,7 +115,7 @@
                                 <label for="nominal_angsuran" class="form-label fw-bold small text-uppercase text-muted">{{ __('Monthly Installment (Rp)') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light">Rp</span>
-                                    <input type="number" class="form-control @error('nominal_angsuran') is-invalid @enderror" id="nominal_angsuran" name="nominal_angsuran" value="{{ old('nominal_angsuran') }}" placeholder="0" min="0" step="any">
+                                    <input type="text" class="form-control @error('nominal_angsuran') is-invalid @enderror" id="nominal_angsuran" name="nominal_angsuran" value="{{ old('nominal_angsuran') }}" placeholder="0">
                                 </div>
                                 <div class="form-text small text-muted">{{ __('Auto-calculated or enter manually') }}</div>
                                 @error('nominal_angsuran')
@@ -201,6 +201,16 @@
                             </div>
                         </div>
                     </form>
+                    <script>
+                        document.getElementById('createLoanForm').addEventListener('submit', function(e) {
+                            const amountInput = document.getElementById('jumlah_pinjaman');
+                            const installmentInput = document.getElementById('nominal_angsuran');
+                            
+                            // Remove dots before submission
+                            if (amountInput) amountInput.value = amountInput.value.replace(/\./g, '').replace(',', '.');
+                            if (installmentInput) installmentInput.value = installmentInput.value.replace(/\./g, '').replace(',', '.');
+                        });
+                    </script>
                 </div>
             </div>
         </div>
@@ -229,23 +239,43 @@
             .catch(error => {
                 console.error(error);
             });
+        
+        const formatRupiah = (value) => {
+            if (!value && value !== 0) return '';
+            let valStr = value.toString();
+            
+            if (valStr.includes('.') && !valStr.includes(',') && valStr.match(/\.\d{1,2}$/)) {
+                valStr = valStr.replace('.', ',');
+            }
+            
+            let numberString = valStr.replace(/[^,\d]/g, '');
+            let split = numberString.split(',');
+            split[0] = split[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            
+            return split.length > 1 ? split[0] + ',' + split[1] : split[0];
+        };
+
+        const parseRupiah = (value) => {
+            if (!value) return 0;
+            return parseFloat(value.toString().replace(/\./g, '').replace(',', '.'));
+        };
 
         let isManuallyEditingInstallment = false;
 
         function calculateInstallment() {
             if (isManuallyEditingInstallment) return;
-            const amount = parseFloat(amountInput.value);
+            const amount = parseRupiah(amountInput.value);
             const duration = parseInt(durationInput.value);
             
             if (!isNaN(amount) && !isNaN(duration) && duration > 0) {
                 const installment = amount / duration;
-                installmentInput.value = installment % 1 === 0 ? installment : installment.toFixed(2);
+                installmentInput.value = formatRupiah(installment % 1 === 0 ? installment : installment.toFixed(0));
             }
         }
 
         function calculateDuration() {
-            const amount = parseFloat(amountInput.value);
-            const installment = parseFloat(installmentInput.value);
+            const amount = parseRupiah(amountInput.value);
+            const installment = parseRupiah(installmentInput.value);
             
             if (!isNaN(amount) && !isNaN(installment) && installment > 0) {
                 const duration = Math.ceil(amount / installment);
@@ -268,7 +298,7 @@
         }
 
         function generateSimulasi() {
-            const amount = parseFloat(amountInput.value);
+            const amount = parseRupiah(amountInput.value);
             const duration = parseInt(durationInput.value);
             const startDateStr = startDateInput.value;
             const simulasiContainer = document.getElementById('simulasiContainer');
@@ -286,7 +316,7 @@
             let startDate = new Date(startDateStr);
             
             // Allow override from specific installment input, else default to pure split
-            let customInstallment = parseFloat(installmentInput.value);
+            let customInstallment = parseRupiah(installmentInput.value);
             let usingCustomInstallment = true;
             if (isNaN(customInstallment) || customInstallment <= 0) {
                 customInstallment = Math.floor(amount / duration);
@@ -331,7 +361,7 @@
                         <td>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-0">Rp</span>
-                                <input type="number" class="form-control text-end flex-grow-1 simulasi-input border-0 bg-transparent fw-bold" data-index="${i-1}" value="${nominal}" min="0" step="any">
+                                <input type="text" class="form-control text-end flex-grow-1 simulasi-input border-0 bg-transparent fw-bold" data-index="${i-1}" value="${formatRupiah(nominal)}" placeholder="0">
                             </div>
                         </td>
                     </tr>
@@ -344,8 +374,9 @@
 
             document.querySelectorAll('.simulasi-input').forEach(input => {
                 input.addEventListener('input', function() {
+                    this.value = formatRupiah(this.value);
                     const idx = parseInt(this.getAttribute('data-index'));
-                    let val = parseFloat(this.value);
+                    let val = parseRupiah(this.value);
                     if (isNaN(val) || val < 0) val = 0;
                     currentSimulasi[idx].nominal = val;
                     simulasi_cicilan_input.value = JSON.stringify(currentSimulasi);
@@ -388,7 +419,15 @@
                 generateSimulasi();
             });
             
-            amountInput.addEventListener('input', () => {
+            installmentInput.addEventListener('input', function() {
+                this.value = formatRupiah(this.value);
+                isManuallyEditingInstallment = true;
+                calculateDuration();
+                generateSimulasi();
+            });
+
+            amountInput.addEventListener('input', function() {
+                this.value = formatRupiah(this.value);
                 isManuallyEditingInstallment = false;
                 calculateInstallment();
                 generateSimulasi();
@@ -401,14 +440,11 @@
                 generateSimulasi();
             });
 
-            installmentInput.addEventListener('input', () => {
-                isManuallyEditingInstallment = true;
-                calculateDuration();
-                generateSimulasi();
-            });
-
             // Initial calc
             isManuallyEditingInstallment = false;
+            if (amountInput.value) amountInput.value = formatRupiah(amountInput.value);
+            if (installmentInput.value) installmentInput.value = formatRupiah(installmentInput.value);
+            
             calculateInstallment();
             calculateEndDate();
             // Optional: You could call generateSimulasi() here if you want it visible immediately upon edit/old data

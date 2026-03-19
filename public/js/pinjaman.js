@@ -14,6 +14,33 @@ $(document).ready(function () {
     const tableContainer = $('#pinjaman-table-container');
     const filterStatus = $('#filter_status');
 
+    // Utility functions for formatting
+    const formatRupiah = (value) => {
+        if (!value && value !== 0) return '';
+        let valStr = value.toString();
+
+        // Normalize: if it looks like a raw number with dot decimal, convert to comma
+        if (valStr.includes('.') && !valStr.includes(',') && valStr.match(/\.\d{1,2}$/)) {
+            valStr = valStr.replace('.', ',');
+        }
+
+        let numberString = valStr.replace(/[^,\d]/g, '');
+        let split = numberString.split(',');
+        split[0] = split[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        return split.length > 1 ? split[0] + ',' + split[1] : split[0];
+    };
+
+    const parseRupiah = (value) => {
+        if (!value) return 0;
+        return parseFloat(value.toString().replace(/\./g, '').replace(',', '.'));
+    };
+
+    // Apply formatting to modal inputs
+    $('#pinjamanModal #jumlah_pinjaman').on('keyup', function () {
+        $(this).val(formatRupiah($(this).val()));
+    });
+
     let modalEditor;
     ClassicEditor
         .create(document.querySelector('#pinjamanModal #keterangan'), {
@@ -129,9 +156,9 @@ $(document).ready(function () {
 
         const formData = {
             nama_pinjaman: $('#nama_pinjaman').val().trim(),
-            jumlah_pinjaman: $('#jumlah_pinjaman').val().trim(),
+            jumlah_pinjaman: parseRupiah($('#jumlah_pinjaman').val().trim()),
             jangka_waktu: $('#jangka_waktu').val().trim(),
-            nominal_angsuran: $('#nominal_angsuran').val() ? $('#nominal_angsuran').val().trim() : null,
+            nominal_angsuran: $('#nominal_angsuran').val() ? parseRupiah($('#nominal_angsuran').val().trim()) : null,
             start_date: $('#start_date').val().trim(),
             end_date: $('#end_date').val().trim(),
             status: $('#status').val().trim(),
@@ -155,8 +182,17 @@ $(document).ready(function () {
                 fetchPinjaman();
             },
             error: function (xhr) {
-                console.error(xhr.responseText);
-                showToast('Gagal menyimpan data!', 'danger');
+                if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+                    let errorMessage = '';
+                    for (const key in errors) {
+                        errorMessage += errors[key][0] + '\n';
+                    }
+                    showToast(errorMessage || 'Gagal menyimpan data!', 'danger');
+                } else {
+                    console.error(xhr.responseText);
+                    showToast('Terjadi kesalahan pada server!', 'danger');
+                }
             },
             complete: function () {
                 $('.tombol-simpan-pinjaman').prop('disabled', false).html('Simpan');
@@ -190,9 +226,9 @@ $(document).ready(function () {
 
                 // Populate Form
                 $('#nama_pinjaman').val(response.result.nama_pinjaman);
-                $('#jumlah_pinjaman').val(response.result.jumlah_pinjaman);
+                $('#jumlah_pinjaman').val(formatRupiah(response.result.jumlah_pinjaman));
                 $('#jangka_waktu').val(response.result.jangka_waktu);
-                $('#nominal_angsuran').val(response.result.nominal_angsuran);
+                $('#nominal_angsuran').val(formatRupiah(response.result.nominal_angsuran));
                 $('#start_date').val(response.result.start_date);
                 $('#end_date').val(response.result.end_date);
                 $('#status').val(response.result.status);
