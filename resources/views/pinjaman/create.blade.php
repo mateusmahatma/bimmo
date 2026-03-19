@@ -78,7 +78,7 @@
                         <div class="row g-3">
                             <!-- Loan Name -->
                             <div class="col-12">
-                                <label for="nama_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Liability Name') }}</label>
+                                <label for="nama_pinjaman" class="form-label fw-bold small text-uppercase text-muted">{{ __('Loan Name') }}</label>
                                 <input type="text" class="form-control @error('nama_pinjaman') is-invalid @enderror" id="nama_pinjaman" name="nama_pinjaman" value="{{ old('nama_pinjaman') }}" placeholder="{{ __('e.g., Koperasi Loan, Bank Loan') }}" required>
                                 @error('nama_pinjaman')
                                     <div class="invalid-feedback">{{ $message }}</div>

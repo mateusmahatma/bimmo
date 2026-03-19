@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', __('Liability List'))
+@section('title', __('Loan List'))
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
@@ -187,11 +187,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">{{ __('Liability List') }}</h1>
+    <h1 class="fw-bold mb-1">{{ __('Loan List') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-            <li class="breadcrumb-item active">{{ __('Liabilitys') }}</li>
+            <li class="breadcrumb-item active">{{ __('Loans') }}</li>
         </ol>
     </nav>
 </div>
@@ -207,7 +207,7 @@
                             <i class="bi bi-bank fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Liability') }}</h6>
+                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Loan') }}</h6>
                             <h4 class="mb-0 fw-bold text-primary" id="statTotalOriginal">Rp {{ number_format($totalOriginal, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -268,8 +268,8 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Liability List') }}</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage and track your Liability records.') }}</p>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Loan List') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage and track your Loan records.') }}</p>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
@@ -280,7 +280,7 @@
                             <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
                         <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill shadow-sm btn-add-desktop" style="padding: 2px 10px; font-size: 0.75rem;">
-                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Liability') }}
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Loan') }}
                         </a>
                     </div>
                 </div>
@@ -290,11 +290,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>{{ __('How to Pay Liability:') }}</h6>
+                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>{{ __('How to Pay Loan:') }}</h6>
                                     <ol class="mb-0 ps-3 small">
-                                        <li>{{ __('Find the Liability you want to pay in the list below.') }}</li>
+                                        <li>{{ __('Find the Loan you want to pay in the list below.') }}</li>
                                         <li>{{ __('Click the Blue Eye Icon') }} (<strong><i class="bi bi-eye"></i></strong>) {{ __('to view details.') }}</li>
-                                        <li>{{ __('Click the Pay Liability button at the top right of the history section.') }}</li>
+                                        <li>{{ __('Click the Pay Loan button at the top right of the history section.') }}</li>
                                         <li>{{ __('Enter the amount, date, and optionally upload proof.') }}</li>
                                     </ol>
                                 </div>
@@ -367,7 +367,7 @@
 @include('modal.pinjaman.index')
 
 <!-- Floating Action Button for Mobile -->
-<a href="{{ route('pinjaman.create') }}" class="btn btn-primary fab-add" title="{{ __('Add New Liability') }}">
+<a href="{{ route('pinjaman.create') }}" class="btn btn-primary fab-add" title="{{ __('Add New Loan') }}">
     <i class="bi bi-plus-lg fs-2"></i>
 </a>
 

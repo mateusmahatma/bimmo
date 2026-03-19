@@ -17,11 +17,11 @@
                 <th style="width: 5%;" class="text-secondary small text-uppercase fw-bold">{{ __('No') }}</th>
                 <th class="text-secondary small text-uppercase fw-bold">
                     <a href="{{ $sortLink('nama_pinjaman') }}" class="text-decoration-none text-secondary d-flex align-items-center gap-1 sort-link" data-sort="nama_pinjaman" data-direction="{{ $currentSort === 'nama_pinjaman' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
-                        {{ __('Liability Name') }} @if($currentSort === 'nama_pinjaman') <i class="bi bi-arrow-{{ $currentDir === 'asc' ? 'up' : 'down' }}"></i> @endif
+                        {{ __('Loan Name') }} @if($currentSort === 'nama_pinjaman') <i class="bi bi-arrow-{{ $currentDir === 'asc' ? 'up' : 'down' }}"></i> @endif
                     </a>
                 </th>
                 <th class="text-secondary small text-uppercase fw-bold">{{ __('Notes') }}</th>
-                <th class="text-end text-secondary small text-uppercase fw-bold">{{ __('Total Liability') }}</th>
+                <th class="text-end text-secondary small text-uppercase fw-bold">{{ __('Total Loan') }}</th>
                 <th class="text-end text-secondary small text-uppercase fw-bold">{{ __('Paid Amount') }}</th>
                 <th class="text-end text-secondary small text-uppercase fw-bold">
                     <a href="{{ $sortLink('jumlah_pinjaman') }}" class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link" data-sort="jumlah_pinjaman" data-direction="{{ $currentSort === 'jumlah_pinjaman' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
@@ -70,7 +70,7 @@
                     <td colspan="9" class="text-center py-5">
                         <div class="py-4">
                             <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                            <p class="text-muted mt-2">{{ __('No liability records found') }}</p>
+                            <p class="text-muted mt-2">{{ __('No Loan records found') }}</p>
                         </div>
                     </td>
                 </tr>
