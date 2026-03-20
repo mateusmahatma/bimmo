@@ -341,7 +341,7 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                             <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm rounded-pill d-flex align-items-center gap-2" style="padding: 2px 10px; font-size: 0.75rem;">
+                             <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm rounded-pill d-flex align-items-center gap-2 no-loader" style="padding: 2px 10px; font-size: 0.75rem;">
                                 <i class="bi bi-file-earmark-excel"></i> {{ __('Export Excel') }}
                             </a>
                         </div>

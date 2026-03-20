@@ -376,8 +376,8 @@
                                     <i class="bi bi-download"></i> {{ __('Export') }}
                                 </button>
                                 <ul class="dropdown-menu shadow border-0 rounded-3">
-                                    <li><a class="dropdown-item" id="btnExportExcel" href="{{ route('transaksi.export.excel', request()->all()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
-                                    <li><a class="dropdown-item" id="btnExportPdf" href="{{ route('transaksi.export.pdf', request()->all()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
+                                    <li><a class="dropdown-item no-loader" id="btnExportExcel" href="{{ route('transaksi.export.excel', request()->all()) }}"><i class="bi bi-file-earmark-excel me-2 text-success"></i> Excel</a></li>
+                                    <li><a class="dropdown-item no-loader" id="btnExportPdf" href="{{ route('transaksi.export.pdf', request()->all()) }}"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> PDF</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" id="btnExportEmail" href="#" data-bs-toggle="modal" data-bs-target="#emailExportModal"><i class="bi bi-envelope me-2 text-primary"></i> {{ __('Export to Email') }}</a></li>
                                 </ul>
@@ -387,7 +387,7 @@
                                 <i class="bi bi-upload"></i> {{ __('Import') }}
                             </button>
 
-                             <a href="{{ route('transaksi.download.template') }}" class="btn btn-outline-secondary btn-sm rounded-circle" title="Download Template" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                             <a href="{{ route('transaksi.download.template') }}" class="btn btn-outline-secondary btn-sm rounded-circle no-loader" title="Download Template" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-file-earmark-spreadsheet"></i>
                             </a>
                         </div>
