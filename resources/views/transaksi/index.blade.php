@@ -187,17 +187,51 @@
         #transaksiTable td:last-child {
              padding-left: 10px;
              text-align: center;
-             display: flex !important;
+             display: none !important; /* Action hidden by default on mobile detail */
              justify-content: center !important;
              align-items: center !important;
              gap: 10px;
              border-bottom: 0;
              margin-top: 5px;
         }
-        #transaksiTable td:last-child:before { 
-            display: none;
+
+        /* NEW COLLAPSE LOGIC */
+        .mobile-collapsible-row {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-detail {
+            display: none !important;
+        }
+
+        .mobile-collapsible-row.expanded .mobile-detail {
+            display: flex !important;
+        }
+
+        .mobile-collapsible-row.expanded {
+            border: 1px solid rgba(13, 110, 253, 0.2) !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        }
+
+        .mobile-collapsible-row.expanded .mobile-toggle-icon i {
+            transform: rotate(180deg);
+        }
+
+        .mobile-toggle-icon i {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        /* Ensure amount and category look good in header */
+        #transaksiTable tr.mobile-collapsible-row td.mobile-header {
+            border-bottom: 0;
         }
         
+        #transaksiTable tr.mobile-collapsible-row.expanded td.mobile-header {
+            border-bottom: 1px solid #f8f9fa;
+        }
+
         /* Hide ID/Extra on mobile */
         #transaksiTable td:nth-of-type(2) {
             display: none;
@@ -647,6 +681,15 @@
 
         // Pagination and Sorting Links (Delegate)
         tableContainer.addEventListener('click', function(e) {
+            // Mobile Expand Logic
+            const row = e.target.closest('.mobile-collapsible-row');
+            const isAction = e.target.closest('.mobile-detail') || e.target.closest('.check-item') || e.target.closest('a') || e.target.closest('button');
+            
+            if (window.innerWidth < 768 && row && !isAction) {
+                row.classList.toggle('expanded');
+                return;
+            }
+
             const link = e.target.closest('.pagination a') || e.target.closest('.sort-link');
             if (link) {
                 e.preventDefault();

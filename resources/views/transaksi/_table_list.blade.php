@@ -45,20 +45,20 @@
         </thead>
         <tbody>
             @forelse ($transaksi as $row)
-                <tr>
-                    <td class="text-center mobile-checkbox" data-label="Select">
+                <tr class="mobile-collapsible-row">
+                    <td class="text-center mobile-checkbox mobile-header" data-label="Select">
                         <div class="form-check d-flex justify-content-center">
                             <input class="form-check-input check-item" type="checkbox" value="{{ $row->id }}">
                         </div>
                     </td>
-                    <td data-label="No">{{ $loop->iteration + ($transaksi->currentPage() - 1) * $transaksi->perPage() }}</td>
-                    <td data-label="Date">
+                    <td data-label="No" class="mobile-detail">{{ $loop->iteration + ($transaksi->currentPage() - 1) * $transaksi->perPage() }}</td>
+                    <td data-label="Date" class="mobile-detail">
                         <div class="fw-bold text-dark">{{ \Carbon\Carbon::parse($row->tgl_transaksi)->format('d M Y') }}
                         </div>
                         <div class="small text-muted">
                             {{ \Carbon\Carbon::parse($row->tgl_transaksi)->locale(app()->getLocale())->isoFormat('dddd') }}</div>
                     </td>
-                    <td data-label="Category">
+                    <td data-label="Category" class="mobile-header">
                         @if ((float)$row->nominal_pemasukan > 0)
                             <div class="mb-1">
                                 <span class="badge bg-success-light text-success border border-success-subtle rounded-pill px-3">
@@ -75,7 +75,7 @@
                             </div>
                         @endif
                     </td>
-                    <td data-label="Description">
+                    <td data-label="Description" class="mobile-detail">
                         @if ($row->keterangan)
                             <div class="text-muted small" style="max-height: 60px; overflow-y: auto;">
                                 @php
@@ -99,15 +99,18 @@
                             <span class="text-muted small">-</span>
                         @endif
                     </td>
-                    <td class="text-end fw-bold" data-label="Amount">
+                    <td class="text-end fw-bold mobile-header" data-label="Amount">
                         @if ((float)$row->nominal_pemasukan > 0)
                             <div class="text-success">+ Rp {{ number_format((float)$row->nominal_pemasukan, 0, ',', '.') }}</div>
                         @endif
                         @if ((float)$row->nominal > 0)
                             <div class="text-danger">- Rp {{ number_format((float)$row->nominal, 0, ',', '.') }}</div>
                         @endif
+                        <div class="mobile-toggle-icon d-md-none mt-2">
+                             <i class="bi bi-chevron-down text-muted"></i>
+                        </div>
                     </td>
-                    <td class="text-center" data-label="Action">
+                    <td class="text-center mobile-detail" data-label="Action">
                         @include('transaksi._aksi', ['row' => $row])
                     </td>
                 </tr>
