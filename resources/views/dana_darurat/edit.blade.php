@@ -100,8 +100,8 @@
                             <div class="col-md-6">
                                 <label for="jenis_transaksi_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Type') }} <span class="text-danger">*</span></label>
                                 <select name="jenis_transaksi_dana_darurat" id="jenis_transaksi_dana_darurat" class="form-select form-select-lg" required>
-                                    <option value="1" {{ old('jenis_transaksi_dana_darurat', $dana->status) == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
-                                    <option value="2" {{ old('jenis_transaksi_dana_darurat', $dana->status) == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
+                                    <option value="1" {{ old('jenis_transaksi_dana_darurat', $dana->jenis_transaksi_dana_darurat) == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
+                                    <option value="2" {{ old('jenis_transaksi_dana_darurat', $dana->jenis_transaksi_dana_darurat) == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
