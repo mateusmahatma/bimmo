@@ -18,7 +18,9 @@ class AsetMaintenance extends Model
         'teknisi',
         'biaya',
         'keterangan',
+        'dokumen',
     ];
+
 
     protected $casts = [
         'tanggal' => 'date',

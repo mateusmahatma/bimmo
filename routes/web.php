@@ -63,7 +63,8 @@ Route::get('/diagnose-encryption', function () {
             ;
         $check('users', ['name', 'email', 'no_hp', 'nominal_target_dana_darurat']);
         $check('transaksi', ['pemasukan', 'nominal_pemasukan', 'pengeluaran', 'nominal', 'keterangan']);
-        return count($results) > 0 ? implode("\n", $results) : "ALL OK";    });
+        return count($results) > 0 ? implode("\n", $results) : "ALL OK";
+    });
 
 // Authenticated Routes
 Route::middleware(['auth'])->group(function () {
@@ -129,9 +130,13 @@ Route::middleware(['auth'])->group(function () {
             function () {
             Route::get('/report', [AsetController::class , 'report'])->name('aset.report');
             Route::post('/{id}/maintenance', [AsetController::class , 'addMaintenance'])->name('aset.maintenance.store');
+            Route::get('/maintenance/{id}/edit', [AsetController::class , 'editMaintenance'])->name('aset.maintenance.edit');
+            Route::put('/maintenance/{id}', [AsetController::class , 'updateMaintenance'])->name('aset.maintenance.update');
+            Route::delete('/maintenance/{id}', [AsetController::class , 'destroyMaintenance'])->name('aset.maintenance.destroy');
             Route::post('/{id}/dispose', [AsetController::class , 'dispose'])->name('aset.dispose');
         }
         );
+
         Route::resource('aset', AsetController::class);
         Route::resource('events', EventController::class);
         Route::resource('barang', BarangController::class);
@@ -203,7 +208,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/template/{type}', [MigrationController::class , 'downloadTemplate'])->name('panduan.pindah.template');
             Route::post('/upload', [MigrationController::class , 'upload'])->name('panduan.pindah.upload');
         }
-        );    });
+        );
+    });
 
 // App Webhook
 Route::post('/api/webhook/whatsapp', [\App\Http\Controllers\Api\WhatsAppController::class , 'handle'])

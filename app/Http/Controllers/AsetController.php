@@ -72,7 +72,8 @@ class AsetController extends Controller
         if ($request->kategori === 'Investasi / Emas') {
             $rules['berat'] = 'required|numeric|min:0.01';
             $request->merge(['masa_pakai' => 0, 'nilai_sisa' => $request->harga_beli]);
-        } else {
+        }
+        else {
             $rules['masa_pakai'] = 'required|integer';
         }
 
@@ -120,7 +121,8 @@ class AsetController extends Controller
         if ($request->kategori === 'Investasi / Emas') {
             $rules['berat'] = 'required|numeric|min:0.01';
             $request->merge(['masa_pakai' => 0, 'nilai_sisa' => $request->harga_beli ?? $aset->harga_beli]);
-        } else {
+        }
+        else {
             $rules['masa_pakai'] = 'required|integer';
         }
 
@@ -165,18 +167,79 @@ class AsetController extends Controller
             'tanggal' => 'required|date',
             'kegiatan' => 'required',
             'biaya' => 'required|numeric',
+            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        AsetMaintenance::create([
-            'id_aset' => $aset->id,
-            'tanggal' => $request->tanggal,
-            'kegiatan' => $request->kegiatan,
-            'teknisi' => $request->teknisi,
-            'biaya' => $request->biaya,
-            'keterangan' => $request->keterangan,
-        ]);
+        $data = $request->only(['tanggal', 'kegiatan', 'teknisi', 'biaya', 'keterangan']);
+        $data['id_aset'] = $aset->id;
+
+        if ($request->hasFile('dokumen')) {
+            $data['dokumen'] = $request->file('dokumen')->store('aset/maintenance', 'public');
+        }
+
+        AsetMaintenance::create($data);
 
         return back()->with('success', 'Catatan pemeliharaan ditambahkan.');
+    }
+
+    public function editMaintenance($id)
+    {
+        $log = AsetMaintenance::findOrFail($id);
+
+        // Ensure the asset belongs to the authenticated user
+        if ($log->aset->id_user !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json($log);
+    }
+
+    public function updateMaintenance(Request $request, $id)
+    {
+        $log = AsetMaintenance::findOrFail($id);
+
+        // Ensure the asset belongs to the authenticated user
+        if ($log->aset->id_user !== Auth::id()) {
+            return back()->with('error', 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'tanggal' => 'required|date',
+            'kegiatan' => 'required',
+            'biaya' => 'required|numeric',
+            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        $data = $request->only(['tanggal', 'kegiatan', 'teknisi', 'biaya', 'keterangan']);
+
+        if ($request->hasFile('dokumen')) {
+            if ($log->dokumen) {
+                Storage::disk('public')->delete($log->dokumen);
+            }
+            $data['dokumen'] = $request->file('dokumen')->store('aset/maintenance', 'public');
+        }
+
+        $log->update($data);
+
+        return back()->with('success', 'Catatan pemeliharaan diperbarui.');
+    }
+
+    public function destroyMaintenance($id)
+    {
+        $log = AsetMaintenance::findOrFail($id);
+
+        // Ensure the asset belongs to the authenticated user
+        if ($log->aset->id_user !== Auth::id()) {
+            return back()->with('error', 'Unauthorized access.');
+        }
+
+        if ($log->dokumen) {
+            Storage::disk('public')->delete($log->dokumen);
+        }
+
+        $log->delete();
+
+        return back()->with('success', 'Catatan pemeliharaan dihapus.');
     }
 
     public function dispose(Request $request, $id)

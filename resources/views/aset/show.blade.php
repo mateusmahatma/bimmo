@@ -216,8 +216,13 @@
                                     <td>{{ $log->kegiatan }}</td>
                                     <td>{{ $log->teknisi ?: '-' }}</td>
                                     <td class="text-nowrap">Rp {{ number_format($log->biaya, 0, ',', '.') }}</td>
-                                    <td class="text-end px-3">
+                                    <td class="text-end px-3 text-nowrap">
+                                        @if($log->dokumen)
+                                        <a href="{{ asset('storage/'.$log->dokumen) }}" target="_blank" class="btn btn-sm text-secondary" title="{{ __('View Document') }}"><i class="bi bi-file-earmark-arrow-down"></i></a>
+                                        @endif
                                         <button class="btn btn-sm text-info" title="{{ __('View details') }}" onclick="showLogDetail('{{ $log->kegiatan }}', '{{ $log->keterangan }}')"><i class="bi bi-info-circle"></i></button>
+                                        <button class="btn btn-sm text-primary" title="{{ __('Edit') }}" onclick="editMaintenance({{ $log->id }})"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn btn-sm text-danger" title="{{ __('Delete') }}" onclick="deleteMaintenance({{ $log->id }})"><i class="bi bi-trash"></i></button>
                                     </td>
                                 </tr>
                                 @empty
@@ -237,7 +242,7 @@
 <!-- Maintenance Modal -->
 <div class="modal fade" id="maintenanceModal" tabindex="-1">
     <div class="modal-dialog">
-        <form action="{{ route('aset.maintenance.store', $aset->id) }}" method="POST" class="modal-content border-0">
+        <form action="{{ route('aset.maintenance.store', $aset->id) }}" method="POST" enctype="multipart/form-data" class="modal-content border-0">
             @csrf
             <div class="modal-header border-bottom">
                 <h5 class="modal-title fw-bold">{{ __('Add Maintenance Log') }}</h5>
@@ -267,6 +272,10 @@
                     <label class="form-label fw-bold small">{{ __('Description') }}</label>
                     <textarea name="keterangan" class="form-control" rows="3"></textarea>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Document') }} (JPG, PNG, PDF)</label>
+                    <input type="file" name="dokumen" class="form-control">
+                </div>
             </div>
             <div class="modal-footer border-top">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
@@ -275,6 +284,61 @@
         </form>
     </div>
 </div>
+
+<!-- Edit Maintenance Modal -->
+<div class="modal fade" id="editMaintenanceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form id="editMaintenanceForm" method="POST" enctype="multipart/form-data" class="modal-content border-0">
+            @csrf
+            @method('PUT')
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold">{{ __('Edit Maintenance Log') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Maintenance Date') }}</label>
+                    <input type="date" name="tanggal" id="edit_tanggal" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Activity Name') }}</label>
+                    <input type="text" name="kegiatan" id="edit_kegiatan" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Technician / Vendor') }}</label>
+                    <input type="text" name="teknisi" id="edit_teknisi" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Cost') }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Rp</span>
+                        <input type="number" name="biaya" id="edit_biaya" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Description') }}</label>
+                    <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">{{ __('Document') }} (JPG, PNG, PDF)</label>
+                    <input type="file" name="dokumen" class="form-control">
+                    <div id="edit_dokumen_preview" class="mt-2 small text-muted"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">{{ __('Update Log') }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Maintenance Form -->
+<form id="deleteMaintenanceForm" method="POST" action="" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 
 <!-- Disposal Modal -->
 <div class="modal fade" id="disposeModal" tabindex="-1">
@@ -329,6 +393,64 @@
             confirmButtonColor: '#0d6efd',
             customClass: {
                 popup: 'rounded-4 shadow-lg'
+            }
+        });
+    }
+
+    function editMaintenance(id) {
+        fetch(`/aset/maintenance/${id}/edit`)
+            .then(response => response.json())
+            .then(data => {
+                const editForm = document.getElementById('editMaintenanceForm');
+                editForm.action = `/aset/maintenance/${id}`;
+                
+                // Format date for input: YYYY-MM-DD
+                const date = data.tanggal ? data.tanggal.split('T')[0] : '';
+                
+                document.getElementById('edit_tanggal').value = date;
+                document.getElementById('edit_kegiatan').value = data.kegiatan;
+                document.getElementById('edit_teknisi').value = data.teknisi || '';
+                document.getElementById('edit_biaya').value = Math.round(data.biaya); // Use integer for cost input
+                document.getElementById('edit_keterangan').value = data.keterangan || '';
+                
+                const preview = document.getElementById('edit_dokumen_preview');
+                if (data.dokumen) {
+                    preview.innerHTML = `<i class="bi bi-file-check me-1"></i> ${data.dokumen.split('/').pop()} <span class="text-danger small">(upload again to replace)</span>`;
+                } else {
+                    preview.innerHTML = '';
+                }
+                
+                const modal = new bootstrap.Modal(document.getElementById('editMaintenanceModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error fetching maintenance log details:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: '{{ __("Failed to fetch data") }}'
+                });
+            });
+    }
+
+    function deleteMaintenance(id) {
+        Swal.fire({
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('You will not be able to revert this!') }}",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: "{{ __('Yes, delete it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
+            customClass: {
+                popup: 'rounded-4'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('deleteMaintenanceForm');
+                form.action = `/aset/maintenance/${id}`;
+                form.submit();
             }
         });
     }

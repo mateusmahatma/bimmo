@@ -542,5 +542,12 @@
     "Net Worth": "Kekayaan Bersih",
     "Your overall financial position.": "Posisi keuangan keseluruhan Anda.",
     "Liabilities": "Kewajiban",
-    "Your solvency and wealth status.": "Status solvabilitas dan kekayaan Anda."
+    "Your solvency and wealth status.": "Status solvabilitas dan kekayaan Anda.",
+    "Edit Maintenance Log": "Edit Log Pemeliharaan",
+    "Update Log": "Perbarui Log",
+    "Are you sure?": "Apakah Anda yakin?",
+    "You will not be able to revert this!": "Anda tidak akan dapat mengembalikannya!",
+    "Yes, delete it!": "Ya, hapus!",
+    "Failed to fetch data": "Gagal mengambil data",
+    "Document": "Dokumen"
 }
