@@ -119,7 +119,7 @@
                     </ul>
                     @if($aset->dokumen)
                     <div class="mt-3">
-                        <a href="{{ asset('storage/'.$aset->dokumen) }}" target="_blank" class="btn btn-outline-info btn-sm w-100 rounded-pill">
+                        <a href="{{ route('storage.aset_document', ['filename' => basename($aset->dokumen)]) }}" target="_blank" class="btn btn-outline-info btn-sm w-100 rounded-pill">
                             <i class="bi bi-file-earmark-text me-1"></i> {{ __('View Document') }}
                         </a>
                     </div>
@@ -218,7 +218,7 @@
                                     <td class="text-nowrap">Rp {{ number_format($log->biaya, 0, ',', '.') }}</td>
                                     <td class="text-end px-3 text-nowrap">
                                         @if($log->dokumen)
-                                        <a href="{{ asset('storage/'.$log->dokumen) }}" target="_blank" class="btn btn-sm text-secondary" title="{{ __('View Document') }}"><i class="bi bi-file-earmark-arrow-down"></i></a>
+                                        <a href="{{ route('storage.maintenance_document', ['filename' => basename($log->dokumen)]) }}" target="_blank" class="btn btn-sm text-secondary" title="{{ __('View Document') }}"><i class="bi bi-file-earmark-arrow-down"></i></a>
                                         @endif
                                         <button class="btn btn-sm text-info" title="{{ __('View details') }}" onclick="showLogDetail('{{ $log->kegiatan }}', '{{ $log->keterangan }}')"><i class="bi bi-info-circle"></i></button>
                                         <button class="btn btn-sm text-primary" title="{{ __('Edit') }}" onclick="editMaintenance({{ $log->id }})"><i class="bi bi-pencil-square"></i></button>

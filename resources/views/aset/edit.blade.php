@@ -176,7 +176,7 @@
                                 <label class="form-label fw-bold">{{ __('Purchase Invoice / Warranty Doc') }}</label>
                                 @if($aset->dokumen)
                                 <div class="mb-2">
-                                    <a href="{{ asset('storage/'.$aset->dokumen) }}" target="_blank" class="btn btn-sm btn-outline-info">{{ __('View Existing Document') }}</a>
+                                    <a href="{{ route('storage.aset_document', ['filename' => basename($aset->dokumen)]) }}" target="_blank" class="btn btn-sm btn-outline-info">{{ __('View Existing Document') }}</a>
                                 </div>
                                 @endif
                                 <input type="file" name="dokumen" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">

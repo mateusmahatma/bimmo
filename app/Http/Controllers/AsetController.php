@@ -127,8 +127,7 @@ class AsetController extends Controller
         }
 
         $request->validate($rules);
-
-        $data = $request->all();
+        $data = $request->except(['foto', 'dokumen']);
 
         if ($request->hasFile('foto')) {
             if ($aset->foto)
@@ -259,6 +258,32 @@ class AsetController extends Controller
         ]);
 
         return redirect()->route('aset.index')->with('success', 'Aset telah dihapus dari inventaris aktif.');
+    }
+
+    /*
+     |--------------------------------------------------------------------------
+     | Document Viewing Methods (Same pattern as profile photos)
+     |--------------------------------------------------------------------------
+     */
+    public function showDocument($filename)
+    {
+        $path = 'aset/dokumen/' . $filename;
+        if (!Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        // Return file directly through Laravel for better compatibility and permission handling
+        return response()->file(Storage::disk('public')->path($path));
+    }
+
+    public function showMaintenanceDocument($filename)
+    {
+        $path = 'aset/maintenance/' . $filename;
+        if (!Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return response()->file(Storage::disk('public')->path($path));
     }
 
     public function report()

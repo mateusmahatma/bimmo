@@ -135,6 +135,10 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/maintenance/{id}', [AsetController::class , 'updateMaintenance'])->name('aset.maintenance.update');
             Route::delete('/maintenance/{id}', [AsetController::class , 'destroyMaintenance'])->name('aset.maintenance.destroy');
             Route::post('/{id}/dispose', [AsetController::class , 'dispose'])->name('aset.dispose');
+
+            // Storage access for assets (consistent with profile photos)
+            Route::get('/storage/document/{filename}', [AsetController::class , 'showDocument'])->name('storage.aset_document');
+            Route::get('/storage/maintenance/{filename}', [AsetController::class , 'showMaintenanceDocument'])->name('storage.maintenance_document');
         }
         );
 
