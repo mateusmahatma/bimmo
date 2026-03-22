@@ -204,6 +204,29 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form[action*="transaksi/update"]');
+        let editorInstance;
+
+        // Initialize CKEditor
+        ClassicEditor
+            .create(document.querySelector('#keterangan'), {
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote' ]
+            })
+            .then(editor => {
+                editorInstance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        if (form) {
+            form.addEventListener('submit', function() {
+                if (editorInstance) {
+                    editorInstance.updateSourceElement();
+                }
+            });
+        }
+
         // Initialize TomSelect
         if (typeof TomSelect !== 'undefined') {
              if(document.getElementById('pemasukan')) new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- {{ __('Select Income') }} -' });

@@ -424,7 +424,7 @@
                             </td>
 
                             <td>
-                                {{ $row->keterangan ?? '-' }}
+                                {!! $row->keterangan ?? '-' !!}
                                 <div class="small text-muted">{{ $row->kategori }}</div>
                             </td>
 

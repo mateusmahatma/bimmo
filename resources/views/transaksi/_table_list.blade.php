@@ -77,23 +77,8 @@
                     </td>
                     <td data-label="Description" class="mobile-detail">
                         @if ($row->keterangan)
-                            <div class="text-muted small" style="max-height: 60px; overflow-y: auto;">
-                                @php
-                                    $descLines = array_filter(preg_split('/\r\n|\r|\n/', $row->keterangan), function (
-                                        $l,
-                                    ) {
-                                        return trim($l) !== '';
-                                    });
-                                @endphp
-                                @if (count($descLines) > 1)
-                                    <ol class="ps-3 mb-0">
-                                        @foreach ($descLines as $line)
-                                            <li>{{ trim($line) }}</li>
-                                        @endforeach
-                                    </ol>
-                                @else
-                                    {!! nl2br(e($row->keterangan)) !!}
-                                @endif
+                            <div class="text-muted small" style="max-height: 80px; overflow-y: auto;">
+                                {!! $row->keterangan !!}
                             </div>
                         @else
                             <span class="text-muted small">-</span>

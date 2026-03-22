@@ -35,7 +35,7 @@
                 <td style="text-align: right;">{{ number_format((float)$row->nominal_pemasukan,0,',','.') }}</td>
                 <td>{{ optional($row->pengeluaranRelation)->nama ?? '-' }}</td>
                 <td style="text-align: right;">{{ number_format((float)$row->nominal,0,',','.') }}</td>
-                <td>{{ $row->keterangan }}</td>
+                <td>{!! $row->keterangan !!}</td>
             </tr>
             @endforeach
         </tbody>

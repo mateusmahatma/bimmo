@@ -391,6 +391,9 @@ const TomSelectHandler = {
 // =====================================================
 // TRANSAKSI CRUD HANDLER
 // =====================================================
+let createEditor;
+let editEditor;
+
 const TransaksiCRUD = {
     // Create Transaksi
     initCreate() {
@@ -413,6 +416,9 @@ const TransaksiCRUD = {
             btnSimpan.disabled = true;
 
             const formData = new FormData(formTransaksi);
+            if (createEditor) {
+                formData.set('keterangan', createEditor.getData());
+            }
 
             fetch(formTransaksi.action, {
                 method: 'POST',
@@ -431,6 +437,7 @@ const TransaksiCRUD = {
                         this.closeModal('transaksiModal');
                         ToastHandler.show(data.message || 'Data transaksi berhasil disimpan!', 'success');
                         formTransaksi.reset();
+                        if (createEditor) createEditor.setData('');
                         DataTableHandler.reload();
                     } else {
                         ToastHandler.show(data.message || 'Gagal menyimpan data transaksi!', 'danger');
@@ -449,6 +456,12 @@ const TransaksiCRUD = {
 
         // Modal shown event
         if (transaksiModal) {
+            if (document.querySelector('#keterangan') && !createEditor) {
+                ClassicEditor.create(document.querySelector('#keterangan'), {
+                    toolbar: ['heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote']
+                }).then(editor => { createEditor = editor; });
+            }
+
             transaksiModal.addEventListener('shown.bs.modal', () => {
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('tgl_transaksi').value = today;
@@ -541,7 +554,19 @@ const TransaksiCRUD = {
                     $("#edit_nominal_pemasukan").val(response.result.nominal_pemasukan);
                     TomSelectHandler.setValue("#edit_pengeluaran", response.result.pengeluaran);
                     $("#edit_nominal").val(response.result.nominal);
-                    $("#edit_keterangan").val(response.result.keterangan);
+
+                    if (document.querySelector('#edit_keterangan') && !editEditor) {
+                        ClassicEditor.create(document.querySelector('#edit_keterangan'), {
+                            toolbar: ['heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote']
+                        }).then(editor => {
+                            editEditor = editor;
+                            editEditor.setData(response.result.keterangan || '');
+                        });
+                    } else if (editEditor) {
+                        editEditor.setData(response.result.keterangan || '');
+                    } else {
+                        $("#edit_keterangan").val(response.result.keterangan);
+                    }
 
                     const form = $("#editTransaksiForm");
                     form.attr("action", TransaksiConfig.urls.update(id));
@@ -561,7 +586,14 @@ const TransaksiCRUD = {
 
             const form = $(this);
             const url = form.attr("action");
-            const formData = form.serialize();
+            let formData = form.serializeArray();
+
+            if (editEditor) {
+                // Replace keterangan in serialized array
+                formData = formData.filter(item => item.name !== 'keterangan');
+                formData.push({ name: 'keterangan', value: editEditor.getData() });
+            }
+
             const submitButton = form.find("button[type='submit']");
 
             $.ajax({

@@ -328,6 +328,18 @@
         if (pengeluaranSectionEl.classList.contains('show')) togglePengeluaran.classList.add('active', 'bg-danger', 'text-white');
 
         // Form Validation Logic
+        let editorInstance;
+        ClassicEditor
+            .create(document.querySelector('#keterangan'), {
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote' ]
+            })
+            .then(editor => {
+                editorInstance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         const form = document.getElementById('transactionForm');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -378,6 +390,9 @@
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> {{ __('Saving...') }}';
 
             const formData = new FormData(form);
+            if (editorInstance) {
+                formData.set('keterangan', editorInstance.getData());
+            }
             const alertPlaceholder = document.getElementById('alertPlaceholder');
 
             fetch(form.action, {
@@ -430,6 +445,7 @@
                 form.reset();
                 if(incSelect) incSelect.clear();
                 if(expSelect) expSelect.clear();
+                if(editorInstance) editorInstance.setData('');
                 
                 // Scroll to Top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
