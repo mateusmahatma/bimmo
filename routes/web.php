@@ -89,6 +89,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/filter', [DashboardController::class , 'filter'])->name('dashboard.filter');
             Route::get('/saving-rate-data', [DashboardController::class , 'getSavingRateData']);
             Route::get('/anggaran/chart', [DashboardController::class , 'AnggaranChart'])->name('anggaran.chart');
+            Route::get('/net-worth-history', [DashboardController::class , 'getNetWorthHistory'])->name('dashboard.net-worth-history');
             Route::post('/toggle-nominal-ajax', [DashboardController::class , 'toggleNominalAjax'])->name('dashboard.toggle-nominal.ajax');
         }
         );

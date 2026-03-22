@@ -12,6 +12,7 @@ use App\Models\DanaDarurat;
 use App\Models\Anggaran;
 use App\Models\HasilProsesAnggaran;
 use App\Models\Dompet;
+use App\Models\BayarPinjaman;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -262,6 +263,92 @@ class DashboardController extends Controller
             'netWorth',
             'netWorthFormatted'
         ));
+    }
+
+    public function getNetWorthHistory(Request $request)
+    {
+        $userId = Auth::id();
+        $periode = (int)$request->query('periode', 6);
+        if (!in_array($periode, [2, 6, 12])) $periode = 6;
+
+        $netWorthHistory = [];
+        $startPeriodNw = now()->subMonths($periode - 1)->startOfMonth();
+        $endPeriodNw = now()->endOfMonth();
+
+        // PRE-FETCH DATA (Avoid N+1)
+        $allAssets = Aset::where('id_user', $userId)->get();
+        $allDD = DanaDarurat::where('id_user', $userId)->get();
+        $allPinjaman = Pinjaman::where('id_user', $userId)->get();
+        $allBayar = BayarPinjaman::where('id_user', $userId)->get();
+
+        $currentMonthNw = $startPeriodNw->copy();
+
+        while ($currentMonthNw <= $endPeriodNw) {
+            $monthEnd = $currentMonthNw->copy()->endOfMonth();
+            $monthStr = $currentMonthNw->translatedFormat('M Y');
+
+            // ASSETS LOGIC REFINED
+            $assetsMonthQuery = $allAssets->filter(function($aset) use ($monthEnd) {
+                $purchased = Carbon::parse($aset->tanggal_pembelian) <= $monthEnd;
+                $notDisposedYet = !$aset->is_disposed || 
+                                  ($aset->tanggal_disposal && Carbon::parse($aset->tanggal_disposal) > $monthEnd);
+                return $purchased && $notDisposedYet;
+            });
+            $assetsSum = $assetsMonthQuery->sum('harga_beli');
+
+            // DD LOGIC
+            $ddMonthQuery = $allDD->filter(fn($dd) => Carbon::parse($dd->tgl_transaksi_dana_darurat) <= $monthEnd);
+            $ddSum = $ddMonthQuery->reduce(function($carry, $item) {
+                return $item->jenis_transaksi_dana_darurat == 1 
+                    ? $carry + (float)$item->nominal_dana_darurat 
+                    : $carry - (float)$item->nominal_dana_darurat;
+            }, 0);
+
+            // LOAN LOGIC
+            $hutangTotal = $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
+                ->sum('jumlah_pinjaman');
+
+            $bayarTotal = $allBayar->filter(fn($b) => Carbon::parse($b->tgl_bayar) <= $monthEnd)
+                ->sum('jumlah_bayar');
+
+            $totalHutangHistory = $hutangTotal - $bayarTotal;
+            $totalKekayaan = $assetsSum + $ddSum;
+
+            // PREPARE DETAILS Breakdown
+            $details = [
+                'assets' => $assetsMonthQuery->map(fn($a) => [
+                    'name' => $a->nama_aset,
+                    'value' => (float)$a->harga_beli,
+                    'date' => Carbon::parse($a->tanggal_pembelian)->translatedFormat('d M Y')
+                ])->values(),
+                'emergency' => $ddMonthQuery->map(fn($d) => [
+                    'name' => $d->keterangan ?? ($d->jenis_transaksi_dana_darurat == 1 ? 'Top Up' : 'Withdrawal'),
+                    'value' => (float)$d->nominal_dana_darurat * ($d->jenis_transaksi_dana_darurat == 1 ? 1 : -1),
+                    'date' => Carbon::parse($d->tgl_transaksi_dana_darurat)->translatedFormat('d M Y')
+                ])->values(),
+                'loans' => $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
+                    ->map(function($p) use ($allBayar, $monthEnd) {
+                        $p_bayar = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
+                        return [
+                            'name' => $p->nama_pinjaman,
+                            'value' => (float)($p->jumlah_pinjaman - $p_bayar),
+                            'date' => Carbon::parse($p->start_date)->translatedFormat('d M Y')
+                        ];
+                    })->filter(fn($l) => $l['value'] > 0)->values()
+            ];
+
+            $netWorthHistory[] = [
+                'bulan' => $monthStr,
+                'total_aset' => (float)$totalKekayaan,
+                'total_hutang' => (float)$totalHutangHistory,
+                'net_worth' => (float)($totalKekayaan - $totalHutangHistory),
+                'details' => $details
+            ];
+
+            $currentMonthNw->addMonth();
+        }
+
+        return response()->json($netWorthHistory);
     }
 
     public function lineData()

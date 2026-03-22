@@ -208,14 +208,18 @@
                     </div>
                 </div>
             </div>
-            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3">
+            <div class="card card-dashboard border-0 shadow-sm networth-card" style="border-radius: 12px; cursor: pointer; transition: transform 0.2s;" data-bs-toggle="modal" data-bs-target="#netWorthModal" title="{{ __('Click to view Net Worth Details') }}" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                      <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                              {{ __('Net Worth') }}
                         </h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Your solvency and wealth status.') }}</p>
                     </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#netWorthModal">
+                        <i class="bi bi-clock-history"></i>
+                        <span class="fw-bold" style="font-size: 0.75rem;">{{ __('History') }}</span>
+                    </button>
                 </div>
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
@@ -477,6 +481,7 @@
         @include('modal.dashboard.detail')
         @include('modal.dashboard.rasio')
         @include('modal.dashboard.notes')
+        @include('modal.dashboard.networth')
 </section>
 @endsection
 
@@ -485,6 +490,7 @@
     window.cashflowData = @json($cashflow ?? []);
     window.dashboardFilterUrl = "{{ route('dashboard.filter') }}";
     window.eventsUrl = "{{ url('events') }}";
+    window.netWorthData = null;
 </script>
 @endpush
 

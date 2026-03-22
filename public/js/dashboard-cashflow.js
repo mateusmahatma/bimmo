@@ -115,6 +115,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.chartData && data.chartData.cashflow) {
                         window.renderCashflowChart(data.chartData.cashflow);
                     }
+
+                    // Update Net Worth
+                    if (data.netWorthHistory && typeof window.updateNetWorthData === 'function') {
+                        window.updateNetWorthData(data.netWorthHistory);
+                    }
                 })
                 .catch(err => {
                     console.error("Error fetching filtered cashflow:", err);
