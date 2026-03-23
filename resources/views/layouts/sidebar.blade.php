@@ -95,6 +95,13 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {{ Request::is('threads*') ? 'active' : '' }}" href="{{ route('threads.index') }}" role="button">
+                    <i class="bi bi-chat-left-text me-3"></i>
+                    <span>{{ __('Threads') }}</span>
+                </a>
+            </li>
+
             <!-- Money Movement -->
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'active' : '' }}"

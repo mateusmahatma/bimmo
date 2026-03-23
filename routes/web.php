@@ -27,6 +27,8 @@ use App\Http\Controllers\DompetController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\ThreadController;
+use App\Http\Controllers\ThreadCommentController;
 
 // Authentication & Public Routes
 Route::get('/', function () {
@@ -146,6 +148,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('events', EventController::class);
         Route::resource('barang', BarangController::class);
         Route::resource('notes', NoteController::class);
+
+        // Threads
+        Route::resource('threads', ThreadController::class)->only(['index', 'store', 'show', 'destroy']);
+        Route::post('threads/{id}/comments', [ThreadCommentController::class , 'store'])->name('threads.comments.store');
+        Route::delete('threads/comments/{id}', [ThreadCommentController::class , 'destroy'])->name('threads.comments.destroy');
 
         // Pemasukan, Pengeluaran, Anggaran
         Route::delete('/pemasukan/bulk-delete', [PemasukanController::class , 'bulkDelete'])->name('pemasukan.bulkDelete');

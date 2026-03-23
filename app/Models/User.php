@@ -42,6 +42,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class , 'id_user');
     }
+
+    // Relasi ke model Thread
+    public function threads()
+    {
+        return $this->hasMany(Thread::class , 'id_user');
+    }
+
+    // Relasi ke model ThreadComment
+    public function threadComments()
+    {
+        return $this->hasMany(ThreadComment::class , 'id_user');
+    }
     protected $guarded = ['id'];
 
     /**
