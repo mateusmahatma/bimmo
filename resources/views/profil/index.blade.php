@@ -64,7 +64,7 @@
         </div>
 
         <!-- Subscription Settings -->
-        <div class="card mb-4">
+        {{-- <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>{{ __('Subscription Details') }}</span>
                 @if(auth()->user()->isSubscribed())
@@ -104,7 +104,7 @@
                     @endif
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Pengaturan Tema -->
         <div class="card mb-4">

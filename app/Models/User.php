@@ -97,7 +97,8 @@ class User extends Authenticatable
 
     public function canAccessFeatures()
     {
-        return $this->isOnTrial() || $this->isSubscribed();
+        // Subscription dinonaktifkan — semua user bisa akses
+        return true;
     }
 
     public function getRemainingDays()

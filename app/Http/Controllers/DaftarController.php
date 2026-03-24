@@ -25,8 +25,7 @@ class DaftarController extends Controller
         ]);
 
         $validatedData['password'] = bcrypt($validatedData['password']);
-        $validatedData['trial_ends_at'] = now()->addDays(7);
-        $validatedData['subscription_status'] = 0;
+        // Subscription dinonaktifkan
 
         User::create($validatedData);
 

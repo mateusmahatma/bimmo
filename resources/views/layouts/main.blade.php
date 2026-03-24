@@ -27,28 +27,7 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            @if(auth()->check())
-                {{-- Subscription Banner Data --}}
-                @php
-                    $user = auth()->user();
-                    $remainingDays = $user->getRemainingDays();
-                    $isSubscribed = $user->isSubscribed();
-                    $isOnTrial = $user->isOnTrial();
-                    $canAccess = $user->canAccessFeatures();
-                @endphp
 
-                @if($canAccess && $remainingDays <= 3)
-                    <div class="alert alert-warning fade show rounded-3 mb-3 border-0 text-center py-2 sticky-top mt-2" role="alert" style="background: #fff3cd; color: #856404; font-size: 0.9rem; z-index: 1020; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        <i class="bi bi-clock-history me-2"></i>
-                        @if($remainingDays == 0)
-                            {{ __('Your subscription/trial expires') }} <strong>{{ __('Today') }}</strong>.
-                        @else
-                            {{ __('Your subscription/trial expires in') }} <strong>{{ $remainingDays }} {{ __('days') }}</strong>.
-                        @endif
-                        <a href="{{ route('profil.index') }}" class="alert-link text-decoration-underline ms-2">{{ __('Renew now') }}</a> to maintain access.
-                    </div>
-                @endif
-            @endif
             {{-- MOBILE TOGGLE BUTTON --}}
             <div class="d-md-none py-2 mb-3 border-bottom d-flex align-items-center">
                 <button class="btn btn-outline-secondary btn-sm me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
@@ -62,32 +41,7 @@
     </div>
 </div>
 
-@if(auth()->check())
-    {{-- Restrict Access Overlay/Modal logic --}}
-    @if(!$canAccess && !request()->routeIs('profil.index'))
-        <div id="restrictionOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.7); z-index: 2000;">
-            <div class="card border-0 shadow-lg text-center p-4" style="max-width: 400px; border-radius: 20px;">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="bg-danger-light text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; background: rgba(220, 53, 69, 0.1);">
-                            <i class="bi bi-lock-fill fs-1"></i>
-                        </div>
-                    </div>
-                    <h3 class="fw-bold mb-3">{{ __('Access Expired') }}</h3>
-                    <p class="text-muted mb-4">{{ __("Your subscription or trial period has ended. Please subscribe to continue using BIMMO's features.") }}</p>
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('profil.index') }}" class="btn btn-primary btn-lg rounded-pill">
-                            <i class="bi bi-person-fill me-2"></i> {{ __('Go to Profile to Subscribe') }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <style>
-            body { overflow: hidden !important; }
-        </style>
-    @endif
-@endif
+
 
 @if(auth()->check())
     <script>
