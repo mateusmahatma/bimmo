@@ -158,6 +158,15 @@
                 </a>
             </li>
             <li class="nav-item border-top mt-2 pt-2">
+                <a class="nav-link text-success"
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#donateModal">
+                    <i class="bi bi-heart-fill me-3"></i>
+                    <span>{{ __('Donate') }}</span>
+                </a>
+            </li>
+            <li class="nav-item border-top mt-2 pt-2">
                 <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}">
                     @if(Auth::user()->profile_photo)
                     <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-circle me-3" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">

@@ -408,6 +408,7 @@
     @yield('body')
 
     @include('components.feedback-modal')
+    @include('components.donate-modal')
 
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
