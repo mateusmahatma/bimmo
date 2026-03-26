@@ -70,79 +70,99 @@
             Muat Ulang Halaman
         </button>
     </div>
-    <main>
-        <div class="container">
-            <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div class="card-header">
-                                <div class="card-body">
-                                    <div class="pt-4 pb-2">
-                                        <div class="text-center">
-                                            <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
-                                        </div>
-                                        <h5 class="card-title text-center pb-0 fs-4">Welcome back</h5>
-                                        <p class="text-center small">Enter your username and password to log in.</p>
-                                    </div>
-                                    @if (session('success'))
-                                    <div class="alert alert-success">
-                                        {{ session('success') }}
-                                    </div>
-                                    @endif
-                                    <form class="row g-3 needs-validation" action="/login" method="post">
-                                        @csrf
-                                        <div class="form-floating">
-                                            <input type="text" name="username" class="form-control" id="username" placeholder="Username" autocomplete="off" required />
-                                            <label for="username">Username</label>
-                                        </div>
-                                        <div class="form-floating">
-                                            <input type="password" name="password" class="form-control" id="password" placeholder="Password" autocomplete="off" required />
-                                            <label for="password">Password</label>
-                                            <span class="password-toggle-icon"><i class="fas fa-eye-slash"></i></span>
-                                        </div>
-                                        <div class="text-end mt-0 small-text">
-                                            <a href="/lupa-password"><small>Forgot Password?</small></a>
-                                        </div>
-                                        <div class="text-center">
-                                            <button type="submit" class="btn btn-primary tombol-login">Login</button>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="small mb-0">Don't have an account? <a href="/daftar">Create Account</a></p>
-                                        </div>
-                                    </form>
-                                    <hr>
-                                    <div class="text-center">
-                                        <button id="installPwa" class="btn btn-primary w-100">
-                                            Install App
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+    <main class="d-flex w-100 min-vh-100">
+        <!-- Banner Kiri (Corporate Look) -->
+        <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: linear-gradient(135deg, var(--bs-primary) 0%, #001233 100%); overflow: hidden;">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
+            <div class="text-center p-5 z-2">
+                <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-4" style="max-width: 180px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.5px;">Bimmo Portal</h1>
+                <p class="lead" style="color: rgba(255,255,255,0.85); font-weight: 300;">Manajemen Keuangan & Aset Terpadu</p>
+            </div>
+        </div>
+
+        <!-- Form Login Kanan -->
+        <div class="col-12 col-lg-6 d-flex flex-column justify-content-center align-items-center bg-white shadow-lg z-3">
+            <div class="w-100 px-4 px-sm-5" style="max-width: 480px; margin-top: auto;">
+                <!-- Muncul di Mobile/Tablet saja -->
+                <div class="text-center mb-4 d-lg-none">
+                    <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-2" style="max-width: 100px;">
+                    <h3 class="fw-bold" style="color: var(--bs-primary);">Bimmo Portal</h3>
+                </div>
+                
+                <div class="mt-2 mt-lg-3 mb-4 text-center text-lg-start">
+                    <h3 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">Selamat Datang</h3>
+                    <p class="text-muted small">Silakan masukkan kredensial Anda untuk melanjutkan akses ke sistem.</p>
+                </div>
+
+                @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                @endif
+                
+                <form class="row g-3 needs-validation" action="/login" method="post">
+                    @csrf
+                    <div class="col-12">
+                        <div class="form-floating mb-1">
+                            <input type="text" name="username" class="form-control rounded-3" id="username" placeholder="Username" autocomplete="off" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
+                            <label for="username" class="text-muted">Username</label>
                         </div>
                     </div>
+                    <div class="col-12">
+                        <div class="form-floating position-relative">
+                            <input type="password" name="password" class="form-control rounded-3 pe-5" id="password" placeholder="Password" autocomplete="off" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
+                            <label for="password" class="text-muted">Password</label>
+                            <span class="password-toggle-icon position-absolute top-50 end-0 translate-middle-y me-3" style="cursor: pointer; z-index: 10; color: #6c757d;">
+                                <i class="fas fa-eye-slash hover-text-primary transition-all"></i>
+                            </span>
+                        </div>
+                        <div class="text-end mt-1">
+                            <a href="/lupa-password" class="text-decoration-none small text-primary fw-semibold">Lupa Password?</a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold tombol-login" style="border-radius: 8px; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(1, 41, 112, 0.2); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">Masuk ke Portal</button>
+                    </div>
+                    
+                    <div class="col-12 text-center mt-2">
+                        <p class="small mb-0 text-muted">Belum memiliki akun? <a href="/daftar" class="fw-semibold text-primary text-decoration-none">Daftar Sekarang</a></p>
+                    </div>
+                </form>
+
+                <div class="mt-4 pt-3 border-top text-center">
+                    <button id="installPwa" class="btn btn-outline-secondary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 py-2" style="display: none; transition: all 0.3s ease;">
+                        <i class="bi bi-download"></i> Instal Aplikasi PWA
+                    </button>
                 </div>
-            </section>
+            </div>
+            
+            <div class="mt-auto py-3 text-center w-100">
+                <small class="text-muted">&copy; <script>document.write(new Date().getFullYear())</script> Bimmo. All rights reserved.</small>
+            </div>
         </div>
 
         <!-- PWA Manual Install Modal -->
         <div class="modal fade" id="pwaInstructionModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Cara Instal Aplikasi</h5>
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold" style="color: var(--bs-primary);">Cara Instal Aplikasi</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-center">
-                        <div id="pwaInstructions" class="text-start mt-3">
-                            <ul class="mt-2" id="instructionList">
-                                <li><strong>Chrome/Edge (Android/PC):</strong> Klik titik tiga di pojok kanan atas, lalu cari menu <strong>"Instal aplikasi"</strong> atau <strong>"Add to Home screen"</strong>.</li>
+                    <div class="modal-body text-start">
+                        <p class="text-muted small mb-3 text-center" id="pwaDeviceText">Ikuti langkah sederhana berikut untuk menginstal Bimmo ke perangkat Anda.</p>
+                        <div id="pwaInstructions" class="bg-light p-3 rounded-3">
+                            <ul class="mb-0 ps-3 text-secondary small" id="instructionList" style="line-height: 1.6;">
+                                <li class="mb-2"><strong>Chrome/Edge (Android/PC):</strong> Klik titik tiga di pojok kanan atas, lalu cari menu <strong>"Instal aplikasi"</strong> atau <strong>"Add to Home screen"</strong>.</li>
                                 <li><strong>Safari (iOS/iPhone):</strong> Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas), lalu pilih <strong>"Add to Home Screen"</strong>.</li>
                             </ul>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <div class="modal-footer border-top-0 pt-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>

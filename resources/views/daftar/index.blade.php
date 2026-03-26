@@ -70,123 +70,129 @@
             Muat Ulang Halaman
         </button>
     </div>
-    <main>
-        <div class="container">
-            <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div class="card-header">
-                                <div class="card-body">
-                                    <div class="pt-4 pb-2">
-                                        <div class="text-center">
-                                            <img src="/img/bimmo.png" alt="" class="mb-3" style="max-width: 120px;">
-                                        </div>
-                                        <h5 class="card-title text-center pb-0 fs-4">
-                                            Create an account
-                                        </h5>
-                                        <p class="text-center small">
-                                            Enter your personal details to create an account
-                                        </p>
-                                    </div>
-                                    <!-- csrf agar tidak bisa di cross side -->
-                                    <form class="row g-3 needs-validation" action="/daftar" method="post">
-                                        @csrf
-                                        <div class="form-floating">
-                                            <input type="text" name="name" class="form-control rounded-bottom @error('name') is-invalid @enderror" id="yourName" placeholder="Full Name" required />
-                                            <label for="yourName">Full Name</label>
-                                            @error('name')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
-                                        </div>
+    <main class="d-flex w-100 min-vh-100">
+        <!-- Banner Kiri (Corporate Look) -->
+        <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: linear-gradient(135deg, var(--bs-primary) 0%, #001233 100%); overflow: hidden;">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
+            <div class="text-center p-5 z-2">
+                <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-4" style="max-width: 180px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.5px;">Bimmo Portal</h1>
+                <p class="lead" style="color: rgba(255,255,255,0.85); font-weight: 300;">Manajemen Keuangan & Aset Terpadu</p>
+            </div>
+        </div>
 
-                                        <div class="form-floating">
-                                            <input type="email" name="email" class="form-control rounded-bottom @error('email') is-invalid @enderror" id="yourEmail" placeholder="Email" required />
-                                            <label for="yourEmail">Email</label>
-                                            @error('email')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
-                                        </div>
+        <!-- Form Daftar Kanan -->
+        <div class="col-12 col-lg-6 d-flex flex-column justify-content-center align-items-center bg-white shadow-lg z-3">
+            <div class="w-100 px-4 px-sm-5" style="max-width: 480px; margin-top: auto;">
+                <!-- Muncul di Mobile/Tablet saja -->
+                <div class="text-center mb-3 d-lg-none">
+                    <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-2" style="max-width: 90px;">
+                    <h4 class="fw-bold" style="color: var(--bs-primary);">Bimmo Portal</h4>
+                </div>
+                
+                <div class="mb-3 mt-2 mt-lg-3 text-center text-lg-start">
+                    <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">Registrasi Akun</h4>
+                    <p class="text-muted small mb-0">Lengkapi data diri Anda untuk membuat akun baru.</p>
+                </div>
 
-                                        <div class="form-floating">
-                                            <input type="text" name="username" class="form-control rounded-bottom @error('username') is-invalid @enderror" id="yourUsername" placeholder="Username" required />
-                                            <label for="yourUsername">Username</label>
-                                            @error('username')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="form-floating">
-                                            <input type="password" name="password" class="form-control rounded-bottom @error('password') is-invalid @enderror" id="password" placeholder="Password" required />
-                                            <label for="password">Password</label>
-                                            <span class="password-toggle-icon"><i class="fas fa-eye-slash"></i></span>
-                                            @error('password')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col-12">
-                                            <div class="form-check">
-                                                <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required />
-                                                <label class="form-check-label" for="acceptTerms">I agree and accept the
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#openModal">terms and conditions</a></label>
-                                                <div class="invalid-feedback">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <button class="btn btn-primary tombol-login" name="/create" type="submit">
-                                                Create an account
-                                            </button>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="small mb-0">
-                                                Already have an account?
-                                                <a href="/bimmo">Login</a>
-                                            </p>
-                                        </div>
-                                    </form>
-                                    <hr>
-                                    <div class="text-center">
-                                        <button id="installPwa" class="btn btn-primary w-100">
-                                            Install App
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                <form class="row g-2 needs-validation" action="/daftar" method="post">
+                    @csrf
+                    
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" name="name" class="form-control rounded-3 py-2 px-3 h-auto @error('name') is-invalid @enderror" id="yourName" placeholder="Full Name" value="{{ old('name') }}" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
+                            <label for="yourName" class="text-muted py-2 px-3" style="font-size: 0.85rem">Full Name</label>
+                            @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
+
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="email" name="email" class="form-control rounded-3 py-2 px-3 h-auto @error('email') is-invalid @enderror" id="yourEmail" placeholder="Email" value="{{ old('email') }}" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
+                            <label for="yourEmail" class="text-muted py-2 px-3" style="font-size: 0.85rem">Email</label>
+                            @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" name="username" class="form-control rounded-3 py-2 px-3 h-auto @error('username') is-invalid @enderror" id="yourUsername" placeholder="Username" value="{{ old('username') }}" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
+                            <label for="yourUsername" class="text-muted py-2 px-3" style="font-size: 0.85rem">Username</label>
+                            @error('username')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-floating position-relative">
+                            <input type="password" name="password" class="form-control rounded-3 py-2 px-3 pe-5 h-auto @error('password') is-invalid @enderror" id="password" placeholder="Password" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
+                            <label for="password" class="text-muted py-2 px-3" style="font-size: 0.85rem">Password</label>
+                            <span class="password-toggle-icon position-absolute top-50 end-0 translate-middle-y me-3" style="cursor: pointer; z-index: 10; color: #6c757d;">
+                                <i class="fas fa-eye-slash hover-text-primary transition-all"></i>
+                            </span>
+                            @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-2">
+                        <div class="form-check form-check-inline-custom mb-1">
+                            <input class="form-check-input" style="cursor: pointer; width: 0.9rem; height: 0.9rem; margin-top: 0.25rem;" name="terms" type="checkbox" value="" id="acceptTerms" required />
+                            <label class="form-check-label text-muted ms-1" style="cursor: pointer; font-size: 0.8rem;" for="acceptTerms">Saya setuju dengan 
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#openModal" class="fw-semibold text-primary text-decoration-none">Syarat & Ketentuan</a>
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-2">
+                        <button class="btn btn-primary w-100 py-2 fw-bold tombol-login" name="/create" type="submit" style="border-radius: 8px; font-size: 1rem; box-shadow: 0 4px 12px rgba(1, 41, 112, 0.2); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                            Buat Akun
+                        </button>
+                    </div>
+                    
+                    <div class="col-12 text-center mt-2">
+                        <p class="mb-0 text-muted" style="font-size: 0.8rem;">Sudah memiliki akun? <a href="/bimmo" class="fw-semibold text-primary text-decoration-none">Masuk di sini</a></p>
+                    </div>
+                </form>
+
+                <div class="mt-3 pt-2 border-top text-center">
+                    <button id="installPwa" class="btn btn-outline-secondary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 py-1" style="display: none; transition: all 0.3s ease; font-size: 0.85rem;">
+                        <i class="bi bi-download"></i> Instal Aplikasi PWA
+                    </button>
                 </div>
-            </section>
+            </div>
+            
+            <div class="mt-auto py-2 text-center w-100">
+                <small class="text-muted" style="font-size: 0.75rem;">&copy; <script>document.write(new Date().getFullYear())</script> Bimmo. All rights reserved.</small>
+            </div>
         </div>
 
         <!-- PWA Manual Install Modal -->
         <div class="modal fade" id="pwaInstructionModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Cara Instal Aplikasi</h5>
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold" style="color: var(--bs-primary);">Cara Instal Aplikasi</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-center">
-                        <div id="pwaInstructions" class="text-start mt-3">
-                            <ul class="mt-2" id="instructionList">
-                                <li><strong>Chrome/Edge (Android/PC):</strong> Klik titik tiga di pojok kanan atas, lalu cari menu <strong>"Instal aplikasi"</strong> atau <strong>"Add to Home screen"</strong>.</li>
+                    <div class="modal-body text-start">
+                        <p class="text-muted small mb-3 text-center" id="pwaDeviceText">Ikuti langkah sederhana berikut untuk menginstal Bimmo ke perangkat Anda.</p>
+                        <div id="pwaInstructions" class="bg-light p-3 rounded-3">
+                            <ul class="mb-0 ps-3 text-secondary small" id="instructionList" style="line-height: 1.6;">
+                                <li class="mb-2"><strong>Chrome/Edge (Android/PC):</strong> Klik titik tiga di pojok kanan atas, lalu cari menu <strong>"Instal aplikasi"</strong> atau <strong>"Add to Home screen"</strong>.</li>
                                 <li><strong>Safari (iOS/iPhone):</strong> Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas), lalu pilih <strong>"Add to Home Screen"</strong>.</li>
                             </ul>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <div class="modal-footer border-top-0 pt-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>

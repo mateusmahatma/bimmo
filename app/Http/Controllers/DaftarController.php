@@ -29,6 +29,6 @@ class DaftarController extends Controller
 
         User::create($validatedData);
 
-        return redirect('/bimmo')->with('success', 'Pendaftaran Berhasil, Silahkan Login');
+        return redirect('/bimmo')->with('success', 'Pendaftaran berhasil. Silakan masuk dengan akun baru Anda.');
     }
 }

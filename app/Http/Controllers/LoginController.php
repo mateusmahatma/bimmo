@@ -25,12 +25,13 @@ class LoginController extends Controller
             Auth::login($user);
             return response()->json([
                 'success' => true,
-                'message' => 'Log in Successful',
+                'message' => 'Login berhasil. Mengalihkan ke dashboard...',
             ]);
-        } else {
+        }
+        else {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed Log in',
+                'message' => 'Mohon maaf, username atau password yang Anda masukkan tidak sesuai.',
             ]);
         }
     }
