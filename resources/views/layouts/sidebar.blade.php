@@ -140,33 +140,31 @@
     </div>
 
     <div class="sidebar-bottom mt-auto border-top pt-2">
-        <ul class="nav flex-column">
+        {{-- Baris compact: User Guide | Send Feedback | Donate --}}
+        <div class="d-flex align-items-center justify-content-around px-2 pb-1">
+            <a href="{{ route('panduan.index') }}"
+               class="sidebar-compact-btn {{ request()->is('panduan*') ? 'active' : '' }}"
+               title="{{ __('User Guide') }}">
+                <i class="bi bi-book"></i>
+                <span>{{ __('Guide') }}</span>
+            </a>
+            <a href="#" class="sidebar-compact-btn"
+               data-bs-toggle="modal" data-bs-target="#feedbackModal"
+               title="{{ __('Send Feedback') }}">
+                <i class="bi bi-bug"></i>
+                <span>{{ __('Feedback') }}</span>
+            </a>
+            <a href="#" class="sidebar-compact-btn text-success"
+               data-bs-toggle="modal" data-bs-target="#donateModal"
+               title="{{ __('Donate') }}">
+                <i class="bi bi-heart-fill"></i>
+                <span>{{ __('Donate') }}</span>
+            </a>
+        </div>
+
+        {{-- Profile & Logout --}}
+        <ul class="nav flex-column border-top pt-1">
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('panduan*') ? 'active' : '' }}"
-                    href="{{ route('panduan.index') }}">
-                    <i class="bi bi-book me-3"></i>
-                    <span>{{ __('User Guide') }}</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link"
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#feedbackModal">
-                    <i class="bi bi-bug me-3"></i>
-                    <span>{{ __('Send Feedback') }}</span>
-                </a>
-            </li>
-            <li class="nav-item border-top mt-2 pt-2">
-                <a class="nav-link text-success"
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#donateModal">
-                    <i class="bi bi-heart-fill me-3"></i>
-                    <span>{{ __('Donate') }}</span>
-                </a>
-            </li>
-            <li class="nav-item border-top mt-2 pt-2">
                 <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}">
                     @if(Auth::user()->profile_photo)
                     <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-circle me-3" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">

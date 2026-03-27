@@ -223,6 +223,78 @@
     border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
+/* COMPACT BOTTOM BUTTONS (Guide, Feedback, Donate) */
+.sidebar-compact-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    flex: 1;
+    text-align: center;
+}
+
+.sidebar-compact-btn i {
+    font-size: 1rem;
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+.sidebar-compact-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.sidebar-compact-btn:hover i {
+    color: #334155;
+}
+
+.sidebar-compact-btn.active {
+    background-color: #f1f5f9;
+    color: #2563eb;
+}
+
+.sidebar-compact-btn.active i {
+    color: #2563eb;
+}
+
+.sidebar-compact-btn.text-success i {
+    color: #16a34a;
+}
+
+[data-bs-theme="dark"] .sidebar-compact-btn {
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .sidebar-compact-btn i {
+    color: #64748b;
+}
+
+[data-bs-theme="dark"] .sidebar-compact-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .sidebar-compact-btn:hover i {
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .sidebar-compact-btn.active {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: #3b82f6;
+}
+
+[data-bs-theme="dark"] .sidebar-compact-btn.text-success i {
+    color: #22c55e;
+}
+
 /* PWA MODE - Premium Consistency */
 .pwa-mode .sidebar {
     border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
