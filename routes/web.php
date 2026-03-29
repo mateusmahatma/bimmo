@@ -179,6 +179,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/bulk-delete', [TransaksiController::class , 'bulkDelete'])->name('transaksi.bulkDelete');
             Route::delete('/{id}/file', [TransaksiController::class , 'deleteFile'])->name('transaksi.deleteFile');
             Route::post('/{id}/toggle-status', [TransaksiController::class , 'toggleStatus'])->name('transaksi.toggleStatus');
+            Route::get('/date/{date}', [TransaksiController::class , 'showByDate'])->name('transaksi.byDate');
         }
         );
         Route::resource('transaksi', TransaksiController::class)->parameters(['transaksi' => 'hash']);
@@ -201,6 +202,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/storage/profile-photo/{filename}', [UserController::class , 'showPhoto'])->name('storage.profile_photo');
         Route::post('/user/language', [UserController::class , 'updateLanguage'])->name('user.update.language');
         Route::post('/user/skin', [UserController::class , 'updateSkin'])->name('user.update.skin');
+        Route::post('/user/ui-style', [UserController::class , 'updateUiStyle'])->name('user.update.ui-style');
         Route::get('/ubah-password', [UbahPasswordController::class , 'index']);
         Route::post('/ubah-password', [UbahPasswordController::class , 'store']);
         Route::post('/feedback', [FeedbackController::class , 'store'])->name('feedback.store');

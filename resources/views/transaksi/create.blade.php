@@ -115,7 +115,7 @@
                         <!-- Date Section -->
                         <div class="mb-4">
                             <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Date') }} <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi ?? date('Y-m-d')) }}" required>
+                            <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" value="{{ old('tgl_transaksi', $defaultDate ?? date('Y-m-d')) }}" required>
                         </div>
 
                         <!-- Transaction Type Selectors -->

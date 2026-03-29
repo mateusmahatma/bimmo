@@ -242,10 +242,30 @@
         background-color: #1e1e1e;
         border-color: rgba(255,255,255,0.05);
     }
-    [data-bs-theme="dark"] #transaksiTable tr {
-        background-color: #1a1a1a;
-        border-color: rgba(255,255,255,0.05);
+    /* Date Cards */
+    .date-card-link:hover .date-card { box-shadow: 0 6px 20px rgba(0,0,0,0.1); border-color: rgba(13,110,253,0.2); }
+    .date-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.06);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s, border-color 0.2s;
     }
+    [data-bs-theme="dark"] .date-card { background: #1a1a1a; border-color: rgba(255,255,255,0.06); }
+    [data-bs-theme="dark"] .date-card-link:hover .date-card { border-color: rgba(96,165,250,0.3); }
+    .date-badge {
+        width: 52px; min-width: 52px;
+        background: linear-gradient(135deg, #0d6efd, #0984e3);
+        border-radius: 12px;
+        color: #fff;
+        padding: 6px 4px;
+    }
+    .date-badge-month { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; }
+    .date-badge-day   { font-size: 1.35rem; font-weight: 700; line-height: 1.1; }
+    .date-badge-dow   { font-size: 0.6rem; opacity: 0.85; }
+    .date-card-title  { font-size: 0.92rem; }
+
+    [data-bs-theme="dark"] #transaksiTable tr { background-color: #1a1a1a; border-color: rgba(255,255,255,0.05); }
 </style>
 @endpush
 
@@ -352,16 +372,8 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Transaction List') }}</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your income and expense data.') }}</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3" id="btnBulkDelete">
-                            <i class="bi bi-trash me-1"></i> Delete (<span id="countSelected">0</span>)
-                        </button>
-                        <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop">
-                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Transaction') }}
-                        </a>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Transaction Dates') }}</h5>
+                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Click a date to view and add transactions.') }}</p>
                     </div>
                 </div>
 
@@ -424,6 +436,14 @@
                              <a href="{{ route('transaksi.download.template') }}" class="btn btn-outline-secondary btn-sm rounded-circle no-loader" title="Download Template" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-file-earmark-spreadsheet"></i>
                             </a>
+
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#openDateModal">
+                                <i class="bi bi-calendar-event"></i> {{ __('Pilih Tanggal') }}
+                            </button>
+
+                            <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-2 btn-add-desktop ms-lg-2">
+                                <i class="bi bi-plus-lg"></i> {{ __('Add Transaction') }}
+                            </a>
                         </div>
                     </form>
 
@@ -467,9 +487,9 @@
                         </div>
                     @endif
 
-                    <!-- DATA TABLE CONTAINER -->
+                    <!-- DATE CARDS CONTAINER -->
                     <div id="transaction-table-container">
-                        @include('transaksi._table_list')
+                        @include('transaksi._date_cards', ['groupedByDate' => $groupedByDate])
                     </div>
 
                 </div>
@@ -477,6 +497,11 @@
         </div>
     </div>
 </section>
+
+{{-- FAB Mobile --}}
+<a href="{{ route('transaksi.create') }}" class="btn btn-primary fab-add shadow-lg" title="{{ __('Add Transaction') }}">
+    <i class="bi bi-plus-lg fs-2"></i>
+</a>
 
 <!-- Details Modals -->
 <div class="modal fade" id="incomeDetailsModal" tabindex="-1" aria-hidden="true">
@@ -571,6 +596,28 @@
     </div>
 </div>
 
+<!-- Open Date Modal -->
+<div class="modal fade" id="openDateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">{{ __('Pilih Tanggal') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase">{{ __('Tanggal') }}</label>
+                    <input type="date" id="input_open_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Batal') }}</button>
+                <button type="button" id="btnGoToDate" class="btn btn-primary rounded-pill px-4">{{ __('Buka') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Import Modal -->
 <div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -603,10 +650,6 @@
 
 @include('modal.transaksi.upload')
 
-<!-- Floating Action Button for Mobile -->
-<a href="{{ route('transaksi.create') }}" class="btn btn-primary fab-add" title="{{ __('Add Transaction') }}">
-    <i class="bi bi-plus-lg fs-2"></i>
-</a>
 @endsection
 
 @push('scripts')
@@ -679,28 +722,7 @@
             });
         }
 
-        // Pagination and Sorting Links (Delegate)
-        tableContainer.addEventListener('click', function(e) {
-            // Mobile Expand Logic
-            const row = e.target.closest('.mobile-collapsible-row');
-            const isAction = e.target.closest('.mobile-detail') || e.target.closest('.check-item') || e.target.closest('a') || e.target.closest('button');
-            
-            if (window.innerWidth < 768 && row && !isAction) {
-                row.classList.toggle('expanded');
-                return;
-            }
-
-            const link = e.target.closest('.pagination a') || e.target.closest('.sort-link');
-            if (link) {
-                e.preventDefault();
-                const url = link.getAttribute('href');
-                if(url) {
-                    fetchTransactions(url);
-                }
-            }
-            
-            // Re-bind Bulk Delete Check All if needed (handled by mutation observer or direct check below)
-        });
+        // Date card links inside container are plain anchors — no special JS needed.
 
         // Main Fetch Function
         function fetchTransactions(url = "{{ route('transaksi.index') }}") {
@@ -746,16 +768,13 @@
                     updateSummaryCards(data.stats);
                 }
                 
-                // Update Summary Modals (Income/Expense Details)
+                // Update Summary Modals
                 if(data.modal_pemasukan) {
                      document.getElementById('income-modal-body').innerHTML = data.modal_pemasukan;
                 }
                  if(data.modal_pengeluaran) {
                      document.getElementById('expense-modal-body').innerHTML = data.modal_pengeluaran;
                 }
-                
-                // Re-initialize bulk delete listeners
-                initBulkDelete();
                 
                 // Update Export Links
                 updateExportLinks();
@@ -813,59 +832,6 @@
                 dateRangeEl.innerHTML = '<i class="bi bi-calendar3 me-1"></i> ' + stats.dateRange;
             }
         }
-        
-        // ========================
-        // BULK DELETE LOGIC (Re-callable)
-        // ========================
-        function initBulkDelete() {
-            const checkAll = document.getElementById('checkAll');
-            const btnBulkDelete = document.getElementById('btnBulkDelete');
-            const countSelected = document.getElementById('countSelected');
-            
-            function updateBulkDeleteUI() {
-                const checked = document.querySelectorAll('.check-item:checked');
-                const count = checked.length;
-                
-                if (countSelected) countSelected.textContent = count;
-                
-                if (btnBulkDelete) {
-                    if (count > 0) {
-                        btnBulkDelete.classList.remove('d-none');
-                    } else {
-                        btnBulkDelete.classList.add('d-none');
-                    }
-                }
-                
-                // Update checkAll state
-                const allItems = document.querySelectorAll('.check-item');
-                 if (checkAll && allItems.length > 0) {
-                    checkAll.checked = checked.length === allItems.length;
-                    checkAll.indeterminate = checked.length > 0 && checked.length < allItems.length;
-                }
-            }
-            
-            if (checkAll) {
-                checkAll.addEventListener('change', function() {
-                    const isChecked = this.checked;
-                    document.querySelectorAll('.check-item').forEach(item => {
-                        item.checked = isChecked;
-                    });
-                    updateBulkDeleteUI();
-                });
-            }
-            
-            // Delegate for dynamic items
-            if(tableContainer) {
-                tableContainer.addEventListener('change', function(e) {
-                    if(e.target.classList.contains('check-item')) {
-                        updateBulkDeleteUI();
-                    }
-                });
-            }
-        }
-
-        // Initialize Bulk Delete on Load
-        initBulkDelete();
         
         // Export Links Logic
         const btnExportExcel = document.getElementById('btnExportExcel');
@@ -1141,6 +1107,17 @@
                 }
             }
         });
+        // Handle Open Date
+        const btnGoToDate = document.getElementById('btnGoToDate');
+        const inputOpenDate = document.getElementById('input_open_date');
+        if (btnGoToDate && inputOpenDate) {
+            btnGoToDate.addEventListener('click', function() {
+                const date = inputOpenDate.value;
+                if (date) {
+                    window.location.href = `{{ url('transaksi/date') }}/${date}`;
+                }
+            });
+        }
     });
 
 </script>

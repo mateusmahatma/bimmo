@@ -34,7 +34,7 @@ class TransaksiController extends Controller
         $userId = Auth::id();
 
         // Default to this month if no filter is applied
-        if (!$request->filled('start_date') && !$request->filled('end_date') && !$request->ajax()) {
+        if (!$request->filled('start_date') && !$request->filled('end_date')) {
             $request->merge([
                 'start_date' => Carbon::now()->startOfMonth()->format('Y-m-d'),
                 'end_date' => Carbon::now()->endOfMonth()->format('Y-m-d'),
@@ -60,6 +60,20 @@ class TransaksiController extends Controller
         $avgDailyPengeluaran = $totalPengeluaran / max(1, $diffInDays);
         $avgMonthlyPengeluaran = $avgDailyPengeluaran * 30;
         $dateRange = $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y');
+
+        // Group transactions by date for date-card view
+        $groupedByDate = $filteredTransactions
+            ->sortByDesc('tgl_transaksi')
+            ->groupBy(fn($t) => Carbon::parse($t->tgl_transaksi)->format('Y-m-d'))
+            ->map(function ($items, $date) {
+                return (object)[
+                    'date'             => $date,
+                    'dateFormatted'    => Carbon::parse($date)->translatedFormat('l, d F Y'),
+                    'totalPemasukan'   => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+                    'totalPengeluaran' => $items->sum(fn($t) => (float)$t->nominal),
+                    'count'            => $items->count(),
+                ];
+            })->values();
 
         // 4. Handle AJAX Response (Datatables/Custom)
         if ($request->ajax()) {
@@ -99,32 +113,15 @@ class TransaksiController extends Controller
             $modalPemasukanHtml = $this->renderPemasukanModal($summaryPemasukan, $totalPemasukan);
             $modalPengeluaranHtml = $this->renderPengeluaranModal($summaryPengeluaran, $totalPengeluaran);
 
-            // Manual Pagination for AJAX table
-            $page = $request->get('page', 1);
-            $perPage = 10;
-            $items = $filteredTransactions->forPage($page, $perPage)->values();
-            $paginatedTransaksi = new \Illuminate\Pagination\LengthAwarePaginator($items, $filteredTransactions->count(), $perPage, $page, [
-                'path' => $request->url(),
-                'query' => $request->query(),
-            ]);
-
             return response()->json([
-                'html' => view('transaksi._table_list', ['transaksi' => $paginatedTransaksi])->render(),
+                'html' => view('transaksi._date_cards', ['groupedByDate' => $groupedByDate])->render(),
                 'stats' => $stats,
                 'modal_pemasukan' => $modalPemasukanHtml,
                 'modal_pengeluaran' => $modalPengeluaranHtml
             ]);
         }
 
-        // 5. Initial Load - Manual Pagination
-        $page = $request->get('page', 1);
-        $perPage = 10;
-        $items = $filteredTransactions->forPage($page, $perPage)->values();
-        $transaksi = new \Illuminate\Pagination\LengthAwarePaginator($items, $filteredTransactions->count(), $perPage, $page, [
-            'path' => $request->url(),
-            'query' => $request->query(),
-        ]);
-
+        // 5. Initial Load - Category summaries
         $summaryPemasukan = $filteredTransactions->whereNotNull('pemasukan')
             ->groupBy('pemasukan')
             ->map(function ($items, $key) {
@@ -148,7 +145,7 @@ class TransaksiController extends Controller
             ->sortByDesc('total')->values();
 
         return view('transaksi.index', [
-            'transaksi' => $transaksi,
+            'groupedByDate' => $groupedByDate,
             'totalPemasukan' => $totalPemasukan,
             'totalPengeluaran' => $totalPengeluaran,
             'netIncome' => $netIncome,
@@ -256,14 +253,16 @@ class TransaksiController extends Controller
         return $html;
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $userId = Auth::id();
+        $defaultDate = $request->query('date', date('Y-m-d'));
         return view('transaksi.create', [
             'pemasukan' => Pemasukan::where('id_user', $userId)->get(),
             'pengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
             'barang' => Barang::where('id_user', $userId)->get(),
             'dompet' => Dompet::where('id_user', $userId)->get(),
+            'defaultDate' => $defaultDate
         ]);
     }
 
@@ -315,12 +314,12 @@ class TransaksiController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Data Transaksi Berhasil Disimpan!',
-                    'redirect_url' => route('transaksi.index'),
+                    'redirect_url' => route('transaksi.byDate', ['date' => $transaksi->tgl_transaksi]),
                     'redirect_name' => __('Transactions')
                 ]);
             }
 
-            return redirect()->route('transaksi.index')->with('success', 'Data Transaksi Berhasil Disimpan!');
+            return redirect()->route('transaksi.byDate', ['date' => $transaksi->tgl_transaksi])->with('success', 'Data Transaksi Berhasil Disimpan!');
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return response()->json([
@@ -336,6 +335,32 @@ class TransaksiController extends Controller
     {
         return redirect()->route('transaksi.edit', $hash);
     }
+
+    public function showByDate($date)
+    {
+        $userId = Auth::id();
+        $dateCarbon = Carbon::parse($date);
+        
+        $transaksi = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation', 'dompet'])
+            ->where('id_user', $userId)
+            ->whereDate('tgl_transaksi', $date)
+            ->orderBy('id', 'desc')
+            ->get();
+            
+        $totalPemasukan = $transaksi->sum(fn($t) => (float)$t->nominal_pemasukan);
+        $totalPengeluaran = $transaksi->sum(fn($t) => (float)$t->nominal);
+        $netIncome = $totalPemasukan - $totalPengeluaran;
+
+        return view('transaksi.show_by_date', [
+            'transaksi' => $transaksi,
+            'date' => $date,
+            'dateFormatted' => $dateCarbon->translatedFormat('l, d F Y'),
+            'totalPemasukan' => $totalPemasukan,
+            'totalPengeluaran' => $totalPengeluaran,
+            'netIncome' => $netIncome
+        ]);
+    }
+
     public function edit($hash)
     {
         $id = Hashids::decode($hash)[0] ?? abort(404);
