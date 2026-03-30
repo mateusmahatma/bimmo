@@ -62,18 +62,30 @@ class TransaksiController extends Controller
         $dateRange = $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y');
 
         // Group transactions by date for date-card view
+        // $groupedByDate = $filteredTransactions
+        //     ->sortByDesc('tgl_transaksi')
+        //     ->groupBy(fn($t) => Carbon::parse($t->tgl_transaksi)->format('Y-m-d'))
+        //     ->map(function ($items, $date) {
+        //         return (object)[
+        //             'date'             => $date,
+        //             'dateFormatted'    => Carbon::parse($date)->translatedFormat('l, d F Y'),
+        //             'totalPemasukan'   => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
+        //             'totalPengeluaran' => $items->sum(fn($t) => (float)$t->nominal),
+        //             'count'            => $items->count(),
+        //         ];
+        //     })->values();
+
         $groupedByDate = $filteredTransactions
             ->sortByDesc('tgl_transaksi')
             ->groupBy(fn($t) => Carbon::parse($t->tgl_transaksi)->format('Y-m-d'))
-            ->map(function ($items, $date) {
-                return (object)[
-                    'date'             => $date,
-                    'dateFormatted'    => Carbon::parse($date)->translatedFormat('l, d F Y'),
-                    'totalPemasukan'   => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
-                    'totalPengeluaran' => $items->sum(fn($t) => (float)$t->nominal),
-                    'count'            => $items->count(),
-                ];
-            })->values();
+            ->map(fn($items, $date) => (object)[
+                'date'             => $date,
+                'dateFormatted'    => Carbon::parse($date)->translatedFormat('l, d F Y'),
+                'totalPemasukan'   => $items->sum(fn($t) => (float) $t->nominal_pemasukan),
+                'totalPengeluaran' => $items->sum(fn($t) => (float) $t->nominal),
+                'count'            => $items->count(),
+            ])
+            ->values();
 
         // 4. Handle AJAX Response (Datatables/Custom)
         if ($request->ajax()) {
@@ -340,13 +352,13 @@ class TransaksiController extends Controller
     {
         $userId = Auth::id();
         $dateCarbon = Carbon::parse($date);
-        
+
         $transaksi = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation', 'dompet'])
             ->where('id_user', $userId)
             ->whereDate('tgl_transaksi', $date)
             ->orderBy('id', 'desc')
             ->get();
-            
+
         $totalPemasukan = $transaksi->sum(fn($t) => (float)$t->nominal_pemasukan);
         $totalPengeluaran = $transaksi->sum(fn($t) => (float)$t->nominal);
         $netIncome = $totalPemasukan - $totalPengeluaran;
@@ -493,7 +505,7 @@ class TransaksiController extends Controller
         $allRecords = $statsQuery->get();
         $data = $this->applyPhpFilters($request, $allRecords);
 
-        return Excel::download(new TransaksiExport($data, $data->sum(fn($t)=>(float)$t->nominal_pemasukan), $data->sum(fn($t)=>(float)$t->nominal), $data->sum(fn($t)=>(float)$t->nominal_pemasukan)-$data->sum(fn($t)=>(float)$t->nominal)), 'arus_kas.xlsx');
+        return Excel::download(new TransaksiExport($data, $data->sum(fn($t) => (float)$t->nominal_pemasukan), $data->sum(fn($t) => (float)$t->nominal), $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)), 'arus_kas.xlsx');
     }
 
     public function emailExcel(Request $request)
@@ -502,7 +514,7 @@ class TransaksiController extends Controller
         $allRecords = $statsQuery->get();
         $data = $this->applyPhpFilters($request, $allRecords);
 
-        $excelData = Excel::raw(new TransaksiExport($data, $data->sum(fn($t)=>(float)$t->nominal_pemasukan), $data->sum(fn($t)=>(float)$t->nominal), $data->sum(fn($t)=>(float)$t->nominal_pemasukan)-$data->sum(fn($t)=>(float)$t->nominal)), \Maatwebsite\Excel\Excel::XLSX);
+        $excelData = Excel::raw(new TransaksiExport($data, $data->sum(fn($t) => (float)$t->nominal_pemasukan), $data->sum(fn($t) => (float)$t->nominal), $data->sum(fn($t) => (float)$t->nominal_pemasukan) - $data->sum(fn($t) => (float)$t->nominal)), \Maatwebsite\Excel\Excel::XLSX);
 
         $recipientEmail = $request->email ?? Auth::user()->email;
         Mail::to($recipientEmail)->send(new TransactionExportMail($excelData, 'Arus_Kas_BIMMO.xlsx'));
@@ -511,11 +523,11 @@ class TransaksiController extends Controller
 
     public function upload(Request $request)
     {
-        $request->validate(['file'=>'required|file|mimes:jpg,jpeg,png,pdf|max:2048', 'id'=>'required|exists:transaksi,id']);
+        $request->validate(['file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', 'id' => 'required|exists:transaksi,id']);
         $transaksi = Transaksi::findOrFail($request->id);
         if ($request->hasFile('file')) {
-            if (!empty($transaksi->file) && Storage::disk('public')->exists('uploads/'.$transaksi->file)) Storage::disk('public')->delete('uploads/'.$transaksi->file);
-            $fileName = Str::random(40).'.'.$request->file('file')->getClientOriginalExtension();
+            if (!empty($transaksi->file) && Storage::disk('public')->exists('uploads/' . $transaksi->file)) Storage::disk('public')->delete('uploads/' . $transaksi->file);
+            $fileName = Str::random(40) . '.' . $request->file('file')->getClientOriginalExtension();
             $request->file('file')->storeAs('uploads', $fileName, 'public');
             $transaksi->file = $fileName;
             $transaksi->save();
@@ -528,7 +540,7 @@ class TransaksiController extends Controller
     {
         $transaksi = Transaksi::findOrFail($id);
         if (!empty($transaksi->file)) {
-            if (Storage::disk('public')->exists('uploads/'.$transaksi->file)) Storage::disk('public')->delete('uploads/'.$transaksi->file);
+            if (Storage::disk('public')->exists('uploads/' . $transaksi->file)) Storage::disk('public')->delete('uploads/' . $transaksi->file);
             $transaksi->file = null;
             $transaksi->save();
             return response()->json(['success' => true, 'message' => 'File deleted successfully']);
@@ -560,7 +572,9 @@ class TransaksiController extends Controller
 
                 try {
                     $tgl = is_numeric($tglRaw) ? Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tglRaw))->format('Y-m-d') : Carbon::parse($tglRaw)->format('Y-m-d');
-                } catch (\Exception $e) { continue; }
+                } catch (\Exception $e) {
+                    continue;
+                }
 
                 if (($row['nominal_pemasukan'] ?? 0) > 0) {
                     Transaksi::create([
@@ -592,10 +606,10 @@ class TransaksiController extends Controller
     {
         $ids = $request->ids;
         if (!is_array($ids) || count($ids) === 0) return response()->json(['message' => 'No items selected'], 400);
-        
+
         $transactions = Transaksi::where('id_user', Auth::id())->whereIn('id', $ids)->get();
         $deletedCount = 0;
-        foreach($transactions as $transaksi) {
+        foreach ($transactions as $transaksi) {
             // Revert wallet balance before deleting
             if ($transaksi->dompet_id) {
                 $dompet = Dompet::find($transaksi->dompet_id);
@@ -610,7 +624,7 @@ class TransaksiController extends Controller
             }
             // Revert budget impact
             $this->syncBudget($transaksi, false);
-            
+
             $transaksi->delete();
             $deletedCount++;
         }
@@ -630,7 +644,7 @@ class TransaksiController extends Controller
         if ($hasil) {
             $currentUsed = (float)$hasil->getRawOriginal('anggaran_yang_digunakan') ? (float)$hasil->anggaran_yang_digunakan : 0;
             $nominal = (float)$transaksi->nominal;
-            
+
             if ($isIncrement) {
                 $hasil->anggaran_yang_digunakan = $currentUsed + $nominal;
             } else {
