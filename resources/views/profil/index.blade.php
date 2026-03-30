@@ -146,6 +146,47 @@
             </div>
         </div>
 
+        <!-- Pengaturan Gaya Visual -->
+        <div class="card mb-4 shadow-sm border-0" style="border-radius: 15px;">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0"><i class="bi bi-palette2 me-2 text-primary"></i>{{ __('Gaya Visual') }}</h5>
+            </div>
+            <div class="card-body px-4 pb-4">
+                <p class="text-muted small mb-4">{{ __('Pilih gaya desain yang paling sesuai dengan karakter Anda.') }}</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-check style-option p-4 border rounded-4 cursor-pointer transition-all" onclick="document.getElementById('style_corporate').click()" style="border-width: 2px !important;">
+                            <input class="form-check-input d-none" type="radio" name="style_preference" id="style_corporate" value="corporate">
+                            <label class="form-check-label d-block cursor-pointer" for="style_corporate">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="icon-box bg-secondary bg-opacity-10 text-secondary rounded-3 p-2 me-3">
+                                        <i class="bi bi-briefcase fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-0">Corporate</h6>
+                                </div>
+                                <p class="small text-muted mb-0">Tampilan profesional, bersih, dan terstruktur. Cocok untuk fokus maksimal.</p>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check style-option p-4 border rounded-4 cursor-pointer transition-all" onclick="document.getElementById('style_milenial').click()" style="border-width: 2px !important;">
+                            <input class="form-check-input d-none" type="radio" name="style_preference" id="style_milenial" value="milenial">
+                            <label class="form-check-label d-block cursor-pointer" for="style_milenial">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3">
+                                        <i class="bi bi-stars fs-4"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-0">Millennial & Gen Z</h6>
+                                </div>
+                                <p class="small text-muted mb-0">Estetika modern dengan gradasi, glassmorphism, dan visual dinamis.</p>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Informasi Pengguna -->
         <div class="card mb-4">
             <div class="card-header">
@@ -386,6 +427,46 @@
                     });
                     e.target.closest('.theme-option').classList.add('border-primary', 'bg-light-subtle');
                 }
+            });
+        });
+
+        // UI Style Switcher Logic
+        const savedStyle = "{{ auth()->user()->ui_style ?? 'corporate' }}";
+        const styleRadio = document.querySelector(`input[name="style_preference"][value="${savedStyle}"]`);
+        if (styleRadio) {
+            styleRadio.checked = true;
+            styleRadio.closest('.style-option').classList.add('border-primary', 'bg-primary-subtle');
+        }
+
+        document.querySelectorAll('input[name="style_preference"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const style = e.target.value;
+                
+                // Update UI states
+                document.querySelectorAll('.style-option').forEach(opt => {
+                    opt.classList.remove('border-primary', 'bg-primary-subtle');
+                });
+                e.target.closest('.style-option').classList.add('border-primary', 'bg-primary-subtle');
+
+                // Sync to database
+                fetch("{{ route('user.update.ui-style') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ ui_style: style })
+                }).then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                }).then(data => {
+                    // Refresh to apply style changes globally
+                    location.reload();
+                }).catch(err => {
+                    console.error('Failed to sync style to database:', err);
+                    alert('Gagal menyelaraskan gaya visual.');
+                });
             });
         });
     });
