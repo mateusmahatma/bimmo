@@ -83,6 +83,7 @@ class User extends Authenticatable
         'trial_ends_at' => 'datetime',
         'subscription_ends_at' => 'datetime',
         'subscription_auto_renew' => 'boolean',
+        'ui_style' => 'string',
     ];
 
     public function isOnTrial()
