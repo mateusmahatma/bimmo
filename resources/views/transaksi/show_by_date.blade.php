@@ -187,8 +187,8 @@
                                     <div class="flex-grow-1 min-w-0">
                                         <div class="fw-semibold text-dark" style="font-size:0.95rem;">{{ $categoryName }}</div>
                                         @if($t->keterangan)
-                                            <div class="text-muted small text-truncate" style="max-width:320px;">
-                                                {!! strip_tags($t->keterangan) !!}
+                                            <div class="text-muted small">
+                                                {!! $t->keterangan !!}
                                             </div>
                                         @endif
                                         @if($t->dompet)
