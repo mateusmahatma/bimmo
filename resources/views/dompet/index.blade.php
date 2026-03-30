@@ -144,17 +144,21 @@
 
 <section class="section">
     <div class="row">
+@php
+    $uiStyle = auth()->user()->ui_style ?? 'corporate';
+@endphp
+
 <div class="col-lg-12 mb-4">
-    <div class="card card-summary mb-4">
+    <div class="card {{ $uiStyle === 'milenial' ? 'm-wallet-balance-card border-0 shadow-lg' : 'card-summary' }} mb-4">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
-                    <h5 class="card-title mb-1 fw-bold text-dark opacity-75" style="font-size: 1.1rem;">{{ __('Total Balance') }}</h5>
-                    <p class="text-muted small mb-0">{{ __('Combined balance from all your active wallets.') }}</p>
+                    <h5 class="card-title mb-1 fw-bold {{ $uiStyle === 'milenial' ? 'text-white text-uppercase ls-1' : 'text-dark opacity-75' }}" style="font-size: {{ $uiStyle === 'milenial' ? '0.9rem' : '1.1rem' }};">{{ __('Total Balance') }}</h5>
+                    <p class="{{ $uiStyle === 'milenial' ? 'text-white opacity-75' : 'text-muted' }} small mb-0">{{ __('Combined balance from all your active wallets.') }}</p>
                 </div>
                 <div class="text-end">
-                    <p class="small mb-0 text-muted d-md-none text-start">{{ __('Current Total') }}</p>
-                    <h2 class="balance-amount mb-0 text-dark">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
+                    <p class="small mb-0 {{ $uiStyle === 'milenial' ? 'text-white opacity-50' : 'text-muted' }} d-md-none text-start">{{ __('Current Total') }}</p>
+                    <h2 class="{{ $uiStyle === 'milenial' ? 'text-white' : 'balance-amount text-dark' }} mb-0 fw-bold" style="font-size: {{ $uiStyle === 'milenial' ? '2.5rem' : '' }}; letter-spacing: -1px;">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
                 </div>
             </div>
         </div>
@@ -207,10 +211,10 @@
                 @if(count($wallets) > 0)
                     @foreach($wallets as $wallet)
                     <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card wallet-card border-0 shadow-sm h-100 position-relative">
+                        <div class="card {{ $uiStyle === 'milenial' ? 'm-wallet-item-card glass-card' : 'wallet-card shadow-sm' }} border-0 h-100 position-relative">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-start justify-content-between mb-3">
-                                    <div class="wallet-icon-wrapper rounded-4 d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary shadow-sm" style="width: 56px; height: 56px; border: 1px solid rgba(65, 84, 241, 0.1);">
+                                    <div class="{{ $uiStyle === 'milenial' ? 'm-wallet-icon' : 'wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary' }} d-flex align-items-center justify-content-center shadow-sm" style="{{ $uiStyle === 'corporate' ? 'width: 56px; height: 56px; border: 1px solid rgba(65, 84, 241, 0.1);' : '' }}">
                                         @if($wallet->ikon)
                                             @if(str_starts_with($wallet->ikon, 'uploads/'))
                                                 <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 32px; height: 32px; object-fit: contain;">
@@ -218,7 +222,7 @@
                                                 <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}" alt="{{ $wallet->ikon }}" style="width: 32px; height: 32px; object-fit: contain;">
                                             @endif
                                         @else
-                                            <i class="bi bi-wallet2 fs-3"></i>
+                                            <i class="bi bi-wallet2 fs-3 {{ $uiStyle === 'milenial' ? 'text-primary' : '' }}"></i>
                                         @endif
                                     </div>
                                     <div class="dropdown">
@@ -234,8 +238,8 @@
                                 </div>
                                 
                                 <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none stretched-link">
-                                    <p class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">{{ $wallet->nama }}</p>
-                                    <h4 class="fw-bold mb-0 text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h4>
+                                    <p class="{{ $uiStyle === 'milenial' ? 'm-wallet-name' : 'text-uppercase text-muted fw-bold mb-1' }}" style="{{ $uiStyle === 'corporate' ? 'font-size: 0.7rem; letter-spacing: 1px;' : '' }}">{{ $wallet->nama }}</p>
+                                    <h4 class="{{ $uiStyle === 'milenial' ? 'm-wallet-amount' : 'fw-bold mb-0 text-dark' }}">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h4>
                                     
                                     <div class="mt-4 d-flex align-items-center text-primary fw-semibold small">
                                         <span>{{ __('View Details') }}</span>
