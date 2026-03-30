@@ -21,10 +21,10 @@ class DashboardController extends Controller
     protected function getDashboardNumbers()
     {
         $userId = Auth::id();
-        $now = now();
-        $lastMonth = now()->subMonth();
+        $now = Carbon::now('Asia/Jakarta');
+        $lastMonth = $now->copy()->subMonthsNoOverflow(1);
 
-        // THIS MONTH
+        // THIS MONTH (Full Month until now)
         $pemasukanBulanIni = Transaksi::where('id_user', $userId)
             ->whereMonth('tgl_transaksi', $now->month)
             ->whereYear('tgl_transaksi', $now->year)->get()->sum(fn($t) => (float)$t->nominal_pemasukan);
@@ -34,15 +34,15 @@ class DashboardController extends Controller
             ->whereYear('tgl_transaksi', $now->year)->get()->sum(fn($t) => (float)$t->nominal);
 
         $pengeluaranHariIni = Transaksi::where('id_user', $userId)
-            ->whereDate('tgl_transaksi', $now)->get()->sum(fn($t) => (float)$t->nominal);
+            ->whereDate('tgl_transaksi', $now->toDateString())->get()->sum(fn($t) => (float)$t->nominal);
 
         $saldo = $pemasukanBulanIni - $pengeluaranBulanIni;
 
-        // LAST MONTH
-        // Single query for last month — avoid fetching the same rows twice
+        // LAST MONTH (MTD - Month to Date)
+        // Fair comparison: compare exactly until the same date and time last month
+        $startOfLastMonth = $lastMonth->copy()->startOfMonth();
         $transaksiLalu = Transaksi::where('id_user', $userId)
-            ->whereMonth('tgl_transaksi', $lastMonth->month)
-            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->whereBetween('tgl_transaksi', [$startOfLastMonth, $lastMonth])
             ->get();
 
         $pemasukanBulanLalu   = $transaksiLalu->sum(fn($t) => (float) $t->nominal_pemasukan);
@@ -70,6 +70,7 @@ class DashboardController extends Controller
             'persen_pengeluaran' => round($persenPengeluaran, 1),
         ];
     }
+
     public function toggleNominalAjax()
     {
         $show = session('show_nominal', false);
@@ -139,8 +140,8 @@ class DashboardController extends Controller
         $totalAsetPhysical = Aset::where('id_user', $userId)->where('is_disposed', false)->sum('harga_beli') ?? 0;
         $rasio = $totalAsetPhysical > 0 ? ($totalPinjaman / $totalAsetPhysical) * 100 : 0;
 
-        $now = Carbon::now();
-        $lastMonth = $now->copy()->subMonth();
+        $now = Carbon::now('Asia/Jakarta');
+        $lastMonth = $now->copy()->subMonthsNoOverflow(1);
         $totalThisMonth = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal);
         $totalLastMonth = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $lastMonth->year)->whereMonth('tgl_transaksi', $lastMonth->month)->get()->sum(fn($t) => (float)$t->nominal);
         $rasio_inflasi = $totalLastMonth != 0 ? (($totalThisMonth - $totalLastMonth) / $totalLastMonth) * 100 : 0;
