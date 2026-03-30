@@ -39,20 +39,23 @@ class DashboardController extends Controller
         $saldo = $pemasukanBulanIni - $pengeluaranBulanIni;
 
         // LAST MONTH
-        $pemasukanBulanLalu = Transaksi::where('id_user', $userId)
+        // Single query for last month — avoid fetching the same rows twice
+        $transaksiLalu = Transaksi::where('id_user', $userId)
             ->whereMonth('tgl_transaksi', $lastMonth->month)
-            ->whereYear('tgl_transaksi', $lastMonth->year)->get()->sum(fn($t) => (float)$t->nominal_pemasukan);
+            ->whereYear('tgl_transaksi', $lastMonth->year)
+            ->get();
 
-        $pengeluaranBulanLalu = Transaksi::where('id_user', $userId)
-            ->whereMonth('tgl_transaksi', $lastMonth->month)
-            ->whereYear('tgl_transaksi', $lastMonth->year)->get()->sum(fn($t) => (float)$t->nominal);
-
-        $saldoBulanLalu = $pemasukanBulanLalu - $pengeluaranBulanLalu;
+        $pemasukanBulanLalu   = $transaksiLalu->sum(fn($t) => (float) $t->nominal_pemasukan);
+        $pengeluaranBulanLalu = $transaksiLalu->sum(fn($t) => (float) $t->nominal);
+        $saldoBulanLalu       = $pemasukanBulanLalu - $pengeluaranBulanLalu;
 
         // PERCENTAGE CALCULATIONS
-        $persenPemasukan = $pemasukanBulanLalu > 0 ? (($pemasukanBulanIni - $pemasukanBulanLalu) / $pemasukanBulanLalu) * 100 : 0;
-        $persenPengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : 0;
-        $persenSaldo = $saldoBulanLalu != 0 ? (($saldo - $saldoBulanLalu) / abs($saldoBulanLalu)) * 100 : 0;
+        // abs() on denominator handles negative saldo correctly
+        $persenPemasukan = $pemasukanBulanLalu > 0
+            ? (($pemasukanBulanIni - $pemasukanBulanLalu) / $pemasukanBulanLalu) * 100
+            : ($pemasukanBulanIni > 0 ? 100 : 0);
+        $persenPengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : ($pengeluaranBulanIni > 0 ? 100 : 0);
+        $persenSaldo = $saldoBulanLalu != 0 ? (($saldo - $saldoBulanLalu) / abs($saldoBulanLalu)) * 100 : ($saldo != 0 ? 100 : 0);
 
         $cicilanBesok = Pinjaman::where('id_user', $userId)->where('status', 'belum_lunas')->get()->sum(fn($p) => min($p->nominal_angsuran, $p->jumlah_pinjaman));
 
@@ -288,19 +291,19 @@ class DashboardController extends Controller
             $monthStr = $currentMonthNw->translatedFormat('M Y');
 
             // ASSETS LOGIC REFINED
-            $assetsMonthQuery = $allAssets->filter(function($aset) use ($monthEnd) {
+            $assetsMonthQuery = $allAssets->filter(function ($aset) use ($monthEnd) {
                 $purchased = Carbon::parse($aset->tanggal_pembelian) <= $monthEnd;
-                $notDisposedYet = !$aset->is_disposed || 
-                                  ($aset->tanggal_disposal && Carbon::parse($aset->tanggal_disposal) > $monthEnd);
+                $notDisposedYet = !$aset->is_disposed ||
+                    ($aset->tanggal_disposal && Carbon::parse($aset->tanggal_disposal) > $monthEnd);
                 return $purchased && $notDisposedYet;
             });
             $assetsSum = $assetsMonthQuery->sum('harga_beli');
 
             // DD LOGIC
             $ddMonthQuery = $allDD->filter(fn($dd) => Carbon::parse($dd->tgl_transaksi_dana_darurat) <= $monthEnd);
-            $ddSum = $ddMonthQuery->reduce(function($carry, $item) {
-                return $item->jenis_transaksi_dana_darurat == 1 
-                    ? $carry + (float)$item->nominal_dana_darurat 
+            $ddSum = $ddMonthQuery->reduce(function ($carry, $item) {
+                return $item->jenis_transaksi_dana_darurat == 1
+                    ? $carry + (float)$item->nominal_dana_darurat
                     : $carry - (float)$item->nominal_dana_darurat;
             }, 0);
 
@@ -327,7 +330,7 @@ class DashboardController extends Controller
                     'date' => Carbon::parse($d->tgl_transaksi_dana_darurat)->translatedFormat('d M Y')
                 ])->values(),
                 'loans' => $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
-                    ->map(function($p) use ($allBayar, $monthEnd) {
+                    ->map(function ($p) use ($allBayar, $monthEnd) {
                         $p_bayar = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
                         return [
                             'name' => $p->nama_pinjaman,
