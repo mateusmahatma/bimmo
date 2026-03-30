@@ -1,7 +1,10 @@
-<div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+@php
+    $uiStyle = auth()->user()->ui_style ?? 'corporate';
+@endphp
+<div class="card card-dashboard border-0 shadow-sm {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="border-radius: {{ $uiStyle === 'milenial' ? 'var(--m-radius-lg)' : '12px' }};">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3 {{ $uiStyle === 'milenial' ? 'm-card-header-vibrant bg-transparent' : '' }}">
         <div class="header-title-container">
-            <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">
+            <h5 class="card-title mb-0 fw-bold text-dark {{ $uiStyle === 'milenial' ? 'm-card-title-vibrant' : '' }}" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                 Activity Calendar
             </h5>
             <p class="text-muted small mb-0 mt-1 d-none d-sm-block" style="font-size: 0.85rem;">Manage your schedules and financial deadlines.</p>
@@ -11,44 +14,44 @@
                 <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
                 <input type="text" id="calendarSearch" class="form-control border-0" placeholder="Search...">
             </div>
-            <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-shrink-0" id="btnNewEvent">
+            <button class="btn {{ $uiStyle === 'milenial' ? 'btn-primary bg-gradient shadow-sm' : 'btn-primary' }} btn-sm rounded-pill px-3 shadow-sm flex-shrink-0" id="btnNewEvent">
                 <i class="bi bi-plus-lg me-1"></i> <span class="d-none d-md-inline">New Event</span><span class="d-md-none">New</span>
             </button>
         </div>
     </div>
-    <div class="card-body p-2 p-md-3">
+    <div class="card-body p-2 p-md-4">
         <div class="row mb-3 g-2">
             <div class="col-12 d-flex flex-wrap gap-2 justify-content-start overflow-auto pb-1 calendar-filters" style="scrollbar-width: none; -ms-overflow-style: none;">
                 <style>.calendar-filters::-webkit-scrollbar { display: none; }</style>
                 <div class="form-check form-check-inline me-0">
                     <input class="form-check-input filter-category" type="checkbox" id="cat-reminder" value="reminder" checked>
-                    <label class="form-check-label small" for="cat-reminder"><span class="badge bg-info p-1 me-1"></span>Reminder</label>
+                    <label class="form-check-label small" for="cat-reminder"><span class="badge {{ $uiStyle === 'milenial' ? 'm-badge-modern' : '' }} bg-info p-1 me-1"></span>Reminder</label>
                 </div>
                 <div class="form-check form-check-inline me-0">
                     <input class="form-check-input filter-category" type="checkbox" id="cat-task" value="task" checked>
-                    <label class="form-check-label small" for="cat-task"><span class="badge bg-primary p-1 me-1"></span>Task</label>
+                    <label class="form-check-label small" for="cat-task"><span class="badge {{ $uiStyle === 'milenial' ? 'm-badge-modern' : '' }} bg-primary p-1 me-1"></span>Task</label>
                 </div>
                 <div class="form-check form-check-inline me-0">
                     <input class="form-check-input filter-category" type="checkbox" id="cat-meeting" value="meeting" checked>
-                    <label class="form-check-label small" for="cat-meeting"><span class="badge bg-warning p-1 me-1"></span>Meeting</label>
+                    <label class="form-check-label small" for="cat-meeting"><span class="badge {{ $uiStyle === 'milenial' ? 'm-badge-modern' : '' }} bg-warning p-1 me-1"></span>Meeting</label>
                 </div>
                 <div class="form-check form-check-inline me-0">
                     <input class="form-check-input filter-category" type="checkbox" id="cat-deadline" value="deadline" checked>
-                    <label class="form-check-label small" for="cat-deadline"><span class="badge bg-danger p-1 me-1"></span>Deadline</label>
+                    <label class="form-check-label small" for="cat-deadline"><span class="badge {{ $uiStyle === 'milenial' ? 'm-badge-modern' : '' }} bg-danger p-1 me-1"></span>Deadline</label>
                 </div>
             </div>
         </div>
-        <div id="calendar" style="min-height: 400px;"></div>
+        <div id="calendar" style="min-height: 400px; font-family: {{ $uiStyle === 'milenial' ? "'Inter', sans-serif" : 'inherit' }};"></div>
     </div>
 </div>
 
 <!-- Add Event Modal -->
 <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: {{ $uiStyle === 'milenial' ? '24px' : '15px' }}; overflow: hidden;">
             <form id="eventForm">
                 <input type="hidden" name="id" id="eventId">
-                <div class="modal-header border-bottom py-3">
+                <div class="modal-header border-bottom py-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : '' }}">
                     <h5 class="modal-title fw-bold" id="addEventModalLabel">Add New Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -158,7 +161,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3">
+                <div class="modal-footer border-top p-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : '' }}">
                     <button type="button" class="btn btn-light rounded-pill px-3 px-md-4" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-3 px-md-4">Save</button>
                 </div>
