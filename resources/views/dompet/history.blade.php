@@ -54,6 +54,9 @@
 @endpush
 
 @section('container')
+@php
+    $uiStyle = auth()->user()->ui_style ?? 'corporate';
+@endphp
 <div class="pagetitle mb-4">
     <h1 class="fw-bold mb-1">{{ __('History') }} {{ $wallet->nama }}</h1>
     <nav>
@@ -69,11 +72,11 @@
     <div class="row g-4">
         <!-- Balance Card -->
         <div class="col-12 col-lg-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; background: linear-gradient(135deg, #2c384e 0%, #1a2233 100%); color: white;">
+            <div class="card {{ $uiStyle === 'milenial' ? 'm-wallet-balance-card border-0 shadow-lg' : 'border-0 shadow-sm' }} h-100" style="border-radius: {{ $uiStyle === 'milenial' ? 'var(--m-radius-lg)' : '12px' }}; background: {{ $uiStyle === 'milenial' ? '' : 'linear-gradient(135deg, #2c384e 0%, #1a2233 100%)' }}; color: white;">
                 <div class="card-body p-4 d-flex flex-column justify-content-between shadow-lg">
                     <div>
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="rounded-circle bg-white bg-opacity-10 p-2">
+                            <div class="rounded-circle {{ $uiStyle === 'milenial' ? 'bg-white bg-opacity-20' : 'bg-white bg-opacity-10' }} p-2">
                                 @if($wallet->ikon)
                                     @if(str_starts_with($wallet->ikon, 'uploads/'))
                                         <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 32px; height: 32px; object-fit: contain;">
@@ -90,7 +93,7 @@
                         <h1 class="fw-bold mb-0">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h1>
                     </div>
                     
-                    <button class="btn btn-outline-light rounded-pill w-100 mt-4 border-2" data-bs-toggle="modal" data-bs-target="#addBalanceModal">
+                    <button class="btn {{ $uiStyle === 'milenial' ? 'btn-light text-primary fw-bold border-0' : 'btn-outline-light border-2' }} rounded-pill w-100 mt-4" data-bs-toggle="modal" data-bs-target="#addBalanceModal">
                         <i class="bi bi-plus-lg me-1"></i> {{ __('Add Balance') }}
                     </button>
                 </div>
