@@ -62,7 +62,32 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tema berhasil diperbarui!',
+            'message' => 'Mode tampilan berhasil diperbarui!',
+        ]);
+    }
+
+    public function updateUiStyle(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'ui_style' => 'required|in:corporate,milenial',
+        ]);
+
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $user->ui_style = $validated['ui_style'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Gaya visual berhasil diperbarui!',
         ]);
     }
 
