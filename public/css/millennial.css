@@ -1,0 +1,260 @@
+/* Millennial & Gen Z Aesthetic System */
+
+:root {
+    --m-primary-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    --m-secondary-gradient: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+    --m-danger-gradient: linear-gradient(135deg, #d63031 0%, #ff7675 100%);
+    --m-warning-gradient: linear-gradient(135deg, #fdcb6e 0%, #ffeaa7 100%);
+    --m-info-gradient: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+    --m-glass-bg: rgba(255, 255, 255, 0.7);
+    --m-glass-border: rgba(255, 255, 255, 0.3);
+    --m-soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --m-intense-shadow: 0 15px 45px rgba(108, 92, 231, 0.2);
+    --m-radius-lg: 24px;
+    --m-radius-xl: 32px;
+}
+
+[data-bs-theme="dark"] {
+    --m-glass-bg: rgba(30, 30, 30, 0.7);
+    --m-glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Global Styles for Millennial Mode */
+.ui-style-milenial {
+    letter-spacing: -0.015em;
+    background-color: #f8f9fa;
+}
+
+.ui-style-milenial .card {
+    border: none !important;
+    border-radius: var(--m-radius-lg) !important;
+    box-shadow: var(--m-soft-shadow) !important;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.ui-style-milenial .card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--m-intense-shadow) !important;
+}
+
+/* Glassmorphism Effect */
+.glass-card {
+    background: var(--m-glass-bg) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid var(--m-glass-border) !important;
+}
+
+/* Vibrant Buttons */
+.ui-style-milenial .btn-primary {
+    background: var(--m-primary-gradient) !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 10px 24px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3) !important;
+}
+
+.ui-style-milenial .btn-primary:hover {
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+/* Wallet Specific Premium Styles */
+.ui-style-milenial .m-wallet-balance-card {
+    background: var(--m-primary-gradient) !important;
+    color: white !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.ui-style-milenial .m-wallet-balance-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.ui-style-milenial .m-wallet-balance-card .card-body {
+    position: relative;
+    z-index: 2;
+}
+
+.ui-style-milenial .m-wallet-item-card {
+    border: 1px solid var(--m-glass-border) !important;
+}
+
+.ui-style-milenial .m-wallet-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 20px !important;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-bs-theme="dark"] .ui-style-milenial .m-wallet-icon {
+    background: #2d3436;
+}
+
+.ui-style-milenial .m-wallet-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.ui-style-milenial .m-wallet-amount {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* Mobile & PWA Float Animation */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Dashboard Specific Styles */
+.ui-style-milenial .m-dashboard-summary-card {
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ui-style-milenial .m-hero-balance {
+    background: var(--m-primary-gradient) !important;
+    border: none !important;
+    color: white !important;
+    overflow: hidden;
+    position: relative;
+}
+
+.ui-style-milenial .m-hero-balance::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.ui-style-milenial .m-glass-container {
+    background: var(--m-glass-bg) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid var(--m-glass-border) !important;
+    box-shadow: var(--m-soft-shadow) !important;
+}
+
+.ui-style-milenial .m-list-item {
+    border-radius: 18px !important;
+    margin-bottom: 12px !important;
+    transition: transform 0.3s ease;
+    border: 1px solid transparent !important;
+}
+
+.ui-style-milenial .m-list-item:hover {
+    background: var(--m-glass-bg) !important;
+    border-color: var(--m-glass-border) !important;
+    transform: scale(1.02);
+}
+
+.ui-style-milenial .m-badge-modern {
+    padding: 6px 12px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px;
+    font-size: 0.65rem !important;
+}
+
+.ui-style-milenial .progress {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    height: 12px !important;
+    border-radius: 20px !important;
+}
+
+[data-bs-theme="dark"] .ui-style-milenial .progress {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ui-style-milenial .progress-bar {
+    border-radius: 20px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Chart Container Enhancements */
+.ui-style-milenial .apexcharts-canvas {
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.05));
+}
+
+.ui-style-milenial .m-card-header-vibrant {
+    border-bottom: none !important;
+    padding-top: 24px !important;
+    padding-bottom: 8px !important;
+}
+
+.ui-style-milenial .m-card-title-vibrant {
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px !important;
+}
+
+/* Sidebar Glassmorphism */
+.m-glass-sidebar {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(15px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-bs-theme="dark"] .m-glass-sidebar {
+    background: rgba(30, 30, 40, 0.6) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.m-glass-sidebar .nav-link.active {
+    background: var(--m-gradient-primary) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    margin: 4px 15px !important;
+    box-shadow: 0 8px 20px rgba(9, 132, 227, 0.3) !important;
+}
+
+.m-glass-sidebar .nav-link:not(.active):hover {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border-radius: 12px !important;
+    margin: 4px 15px !important;
+}
+
+[data-bs-theme="dark"] .m-glass-sidebar .nav-link:not(.active):hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.m-glass-sidebar .sidebar-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-bs-theme="dark"] .m-glass-sidebar .sidebar-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
