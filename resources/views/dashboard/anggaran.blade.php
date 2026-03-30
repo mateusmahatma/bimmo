@@ -1,3 +1,7 @@
+@php
+    $uiStyle = auth()->user()->ui_style ?? 'corporate';
+@endphp
+
 @push('anggaran-css')
 <link rel="stylesheet" href="{{ asset('css/dashboard/anggaran.css') }}?v={{ filemtime(public_path('css/dashboard/anggaran.css')) }}">
 @endpush
@@ -8,6 +12,7 @@
 @push('anggaran.scripts')
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        const uiStyle = "{{ $uiStyle }}";
 
         function loadChart(filter = "") {
             fetch("{{ route('anggaran.chart') }}?filter=" + filter)
@@ -37,6 +42,11 @@
                     );
 
                     const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                    
+                    // Millennial Colors
+                    const colors = uiStyle === 'milenial' 
+                        ? ["#6366F1", "#10B981", "#F43F5E"] // Indigo, Emerald, Rose
+                        : ["#3B82F6", "#22C55E", "#DC2626"]; // Original colors
 
                     const options = {
                         chart: {
@@ -46,33 +56,34 @@
                             toolbar: {
                                 show: !isMobile
                             },
-                            foreColor: isDark ? '#e0e0e0' : '#333'
+                            foreColor: isDark ? '#e0e0e0' : (uiStyle === 'milenial' ? '#666' : '#333'),
+                            fontFamily: uiStyle === 'milenial' ? "'Inter', 'Outfit', sans-serif" : 'inherit'
                         },
                         plotOptions: {
                             bar: {
                                 horizontal: true,
                                 barHeight: isMobile ? "65%" : "45%",
-                                borderRadius: 4
+                                borderRadius: uiStyle === 'milenial' ? 8 : 4
                             }
                         },
                         stroke: {
-                            width: 1,
+                            width: uiStyle === 'milenial' ? 0 : 1,
                             colors: [isDark ? '#333' : '#fff']
                         },
                         series: [{
                                 name: "Realisasi",
                                 data: realisasi,
-                                color: "#3B82F6"
+                                color: colors[0]
                             },
                             {
                                 name: "Sisa",
                                 data: sisa,
-                                color: "#22C55E"
+                                color: colors[1]
                             },
                             {
                                 name: "Over Budget",
                                 data: overBudget,
-                                color: "#DC2626"
+                                color: colors[2]
                             }
                         ],
                         xaxis: {
@@ -80,7 +91,7 @@
                             labels: {
                                 show: !isMobile || data.labels.length < 5,
                                 style: { 
-                                    colors: isDark ? '#e0e0e0' : '#333',
+                                    colors: isDark ? '#e0e0e0' : (uiStyle === 'milenial' ? '#999' : '#333'),
                                     fontSize: '10px'
                                 },
                                 formatter: value => {
@@ -92,8 +103,9 @@
                         yaxis: {
                             labels: {
                                 style: { 
-                                    colors: isDark ? '#e0e0e0' : '#333',
-                                    fontSize: isMobile ? '10px' : '12px'
+                                    colors: isDark ? '#e0e0e0' : (uiStyle === 'milenial' ? '#666' : '#333'),
+                                    fontSize: isMobile ? '10px' : '12px',
+                                    fontWeight: uiStyle === 'milenial' ? 600 : 400
                                 },
                                 maxWidth: isMobile ? 100 : 200
                             }
@@ -112,8 +124,9 @@
                         legend: {
                             position: isMobile ? "bottom" : "top",
                             markers: {
-                                radius: 8
-                            }
+                                radius: uiStyle === 'milenial' ? 12 : 8
+                            },
+                            fontWeight: uiStyle === 'milenial' ? 600 : 400
                         },
                         tooltip: {
                             theme: isDark ? 'dark' : 'light',
@@ -123,7 +136,7 @@
                             }
                         },
                         grid: {
-                            borderColor: isDark ? '#444' : '#e0e0e0',
+                            borderColor: isDark ? '#444' : '#efefef',
                             padding: {
                                 left: isMobile ? 0 : 20
                             }
