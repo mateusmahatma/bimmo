@@ -1,4 +1,7 @@
-<aside class="sidebar d-flex flex-column">
+@php
+    $uiStyle = auth()->user()->ui_style ?? 'corporate';
+@endphp
+<aside class="sidebar d-flex flex-column {{ $uiStyle === 'milenial' ? 'm-glass-sidebar' : '' }}">
     <div class="sidebar-header p-4 d-flex align-items-center justify-content-between border-bottom mb-2">
         <a href="/dashboard">
             <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo me-2" style="height: 22px; width: auto;" alt="BIMMO">
