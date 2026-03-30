@@ -70,16 +70,22 @@
                                     </div>
                                     <h2 class="mb-2 fw-extrabold {{ $uiStyle === 'milenial' ? 'text-white' : ($totalNominalSisa >= 0 ? 'text-dark' : 'text-danger') }}" id="summary-saldo" style="font-size: 2.2rem; letter-spacing: -1.5px;">{{ $saldoView }}</h2>
                                 </div>
-                                <div class="mt-2 small">
-                                    @if($persenSaldo > 0)
-                                        <span class="{{ $uiStyle === 'milenial' ? 'text-white fw-bold' : 'text-success fw-bold' }}"><i class="bi bi-arrow-up-short"></i>{{ abs($persenSaldo) }}%</span>
-                                    @elseif($persenSaldo < 0)
-                                        <span class="{{ $uiStyle === 'milenial' ? 'text-white fw-bold' : 'text-danger fw-bold' }}"><i class="bi bi-arrow-down-short"></i>{{ abs($persenSaldo) }}%</span>
-                                    @else
-                                        <span class="{{ $uiStyle === 'milenial' ? 'text-white opacity-50' : 'text-muted' }}"><i class="bi bi-dash"></i></span>
-                                    @endif
-                                    <span class="{{ $uiStyle === 'milenial' ? 'text-white opacity-50' : 'text-muted' }} ms-1" style="font-size: 0.8rem;">{{ __('vs last month') }}</span>
-                                </div>
+                                    <div class="mt-2 small growth-detail-trigger"
+                                         style="cursor: pointer;"
+                                         data-title="{{ __('Balance Change') }}"
+                                         data-current="{{ round($numbers['saldo'], 0) }}"
+                                         data-last="{{ round($saldoLalu, 0) }}"
+                                         data-percent="{{ $persenSaldo }}"
+                                         data-type="balance">
+                                        @if($persenSaldo > 0)
+                                            <span class="{{ $uiStyle === 'milenial' ? 'text-white fw-bold' : 'text-success fw-bold' }}"><i class="bi bi-arrow-up-short"></i>{{ abs($persenSaldo) }}%</span>
+                                        @elseif($persenSaldo < 0)
+                                            <span class="{{ $uiStyle === 'milenial' ? 'text-white fw-bold' : 'text-danger fw-bold' }}"><i class="bi bi-arrow-down-short"></i>{{ abs($persenSaldo) }}%</span>
+                                        @else
+                                            <span class="{{ $uiStyle === 'milenial' ? 'text-white opacity-50' : 'text-muted' }}"><i class="bi bi-dash"></i></span>
+                                        @endif
+                                        <span class="{{ $uiStyle === 'milenial' ? 'text-white opacity-50' : 'text-muted' }} ms-1" style="font-size: 0.8rem;">{{ __('vs last month') }}</span>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -100,7 +106,13 @@
                                                 <i class="bi bi-graph-up-arrow fs-5"></i>
                                             </div>
                                         </div>
-                                        <div class="mt-1 small">
+                                        <div class="mt-1 small growth-detail-trigger"
+                                             style="cursor: pointer;"
+                                             data-title="{{ __('Income Change') }}"
+                                             data-current="{{ round($numbers['pemasukan'], 0) }}"
+                                             data-last="{{ round($pemasukanLalu, 0) }}"
+                                             data-percent="{{ $persenPemasukan }}"
+                                             data-type="income">
                                             @if($persenPemasukan > 0)
                                                 <span class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i>{{ abs($persenPemasukan) }}%</span>
                                             @elseif($persenPemasukan < 0)
@@ -126,7 +138,13 @@
                                                 <i class="bi bi-graph-down-arrow fs-5"></i>
                                             </div>
                                         </div>
-                                        <div class="mt-1 small">
+                                        <div class="mt-1 small growth-detail-trigger"
+                                             style="cursor: pointer;"
+                                             data-title="{{ __('Expense Change') }}"
+                                             data-current="{{ round($numbers['pengeluaran'], 0) }}"
+                                             data-last="{{ round($pengeluaranLalu, 0) }}"
+                                             data-percent="{{ $persenPengeluaran }}"
+                                             data-type="expense">
                                             @if($persenPengeluaran > 0)
                                                 <span class="text-danger fw-bold"><i class="bi bi-arrow-up-short"></i>{{ abs($persenPengeluaran) }}%</span>
                                             @elseif($persenPengeluaran < 0)
@@ -498,6 +516,7 @@
                 </div>
             </div>
 
+        @include('modal.dashboard.growth_detail')
         @include('modal.dashboard.detail')
         @include('modal.dashboard.rasio')
         @include('modal.dashboard.notes')

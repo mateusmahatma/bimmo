@@ -68,6 +68,9 @@ class DashboardController extends Controller
             'persen_saldo' => round($persenSaldo, 1),
             'persen_pemasukan' => round($persenPemasukan, 1),
             'persen_pengeluaran' => round($persenPengeluaran, 1),
+            'pemasukan_lalu' => $pemasukanBulanLalu,
+            'pengeluaran_lalu' => $pengeluaranBulanLalu,
+            'saldo_lalu' => $saldoBulanLalu,
         ];
     }
 
@@ -207,6 +210,9 @@ class DashboardController extends Controller
 
         $showNominal = session('show_nominal', false);
         $numbers = $this->getDashboardNumbers();
+        $pemasukanLalu = $numbers['pemasukan_lalu'] ?? 0;
+        $pengeluaranLalu = $numbers['pengeluaran_lalu'] ?? 0;
+        $saldoLalu = $numbers['saldo_lalu'] ?? 0;
         session(['dashboard_numbers' => $numbers]);
         $saldoView = $this->maskNominal($numbers['saldo'], $showNominal);
         $pemasukanView = $this->maskNominal($numbers['pemasukan'], $showNominal);
@@ -258,6 +264,10 @@ class DashboardController extends Controller
             'persenSaldo',
             'persenPemasukan',
             'persenPengeluaran',
+            'numbers',
+            'pemasukanLalu',
+            'pengeluaranLalu',
+            'saldoLalu',
             'totalDanaDarurat',
             'targetDanaDarurat',
             'persentaseDanaDarurat',

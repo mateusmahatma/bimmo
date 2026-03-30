@@ -260,3 +260,64 @@ document.addEventListener("DOMContentLoaded", function () {
         window.fetchDataAndRenderChart(filterBulan.value, filterTahun.value);
     }
 });
+
+// ==== GROWTH DETAIL MODAL HANDLER ====
+document.addEventListener("DOMContentLoaded", function () {
+    const growthTriggers = document.querySelectorAll('.growth-detail-trigger');
+    growthTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function () {
+            const title = this.dataset.title;
+            const current = parseFloat(this.dataset.current);
+            const last = parseFloat(this.dataset.last);
+            const percent = parseFloat(this.dataset.percent);
+            const type = this.dataset.type;
+
+            document.getElementById('growthDetailTitle').textContent = title;
+            document.getElementById('growthPercentValue').textContent = (percent > 0 ? '+' : '') + percent + '%';
+            document.getElementById('currentPeriodValue').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(current);
+            document.getElementById('lastPeriodValue').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(last);
+            document.getElementById('growthDiffValue').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(current - last);
+
+            const badge = document.getElementById('growthPercentBadge');
+            const icon = document.getElementById('growthIcon');
+            const alert = document.getElementById('growthSummaryAlert');
+            const summaryIcon = document.getElementById('growthSummaryIcon');
+            const summaryText = document.getElementById('growthSummaryText');
+
+            // Reset classes
+            badge.className = 'd-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 fw-bold fs-5 shadow-sm';
+            alert.className = 'alert border-0 py-3 mb-0 rounded-4 d-flex align-items-start gap-3';
+
+            let isPositive = percent > 0;
+            // For expenses, positive growth is "bad" (red/danger), negative is "good" (green/success)
+            let isGood = type === 'expense' ? !isPositive : isPositive;
+
+            if (percent === 0) {
+                badge.classList.add('bg-secondary-light');
+                icon.className = 'bi bi-dash';
+                alert.classList.add('alert-secondary');
+                summaryIcon.className = 'bi bi-info-circle-fill text-secondary';
+                summaryText.textContent = 'Tidak ada perubahan signifikan dibandingkan periode yang sama bulan lalu.';
+            } else if (isGood) {
+                badge.classList.add('bg-success-light');
+                icon.className = isPositive ? 'bi bi-arrow-up-circle-fill' : 'bi bi-arrow-down-circle-fill';
+                alert.classList.add('alert-success');
+                summaryIcon.className = 'bi bi-check-circle-fill text-success';
+                summaryText.textContent = type === 'expense'
+                    ? 'Bagus! Pengeluaran Anda menurun dibandingkan periode yang sama bulan lalu.'
+                    : 'Luar biasa! Pendapatan Anda meningkat dibandingkan periode yang sama bulan lalu.';
+            } else {
+                badge.classList.add('bg-danger-light');
+                icon.className = isPositive ? 'bi bi-arrow-up-circle-fill' : 'bi bi-arrow-down-circle-fill';
+                alert.classList.add('alert-danger');
+                summaryIcon.className = 'bi bi-exclamation-triangle-fill text-danger';
+                summaryText.textContent = type === 'expense'
+                    ? 'Waspada! Pengeluaran Anda meningkat dibandingkan periode yang sama bulan lalu.'
+                    : 'Perhatian! Pendapatan Anda menurun dibandingkan periode yang sama bulan lalu.';
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('growthDetailModal'));
+            modal.show();
+        });
+    });
+});
