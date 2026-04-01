@@ -21,6 +21,7 @@ return [
     'convert_entities' => true,
 
     'options' => [
+        'memory_limit' => '256mb',
         /**
          * The location of the DOMPDF font directory
          *
