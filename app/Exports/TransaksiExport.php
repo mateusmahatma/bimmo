@@ -7,10 +7,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class TransaksiExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+class TransaksiExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithColumnFormatting
 {
     protected $transaksi;
     protected $totalPemasukan;
@@ -30,6 +32,15 @@ class TransaksiExport implements FromCollection, WithHeadings, WithMapping, With
         return $this->transaksi;
     }
 
+    public function columnFormats(): array
+    {
+        // D = Income Amount (col 4), F = Expense Amount (col 6)
+        return [
+            "D" => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            "F" => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+        ];
+    }
+
     public function headings(): array
     {
         return [
@@ -37,7 +48,7 @@ class TransaksiExport implements FromCollection, WithHeadings, WithMapping, With
             ["Total Income", number_format($this->totalPemasukan, 0, ",", ".")],
             ["Total Expense", number_format($this->totalPengeluaran, 0, ",", ".")],
             ["Net Balance", number_format($this->netIncome, 0, ",", ".")],
-            [""], 
+            [""],
             [
                 "No",
                 "Date",
@@ -77,9 +88,9 @@ class TransaksiExport implements FromCollection, WithHeadings, WithMapping, With
             $iteration,
             $row->tgl_transaksi,
             $row->pemasukanRelation?->nama ?? "-",
-            number_format((float)$row->nominal_pemasukan, 0, ",", "."),
+            (float)$row->nominal_pemasukan,   // numeric so Excel treats as number
             $row->pengeluaranRelation?->nama ?? "-",
-            number_format((float)$row->nominal, 0, ",", "."),
+            (float)$row->nominal,             // numeric so Excel treats as number
             $desc
         ];
     }
