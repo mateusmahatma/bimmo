@@ -20,9 +20,13 @@ class NoteController extends Controller
             'content' => 'required|string',
         ]);
 
+        // Basic sanitization for Rich Text (allowing bold, italic, underline, lists, links)
+        $cleanContent = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $request->content);
+        $sanitizedContent = strip_tags($cleanContent, '<b><i><u><strong><em><ul><ol><li><a><br><p>');
+
         $note = Note::create([
             'id_user' => Auth::id(),
-            'content' => $request->content,
+            'content' => $sanitizedContent,
             'is_checked' => false,
         ]);
 
@@ -35,10 +39,17 @@ class NoteController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $note->update([
-            'is_checked' => $request->has('is_checked') ? $request->is_checked : $note->is_checked,
-            'content' => $request->has('content') ? $request->content : $note->content,
-        ]);
+        $updateData = [];
+        if ($request->has('is_checked')) {
+            $updateData['is_checked'] = $request->is_checked;
+        }
+
+        if ($request->has('content')) {
+            $cleanContent = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $request->content);
+            $updateData['content'] = strip_tags($cleanContent, '<b><i><u><strong><em><ul><ol><li><a><br><p>');
+        }
+
+        $note->update($updateData);
 
         return response()->json(['success' => true, 'note' => $note]);
     }
