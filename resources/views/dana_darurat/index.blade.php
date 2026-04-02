@@ -4,54 +4,6 @@
 
 @push('css')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<style>
-    /* Header Enhancements */
-    .pagetitle {
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 0.75rem;
-    }
-    .pagetitle h1 {
-        font-size: 1.75rem;
-        letter-spacing: -0.03em;
-        color: #2d3436;
-    }
-    .breadcrumb {
-        font-size: 0.85rem;
-    }
-    .breadcrumb-item a {
-        color: #636e72;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-    .breadcrumb-item a:hover {
-        color: #0984e3;
-    }
-    .breadcrumb-item.active {
-        color: #0984e3;
-        font-weight: 600;
-    }
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "\F285"; /* bi-chevron-right */
-        font-family: "bootstrap-icons";
-        font-size: 0.65rem;
-        color: #b2bec3;
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-    }
-
-    [data-bs-theme="dark"] .pagetitle {
-        border-bottom: 1px solid #2d2d2d;
-    }
-    [data-bs-theme="dark"] .pagetitle h1 {
-        color: #e0e0e0;
-    }
-    [data-bs-theme="dark"] .breadcrumb-item a {
-        color: #a0a0a0;
-    }
-    [data-bs-theme="dark"] .breadcrumb-item.active {
-        color: #60a5fa;
-    }
-</style>
 @endpush
 
 @section('container')
@@ -296,4 +248,9 @@
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/dana-darurat.js') }}?v={{ filemtime(public_path('js/dana-darurat.js')) }}"></script>
+<script>
+    if (typeof window.initDanaDarurat === 'function') {
+        window.initDanaDarurat();
+    }
+</script>
 @endpush

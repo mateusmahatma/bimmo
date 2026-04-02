@@ -1,4 +1,11 @@
-$(document).ready(function () {
+window.initDanaDarurat = function () {
+    if (!$('#danaDaruratTable').length) return;
+
+    // Check if DataTable is already initialized to avoid re-init error
+    if ($.fn.DataTable.isDataTable('#danaDaruratTable')) {
+        $('#danaDaruratTable').DataTable().destroy();
+    }
+
     // CSRF Setup
     $.ajaxSetup({
         headers: {
@@ -252,14 +259,14 @@ $(document).ready(function () {
     }
 
     // Event Handlers
-    $('body').on('click', '.tombol-simpan-dana-darurat', function (e) {
+    $('.tombol-simpan-dana-darurat').off('click').on('click', function (e) {
         e.preventDefault();
         const id = $('#danaDaruratModal').data('id');
         id ? updateDanaDarurat(id) : simpanDanaDaruratBaru();
     });
 
     // Edit
-    $('body').on('click', '.tombol-edit-dana-darurat', function (e) {
+    $('body').off('click', '.tombol-edit-dana-darurat').on('click', '.tombol-edit-dana-darurat', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
 
@@ -281,10 +288,10 @@ $(document).ready(function () {
         });
     });
 
-    $('#danaDaruratModal').on('hidden.bs.modal', resetFormDanaDarurat);
+    $('#danaDaruratModal').off('hidden.bs.modal').on('hidden.bs.modal', resetFormDanaDarurat);
 
     // Delete
-    $('body').on('click', '.tombol-del-dana-darurat', function (e) {
+    $('body').off('click', '.tombol-del-dana-darurat').on('click', '.tombol-del-dana-darurat', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
 
@@ -323,14 +330,14 @@ $(document).ready(function () {
     // ----------------------------------------------------------------
 
     // Check All
-    $(document).on('change', '#checkAll', function () {
+    $(document).off('change', '#checkAll').on('change', '#checkAll', function () {
         const isChecked = $(this).is(':checked');
         $('.check-item').prop('checked', isChecked);
         updateBulkButton();
     });
 
     // Check Item
-    $(document).on('change', '.check-item', function () {
+    $(document).off('change', '.check-item').on('change', '.check-item', function () {
         var total = $('.check-item').length;
         var checked = $('.check-item:checked').length;
 
@@ -351,7 +358,7 @@ $(document).ready(function () {
     }
 
     // Handle Bulk Delete Click
-    $('#btnBulkDelete').on('click', function () {
+    $('#btnBulkDelete').off('click').on('click', function () {
         const ids = [];
         $('.check-item:checked').each(function () {
             ids.push($(this).val());
@@ -400,4 +407,10 @@ $(document).ready(function () {
         $('#checkAll').prop('indeterminate', false);
         updateBulkButton();
     });
+}
+
+// Initial initialization
+$(document).ready(function () {
+    window.initDanaDarurat();
 });
+

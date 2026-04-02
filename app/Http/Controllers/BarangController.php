@@ -11,7 +11,7 @@ class BarangController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             $userId = Auth::id();
             $query = Barang::where('id_user', $userId);
             $status = $request->status;

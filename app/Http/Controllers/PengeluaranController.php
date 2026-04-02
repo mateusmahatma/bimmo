@@ -37,7 +37,7 @@ class PengeluaranController extends Controller
 
         $pengeluaran = $query->paginate(10)->withQueryString();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json([
                 'html' => view('pengeluaran._table_list', compact('pengeluaran'))->render(),
             ]);

@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initDashboardGeneral() {
     const csrfToken = window.csrfToken;
 
     // ==== DASHBOARD FILTER HANDLER (Global elements that aren't specific to Cash Flow) ====
@@ -63,9 +63,12 @@ document.addEventListener("DOMContentLoaded", function () {
         chart = new ApexCharts(chartElement, options);
         chart.render();
 
-        document.addEventListener("themeChanged", () => {
-            chart.updateOptions({ chart: { foreColor: getTextColor() } });
-        });
+        if (!window.kompasThemeListenerAdded) {
+            document.addEventListener("themeChanged", () => {
+                if (chart) chart.updateOptions({ chart: { foreColor: getTextColor() } });
+            });
+            window.kompasThemeListenerAdded = true;
+        }
     }
 
     // ==== TOGGLE NOMINAL VISIBILITY AJAX ====
@@ -278,10 +281,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     }
-});
+}
+document.addEventListener('DOMContentLoaded', initDashboardGeneral);
+document.addEventListener('spa:page-loaded', initDashboardGeneral);
 
 // ==== EXPENSES BAR DETAILED CHART (Managed by own listener) ====
-document.addEventListener("DOMContentLoaded", function () {
+function initDashboardExpensesBar() {
     let barChart = null;
     const isDark = () => document.documentElement.getAttribute("data-bs-theme") === "dark";
 
@@ -321,10 +326,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (filterBulan && filterTahun) {
         window.fetchDataAndRenderChart(filterBulan.value, filterTahun.value);
     }
-});
+}
+document.addEventListener('DOMContentLoaded', initDashboardExpensesBar);
+document.addEventListener('spa:page-loaded', initDashboardExpensesBar);
 
 // ==== GROWTH DETAIL MODAL HANDLER ====
-document.addEventListener("DOMContentLoaded", function () {
+function initDashboardGrowthDetail() {
     const growthTriggers = document.querySelectorAll('.growth-detail-trigger');
     growthTriggers.forEach(trigger => {
         trigger.addEventListener('click', function () {
@@ -382,4 +389,6 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.show();
         });
     });
-});
+}
+document.addEventListener('DOMContentLoaded', initDashboardGrowthDetail);
+document.addEventListener('spa:page-loaded', initDashboardGrowthDetail);

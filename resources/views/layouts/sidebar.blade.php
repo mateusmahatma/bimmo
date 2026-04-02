@@ -8,10 +8,10 @@
         </a>
         <div class="d-flex align-items-center gap-1">
             <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}" 
-                    style="font-size: 0.65rem; border-radius: 6px;" 
+                    style="font-size: 0.65rem; border-radius: 0;" 
                     onclick="updateLanguage('id')">ID</button>
             <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'en' ? 'btn-primary' : 'btn-outline-secondary' }}" 
-                    style="font-size: 0.65rem; border-radius: 6px;" 
+                    style="font-size: 0.65rem; border-radius: 0;" 
                     onclick="updateLanguage('en')">EN</button>
         </div>
     </div>
@@ -36,22 +36,24 @@
 
             <!-- Anggaran -->
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('anggaran*','kalkulator*') ? 'active' : '' }}"
+                <a class="nav-link d-flex align-items-center {{ Request()->is('anggaran*','kalkulator*') ? 'active' : '' }}"
                     data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAnggaran" role="button">
                     <i class="bi bi-calculator-fill me-3"></i>
                     <span>{{ __('Budget') }}</span>
                     <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
 
-                <div class="collapse {{ Request::is('anggaran*','kalkulator*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAnggaran">
+                <div class="collapse {{ Request()->is('anggaran*','kalkulator*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAnggaran">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('anggaran') ? 'active' : '' }}" href="/anggaran">
+                            <a class="nav-link sub-link {{ Request()->is('anggaran') ? 'active' : '' }}" href="{{ route('anggaran.index') }}"
+                            wire:navigate>
                                 {{ __('Budget Categories') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('kalkulator') ? 'active' : '' }}" href="/kalkulator">
+                            <a class="nav-link sub-link {{ Request()->is('kalkulator') ? 'active' : '' }}" href="{{ route('kalkulator.index') }}"
+                            wire:navigate>
                                 {{ __('Budget Monitoring') }}
                             </a>
                         </li>
@@ -85,7 +87,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}" href="/dana-darurat" role="button">
+                <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}" href="{{ route('dana-darurat.index') }}" role="button">
                     <i class="bi bi-exclamation-triangle-fill me-3"></i>
                     <span>{{ __('Emergency Fund') }}</span>
                 </a>
@@ -159,9 +161,9 @@
             </a>
             <a href="#" class="sidebar-compact-btn text-success"
                data-bs-toggle="modal" data-bs-target="#donateModal"
-               title="{{ __('Donate') }}">
-                <i class="bi bi-heart-fill"></i>
-                <span>{{ __('Donate') }}</span>
+               title="{{ __('Coffee') }}">
+                <i class="bi bi-cup-hot"></i>
+                <span>{{ __('Coffee') }}</span>
             </a>
         </div>
 
@@ -170,7 +172,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}">
                     @if(Auth::user()->profile_photo)
-                    <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-circle me-3" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">
+                    <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-0 me-3" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">
                     @else
                     <i class="bi bi-person-circle me-3"></i>
                     @endif

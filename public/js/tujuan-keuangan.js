@@ -1,4 +1,18 @@
-$(document).ready(function () {
+window.initTujuanKeuangan = function () {
+    if (!$('#goalsTable').length) return;
+
+    // CSRF Setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Check if DataTable is already initialized to avoid re-init error
+    if ($.fn.DataTable.isDataTable('#goalsTable')) {
+        $('#goalsTable').DataTable().destroy();
+    }
+
     // Initialize DataTable
     var table = $('#goalsTable').DataTable({
         processing: true,
@@ -84,12 +98,12 @@ $(document).ready(function () {
     });
 
     // Handle Filters
-    $('#filter_kategori, #filter_prioritas').on('change', function () {
+    $('#filter_kategori, #filter_prioritas').off('change').on('change', function () {
         table.ajax.reload();
     });
 
     // Handle interactive recommendation in Add modal
-    $('#input_target, #input_deadline').on('input change', function () {
+    $('#input_target, #input_deadline').off('input change').on('input change', function () {
         const target = parseFloat($('#input_target').val());
         const deadline = $('#input_deadline').val();
 
@@ -121,7 +135,7 @@ $(document).ready(function () {
 
     // Simulation logic
     const slider = $('#simSlider');
-    slider.on('input', function () {
+    slider.off('input').on('input', function () {
         const monthly = parseInt($(this).val());
         $('#simMonthlyValue').text('Rp ' + new Intl.NumberFormat('id-ID').format(monthly));
 
@@ -141,16 +155,22 @@ $(document).ready(function () {
         $('#simResultDate').text(finishDate.locale('id').format('MMMM YYYY'));
         $('#simMonthsLeft').text(`Sekitar ${monthsNeeded} bulan lagi dari sekarang.`);
     });
+}
+
+// Initial initialization
+$(document).ready(function () {
+    window.initTujuanKeuangan();
 });
 
-function updateProgress(id, name) {
+// Global functions for inline onclick handlers
+window.updateProgress = function (id, name) {
     $('#goalNameProgress').text(name);
     $('#formUpdateProgress').attr('action', `/tujuan-keuangan/${id}/progress`);
-    $('#formUpdateProgress')[0].reset(); // Reset form field
+    if ($('#formUpdateProgress')[0]) $('#formUpdateProgress')[0].reset();
     $('#modalProgress').modal('show');
 }
 
-function viewHistory(id, name, target) {
+window.viewHistory = function (id, name, target) {
     $('#historyGoalName').text(name);
     $('#historyGoalTarget').html(`Target: Rp ${new Intl.NumberFormat('id-ID').format(target)}`);
 
@@ -183,7 +203,7 @@ function viewHistory(id, name, target) {
     });
 }
 
-function deleteHistoryLog(logId) {
+window.deleteHistoryLog = function (logId) {
     Swal.fire({
         title: 'Hapus entri ini?',
         text: "Ini juga akan mengurangi progres jumlah yang terkumpul.",
@@ -205,7 +225,9 @@ function deleteHistoryLog(logId) {
                     if (response.success) {
                         Swal.fire('Terhapus!', 'Entri riwayat dihapus dan progres disesuaikan.', 'success');
                         $('#modalHistory').modal('hide');
-                        $('#goalsTable').DataTable().ajax.reload();
+                        if ($.fn.DataTable.isDataTable('#goalsTable')) {
+                            $('#goalsTable').DataTable().ajax.reload();
+                        }
                     }
                 }
             });
@@ -213,7 +235,7 @@ function deleteHistoryLog(logId) {
     });
 }
 
-function simulateGoal(id, name, target, collected) {
+window.simulateGoal = function (id, name, target, collected) {
     $('#simGoalName').text(name);
     $('#simTargetInfo').text(`Target: Rp ${new Intl.NumberFormat('id-ID').format(target)} (Remaining: Rp ${new Intl.NumberFormat('id-ID').format(target - collected)})`);
 
@@ -228,7 +250,7 @@ function simulateGoal(id, name, target, collected) {
     $('#modalSimulate').modal('show');
 }
 
-function deleteGoal(id) {
+window.deleteGoal = function (id) {
     Swal.fire({
         title: 'Apakah Anda yakin?',
         text: "Anda tidak akan dapat mengembalikan ini!",
@@ -249,7 +271,9 @@ function deleteGoal(id) {
                 success: function (response) {
                     if (response.success) {
                         Swal.fire('Terhapus!', 'Tujuan telah dihapus.', 'success');
-                        $('#goalsTable').DataTable().ajax.reload();
+                        if ($.fn.DataTable.isDataTable('#goalsTable')) {
+                            $('#goalsTable').DataTable().ajax.reload();
+                        }
                     }
                 }
             });

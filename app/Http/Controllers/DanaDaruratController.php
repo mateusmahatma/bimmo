@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -6,6 +7,7 @@ use App\Models\DanaDarurat;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class DanaDaruratController extends Controller
 {
@@ -17,7 +19,7 @@ class DanaDaruratController extends Controller
         $userId = Auth::id();
         $user = Auth::user();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             // Ambil semua data transaksi untuk user
             $query = DanaDarurat::where('id_user', $userId);
 
@@ -36,16 +38,14 @@ class DanaDaruratController extends Controller
             $targetDanaDarurat = 0;
             if ($user->metode_target_dana_darurat === 'manual') {
                 $targetDanaDarurat = $user->nominal_target_dana_darurat ?? 0;
-            }
-            else {
+            } else {
                 $transaksi = \App\Models\Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
                 $totalPengeluaran = $transaksi->where('status', '1')->sum(fn($t) => (float)$t->nominal);
                 if ($transaksi->count() > 1) {
                     $firstDate = Carbon::parse($transaksi->first()->tgl_transaksi)->startOfMonth();
                     $lastDate = Carbon::parse($transaksi->last()->tgl_transaksi)->startOfMonth();
                     $selisihBulan = $firstDate->diffInMonths($lastDate) + 1;
-                }
-                else {
+                } else {
                     $selisihBulan = 1;
                 }
                 $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaran / $selisihBulan : 0;
@@ -61,19 +61,18 @@ class DanaDaruratController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('jenis_transaksi_dana_darurat', function ($dana) {
-                return $dana->jenis_transaksi_dana_darurat == 1 ? 'Masuk' : 'Keluar';
-            })
+                    return $dana->jenis_transaksi_dana_darurat == 1 ? 'Masuk' : 'Keluar';
+                })
                 ->addColumn('aksi', function ($dana) {
-                return view('dana_darurat.tombol')->with('request', $dana);
-            })
+                    return view('dana_darurat.tombol')->with('request', $dana);
+                })
                 ->with([
                     'totalDanaDarurat' => $totalDanaDarurat,
                     'targetDanaDarurat' => $targetDanaDarurat,
                     'percentage' => $percentage
                 ])
                 ->toJson();
-        }
-        else {
+        } else {
             // Hitung Total Dana Darurat
             $totalMasuk = DanaDarurat::where('id_user', $userId)
                 ->where('jenis_transaksi_dana_darurat', 1)
@@ -89,8 +88,7 @@ class DanaDaruratController extends Controller
             $targetDanaDarurat = 0;
             if ($user->metode_target_dana_darurat === 'manual') {
                 $targetDanaDarurat = $user->nominal_target_dana_darurat ?? 0;
-            }
-            else {
+            } else {
                 // Ambil semua transaksi user untuk menghitung rata-rata
                 $transaksi = \App\Models\Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
 
@@ -102,8 +100,7 @@ class DanaDaruratController extends Controller
                     $firstDate = Carbon::parse($transaksi->first()->tgl_transaksi)->startOfMonth();
                     $lastDate = Carbon::parse($transaksi->last()->tgl_transaksi)->startOfMonth();
                     $selisihBulan = $firstDate->diffInMonths($lastDate) + 1; // +1 supaya bulan awal ikut dihitung
-                }
-                else {
+                } else {
                     $selisihBulan = 1;
                 }
 
@@ -137,13 +134,14 @@ class DanaDaruratController extends Controller
             'kelipatan_target' => 'nullable|integer|min:1|required_if:metode_target,otomatis',
         ]);
 
-        $user = Auth::user();
+        // Ambil ulang dari DB untuk memastikan data terbaru  
+        $user = User::find(Auth::id());
+
         $user->metode_target_dana_darurat = $validated['metode_target'];
 
         if ($validated['metode_target'] === 'manual') {
             $user->nominal_target_dana_darurat = $validated['nominal_target'];
-        }
-        else {
+        } else {
             $user->kelipatan_target_dana_darurat = $validated['kelipatan_target'];
         }
 
@@ -186,7 +184,7 @@ class DanaDaruratController extends Controller
      */
     public function show(string $id)
     {
-    //
+        //
     }
 
     /**

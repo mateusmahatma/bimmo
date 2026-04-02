@@ -1,6 +1,13 @@
-document.addEventListener('DOMContentLoaded', function () {
+function initCalendar() {
     const calendarEl = document.getElementById('calendar');
-    if (!calendarEl) return;
+    if (!calendarEl) {
+        console.warn('Calendar element not found');
+        return;
+    }
+
+    // Prevent double initialization on the same element
+    if (calendarEl.dataset.initialized) return;
+    calendarEl.dataset.initialized = 'true';
 
     // Use dynamic URL provided from Blade, fallback to '/events'
     const eventsBaseUrl = window.eventsUrl || '/events';
@@ -48,20 +55,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    calendar.render();
+    setTimeout(() => {
+        calendar.render();
+    }, 10);
 
     window.addEventListener('resize', function () {
-        if (window.innerWidth < 768 && calendar.view.type !== 'listMonth' && calendar.view.type !== 'dayGridMonth') {
-            calendar.changeView('listMonth');
+        if (calendar && calendar.view) {
+            if (window.innerWidth < 768 && calendar.view.type !== 'listMonth' && calendar.view.type !== 'dayGridMonth') {
+                calendar.changeView('listMonth');
+            }
         }
     });
 
     // New Event Button
-    document.getElementById('btnNewEvent').addEventListener('click', function () {
-        openEventModal();
-    });
+    const btnNewEvent = document.getElementById('btnNewEvent');
+    if (btnNewEvent) {
+        btnNewEvent.addEventListener('click', function () {
+            openEventModal();
+        });
+    }
 
     const modalEl = document.getElementById('addEventModal');
+    if (!modalEl) return;
+
     const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modalEl);
     const form = document.getElementById('eventForm');
     const allDaySwitch = document.getElementById('allDaySwitch');
@@ -390,40 +406,42 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Hide popover when clicking outside
-    document.addEventListener('click', function (e) {
-        const popover = document.getElementById('eventPopover');
-        if (popover.style.display === 'block' && !popover.contains(e.target) && !e.target.closest('.fc-event')) {
-            hidePopover();
-        }
-    });
+    if (!window.calendarPopoverListenerAdded) {
+        document.addEventListener('click', function (e) {
+            const popover = document.getElementById('eventPopover');
+            if (popover && popover.style.display === 'block' && !popover.contains(e.target) && !e.target.closest('.fc-event')) {
+                hidePopover();
+            }
+        });
+        window.calendarPopoverListenerAdded = true;
+    }
 
     // Simple calendar filtering/search logic
-    document.getElementById('calendarSearch').addEventListener('input', function (e) {
-        const term = e.target.value.toLowerCase();
-        calendar.getEvents().forEach(ev => {
-            const match = ev.title.toLowerCase().includes(term) || (ev.extendedProps.description && ev.extendedProps.description.toLowerCase().includes(term));
-            ev.setProp('display', match ? 'auto' : 'none');
-        });
-    });
-
-    document.querySelectorAll('.filter-category').forEach(cb => {
-        cb.addEventListener('change', () => {
-            const activeCats = Array.from(document.querySelectorAll('.filter-category:checked')).map(c => c.value);
+    const calendarSearch = document.getElementById('calendarSearch');
+    if (calendarSearch) {
+        calendarSearch.addEventListener('input', function (e) {
+            const term = e.target.value.toLowerCase();
             calendar.getEvents().forEach(ev => {
-                const match = activeCats.includes(ev.extendedProps.category);
+                const match = ev.title.toLowerCase().includes(term) || (ev.extendedProps.description && ev.extendedProps.description.toLowerCase().includes(term));
                 ev.setProp('display', match ? 'auto' : 'none');
             });
         });
-    });
+    }
 
-    // Dark Mode Observer
-    const observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            if (mutation.attributeName === "class") {
-                const isDarkMode = document.body.classList.contains('dark-mode');
-                // FullCalendar handles some aspect of theme but we might need manual tweaks
-            }
+    const filterCategories = document.querySelectorAll('.filter-category');
+    if (filterCategories) {
+        filterCategories.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const activeCats = Array.from(document.querySelectorAll('.filter-category:checked')).map(c => c.value);
+                calendar.getEvents().forEach(ev => {
+                    const match = activeCats.includes(ev.extendedProps.category);
+                    ev.setProp('display', match ? 'auto' : 'none');
+                });
+            });
         });
-    });
-    observer.observe(document.body, { attributes: true });
-});
+    }
+    // Initial end load in case script loads after page partially ready
+}
+
+document.addEventListener('DOMContentLoaded', initCalendar);
+document.addEventListener('spa:page-loaded', initCalendar);

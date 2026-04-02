@@ -88,7 +88,8 @@ class TransaksiController extends Controller
             ->values();
 
         // 4. Handle AJAX Response (Datatables/Custom)
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
+
             $stats = [
                 'totalPemasukan' => $totalPemasukan,
                 'totalPengeluaran' => $totalPengeluaran,
@@ -322,7 +323,8 @@ class TransaksiController extends Controller
                 }
             }
 
-            if ($request->ajax()) {
+            if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Data Transaksi Berhasil Disimpan!',
@@ -333,7 +335,8 @@ class TransaksiController extends Controller
 
             return redirect()->route('transaksi.byDate', ['date' => $transaksi->tgl_transaksi])->with('success', 'Data Transaksi Berhasil Disimpan!');
         } catch (\Exception $e) {
-            if ($request->ajax()) {
+            if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Terjadi error: ' . $e->getMessage()
@@ -437,7 +440,8 @@ class TransaksiController extends Controller
             // Apply new budget impact
             $this->syncBudget($transaksi, true);
 
-            if ($request->ajax()) {
+            if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Data Transaksi Berhasil Diperbarui!',

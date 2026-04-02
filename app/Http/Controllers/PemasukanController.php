@@ -37,7 +37,7 @@ class PemasukanController extends Controller
 
         $pemasukan = $query->paginate(10)->withQueryString();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json([
                 'html' => view('pemasukan._table_list', compact('pemasukan'))->render(),
             ]);

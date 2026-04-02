@@ -1,9 +1,18 @@
 @extends('layouts.main')
 
 @section('container')
+<div class="pagetitle mb-4">
+    <h1 class="fw-bold mb-1">{{ __('My Profile') }}</h1>
+    <nav>
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+            <li class="breadcrumb-item active">{{ __('Profile') }}</li>
+        </ol>
+    </nav>
+</div>
+
 <div class="row">
     <div class="col-md-12">
-        <h2 class="mb-4">{{ __('User Profile') }}</h2>
 
 
         <!-- Foto Profil -->
@@ -336,119 +345,115 @@
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 @endif
 <script>
-    const payButton = document.getElementById('pay-button');
-    if (payButton) {
-        payButton.addEventListener('click', function () {
-            payButton.disabled = true;
-            payButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{ __('Initializing...') }}';
-            
-            fetch("{{ route('subscription.subscribe') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+(function() {
+    const initProfileFeatures = () => {
+        // 1. Password Toggle
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            // Remove existing listener to prevent duplicates if script re-runs
+            button.replaceWith(button.cloneNode(true));
+        });
+
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.closest('.input-group').querySelector('input');
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
                 }
-            })
-            .then(async response => {
-                const data = await response.json().catch(() => null);
-                if (!response.ok || !data || !data.success) {
-                    throw new Error(data?.message || `HTTP error! status: ${response.status}`);
-                }
-                return data;
-            })
-            .then(data => {
-                window.snap.pay(data.snap_token, {
-                    onSuccess: function (result) {
-                        window.location.reload();
-                    },
-                    onPending: function (result) {
-                        window.location.reload();
-                    },
-                    onError: function (result) {
-                        alert("{{ __('Payment failed!') }}");
-                        window.location.reload();
-                    },
-                    onClose: function () {
-                        payButton.disabled = false;
-                        payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)';
-                    }
-                });
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Error: " + error.message);
-                payButton.disabled = false;
-                payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)';
             });
         });
 
-    }
-</script>
+        // 2. Subscription Snap
+        const payButton = document.getElementById('pay-button');
+        if (payButton && !payButton.dataset.listenerAttached) {
+            payButton.dataset.listenerAttached = 'true';
+            payButton.addEventListener('click', function () {
+                payButton.disabled = true;
+                payButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{ __('Initializing...') }}';
+                
+                fetch("{{ route('subscription.subscribe') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    }
+                })
+                .then(async response => {
+                    const data = await response.json().catch(() => null);
+                    if (!response.ok || !data || !data.success) {
+                        throw new Error(data?.message || `HTTP error! status: ${response.status}`);
+                    }
+                    return data;
+                })
+                .then(data => {
+                    window.snap.pay(data.snap_token, {
+                        onSuccess: () => window.location.reload(),
+                        onPending: () => window.location.reload(),
+                        onError: () => {
+                            alert("{{ __('Payment failed!') }}");
+                            window.location.reload();
+                        },
+                        onClose: () => {
+                            payButton.disabled = false;
+                            payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)';
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error: " + error.message);
+                    payButton.disabled = false;
+                    payButton.innerHTML = '<i class="bi bi-qr-code-scan me-1"></i> {{ __('Subscribe Now') }} (Rp 49.000)';
+                });
+            });
+        }
 
-<script>
-
-
-    document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function() {
-            const input = this.previousElementSibling;
-            const icon = this.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
-            }
-        });
-    });
-
-    // Theme Switcher Logic
-    document.addEventListener('DOMContentLoaded', () => {
-        // Prioritize server-side skin, then localStorage, default to 'auto'
-        const savedTheme = "{{ auth()->user()->skin ?? '' }}" || localStorage.getItem('theme') || 'auto';
+        // 3. Theme Switcher Logic
+        const savedTheme = "{{ auth()->user()->skin ?? 'auto' }}";
         const radio = document.querySelector(`input[name="theme_preference"][value="${savedTheme}"]`);
         if (radio) {
             radio.checked = true;
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('border-primary', 'bg-light-subtle'));
             radio.closest('.theme-option').classList.add('border-primary', 'bg-light-subtle');
         }
 
         document.querySelectorAll('input[name="theme_preference"]').forEach(input => {
+            if (input.dataset.listenerAttached) return;
+            input.dataset.listenerAttached = 'true';
             input.addEventListener('change', (e) => {
                 const theme = e.target.value;
                 if (window.applyTheme) {
                     window.applyTheme(theme);
-                    
-                    // Update UI states
-                    document.querySelectorAll('.theme-option').forEach(opt => {
-                        opt.classList.remove('border-primary', 'bg-light-subtle');
-                    });
+                    document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('border-primary', 'bg-light-subtle'));
                     e.target.closest('.theme-option').classList.add('border-primary', 'bg-light-subtle');
                 }
             });
         });
 
-        // UI Style Switcher Logic
+        // 4. UI Style Switcher Logic
         const savedStyle = "{{ auth()->user()->ui_style ?? 'corporate' }}";
         const styleRadio = document.querySelector(`input[name="style_preference"][value="${savedStyle}"]`);
         if (styleRadio) {
             styleRadio.checked = true;
+            document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('border-primary', 'bg-primary-subtle'));
             styleRadio.closest('.style-option').classList.add('border-primary', 'bg-primary-subtle');
         }
 
         document.querySelectorAll('input[name="style_preference"]').forEach(input => {
+            if (input.dataset.listenerAttached) return;
+            input.dataset.listenerAttached = 'true';
             input.addEventListener('change', (e) => {
                 const style = e.target.value;
-                
-                // Update UI states
-                document.querySelectorAll('.style-option').forEach(opt => {
-                    opt.classList.remove('border-primary', 'bg-primary-subtle');
-                });
+                document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('border-primary', 'bg-primary-subtle'));
                 e.target.closest('.style-option').classList.add('border-primary', 'bg-primary-subtle');
 
-                // Sync to database
                 fetch("{{ route('user.update.ui-style') }}", {
                     method: 'POST',
                     headers: {
@@ -457,18 +462,19 @@
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({ ui_style: style })
-                }).then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                }).then(data => {
-                    // Refresh to apply style changes globally
-                    location.reload();
-                }).catch(err => {
-                    console.error('Failed to sync style to database:', err);
+                }).then(() => location.reload()).catch(err => {
+                    console.error('Failed to sync style:', err);
                     alert('Gagal menyelaraskan gaya visual.');
                 });
             });
         });
-    });
+    };
+
+    // Initialize immediately (for SPA and full-load)
+    initProfileFeatures();
+    
+    // Fallback for redundant calls
+    document.addEventListener('spa:page-loaded', initProfileFeatures);
+})();
 </script>
 @endpush

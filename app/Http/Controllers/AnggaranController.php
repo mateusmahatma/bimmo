@@ -45,7 +45,7 @@ class AnggaranController extends Controller
 
         $anggarans = $query->paginate(10)->withQueryString();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json([
                 'html' => view('anggaran._table_list', [
                     'anggarans' => $anggarans,
@@ -87,7 +87,7 @@ class AnggaranController extends Controller
 
         // Validasi total melebihi 100%
         if ($newTotal > 100) {
-            if ($request->ajax()) {
+            if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
                 return response()->json(['errors' => ['persentase_anggaran' => ['Persentase anggaran sudah melebihi 100% mohon dicek kembali.']]], 422);
             }
             return back()
@@ -100,7 +100,7 @@ class AnggaranController extends Controller
         $validatedData['id_user'] = $userId;
         Anggaran::create($validatedData);
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json(['success' => true, 'message' => 'Data berhasil disimpan!']);
         }
 

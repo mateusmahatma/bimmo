@@ -1,10 +1,12 @@
 @extends('layouts.main')
 
+@section('title', __('Threads'))
+
 @section('container')
 <div class="threads-page">
 
     {{-- Page Header --}}
-    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    {{-- <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <div>
             <h4 class="fw-bold mb-0"><i class="bi bi-chat-left-text-fill me-2 text-primary"></i>{{ __('Threads') }}</h4>
             <small class="text-muted">{{ __('Diskusi bersama pengguna lain') }}</small>
@@ -12,6 +14,23 @@
         <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#formBuatThread" aria-expanded="false">
             <i class="bi bi-plus-lg me-1"></i>{{ __('Buat Thread') }}
         </button>
+    </div> --}}
+
+    <div class="pagetitle mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="fw-bold mb-1">{{ __('Threads') }}</h1>
+                <nav>
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('Threads') }}</li>
+                    </ol>
+                </nav>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addThreadModal">
+                <i class="bi bi-chat-left-text me-1"></i>{{ __('Buat Thread') }}
+            </button>
+        </div>
     </div>
 
     {{-- Flash Messages --}}
@@ -22,39 +41,41 @@
         </div>
     @endif
 
-    {{-- Create Thread Form (collapsible) --}}
-    <div class="collapse mb-4" id="formBuatThread">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-3 p-md-4">
-                <h6 class="fw-semibold mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i>{{ __('Thread Baru') }}</h6>
+    <!-- Add Thread Modal -->
+    <div class="modal fade" id="addThreadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2 text-primary"></i>{{ __('Thread Baru') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <form action="{{ route('threads.store') }}" method="POST" class="no-loader">
                     @csrf
-                    <div class="mb-3">
-                        <label for="title" class="form-label fw-semibold small">{{ __('Judul Thread') }}</label>
-                        <input type="text" name="title" id="title"
-                            class="form-control rounded-3 @error('title') is-invalid @enderror"
-                            placeholder="{{ __('Tulis judul thread yang menarik...') }}"
-                            value="{{ old('title') }}" maxlength="255" required>
-                        @error('title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-semibold small">{{ __('Judul Thread') }}</label>
+                            <input type="text" name="title" id="title"
+                                class="form-control rounded-3 @error('title') is-invalid @enderror"
+                                placeholder="{{ __('Tulis judul thread yang menarik...') }}"
+                                value="{{ old('title') }}" maxlength="255" required>
+                            @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="body" class="form-label fw-semibold small">{{ __('Isi Thread') }}</label>
+                            <textarea name="body" id="body" rows="4"
+                                class="form-control rounded-3 @error('body') is-invalid @enderror"
+                                placeholder="{{ __('Ceritakan sesuatu, tanya, atau berbagi tips keuangan...') }}"
+                                maxlength="5000" required>{{ old('body') }}</textarea>
+                            @error('body')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="body" class="form-label fw-semibold small">{{ __('Isi Thread') }}</label>
-                        <textarea name="body" id="body" rows="4"
-                            class="form-control rounded-3 @error('body') is-invalid @enderror"
-                            placeholder="{{ __('Ceritakan sesuatu, tanya, atau berbagi tips keuangan...') }}"
-                            maxlength="5000" required>{{ old('body') }}</textarea>
-                        @error('body')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3"
-                            data-bs-toggle="collapse" data-bs-target="#formBuatThread">
-                            {{ __('Batal') }}
-                        </button>
-                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Batal') }}</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
                             <i class="bi bi-send me-1"></i>{{ __('Kirim') }}
                         </button>
                     </div>
@@ -72,7 +93,7 @@
             <h6 class="text-muted">{{ __('Belum ada thread.') }}</h6>
             <p class="text-muted small">{{ __('Jadilah yang pertama memulai diskusi!') }}</p>
             <button class="btn btn-primary btn-sm rounded-pill px-4 mt-1"
-                data-bs-toggle="collapse" data-bs-target="#formBuatThread">
+                data-bs-toggle="modal" data-bs-target="#addThreadModal">
                 <i class="bi bi-plus-lg me-1"></i>{{ __('Buat Thread Pertama') }}
             </button>
         </div>
@@ -130,6 +151,7 @@
     @endif
 </div>
 
+@push('css')
 <style>
 .thread-card {
     transition: box-shadow 0.2s ease, transform 0.15s ease;
@@ -162,4 +184,5 @@
     }
 }
 </style>
+@endpush
 @endsection

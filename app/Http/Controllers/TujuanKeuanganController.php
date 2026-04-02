@@ -16,7 +16,7 @@ class TujuanKeuanganController extends Controller
     {
         $userId = Auth::id();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             $query = TujuanKeuangan::where('id_user', $userId);
 
             if ($request->filled('filter_kategori')) {
@@ -30,39 +30,39 @@ class TujuanKeuanganController extends Controller
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->addColumn('progress', function ($goal) {
-                $percentage = $goal->nominal_target > 0 ? ($goal->nominal_terkumpul / $goal->nominal_target) * 100 : 0;
-                return round(min($percentage, 100), 1);
-            })
+                    $percentage = $goal->nominal_target > 0 ? ($goal->nominal_terkumpul / $goal->nominal_target) * 100 : 0;
+                    return round(min($percentage, 100), 1);
+                })
                 ->addColumn('sisa_waktu', function ($goal) {
-                $deadline = Carbon::parse($goal->tenggat_waktu);
-                $now = Carbon::now();
-                if ($now->greaterThan($deadline)) {
-                    return 'Expired';
-                }
-                $diff = $now->diff($deadline);
-                if ($diff->y > 0)
-                    return $diff->y . ' year(s) ' . $diff->m . ' month(s)';
-                if ($diff->m > 0)
-                    return $diff->m . ' month(s) ' . $diff->d . ' day(s)';
-                return $diff->d . ' day(s)';
-            })
+                    $deadline = Carbon::parse($goal->tenggat_waktu);
+                    $now = Carbon::now();
+                    if ($now->greaterThan($deadline)) {
+                        return 'Expired';
+                    }
+                    $diff = $now->diff($deadline);
+                    if ($diff->y > 0)
+                        return $diff->y . ' year(s) ' . $diff->m . ' month(s)';
+                    if ($diff->m > 0)
+                        return $diff->m . ' month(s) ' . $diff->d . ' day(s)';
+                    return $diff->d . ' day(s)';
+                })
                 ->addColumn('rekomendasi', function ($goal) {
-                $deadline = Carbon::parse($goal->tenggat_waktu);
-                $now = Carbon::now();
-                $months = $now->diffInMonths($deadline);
+                    $deadline = Carbon::parse($goal->tenggat_waktu);
+                    $now = Carbon::now();
+                    $months = $now->diffInMonths($deadline);
 
-                if ($months <= 0) {
-                    $days = $now->diffInDays($deadline);
-                    if ($days <= 0)
-                        return 0;
-                    return ($goal->nominal_target - $goal->nominal_terkumpul) / max($days, 1); // per day if less than a month
-                }
+                    if ($months <= 0) {
+                        $days = $now->diffInDays($deadline);
+                        if ($days <= 0)
+                            return 0;
+                        return ($goal->nominal_target - $goal->nominal_terkumpul) / max($days, 1); // per day if less than a month
+                    }
 
-                return ($goal->nominal_target - $goal->nominal_terkumpul) / $months;
-            })
+                    return ($goal->nominal_target - $goal->nominal_terkumpul) / $months;
+                })
                 ->addColumn('aksi', function ($goal) {
-                return view('tujuan_keuangan.tombol')->with('goal', $goal);
-            })
+                    return view('tujuan_keuangan.tombol')->with('goal', $goal);
+                })
                 ->rawColumns(['aksi'])
                 ->make(true);
         }

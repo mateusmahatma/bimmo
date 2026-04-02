@@ -20,23 +20,22 @@
             </div>
         </div>
 
-        <main class="col-md-10 ms-sm-auto px-md-4 position-relative" style="min-height: 100vh;">
-            <!-- Loading Overlay -->
-            <div id="page-loader-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-none justify-content-center pt-5" style="background: rgba(255, 255, 255, 0.6); z-index: 9999; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: opacity 0.3s ease; opacity: 0;">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; position: sticky; top: 30vh;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
+        <main class="col-md-10 ms-sm-auto px-md-4 position-relative" style="min-height: 100vh; border-radius: 0 !important;">
+            <!-- Loading Overlay (YouTube Style) -->
+            <div id="top-progress-bar"></div>
 
             {{-- MOBILE TOGGLE BUTTON --}}
             <div class="d-md-none py-2 mb-3 border-bottom d-flex align-items-center">
-                <button class="btn btn-outline-secondary btn-sm me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+                <button class="btn btn-outline-secondary btn-sm me-2 rounded-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
                     <i class="bi bi-list fs-5"></i>
                 </button>
                 <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo" alt="BIMMO" style="height: 25px;">
             </div>
 
-            @yield('container')
+
+            <div id="spa-container">
+                @yield('container')
+            </div>
         </main>
     </div>
 </div>
@@ -71,87 +70,222 @@
             });
         }
     </script>
-    <!-- Page Transition Loader Script -->
+    <!-- YouTube Style Top Progress Bar Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const loader = document.getElementById('page-loader-overlay');
-            if (!loader) return;
-            
-            // Adjust loader overlay background based on theme
-            const adjustLoaderTheme = () => {
-                if(document.documentElement.getAttribute('data-bs-theme') === 'dark') {
-                    loader.style.background = 'rgba(33, 37, 41, 0.6)';
-                } else {
-                    loader.style.background = 'rgba(255, 255, 255, 0.6)';
-                }
-            };
-            
-            adjustLoaderTheme();
-            
-            // Observe theme changes
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.attributeName === 'data-bs-theme') {
-                        adjustLoaderTheme();
+            const progressBar = document.getElementById('top-progress-bar');
+            let progressInterval;
+
+            function startTopLoad() {
+                if (!progressBar) return;
+                clearInterval(progressInterval);
+                progressBar.style.width = '0%';
+                progressBar.style.opacity = '1';
+                progressBar.style.display = 'block';
+                
+                let width = 0;
+                progressInterval = setInterval(() => {
+                    if (width >= 90) {
+                        clearInterval(progressInterval);
+                    } else {
+                        width += Math.random() * 5;
+                        progressBar.style.width = width + '%';
                     }
-                });
-            });
-            observer.observe(document.documentElement, { attributes: true });
-            
+                }, 200);
+            }
+
+            function endTopLoad() {
+                if (!progressBar) return;
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    progressBar.style.opacity = '0';
+                    setTimeout(() => {
+                        progressBar.style.width = '0%';
+                        progressBar.style.display = 'none';
+                    }, 300);
+                }, 200);
+            }
+
+            // Global SPA & Page Load handling
+            async function fetchAndReplaceSPA(url, pushHistory = true) {
+                startTopLoad();
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-SPA-Navigation': 'true',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 419) {
+                            window.location.href = '/login';
+                            return;
+                        }
+                        window.location.href = url;
+                        return;
+                    }
+
+                    const html = await response.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                    document.title = doc.title;
+                    const currentContainer = document.getElementById('spa-container');
+                    const newContainer = doc.getElementById('spa-container');
+                    if (currentContainer && newContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
+                    } else {
+                        window.location.href = url;
+                        return;
+                    }
+
+                    // Update sidebars
+                    ['.sidebar', '#mobileSidebar .offcanvas-body'].forEach(selector => {
+                        const el = document.querySelector(selector);
+                        const newEl = doc.querySelector(selector);
+                        if (el && newEl) el.innerHTML = newEl.innerHTML;
+                    });
+
+                    // 5. Scripts (load scripts from the new page)
+                    const newScripts = doc.querySelectorAll('script');
+                    const scriptPromises = [];
+                    
+                    newScripts.forEach(oldScript => {
+                        if (oldScript.innerHTML.includes('Extreme Source Code Protection') || 
+                            oldScript.innerHTML.includes('fetchAndReplaceSPA') ||
+                            oldScript.innerHTML.includes('serviceWorker')) {
+                            return; 
+                        }
+                        
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        
+                        if (oldScript.src) {
+                            // Page-specific scripts often have ?v= or are in the js/ folder
+                            // We force re-execution by removing the old one and adding a new one with a timestamp
+                            const isPageScript = oldScript.src.includes('?v=') || oldScript.src.includes('/js/');
+                            const existingScript = document.querySelector(`script[src^="${oldScript.src.split('?')[0]}"]`);
+                            
+                            if (isPageScript || !existingScript) {
+                                if (existingScript) existingScript.remove();
+                                
+                                const p = new Promise((resolve) => {
+                                    newScript.onload = resolve;
+                                    newScript.onerror = resolve;
+                                });
+                                scriptPromises.push(p);
+                                
+                                // Add timestamp to force re-execution if it's a page script
+                                if (isPageScript) {
+                                    const connector = oldScript.src.includes('?') ? '&' : '?';
+                                    newScript.src = oldScript.src + connector + 'spa_ts=' + Date.now();
+                                }
+                                
+                                document.body.appendChild(newScript);
+                            }
+                        } else {
+                            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                            document.body.appendChild(newScript);
+                            // Brief delay before cleanup for inline execution
+                            setTimeout(() => { if(newScript.parentNode) newScript.parentNode.removeChild(newScript); }, 60);
+                        }
+                    });
+
+                    // 6. Sync head styles (for visual consistency like after reload)
+                    const currentHeadLinks = Array.from(document.querySelectorAll('head link[rel="stylesheet"]')).map(l => l.href.split('?')[0]);
+                    const newHeadStyles = doc.querySelectorAll('head link[rel="stylesheet"], head style');
+                    newHeadStyles.forEach(tag => {
+                        if (tag.tagName === 'LINK') {
+                            const baseUrl = tag.href.split('?')[0];
+                            if (!currentHeadLinks.includes(baseUrl)) {
+                                const newLink = document.createElement('link');
+                                Array.from(tag.attributes).forEach(attr => newLink.setAttribute(attr.name, attr.value));
+                                document.head.appendChild(newLink);
+                            }
+                        } else if (tag.tagName === 'STYLE') {
+                            const newStyle = document.createElement('style');
+                            Array.from(tag.attributes).forEach(attr => newStyle.setAttribute(attr.name, attr.value));
+                            newStyle.textContent = tag.textContent;
+                            document.head.appendChild(newStyle);
+                        }
+                    });
+
+                    // Wait for all newly added external scripts to load before triggering page-loaded
+                    await Promise.all(scriptPromises);
+
+                    if (pushHistory) window.history.pushState({ spaUrl: url }, doc.title, url);
+                    window.scrollTo(0, 0);
+                    
+                    endTopLoad();
+
+                    // Use requestAnimationFrame to ensure the DOM has settled before dispatching the load event
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            // Cleanup any lingering Bootstrap modal artifacts
+                            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                            document.body.classList.remove('modal-open');
+                            document.body.style.overflow = '';
+                            document.body.style.paddingRight = '';
+
+                            document.dispatchEvent(new Event('spa:page-loaded'));
+                            // Fallback for some components that specifically need a slightly later trigger
+                            window.dispatchEvent(new Event('resize'));
+                        }, 50);
+                    });
+
+                } catch (err) {
+                    console.error('SPA Error:', err);
+                    window.location.href = url;
+                }
+            }
+
             document.body.addEventListener('click', function(e) {
                 if (e.defaultPrevented) return;
-
                 const link = e.target.closest('a');
                 if (!link) return;
-                
                 const href = link.getAttribute('href');
                 const target = link.getAttribute('target');
                 
-                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.includes('mailto:') || href.includes('tel:') || target === '_blank' || link.hasAttribute('data-bs-toggle') || link.classList.contains('no-loader')) {
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.includes('mailto:') || href.includes('tel:') || target === '_blank' || link.hasAttribute('data-bs-toggle') || link.classList.contains('no-spa') || href.includes('logout')) {
+                    if (!link.hasAttribute('data-bs-toggle') && href && !href.startsWith('#')) {
+                        // Regular links that aren't SPA
+                        startTopLoad();
+                    }
                     return;
                 }
                 
                 try {
                     const url = new URL(href, window.location.origin);
-                    if (url.origin === window.location.origin) {
-                        // Ignore pure hash changes
-                        if (url.pathname === window.location.pathname && url.search === window.location.search) {
-                            return; 
+                    const isSameOrigin = url.origin === window.location.origin;
+                    const isSameHost = url.hostname === window.location.hostname;
+                    
+                    // If it's the same host (even if port/protocol was weirdly different in the link attributes)
+                    if (isSameOrigin || isSameHost) {
+                        e.preventDefault();
+                        fetchAndReplaceSPA(url.href, true);
+                        
+                        const offcanvasEl = document.getElementById('mobileSidebar');
+                        if (offcanvasEl && offcanvasEl.classList.contains('show')) {
+                            bootstrap.Offcanvas.getInstance(offcanvasEl)?.hide();
                         }
-                        // Ignore modifier keys
-                        if (e.ctrlKey || e.shiftKey || e.metaKey || e.which === 2) {
-                            return;
-                        }
-                        // Show Loader
-                        loader.classList.add('d-flex');
-                        loader.classList.remove('d-none');
-                        void loader.offsetWidth; // Trigger reflow
-                        loader.style.opacity = '1';
                     }
                 } catch (err) {}
             });
 
-            document.body.addEventListener('submit', function(e) {
-                if (e.defaultPrevented) return;
-                
-                const form = e.target;
-                if (form.getAttribute('target') !== '_blank' && !form.classList.contains('no-loader')) {
-                    loader.classList.add('d-flex');
-                    loader.classList.remove('d-none');
-                    void loader.offsetWidth;
-                    loader.style.opacity = '1';
-                }
+            window.addEventListener('popstate', (e) => {
+                if (e.state?.spaUrl) fetchAndReplaceSPA(location.href, false);
+                else window.location.reload();
             });
 
-            window.addEventListener('pageshow', function(e) {
-                if (e.persisted) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => {
-                        loader.classList.add('d-none');
-                        loader.classList.remove('d-flex');
-                    }, 300);
-                }
+            document.body.addEventListener('submit', (e) => {
+                if (!e.defaultPrevented && e.target.getAttribute('target') !== '_blank') startTopLoad();
             });
+
+            window.addEventListener('pageshow', (e) => { if (e.persisted) endTopLoad(); });
+            
+            // Initial end load in case script loads after page partially ready
+            endTopLoad();
         });
     </script>
     <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>

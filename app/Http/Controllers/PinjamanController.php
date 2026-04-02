@@ -60,7 +60,7 @@ class PinjamanController extends Controller
 
         $pinjaman = $query->paginate(10)->withQueryString();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json([
                 'html' => view('pinjaman._table_list', compact('pinjaman'))->render(),
                 'totalPinjaman' => 'Rp ' . number_format($totalRemaining, 0, ',', '.'),

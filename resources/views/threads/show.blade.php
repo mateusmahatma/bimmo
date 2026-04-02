@@ -2,11 +2,15 @@
 
 @section('container')
 <div class="thread-detail-page mb-5">
-    {{-- Back Button --}}
-    <div class="mb-3">
-        <a href="{{ route('threads.index') }}" class="btn btn-link text-decoration-none text-muted p-0">
-            <i class="bi bi-arrow-left me-1"></i>{{ __('Kembali ke Threads') }}
-        </a>
+    <div class="pagetitle mb-4">
+        <h1 class="fw-bold mb-1">{{ __('Thread Detail') }}</h1>
+        <nav>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('threads.index') }}">{{ __('Threads') }}</a></li>
+                <li class="breadcrumb-item active">{{ __('Thread Detail') }}</li>
+            </ol>
+        </nav>
     </div>
 
     {{-- Flash Messages --}}
@@ -139,6 +143,7 @@
     </div>
 </div>
 
+@push('css')
 <style>
 .thread-detail-page {
     max-width: 800px;
@@ -169,6 +174,7 @@
     }
 }
 </style>
+@endpush
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

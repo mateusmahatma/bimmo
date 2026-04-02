@@ -126,7 +126,7 @@
 
             const blockAccess = (force = false) => {
                 if (isLocked && force !== true) return;
-                if (!force && isMobileOrPWA) return; // Skip threshold-based blocking on mobile/PWA
+                if (!force && (isMobileOrPWA || isModalOpen())) return; // Skip threshold-based blocking on mobile/PWA/Modal
                 
                 isLocked = true;
                 document.body.classList.remove('protection-active');
@@ -266,8 +266,28 @@
                 if (overlay) overlay.style.display = 'none';
             };
 
-            window.addEventListener('blur', hideContent);
-            window.addEventListener('focus', showContent);
+            let isIgnoringProtection = false;
+            const isModalOpen = () => !!document.querySelector('.modal.show');
+
+            window.addEventListener('blur', () => {
+                if (isIgnoringProtection || isModalOpen()) return;
+                hideContent();
+            });
+            // Ignore protection when interacting with file inputs (avoids black screen on file picker)
+            const handleFileInputInteraction = (e) => {
+                if (e.target.tagName === 'INPUT' && e.target.type === 'file') {
+                    isIgnoringProtection = true;
+                }
+            };
+            document.addEventListener('click', handleFileInputInteraction, true);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') handleFileInputInteraction(e);
+            }, true);
+
+            window.addEventListener('focus', () => {
+                isIgnoringProtection = false;
+                showContent();
+            });
 
             // Extreme Focus Sentry - Frame Perfect (requestAnimationFrame)
             let isPageActive = false;
@@ -280,7 +300,7 @@
                 }
 
                 if (!document.hasFocus()) {
-                    hideContent();
+                    if (!isIgnoringProtection && !isModalOpen()) hideContent();
                     lastFocusLoss = Date.now();
                 } else {
                     // Hysteretic recovery: Stay hidden for at least 500ms after focus loss
@@ -339,7 +359,7 @@
                 const isModCombo = (e.ctrlKey && e.shiftKey) || (e.metaKey && e.shiftKey);
                 
                 if (isModCombo) {
-                    hideContent();
+                    if (!isIgnoringProtection) hideContent();
                 }
 
                 // F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, etc.
@@ -353,7 +373,7 @@
                         blockAccess(true); // Permanent forced hard block for Prt Sc
                     } else {
                         isLocked = true; // Permanent lock
-                        hideContent(true); // Instant hide for shortcuts
+                        if (!isIgnoringProtection) hideContent(true); // Instant hide for shortcuts
                     }
                     clearClipboard();
                     e.preventDefault();

@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+function initDashboardCashflow() {
     const el = document.querySelector('#cashflowChart');
     if (!el) return;
 
@@ -129,11 +129,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Theme Change Handler
-    document.addEventListener('themeChanged', function () {
-        if (window.cashflowChartInstance && window.lastRenderedData) {
-            window.renderCashflowChart(window.lastRenderedData);
-        } else if (window.cashflowData) {
-            window.renderCashflowChart(window.cashflowData);
-        }
-    });
-});
+    if (!window.cashflowThemeListenerAdded) {
+        document.addEventListener('themeChanged', function () {
+            if (window.cashflowChartInstance && window.lastRenderedData) {
+                window.renderCashflowChart(window.lastRenderedData);
+            } else if (window.cashflowData) {
+                window.renderCashflowChart(window.cashflowData);
+            }
+        });
+        window.cashflowThemeListenerAdded = true;
+    }
+}
+document.addEventListener('DOMContentLoaded', initDashboardCashflow);
+document.addEventListener('spa:page-loaded', initDashboardCashflow);

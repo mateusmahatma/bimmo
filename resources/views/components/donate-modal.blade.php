@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="donateModalLabel">
-                    <i class="bi bi-heart-fill text-danger me-2"></i>{{ __('Donate') }}
+                    <i class="bi bi-cup-hot text-danger me-2"></i>{{ __('Coffee') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

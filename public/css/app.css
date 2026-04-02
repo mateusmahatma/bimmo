@@ -328,3 +328,368 @@ body.protection-active>*:not(#protection-overlay):not(script) {
 .sensitive-data:hover {
     filter: blur(0);
 }
+
+
+/* =========================================
+   GLOBAL PAGETITLE & BREADCRUMB
+   ========================================= */
+.pagetitle {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.pagetitle h1 {
+    font-size: 1.75rem;
+    letter-spacing: -0.03em;
+    color: #2d3436;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.breadcrumb {
+    font-size: 0.85rem;
+}
+
+.breadcrumb-item a {
+    color: #636e72;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-item a:hover {
+    color: #0984e3;
+}
+
+.breadcrumb-item.active {
+    color: #0984e3;
+    font-weight: 600;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "\F285";
+    /* bi-chevron-right */
+    font-family: "bootstrap-icons";
+    font-size: 0.65rem;
+    color: #b2bec3;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+[data-bs-theme="dark"] .pagetitle {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .pagetitle h1 {
+    color: #f1f5f9;
+}
+
+[data-bs-theme="dark"] .breadcrumb-item a {
+    color: #94a3b8;
+}
+
+/* =========================================
+   DASHBOARD UI REDESIGN — Clean & Organized
+   ========================================= */
+
+/* Page Header */
+.dashboard-pagetitle h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+    margin-bottom: 0;
+}
+
+[data-bs-theme="dark"] .dashboard-pagetitle h1 {
+    color: #f1f5f9;
+}
+
+.dashboard-pagetitle .breadcrumb {
+    margin-bottom: 0;
+}
+
+.dashboard-date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    border-radius: 0;
+    padding: 4px 12px;
+}
+
+[data-bs-theme="dark"] .dashboard-date-badge {
+    background: rgba(255, 255, 255, 0.07);
+    color: #94a3b8;
+}
+
+/* Card Dashboard — Clean, No Hover */
+.card-dashboard {
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 0 !important;
+    background: #ffffff;
+}
+
+[data-bs-theme="dark"] .card-dashboard {
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    background: #1e2128 !important;
+}
+
+.card-dashboard .card-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 18px 24px !important;
+}
+
+[data-bs-theme="dark"] .card-dashboard .card-header {
+    background: #1e2128 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Section Label */
+.section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+/* Stat Number */
+.stat-number-lg {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+
+.stat-number-md {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+/* Icon Shape Clean */
+.icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.15rem;
+}
+
+.icon-circle.income {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.icon-circle.expense {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.icon-circle.today {
+    background: #fef9c3;
+    color: #b45309;
+}
+
+.icon-circle.install {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.icon-circle.balance {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .icon-circle.income {
+    background: rgba(22, 163, 74, 0.15);
+    color: #4ade80;
+}
+
+[data-bs-theme="dark"] .icon-circle.expense {
+    background: rgba(220, 38, 38, 0.15);
+    color: #f87171;
+}
+
+[data-bs-theme="dark"] .icon-circle.today {
+    background: rgba(180, 83, 9, 0.15);
+    color: #fbbf24;
+}
+
+[data-bs-theme="dark"] .icon-circle.install {
+    background: rgba(37, 99, 235, 0.15);
+    color: #60a5fa;
+}
+
+/* Hero Balance Card */
+.card-hero-balance {
+    background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
+    border: none !important;
+    border-radius: 0 !important;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .card-hero-balance {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 100%);
+}
+
+/* Progress Bar Clean */
+.progress-clean {
+    height: 8px;
+    border-radius: 0;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+[data-bs-theme="dark"] .progress-clean {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Table Clean */
+.table-dashboard {
+    font-size: 0.9rem;
+}
+
+.table-dashboard td {
+    padding: 10px 16px !important;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-bs-theme="dark"] .table-dashboard td {
+    border-bottom-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.table-dashboard tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Badge Clean */
+.badge-type {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 0;
+    letter-spacing: 0.02em;
+}
+
+/* Section Divider */
+.dashboard-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 0 4px;
+    margin-bottom: 12px;
+}
+
+/* Stat mini info row */
+.stat-vs-label {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+
+/* Alert Minimal */
+.alert-minimal {
+    border: none;
+    border-radius: 0;
+    padding: 10px 16px;
+    font-size: 0.84rem;
+    font-weight: 500;
+}
+
+/* Stat Inner Card (small cards in financial summary) */
+.stat-card-inner {
+    background: #f8fafc;
+    border-radius: 0;
+}
+
+[data-bs-theme="dark"] .stat-card-inner {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Card Footer Strip */
+.card-footer-strip {
+    background: #f8fafc;
+}
+
+[data-bs-theme="dark"] .card-footer-strip {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Table Header Strip */
+.table-header-strip {
+    background: #f8fafc;
+}
+
+[data-bs-theme="dark"] .table-header-strip {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Stat table header cells */
+[data-bs-theme="dark"] .table-header-strip th {
+    color: #94a3b8 !important;
+}
+
+/* Net Worth & Emergency Fund progress bar track */
+[data-bs-theme="dark"] .progress-clean {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Hero balance dark mode — already defined, ensure deep dark gradient */
+[data-bs-theme="dark"] .card-hero-balance {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 100%);
+}
+
+/* Dashboard date badge dark mode */
+[data-bs-theme="dark"] .dashboard-date-badge {
+    background: rgba(255, 255, 255, 0.07);
+    color: #94a3b8;
+}
+
+/* YouTube Style Top Progress Bar */
+#top-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background-color: #2563eb;
+    /* Primary blue */
+    z-index: 999999;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+    opacity: 0;
+    pointer-events: none;
+}
+
+[data-bs-theme="dark"] #top-progress-bar {
+    background-color: #60a5fa;
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+/* Net Worth & Emergency Fund progress bar track */
+[data-bs-theme="dark"] .progress-clean {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Hero balance dark mode — already defined, ensure deep dark gradient */
+[data-bs-theme="dark"] .card-hero-balance {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 100%);
+}
+
+/* Dashboard date badge dark mode */
+[data-bs-theme="dark"] .dashboard-date-badge {
+    background: rgba(255, 255, 255, 0.07);
+    color: #94a3b8;
+}
