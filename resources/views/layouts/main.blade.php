@@ -24,13 +24,11 @@
             <!-- Loading Overlay (YouTube Style) -->
             <div id="top-progress-bar"></div>
 
-            {{-- MOBILE TOGGLE BUTTON --}}
-            <div class="d-md-none py-2 mb-3 border-bottom d-flex align-items-center">
-                <button class="btn btn-outline-secondary btn-sm me-2 rounded-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
+            {{-- MOBILE TOP APP BAR --}}
+            <div class="d-md-none py-2 mb-2 border-bottom d-flex align-items-center justify-content-center bg-white shadow-sm" style="position: sticky; top: 0; z-index: 1020;">
                 <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo" alt="BIMMO" style="height: 25px;">
             </div>
+
 
 
             <div id="spa-container">
@@ -40,7 +38,16 @@
     </div>
 </div>
 
+{{-- BOTTOM NAVIGATION FOR MOBILE --}}
+@include('layouts.bottom-nav')
 
+<style>
+    @media (max-width: 767.98px) {
+        main {
+            padding-bottom: 90px !important; /* Space for bottom nav */
+        }
+    }
+</style>
 
 @if(auth()->check())
     <script>
