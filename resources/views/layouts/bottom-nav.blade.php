@@ -4,6 +4,11 @@
         background-color: var(--bs-body-bg);
         border-top: 1px solid rgba(0,0,0,0.05);
         padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
         z-index: 1030;
     }
     [data-bs-theme="dark"] .mobile-bottom-nav {
@@ -36,7 +41,7 @@
     }
 </style>
 
-<nav class="mobile-bottom-nav d-md-none d-flex justify-content-around align-items-center fixed-bottom shadow-sm pt-2">
+<nav class="mobile-bottom-nav d-md-none d-flex justify-content-around align-items-center shadow-sm pt-2">
     <a href="{{ url('dashboard') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('dashboard*') ? 'active' : '' }}">
         <i class="bi bi-speedometer2 fs-4 d-block mb-1"></i>
         <span style="font-size: 0.65rem;">{{ __('Home') }}</span>
