@@ -4,7 +4,7 @@
         background-color: var(--bs-body-bg);
         border-top: 1px solid rgba(0,0,0,0.05);
         padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
-        z-index: 1040; /* Above offcanvas backdrop if needed */
+        z-index: 1030;
     }
     [data-bs-theme="dark"] .mobile-bottom-nav {
         background-color: #1a1d20 !important;

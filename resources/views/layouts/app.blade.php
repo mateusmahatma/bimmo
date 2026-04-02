@@ -224,7 +224,7 @@
                     document.body.style.filter = 'blur(20px)';
                     document.title = 'Bimmo - Protected';
                 } else {
-                    document.body.style.filter = 'none';
+                    document.body.style.filter = '';
                     document.title = '{{ $title ?? "Bimmo" }}';
                 }
             });
@@ -414,7 +414,7 @@
     </script>
 </head>
 
-<body class="{{ auth()->check() ? 'ui-style-' . (auth()->user()->ui_style ?? 'corporate') : '' }}">
+<body class="{{ auth()->check() ? 'ui-style-' . (auth()->user()->ui_style ?? 'corporate') : '' }}" style="overflow-x: hidden;">
     <div id="protection-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:#000;justify-content:center;align-items:center;flex-direction:column;font-family:sans-serif;padding: 20px; text-align: center;">
         <div style="width: 80px; height: 80px; background: #1a1a1a; color: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 1.5rem;">
             <i class="bi bi-camera-fill"></i>
