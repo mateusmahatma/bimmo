@@ -26,7 +26,6 @@
     @endif
 
 
-    @livewireStyles
     @stack('css')
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
@@ -83,12 +82,6 @@
 
         // Legacy/Shortcut function
         window.setTheme = (theme) => applyTheme(theme);
-
-        // Re-apply theme after Livewire navigations
-        document.addEventListener('livewire:navigated', () => {
-            const theme = localStorage.getItem('theme') || "{{ auth()->user()->skin ?? 'auto' }}";
-            applyTheme(theme, false);
-        });
 
         // Extreme Source Code Protection
         (function() {
@@ -514,16 +507,6 @@
             };
         });
     </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register("{{ asset('sw.js') }}")
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker not registered', err));
-            });
-        }
-    </script>
-    @livewireScripts
 </body>
 
 </html>
