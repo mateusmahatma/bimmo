@@ -156,7 +156,7 @@
         </div>
 
         <!-- Pengaturan Gaya Visual -->
-        <div class="card mb-4 shadow-sm border-0" style="border-radius: 15px;">
+        {{-- <div class="card mb-4 shadow-sm border-0" style="border-radius: 15px;">
             <div class="card-header bg-transparent border-0 pt-4 px-4">
                 <h5 class="fw-bold mb-0"><i class="bi bi-palette2 me-2 text-primary"></i>{{ __('Gaya Visual') }}</h5>
             </div>
@@ -194,7 +194,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Informasi Pengguna -->
         <div class="card mb-4">
