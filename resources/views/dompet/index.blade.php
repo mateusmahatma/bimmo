@@ -39,7 +39,6 @@
 
     /* PWA & Premium Enhancements (White Theme) */
     .card-summary {
-        border-radius: 20px;
         border: 1px solid rgba(0,0,0,0.05);
         background: #ffffff;
         color: #2d3436;
@@ -54,7 +53,6 @@
         letter-spacing: -1px;
     }
     .wallet-card {
-        border-radius: 20px;
         border: 1px solid rgba(0,0,0,0.05);
         background: #fff;
     }
@@ -75,7 +73,6 @@
         z-index: 1040;
         width: 60px;
         height: 60px;
-        border-radius: 50%;
         display: none; /* Desktop hidden */
         align-items: center;
         justify-content: center;
@@ -184,7 +181,7 @@
 
             <!-- Instructions Section -->
             <div class="collapse mb-4" id="instructionsCollapse">
-                <div class="card-body bg-light border-bottom mb-4" style="border-radius: 12px;">
+                <div class="card-body bg-light border-bottom mb-4">
                     <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
                         <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-lightbulb me-2"></i>{{ __('How to Use the Wallet Page') }}:</h6>
                         <div class="row g-4">
@@ -229,7 +226,7 @@
                                         <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
                                             <i class="bi bi-three-dots-vertical fs-5"></i>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px; z-index: 1050;">
+                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
                                             <li><a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
                                                 <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
                                             </a></li>
@@ -274,7 +271,7 @@
 <!-- Add Wallet Modal -->
 <div class="modal fade" id="addWalletModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0" style="border-radius: 15px;">
+        <div class="modal-content border-0">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold">{{ __('Add New Wallet') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -318,7 +315,7 @@
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteWalletModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0" style="border-radius: 15px;">
+        <div class="modal-content border-0">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold">{{ __('Delete Wallet') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
