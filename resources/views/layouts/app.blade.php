@@ -463,11 +463,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sessionLifetime = {
-                {
-                    config('session.lifetime')
-                }
-            }* 60 * 1000; // minutes to milliseconds
+            const sessionLifetime = {{ config('session.lifetime') }} * 60 * 1000; // minutes to milliseconds
             let timeoutTimer;
             const modalElement = document.getElementById('sessionTimeoutModal');
             let sessionModal;
