@@ -1,5 +1,13 @@
+let isDanaDaruratInitialized = false;
+
 window.initDanaDarurat = function () {
     if (!$('#danaDaruratTable').length) return;
+
+    if (isDanaDaruratInitialized) return;
+    isDanaDaruratInitialized = true;
+
+    // reset the flag after a short delay so that future SPA navigations can trigger it
+    setTimeout(() => { isDanaDaruratInitialized = false; }, 500);
 
     // Check if DataTable is already initialized to avoid re-init error
     if ($.fn.DataTable.isDataTable('#danaDaruratTable')) {
@@ -411,6 +419,10 @@ window.initDanaDarurat = function () {
 
 // Initial initialization
 $(document).ready(function () {
+    window.initDanaDarurat();
+});
+
+document.addEventListener('livewire:navigated', function () {
     window.initDanaDarurat();
 });
 

@@ -20,7 +20,7 @@
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
-                    href="{{ url('dashboard') }}">
+                    href="{{ url('dashboard') }}" wire:navigate>
                     <i class="bi bi-speedometer me-3"></i>
                     <span>{{ __('Dashboard') }}</span>
                 </a>
@@ -28,7 +28,7 @@
 
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('dompet*') ? 'active' : '' }}"
-                    href="{{ route('dompet.index') }}">
+                    href="{{ route('dompet.index') }}" wire:navigate>
                     <i class="bi bi-wallet2 me-3"></i>
                     <span>{{ __('Wallet') }}</span>
                 </a>
@@ -73,12 +73,12 @@
                 <div class="collapse {{ Request::is('aset*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAset">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('aset') ? 'active' : '' }}" href="{{ route('aset.index') }}">
+                            <a class="nav-link sub-link {{ Request::is('aset') ? 'active' : '' }}" href="{{ route('aset.index') }}" wire:navigate>
                                 {{ __('Inventory') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('aset/report') ? 'active' : '' }}" href="{{ route('aset.report') }}">
+                            <a class="nav-link sub-link {{ Request::is('aset/report') ? 'active' : '' }}" href="{{ route('aset.report') }}" wire:navigate>
                                 {{ __('Analysis & Report') }}
                             </a>
                         </li>
@@ -87,21 +87,21 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}" href="{{ route('dana-darurat.index') }}" role="button">
+                <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}" href="{{ route('dana-darurat.index') }}" role="button" wire:navigate>
                     <i class="bi bi-exclamation-triangle-fill me-3"></i>
                     <span>{{ __('Emergency Fund') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('tujuan-keuangan*') ? 'active' : '' }}" href="/tujuan-keuangan" role="button">
+                <a class="nav-link d-flex align-items-center {{ Request::is('tujuan-keuangan*') ? 'active' : '' }}" href="/tujuan-keuangan" role="button" wire:navigate>
                     <i class="bi bi-bullseye me-3"></i>
                     <span>{{ __('Financial Goals') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('threads*') ? 'active' : '' }}" href="{{ route('threads.index') }}" role="button">
+                <a class="nav-link d-flex align-items-center {{ Request::is('threads*') ? 'active' : '' }}" href="{{ route('threads.index') }}" role="button" wire:navigate>
                     <i class="bi bi-chat-left-text me-3"></i>
                     <span>{{ __('Threads') }}</span>
                 </a>
@@ -119,22 +119,22 @@
                 <div class="collapse {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuMoneyMovement">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan">
+                            <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan" wire:navigate>
                                 {{ __('Income') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran">
+                            <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran" wire:navigate>
                                 {{ __('Expense') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('transaksi') ? 'active' : '' }}" href="/transaksi">
+                            <a class="nav-link sub-link {{ Request::is('transaksi') ? 'active' : '' }}" href="/transaksi" wire:navigate>
                                 {{ __('Cash Flow') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman">
+                            <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman" wire:navigate>
                                 {{ __('Loan') }}
                             </a>
                         </li>
@@ -149,7 +149,7 @@
         <div class="d-flex align-items-center justify-content-around px-2 pb-1">
             <a href="{{ route('panduan.index') }}"
                class="sidebar-compact-btn {{ request()->is('panduan*') ? 'active' : '' }}"
-               title="{{ __('User Guide') }}">
+               title="{{ __('User Guide') }}" wire:navigate>
                 <i class="bi bi-book"></i>
                 <span>{{ __('Guide') }}</span>
             </a>
@@ -170,7 +170,7 @@
         {{-- Profile & Logout --}}
         <ul class="nav flex-column border-top pt-1">
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}">
+                <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}" wire:navigate>
                     @if(Auth::user()->profile_photo)
                     <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-0 me-3" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">
                     @else

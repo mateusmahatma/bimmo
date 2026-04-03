@@ -22,10 +22,11 @@
     <link href="{{ asset('css/sidebar.css') }}?v={{ filemtime(public_path('css/sidebar.css')) }}" rel="stylesheet">
     <link href="{{ asset('css/tombol.css') }}?v={{ filemtime(public_path('css/tombol.css')) }}" rel="stylesheet">
     @if(auth()->check() && auth()->user()->ui_style === 'milenial')
-        <link href="{{ asset('css/millennial.css') }}?v={{ time() }}" rel="stylesheet">
+        <link href="{{ asset('css/millennial.css') }}?v={{ filemtime(public_path('css/millennial.css')) }}" rel="stylesheet">
     @endif
 
 
+    @livewireStyles
     @stack('css')
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
@@ -82,6 +83,12 @@
 
         // Legacy/Shortcut function
         window.setTheme = (theme) => applyTheme(theme);
+
+        // Re-apply theme after Livewire navigations
+        document.addEventListener('livewire:navigated', () => {
+            const theme = localStorage.getItem('theme') || "{{ auth()->user()->skin ?? 'auto' }}";
+            applyTheme(theme, false);
+        });
 
         // Extreme Source Code Protection
         (function() {
@@ -520,6 +527,7 @@
             });
         }
     </script>
+    @livewireScripts
 </body>
 
 </html>

@@ -1,5 +1,12 @@
+let isTujuanKeuanganInitialized = false;
+
 window.initTujuanKeuangan = function () {
     if (!$('#goalsTable').length) return;
+
+    if (isTujuanKeuanganInitialized) return;
+    isTujuanKeuanganInitialized = true;
+    setTimeout(() => { isTujuanKeuanganInitialized = false; }, 500);
+
 
     // CSRF Setup
     $.ajaxSetup({
@@ -280,3 +287,12 @@ window.deleteGoal = function (id) {
         }
     });
 }
+
+// Initial initialization
+$(document).ready(function () {
+    window.initTujuanKeuangan();
+});
+
+document.addEventListener('livewire:navigated', function () {
+    window.initTujuanKeuangan();
+});

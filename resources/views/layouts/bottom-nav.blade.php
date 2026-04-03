@@ -42,24 +42,24 @@
 </style>
 
 <nav class="mobile-bottom-nav d-md-none d-flex justify-content-around align-items-center shadow-sm pt-2">
-    <a href="{{ url('dashboard') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('dashboard*') ? 'active' : '' }}">
+    <a href="{{ url('dashboard') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('dashboard*') ? 'active' : '' }}" wire:navigate>
         <i class="bi bi-speedometer2 fs-4 d-block mb-1"></i>
         <span style="font-size: 0.65rem;">{{ __('Home') }}</span>
     </a>
-    <a href="{{ route('dompet.index') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('dompet*') ? 'active' : '' }}">
+    <a href="{{ route('dompet.index') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('dompet*') ? 'active' : '' }}" wire:navigate>
         <i class="bi bi-wallet2 fs-4 d-block mb-1"></i>
         <span style="font-size: 0.65rem;">{{ __('Wallet') }}</span>
     </a>
     
     <!-- Central Action Button -->
-    <a href="{{ url('transaksi') }}" class="mobile-nav-item text-center text-decoration-none position-relative" style="flex: 1.2;">
+    <a href="{{ url('transaksi') }}" class="mobile-nav-item text-center text-decoration-none position-relative" style="flex: 1.2;" wire:navigate>
         <div class="center-action-btn bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 50px; height: 50px; margin: -25px auto 4px auto; border: 4px solid var(--bs-body-bg);">
             <i class="bi bi-arrow-down-up fs-4"></i>
         </div>
         <span style="font-size: 0.65rem;" class="{{ request()->is('transaksi*') ? 'text-primary fw-bold' : '' }}">{{ __('Cash Flow') }}</span>
     </a>
 
-    <a href="{{ route('anggaran.index') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('anggaran*') ? 'active' : '' }}">
+    <a href="{{ route('anggaran.index') }}" class="mobile-nav-item text-center text-decoration-none {{ request()->is('anggaran*') ? 'active' : '' }}" wire:navigate>
         <i class="bi bi-calculator-fill fs-4 d-block mb-1"></i>
         <span style="font-size: 0.65rem;">{{ __('Budget') }}</span>
     </a>

@@ -1087,7 +1087,21 @@ window.validasiInput = (inputElement) => Utils.validasiInput(inputElement);
 // =====================================================
 // MAIN INITIALIZATION
 // =====================================================
-$(document).ready(function () {
+let isTransaksiInitRunning = false;
+
+window.initTransaksiAll = function () {
+    if (isTransaksiInitRunning) return;
+    isTransaksiInitRunning = true;
+    setTimeout(() => { isTransaksiInitRunning = false; }, 500);
+
+    // Make sure we only initialize if the transaction table exists!
+    if (!$('#transaksiTable').length) return;
+
+    // Check if DataTable is already initialized to avoid re-init error
+    if ($.fn.DataTable.isDataTable('#transaksiTable')) {
+        $('#transaksiTable').DataTable().destroy();
+    }
+
     // Setup AJAX CSRF Token
     $.ajaxSetup({
         headers: {
@@ -1099,25 +1113,36 @@ $(document).ready(function () {
     ThemeHandler.init();
     DateRangeHandler.init();
     DataTableHandler.init();
-    TransaksiCRUD.initCreate();
-    TransaksiCRUD.initEdit();
-    TransaksiCRUD.initUpdate();
-    TransaksiCRUD.initDelete();
-    TransaksiCRUD.initToggleStatus();
-    UploadHandler.init();
-    ImportHandler.init();
+
+    // Only bind global body listeners once to prevent duplication
+    if (!window.transaksiEventsBound) {
+        TransaksiCRUD.initCreate();
+        TransaksiCRUD.initEdit();
+        TransaksiCRUD.initUpdate();
+        TransaksiCRUD.initDelete();
+        TransaksiCRUD.initToggleStatus();
+        UploadHandler.init();
+        ImportHandler.init();
+        window.transaksiEventsBound = true;
+    }
+
     AssetListHandler.init();
     LaporanToggleHandler.init();
+    TomSelectHandler.initAll();
 
     // Download template handler
     const downloadTemplateBtn = document.getElementById('btn-download-template');
     if (downloadTemplateBtn) {
-        downloadTemplateBtn.addEventListener('click', () => DownloadHandler.downloadTemplate());
+        // use off() to prevent duplicate binds if replaced or use simple onclick
+        downloadTemplateBtn.onclick = () => DownloadHandler.downloadTemplate();
     }
+};
+
+$(document).ready(function () {
+    initTransaksiAll();
 });
 
-// Initialize TomSelect after DOM is ready
-document.addEventListener('DOMContentLoaded', function () {
-    TomSelectHandler.initAll();
+document.addEventListener('livewire:navigated', function () {
+    initTransaksiAll();
 });
 

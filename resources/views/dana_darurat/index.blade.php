@@ -248,9 +248,4 @@
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/dana-darurat.js') }}?v={{ filemtime(public_path('js/dana-darurat.js')) }}"></script>
-<script>
-    if (typeof window.initDanaDarurat === 'function') {
-        window.initDanaDarurat();
-    }
-</script>
 @endpush

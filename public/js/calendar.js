@@ -444,4 +444,4 @@ function initCalendar() {
 }
 
 document.addEventListener('DOMContentLoaded', initCalendar);
-document.addEventListener('spa:page-loaded', initCalendar);
+document.addEventListener('livewire:navigated', initCalendar);

@@ -299,9 +299,4 @@
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/tujuan-keuangan.js') }}?v={{ filemtime(public_path('js/tujuan-keuangan.js')) }}"></script>
-<script>
-    if (typeof window.initTujuanKeuangan === 'function') {
-        window.initTujuanKeuangan();
-    }
-</script>
 @endpush

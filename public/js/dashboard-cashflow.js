@@ -141,4 +141,4 @@ function initDashboardCashflow() {
     }
 }
 document.addEventListener('DOMContentLoaded', initDashboardCashflow);
-document.addEventListener('spa:page-loaded', initDashboardCashflow);
+document.addEventListener('livewire:navigated', initDashboardCashflow);

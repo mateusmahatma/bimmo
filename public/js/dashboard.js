@@ -283,7 +283,7 @@ function initDashboardGeneral() {
     }
 }
 document.addEventListener('DOMContentLoaded', initDashboardGeneral);
-document.addEventListener('spa:page-loaded', initDashboardGeneral);
+document.addEventListener('livewire:navigated', initDashboardGeneral);
 
 // ==== EXPENSES BAR DETAILED CHART (Managed by own listener) ====
 function initDashboardExpensesBar() {
@@ -328,7 +328,7 @@ function initDashboardExpensesBar() {
     }
 }
 document.addEventListener('DOMContentLoaded', initDashboardExpensesBar);
-document.addEventListener('spa:page-loaded', initDashboardExpensesBar);
+document.addEventListener('livewire:navigated', initDashboardExpensesBar);
 
 // ==== GROWTH DETAIL MODAL HANDLER ====
 function initDashboardGrowthDetail() {
@@ -391,4 +391,4 @@ function initDashboardGrowthDetail() {
     });
 }
 document.addEventListener('DOMContentLoaded', initDashboardGrowthDetail);
-document.addEventListener('spa:page-loaded', initDashboardGrowthDetail);
+document.addEventListener('livewire:navigated', initDashboardGrowthDetail);

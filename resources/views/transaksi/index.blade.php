@@ -609,7 +609,11 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    let isInlineTransaksiInit = false;
+    function initInlineTransaksi() {
+        if (isInlineTransaksiInit) return;
+        isInlineTransaksiInit = true;
+        setTimeout(() => { isInlineTransaksiInit = false; }, 500);
         // State
         let debounceTimer;
         
@@ -1072,7 +1076,9 @@
                 }
             });
         }
-    });
+    }
 
+    document.addEventListener('DOMContentLoaded', initInlineTransaksi);
+    document.addEventListener('livewire:navigated', initInlineTransaksi);
 </script>
 @endpush
