@@ -3,520 +3,429 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\HasilProsesAnggaran;
+use App\Services\DashboardDataService;
+use App\ViewModels\DashboardViewModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Transaksi;
 use App\Models\Pinjaman;
 use App\Models\Aset;
 use App\Models\DanaDarurat;
-use App\Models\Anggaran;
-use App\Models\HasilProsesAnggaran;
-use App\Models\Dompet;
 use App\Models\BayarPinjaman;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    protected function getDashboardNumbers()
-    {
-        $userId = Auth::id();
-        $now = Carbon::now('Asia/Jakarta');
-        $lastMonth = $now->copy()->subMonthsNoOverflow(1);
-
-        // THIS MONTH (Full Month until now)
-        $pemasukanBulanIni = Transaksi::where('id_user', $userId)
-            ->whereMonth('tgl_transaksi', $now->month)
-            ->whereYear('tgl_transaksi', $now->year)->get()->sum(fn($t) => (float)$t->nominal_pemasukan);
-
-        $pengeluaranBulanIni = Transaksi::where('id_user', $userId)
-            ->whereMonth('tgl_transaksi', $now->month)
-            ->whereYear('tgl_transaksi', $now->year)->get()->sum(fn($t) => (float)$t->nominal);
-
-        $pengeluaranHariIni = Transaksi::where('id_user', $userId)
-            ->whereDate('tgl_transaksi', $now->toDateString())->get()->sum(fn($t) => (float)$t->nominal);
-
-        $saldo = $pemasukanBulanIni - $pengeluaranBulanIni;
-
-        // LAST MONTH (MTD - Month to Date)
-        // Fair comparison: compare exactly until the same date and time last month
-        $startOfLastMonth = $lastMonth->copy()->startOfMonth();
-        $transaksiLalu = Transaksi::where('id_user', $userId)
-            ->whereBetween('tgl_transaksi', [$startOfLastMonth, $lastMonth])
-            ->get();
-
-        $pemasukanBulanLalu   = $transaksiLalu->sum(fn($t) => (float) $t->nominal_pemasukan);
-        $pengeluaranBulanLalu = $transaksiLalu->sum(fn($t) => (float) $t->nominal);
-        $saldoBulanLalu       = $pemasukanBulanLalu - $pengeluaranBulanLalu;
-
-        // PERCENTAGE CALCULATIONS
-        // abs() on denominator handles negative saldo correctly
-        $persenPemasukan = $pemasukanBulanLalu > 0
-            ? (($pemasukanBulanIni - $pemasukanBulanLalu) / $pemasukanBulanLalu) * 100
-            : ($pemasukanBulanIni > 0 ? 100 : 0);
-        $persenPengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : ($pengeluaranBulanIni > 0 ? 100 : 0);
-        $persenSaldo = $saldoBulanLalu != 0 ? (($saldo - $saldoBulanLalu) / abs($saldoBulanLalu)) * 100 : ($saldo != 0 ? 100 : 0);
-
-        $cicilanBesok = Pinjaman::where('id_user', $userId)->where('status', 'belum_lunas')->get()->sum(fn($p) => min($p->nominal_angsuran, $p->jumlah_pinjaman));
-
-        return [
-            'saldo' => $saldo,
-            'pemasukan' => $pemasukanBulanIni,
-            'pengeluaran' => $pengeluaranBulanIni,
-            'hari_ini' => $pengeluaranHariIni,
-            'cicilan_besok' => $cicilanBesok,
-            'persen_saldo' => round($persenSaldo, 1),
-            'persen_pemasukan' => round($persenPemasukan, 1),
-            'persen_pengeluaran' => round($persenPengeluaran, 1),
-            'pemasukan_lalu' => $pemasukanBulanLalu,
-            'pengeluaran_lalu' => $pengeluaranBulanLalu,
-            'saldo_lalu' => $saldoBulanLalu,
-        ];
-    }
-
-    public function toggleNominalAjax()
-    {
-        $show = session('show_nominal', false);
-        $newState = !$show;
-        session(['show_nominal' => $newState]);
-
-        $numbers = session('dashboard_numbers');
-        if (!$numbers) return response()->json(['error' => 'Dashboard numbers not found'], 422);
-
-        return response()->json([
-            'show' => $newState,
-            'data' => [
-                'saldo' => $this->maskNominal($numbers['saldo'], $newState),
-                'pemasukan' => $this->maskNominal($numbers['pemasukan'], $newState),
-                'pengeluaran' => $this->maskNominal($numbers['pengeluaran'], $newState),
-                'hari_ini' => $this->maskNominal($numbers['hari_ini'], $newState),
-                'cicilan_besok' => $this->maskNominal($numbers['cicilan_besok'] ?? 0, $newState),
-            ]
-        ]);
-    }
-
-    protected function maskNominal($value, $show)
+    // -------------------------------------------------------------------------
+    // Helper: masking nominal
+    // -------------------------------------------------------------------------
+    protected function maskNominal(float $value, bool $show): string
     {
         return $show ? 'Rp ' . number_format($value, 0, ',', '.') : 'Rp ********';
     }
 
-    private function ratioStatus($value, $type)
+    // -------------------------------------------------------------------------
+    // Helper: label status rasio
+    // -------------------------------------------------------------------------
+    private function ratioStatus(float $value, string $type): array
     {
         return match ($type) {
-            'expense' => $value < 70 ? ['label' => 'Sehat', 'class' => 'success'] : ($value <= 90 ? ['label' => 'Waspada', 'class' => 'warning'] : ['label' => 'Bahaya', 'class' => 'danger']),
-            'saving' => $value > 20 ? ['label' => 'Sangat Sehat', 'class' => 'success'] : ($value >= 10 ? ['label' => 'Sehat', 'class' => 'primary'] : ($value >= 0 ? ['label' => 'Waspada', 'class' => 'warning'] : ['label' => 'Defisit', 'class' => 'danger'])),
-            'emergency' => $value >= 6 ? ['label' => 'Aman', 'class' => 'success'] : ($value >= 3 ? ['label' => 'Cukup', 'class' => 'warning'] : ['label' => 'Bahaya', 'class' => 'danger']),
+            'expense'   => $value < 70  ? ['label' => 'Sehat',       'class' => 'success']
+                : ($value <= 90 ? ['label' => 'Waspada',      'class' => 'warning']
+                    : ['label' => 'Bahaya',       'class' => 'danger']),
+
+            'saving'    => $value > 20  ? ['label' => 'Sangat Sehat', 'class' => 'success']
+                : ($value >= 10 ? ['label' => 'Sehat',        'class' => 'primary']
+                    : ($value >= 0  ? ['label' => 'Waspada',      'class' => 'warning']
+                        : ['label' => 'Defisit',      'class' => 'danger'])),
+
+            'emergency' => $value >= 6  ? ['label' => 'Aman',        'class' => 'success']
+                : ($value >= 3  ? ['label' => 'Cukup',        'class' => 'warning']
+                    : ['label' => 'Bahaya',       'class' => 'danger']),
         };
     }
 
+    // -------------------------------------------------------------------------
+    // MAIN DASHBOARD
+    // -------------------------------------------------------------------------
     public function index(Request $request)
     {
-        $userId = Auth::id();
-        $periode = (int) request('periode', 6);
-        if (!in_array($periode, [2, 6, 12])) $periode = 6;
+        $userId  = Auth::id();
+        $uiStyle = 'corporate';
+        $periode = $this->sanitizePeriode($request->integer('periode', 6));
+        $bulan   = $request->integer('bulan', now()->month);
+        $tahun   = $request->integer('tahun', now()->year);
 
-        $cashflow = Transaksi::where('id_user', Auth::id())
-            ->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())
-            ->get()
-            ->groupBy(fn($t) => \Carbon\Carbon::parse($t->tgl_transaksi)->format('Y-m'))
-            ->map(function ($items, $bulan) {
-                return (object) [
-                    'bulan' => $bulan,
-                    'total_pemasukan' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
-                    'total_pengeluaran' => $items->sum(fn($t) => (float)$t->nominal),
-                    'selisih' => $items->sum(fn($t) => (float)$t->nominal_pemasukan) - $items->sum(fn($t) => (float)$t->nominal)
-                ];
-            })->sortBy('bulan')->values();
+        $service = new DashboardDataService($userId);
 
+        // 1. Ambil data raw dari service
+        $numbers  = $service->getDashboardNumbers();
+        $wealth   = $service->getWealthData();
+        $cashflow = $service->getCashflow($periode);
+        $kategori = $service->getPengeluaranKategori($bulan, $tahun);
+        $today    = $service->getTransaksiHariIni();
+        $rasio    = $service->getRasioData($cashflow);
 
+        $targetDanaDarurat = $service->getTargetDanaDarurat();
 
-        $totalPendapatan = $cashflow->sum('total_pemasukan');
-        $totalPengeluaranAll = $cashflow->sum('total_pengeluaran');
-        $expenseRatio = $totalPendapatan > 0 ? round(($totalPengeluaranAll / $totalPendapatan) * 100, 2) : 0;
-        $latest = $cashflow->last();
+        // 2. Buat ViewModel — semua kalkulasi di sini
+        $viewModel = new DashboardViewModel(
+            totalAset: $wealth['totalAset'],
+            totalDanaDarurat: $wealth['totalDanaDarurat'],
+            totalHutang: $wealth['totalHutang'],
+            targetDanaDarurat: $targetDanaDarurat,
+            pemasukan: $numbers['pemasukan'],
+            pengeluaran: $numbers['pengeluaran'],
+            pemasukanLalu: $numbers['pemasukan_lalu'],
+            pengeluaranLalu: $numbers['pengeluaran_lalu'],
+            saldo: $numbers['saldo'],
+            saldoLalu: $numbers['saldo_lalu'],
+        );
 
-        $danaDarurat = \App\Models\DanaDarurat::where('id_user', Auth::id())->value('nominal_dana_darurat') ?? 0;
-        $rataPengeluaran = $cashflow->count() > 0 ? $cashflow->avg('total_pengeluaran') : 0;
-        $danaDaruratBulan = $rataPengeluaran > 0 ? round($danaDarurat / $rataPengeluaran, 1) : 0;
-
-        $totalPinjaman = \App\Models\Pinjaman::where('id_user', $userId)->sum('jumlah_pinjaman') ?? 0;
-        $totalAsetPhysical = Aset::where('id_user', $userId)->where('is_disposed', false)->sum('harga_beli') ?? 0;
-        $rasio = $totalAsetPhysical > 0 ? ($totalPinjaman / $totalAsetPhysical) * 100 : 0;
-
-        $now = Carbon::now('Asia/Jakarta');
-        $lastMonth = $now->copy()->subMonthsNoOverflow(1);
-        $totalThisMonth = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal);
-        $totalLastMonth = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $lastMonth->year)->whereMonth('tgl_transaksi', $lastMonth->month)->get()->sum(fn($t) => (float)$t->nominal);
-        $rasio_inflasi = $totalLastMonth != 0 ? (($totalThisMonth - $totalLastMonth) / $totalLastMonth) * 100 : 0;
-
-        $totalMasukDD = DanaDarurat::where('id_user', $userId)->where('jenis_transaksi_dana_darurat', 1)->sum('nominal_dana_darurat');
-        $totalKeluarDD = DanaDarurat::where('id_user', $userId)->where('jenis_transaksi_dana_darurat', 2)->sum('nominal_dana_darurat');
-        $totalDanaDarurat = $totalMasukDD - $totalKeluarDD;
-
-        $user = Auth::user();
-        $targetDanaDarurat = 0;
-        if ($user->metode_target_dana_darurat === 'manual') {
-            $targetDanaDarurat = $user->nominal_target_dana_darurat ?? 0;
-        } else {
-            $allTrx = Transaksi::where('id_user', $userId)->orderBy('tgl_transaksi')->get();
-            $totalPengeluaranTotal = $allTrx->where('status', '1')->sum(fn($t) => (float)$t->nominal);
-            if ($allTrx->count() > 1) {
-                $firstDate = Carbon::parse($allTrx->first()->tgl_transaksi)->startOfMonth();
-                $lastDate = Carbon::parse($allTrx->last()->tgl_transaksi)->startOfMonth();
-                $selisihBulan = $firstDate->diffInMonths($lastDate) + 1;
-            } else {
-                $selisihBulan = 1;
-            }
-            $rataRataPengeluaran = $selisihBulan > 0 ? $totalPengeluaranTotal / $selisihBulan : 0;
-            $kelipatan = $user->kelipatan_target_dana_darurat ?? 6;
-            $targetDanaDarurat = $rataRataPengeluaran * $kelipatan;
-        }
-
-        $persentaseDanaDarurat = $targetDanaDarurat > 0 ? ($totalDanaDarurat / $targetDanaDarurat) * 100 : 0;
-        $persentaseDanaDarurat = round(min($persentaseDanaDarurat, 100), 1);
-        $rasio_dana_darurat = $danaDaruratBulan;
-
-        $totalPemasukanMonth = Transaksi::where('id_user', $userId)->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal_pemasukan);
-        $totalPengeluaranMonth = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal);
-        $rasio_pengeluaran_pendapatan = $totalPemasukanMonth > 0 ? ($totalPengeluaranMonth / $totalPemasukanMonth) * 100 : 0;
-
-        $totalNominalToday = Transaksi::where('id_user', $userId)->whereDate('tgl_transaksi', Carbon::today())->get()->sum(fn($t) => (float)$t->nominal);
-        $totalNominalMonthExp = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal);
-        $totalNominalMonthInc = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float)$t->nominal_pemasukan);
-        $totalNominalSisa = $totalNominalMonthInc - $totalNominalMonthExp;
-
-        $filterOptions = HasilProsesAnggaran::where('id_user', $userId)->select('tanggal_mulai', 'tanggal_selesai')->orderBy('tanggal_mulai', 'asc')->get()->unique(fn($row) => $row->tanggal_mulai . '_' . $row->tanggal_selesai)->values();
-
-        $expenseStatus = $this->ratioStatus($expenseRatio, 'expense');
-        $emergencyStatus = $this->ratioStatus($danaDaruratBulan, 'emergency');
-
-        $bulan = (int) request('bulan', now()->month);
-        $tahun = (int) request('tahun', now()->year);
-        $pengeluaranKategori = Transaksi::with('pengeluaranRelation')->where('id_user', Auth::id())->whereMonth('tgl_transaksi', $bulan)->whereYear('tgl_transaksi', $tahun)->get()->filter(fn($t) => !empty($t->pengeluaran))->groupBy('pengeluaran')->map(fn($items) => (object)['kategori' => $items->first()->pengeluaranRelation->nama ?? 'Unknown', 'total' => $items->sum(fn($t) => (float)$t->nominal)])->sortByDesc('total')->values();
-        $totalPengeluaranBulan = $pengeluaranKategori->sum('total');
-        $pengeluaranKategori = $pengeluaranKategori->map(function ($row) use ($totalPengeluaranBulan) {
-            $row->persen = $totalPengeluaranBulan > 0 ? round(($row->total / $totalPengeluaranBulan) * 100, 1) : 0;
-            return $row;
-        });
-
-        $rawTransaksi = Transaksi::with(['pemasukanRelation', 'pengeluaranRelation'])->where('id_user', Auth::id())->whereDate('tgl_transaksi', now())->orderByDesc('created_at')->limit(10)->get();
-        $transaksiHariIni = collect();
-        foreach ($rawTransaksi as $row) {
-            if ((float)$row->nominal_pemasukan > 0) $transaksiHariIni->push((object)['waktu' => $row->created_at, 'jenis' => 'pemasukan', 'kategori' => $row->pemasukanRelation->nama ?? '-', 'keterangan' => $row->keterangan, 'nominal' => (float)$row->nominal_pemasukan]);
-            if ($row->nominal > 0) $transaksiHariIni->push((object)['waktu' => $row->created_at, 'jenis' => 'pengeluaran', 'kategori' => $row->pengeluaranRelation->nama ?? '-', 'keterangan' => $row->keterangan, 'nominal' => (float)$row->nominal]);
-        }
-        $totalMasukHariIni = $transaksiHariIni->where('jenis', 'pemasukan')->sum(fn($t) => (float)$t->nominal);
-        $totalKeluarHariIni = $transaksiHariIni->where('jenis', 'pengeluaran')->sum(fn($t) => (float)$t->nominal);
-
+        // 3. Tampilan nominal (show/hide)
         $showNominal = session('show_nominal', false);
-        $numbers = $this->getDashboardNumbers();
-        $pemasukanLalu = $numbers['pemasukan_lalu'] ?? 0;
-        $pengeluaranLalu = $numbers['pengeluaran_lalu'] ?? 0;
-        $saldoLalu = $numbers['saldo_lalu'] ?? 0;
-        session(['dashboard_numbers' => $numbers]);
-        $saldoView = $this->maskNominal($numbers['saldo'], $showNominal);
-        $pemasukanView = $this->maskNominal($numbers['pemasukan'], $showNominal);
-        $pengeluaranView = $this->maskNominal($numbers['pengeluaran'], $showNominal);
-        $pengeluaranHariIni = $this->maskNominal($numbers['hari_ini'], $showNominal);
-        $cicilanBesokView = $this->maskNominal($numbers['cicilan_besok'] ?? 0, $showNominal);
+        session(['dashboard_numbers' => $numbers]); // untuk toggleNominalAjax
 
-        $persenSaldo = $numbers['persen_saldo'];
-        $persenPemasukan = $numbers['persen_pemasukan'];
-        $persenPengeluaran = $numbers['persen_pengeluaran'];
+        $saldoView          = $this->maskNominal($numbers['saldo'],          $showNominal);
+        $pemasukanView      = $this->maskNominal($numbers['pemasukan'],       $showNominal);
+        $pengeluaranView    = $this->maskNominal($numbers['pengeluaran'],     $showNominal);
+        $pengeluaranHariIni = $this->maskNominal($numbers['hari_ini'],        $showNominal);
+        $cicilanBesokView   = $this->maskNominal($numbers['cicilan_besok'],   $showNominal);
 
-        $totalAset = (float)$totalAsetPhysical;
-        $totalDanaDarurat = (float)$totalDanaDarurat;
-        $totalHutang = (float)$totalPinjaman;
-        // $netWorthRatio = $totalHutang > 0 ? round(($totalAset + $totalDanaDarurat) / $totalHutang, 2) : ($totalAset > 0 ? 99.9 : 0);
-        $netWorth = ($totalAset + $totalDanaDarurat) - $totalHutang;
-        $netWorthFormatted = number_format($netWorth, 0, ',', '.');
+        // 4. Rasio status label
+        $expenseStatus   = $this->ratioStatus($rasio['expenseRatio'],    'expense');
+        $emergencyStatus = $this->ratioStatus($rasio['danaDaruratBulan'], 'emergency');
 
-        return view('dashboard.index', compact(
-            'totalPinjaman',
-            'totalAsetPhysical',
-            'rasio',
-            'rasio_inflasi',
-            'rasio_dana_darurat',
-            'rasio_pengeluaran_pendapatan',
-            'totalNominalToday',
-            'totalNominalMonthExp',
-            'totalNominalMonthInc',
-            'totalNominalSisa',
-            'filterOptions',
-            'cashflow',
-            'expenseRatio',
-            'danaDaruratBulan',
-            'expenseStatus',
-            'emergencyStatus',
-            'pengeluaranKategori',
-            'bulan',
-            'tahun',
-            'totalPengeluaranBulan',
-            'transaksiHariIni',
-            'totalMasukHariIni',
-            'totalKeluarHariIni',
-            'saldoView',
-            'pemasukanView',
-            'pengeluaranView',
-            'cicilanBesokView',
-            'showNominal',
-            'pengeluaranHariIni',
-            'persenSaldo',
-            'persenPemasukan',
-            'persenPengeluaran',
-            'numbers',
-            'pemasukanLalu',
-            'pengeluaranLalu',
-            'saldoLalu',
-            'totalDanaDarurat',
-            'targetDanaDarurat',
-            'persentaseDanaDarurat',
-            'totalAset',
-            'totalHutang',
-            // 'netWorthRatio',
-            'netWorth',
-            'netWorthFormatted'
+        // 5. Filter options anggaran
+        $filterOptions = HasilProsesAnggaran::where('id_user', $userId)
+            ->select('tanggal_mulai', 'tanggal_selesai')
+            ->orderBy('tanggal_mulai')
+            ->get()
+            ->unique(fn($row) => $row->tanggal_mulai . '_' . $row->tanggal_selesai)
+            ->values();
+
+        // 6. Kirim ke view
+        return view('dashboard.index', array_merge(
+            $viewModel->toArray(),
+            [
+                // Cashflow
+                'cashflow'  => $cashflow,
+                'periode'   => $periode,
+
+                // Kategori pengeluaran
+                'pengeluaranKategori'   => $kategori['pengeluaranKategori'],
+                'totalPengeluaranBulan' => $kategori['totalPengeluaranBulan'],
+                'bulan'                 => $bulan,
+                'tahun'                 => $tahun,
+
+                // Transaksi hari ini
+                'transaksiHariIni'   => $today['transaksiHariIni'],
+                'totalMasukHariIni'  => $today['totalMasukHariIni'],
+                'totalKeluarHariIni' => $today['totalKeluarHariIni'],
+
+                // Nominal views
+                'saldoView'          => $saldoView,
+                'pemasukanView'      => $pemasukanView,
+                'pengeluaranView'    => $pengeluaranView,
+                'pengeluaranHariIni' => $pengeluaranHariIni,
+                'cicilanBesokView'   => $cicilanBesokView,
+                'showNominal'        => $showNominal,
+
+                // Raw numbers (untuk data-attribute JS)
+                'numbers'           => $numbers,
+                'pemasukanLalu'     => $numbers['pemasukan_lalu'],
+                'pengeluaranLalu'   => $numbers['pengeluaran_lalu'],
+                'saldoLalu'         => $numbers['saldo_lalu'],
+
+                // Rasio
+                'expenseRatio'                 => $rasio['expenseRatio'],
+                'danaDaruratBulan'             => $rasio['danaDaruratBulan'],
+                'rasio'                        => $rasio['rasio'],
+                'rasio_inflasi'                => $rasio['rasio_inflasi'],
+                'rasio_pengeluaran_pendapatan' => $rasio['rasio_pengeluaran_pendapatan'],
+                'totalAsetPhysical'            => $rasio['totalAsetPhysical'],
+                'totalPinjaman'                => $rasio['totalPinjaman'],
+                'expenseStatus'                => $expenseStatus,
+                'emergencyStatus'              => $emergencyStatus,
+
+                // Misc
+                'uiStyle'              => $uiStyle,
+                'filterOptions'        => $filterOptions,
+                'totalNominalToday'    => $today['totalKeluarHariIni'],
+                'totalNominalMonthExp' => $numbers['pengeluaran'],
+                'totalNominalMonthInc' => $numbers['pemasukan'],
+            ]
         ));
     }
 
+    // -------------------------------------------------------------------------
+    // Toggle show/hide nominal (AJAX)
+    // -------------------------------------------------------------------------
+    public function toggleNominalAjax()
+    {
+        $show    = session('show_nominal', false);
+        $newShow = !$show;
+        session(['show_nominal' => $newShow]);
+
+        $numbers = session('dashboard_numbers');
+        if (!$numbers) {
+            return response()->json(['error' => 'Dashboard numbers not found'], 422);
+        }
+
+        return response()->json([
+            'show' => $newShow,
+            'data' => [
+                'saldo'        => $this->maskNominal($numbers['saldo'],        $newShow),
+                'pemasukan'    => $this->maskNominal($numbers['pemasukan'],    $newShow),
+                'pengeluaran'  => $this->maskNominal($numbers['pengeluaran'],  $newShow),
+                'hari_ini'     => $this->maskNominal($numbers['hari_ini'],     $newShow),
+                'cicilan_besok' => $this->maskNominal($numbers['cicilan_besok'] ?? 0, $newShow),
+            ],
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Filter AJAX (cashflow periode & expense bar bulan/tahun)
+    // -------------------------------------------------------------------------
+    public function filter(Request $request)
+    {
+        $userId  = Auth::id();
+        $uiStyle = 'corporate';
+        $service = new DashboardDataService($userId);
+
+        if ($request->has('periode')) {
+            $periode  = $this->sanitizePeriode($request->integer('periode'));
+            $cashflow = $service->getCashflow($periode);
+
+            return response()->json([
+                'cashflow'  => view('dashboard.partials.cashflow-table', compact('cashflow', 'uiStyle'))->render(),
+                'chartData' => [
+                    'cashflow' => $cashflow->map(fn($row) => [
+                        'bulan'             => Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
+                        'total_pemasukan'   => (float) $row->total_pemasukan,
+                        'total_pengeluaran' => (float) $row->total_pengeluaran,
+                    ]),
+                ],
+            ]);
+        }
+
+        if ($request->has(['bulan', 'tahun'])) {
+            $bulan  = $request->integer('bulan');
+            $tahun  = $request->integer('tahun');
+            $result = $service->getPengeluaranKategori($bulan, $tahun);
+
+            $pengeluaranKategori   = $result['pengeluaranKategori'];
+            $totalPengeluaranBulan = $result['totalPengeluaranBulan'];
+
+            return response()->json([
+                'expenseBar'       => view('dashboard.partials.expense-bar-table', compact('pengeluaranKategori', 'totalPengeluaranBulan', 'uiStyle'))->render(),
+                'totalPengeluaran' => number_format((float) $totalPengeluaranBulan, 0, ',', '.'),
+            ]);
+        }
+
+        return response()->json(['error' => 'Invalid request'], 400);
+    }
+
+    // -------------------------------------------------------------------------
+    // Net Worth History (AJAX)
+    // -------------------------------------------------------------------------
     public function getNetWorthHistory(Request $request)
     {
-        $userId = Auth::id();
-        $periode = (int)$request->query('periode', 6);
-        if (!in_array($periode, [2, 6, 12])) $periode = 6;
+        $userId  = Auth::id();
+        $periode = $this->sanitizePeriode($request->integer('periode', 6));
 
         $netWorthHistory = [];
-        $startPeriodNw = now()->subMonths($periode - 1)->startOfMonth();
-        $endPeriodNw = now()->endOfMonth();
+        $startPeriod     = now()->subMonths($periode - 1)->startOfMonth();
+        $endPeriod       = now()->endOfMonth();
 
-        // PRE-FETCH DATA (Avoid N+1)
-        $allAssets = Aset::where('id_user', $userId)->get();
-        $allDD = DanaDarurat::where('id_user', $userId)->get();
+        // Pre-fetch untuk hindari N+1
+        $allAssets   = Aset::where('id_user', $userId)->get();
+        $allDD       = DanaDarurat::where('id_user', $userId)->get();
         $allPinjaman = Pinjaman::where('id_user', $userId)->get();
-        $allBayar = BayarPinjaman::where('id_user', $userId)->get();
+        $allBayar    = BayarPinjaman::where('id_user', $userId)->get();
 
-        $currentMonthNw = $startPeriodNw->copy();
+        $currentMonth = $startPeriod->copy();
 
-        while ($currentMonthNw <= $endPeriodNw) {
-            $monthEnd = $currentMonthNw->copy()->endOfMonth();
-            $monthStr = $currentMonthNw->translatedFormat('M Y');
+        while ($currentMonth <= $endPeriod) {
+            $monthEnd = $currentMonth->copy()->endOfMonth();
+            $monthStr = $currentMonth->translatedFormat('M Y');
 
-            // ASSETS LOGIC REFINED
-            $assetsMonthQuery = $allAssets->filter(function ($aset) use ($monthEnd) {
-                $purchased = Carbon::parse($aset->tanggal_pembelian) <= $monthEnd;
-                $notDisposedYet = !$aset->is_disposed ||
-                    ($aset->tanggal_disposal && Carbon::parse($aset->tanggal_disposal) > $monthEnd);
-                return $purchased && $notDisposedYet;
+            // Aset
+            $assetsFiltered = $allAssets->filter(function ($aset) use ($monthEnd) {
+                $purchased     = Carbon::parse($aset->tanggal_pembelian) <= $monthEnd;
+                $notDisposed   = !$aset->is_disposed || ($aset->tanggal_disposal && Carbon::parse($aset->tanggal_disposal) > $monthEnd);
+                return $purchased && $notDisposed;
             });
-            $assetsSum = $assetsMonthQuery->sum('harga_beli');
+            $assetsSum = $assetsFiltered->sum('harga_beli');
 
-            // DD LOGIC
-            $ddMonthQuery = $allDD->filter(fn($dd) => Carbon::parse($dd->tgl_transaksi_dana_darurat) <= $monthEnd);
-            $ddSum = $ddMonthQuery->reduce(function ($carry, $item) {
-                return $item->jenis_transaksi_dana_darurat == 1
-                    ? $carry + (float)$item->nominal_dana_darurat
-                    : $carry - (float)$item->nominal_dana_darurat;
-            }, 0);
+            // Dana Darurat
+            $ddFiltered = $allDD->filter(fn($dd) => Carbon::parse($dd->tgl_transaksi_dana_darurat) <= $monthEnd);
+            $ddSum = $ddFiltered->reduce(fn($carry, $item) => $item->jenis_transaksi_dana_darurat == 1
+                ? $carry + (float) $item->nominal_dana_darurat
+                : $carry - (float) $item->nominal_dana_darurat, 0);
 
-            // LOAN LOGIC
-            $hutangTotal = $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
-                ->sum('jumlah_pinjaman');
+            // Hutang
+            $hutangTotal = $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)->sum('jumlah_pinjaman');
+            $bayarTotal  = $allBayar->filter(fn($b) => Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
+            $totalHutang = $hutangTotal - $bayarTotal;
 
-            $bayarTotal = $allBayar->filter(fn($b) => Carbon::parse($b->tgl_bayar) <= $monthEnd)
-                ->sum('jumlah_bayar');
-
-            $totalHutangHistory = $hutangTotal - $bayarTotal;
             $totalKekayaan = $assetsSum + $ddSum;
 
-            // PREPARE DETAILS Breakdown
-            $details = [
-                'assets' => $assetsMonthQuery->map(fn($a) => [
-                    'name' => $a->nama_aset,
-                    'value' => (float)$a->harga_beli,
-                    'date' => Carbon::parse($a->tanggal_pembelian)->translatedFormat('d M Y')
-                ])->values(),
-                'emergency' => $ddMonthQuery->map(fn($d) => [
-                    'name' => $d->keterangan ?? ($d->jenis_transaksi_dana_darurat == 1 ? 'Top Up' : 'Withdrawal'),
-                    'value' => (float)$d->nominal_dana_darurat * ($d->jenis_transaksi_dana_darurat == 1 ? 1 : -1),
-                    'date' => Carbon::parse($d->tgl_transaksi_dana_darurat)->translatedFormat('d M Y')
-                ])->values(),
-                'loans' => $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
-                    ->map(function ($p) use ($allBayar, $monthEnd) {
-                        $p_bayar = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
-                        return [
-                            'name' => $p->nama_pinjaman,
-                            'value' => (float)($p->jumlah_pinjaman - $p_bayar),
-                            'date' => Carbon::parse($p->start_date)->translatedFormat('d M Y')
-                        ];
-                    })->filter(fn($l) => $l['value'] > 0)->values()
-            ];
-
             $netWorthHistory[] = [
-                'bulan' => $monthStr,
-                'total_aset' => (float)$totalKekayaan,
-                'total_hutang' => (float)$totalHutangHistory,
-                'net_worth' => (float)($totalKekayaan - $totalHutangHistory),
-                'details' => $details
+                'bulan'        => $monthStr,
+                'total_aset'   => (float) $totalKekayaan,
+                'total_hutang' => (float) $totalHutang,
+                'net_worth'    => (float) ($totalKekayaan - $totalHutang),
+                'details'      => [
+                    'assets'    => $assetsFiltered->map(fn($a) => [
+                        'name'  => $a->nama_aset,
+                        'value' => (float) $a->harga_beli,
+                        'date'  => Carbon::parse($a->tanggal_pembelian)->translatedFormat('d M Y'),
+                    ])->values(),
+                    'emergency' => $ddFiltered->map(fn($d) => [
+                        'name'  => $d->keterangan ?? ($d->jenis_transaksi_dana_darurat == 1 ? 'Top Up' : 'Withdrawal'),
+                        'value' => (float) $d->nominal_dana_darurat * ($d->jenis_transaksi_dana_darurat == 1 ? 1 : -1),
+                        'date'  => Carbon::parse($d->tgl_transaksi_dana_darurat)->translatedFormat('d M Y'),
+                    ])->values(),
+                    'loans'     => $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
+                        ->map(function ($p) use ($allBayar, $monthEnd) {
+                            $lunas = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
+                            return ['name' => $p->nama_pinjaman, 'value' => (float) ($p->jumlah_pinjaman - $lunas), 'date' => Carbon::parse($p->start_date)->translatedFormat('d M Y')];
+                        })->filter(fn($l) => $l['value'] > 0)->values(),
+                ],
             ];
 
-            $currentMonthNw->addMonth();
+            $currentMonth->addMonth();
         }
 
         return response()->json($netWorthHistory);
     }
 
+    // -------------------------------------------------------------------------
+    // Chart endpoints (legacy — bisa dihapus jika sudah tidak dipakai)
+    // -------------------------------------------------------------------------
     public function lineData()
     {
-        $userId = Auth::id();
-        $transaksi = Transaksi::where('id_user', $userId)->where('status', '1')->get();
-        $data = [];
-        foreach ($transaksi as $t) {
-            $bulan_tahun = date('F Y', strtotime($t->tgl_transaksi));
-            if (!isset($data[$bulan_tahun])) $data[$bulan_tahun] = ['pengeluaran' => 0, 'pemasukan' => 0];
-            $data[$bulan_tahun]['pengeluaran'] += (float)$t->nominal;
-            $data[$bulan_tahun]['pemasukan'] += (float)$t->nominal_pemasukan;
-        }
-        return response()->json(['labels' => array_keys($data), 'pengeluaran' => array_column($data, 'pengeluaran'), 'pemasukan' => array_column($data, 'pemasukan')]);
+        return $this->buildChartResponse();
     }
 
     public function getChartData()
     {
-        $userId = Auth::id();
-        $transaksi = Transaksi::where('id_user', $userId)->where('status', '1')->get();
+        return $this->buildChartResponse(keysOnly: true);
+    }
+
+    private function buildChartResponse(bool $keysOnly = false)
+    {
+        $transaksi = Transaksi::where('id_user', Auth::id())->where('status', '1')->get();
+
         $data = [];
         foreach ($transaksi as $t) {
-            $bulan_tahun = date('F Y', strtotime($t->tgl_transaksi));
-            if (!isset($data[$bulan_tahun])) $data[$bulan_tahun] = ['pengeluaran' => 0, 'pemasukan' => 0];
-            $data[$bulan_tahun]['pengeluaran'] += (float)$t->nominal;
-            $data[$bulan_tahun]['pemasukan'] += (float)$t->nominal_pemasukan;
+            $key = date('F Y', strtotime($t->tgl_transaksi));
+            $data[$key]['pengeluaran'] = ($data[$key]['pengeluaran'] ?? 0) + (float) $t->nominal;
+            $data[$key]['pemasukan']   = ($data[$key]['pemasukan']   ?? 0) + (float) $t->nominal_pemasukan;
         }
-        return response()->json(['labels' => array_keys($data), 'data_pengeluaran' => array_column($data, 'pengeluaran'), 'data_pemasukan' => array_column($data, 'pemasukan')]);
+
+        return $keysOnly
+            ? response()->json(['labels' => array_keys($data), 'data_pengeluaran' => array_column($data, 'pengeluaran'), 'data_pemasukan' => array_column($data, 'pemasukan')])
+            : response()->json(['labels' => array_keys($data), 'pengeluaran' => array_column($data, 'pengeluaran'), 'pemasukan' => array_column($data, 'pemasukan')]);
     }
 
     public function getPieData()
     {
-        $userId = Auth::id();
-        $now = Carbon::now();
-        $transaksi = Transaksi::where('id_user', $userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->filter(fn($t) => !empty($t->pengeluaran));
+        $now      = Carbon::now();
+        $transaksi = Transaksi::where('id_user', Auth::id())->where('status', '1')
+            ->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)
+            ->get()->filter(fn($t) => !empty($t->pengeluaran));
+
         $labels = [];
-        $data = [];
+        $data   = [];
+
         foreach ($transaksi as $t) {
-            $pengeluaran = $t->pengeluaran;
-            $nominal = (float)$t->nominal;
-            $index = array_search($pengeluaran, $labels);
-            if ($index !== false) $data[$index] += $nominal;
-            else {
-                $labels[] = $pengeluaran;
-                $data[] = $nominal;
+            $index = array_search($t->pengeluaran, $labels);
+            if ($index !== false) {
+                $data[$index] += (float) $t->nominal;
+            } else {
+                $labels[] = $t->pengeluaran;
+                $data[]   = (float) $t->nominal;
             }
         }
+
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
 
     public function TodayTransactions()
     {
-        $userId = Auth::id();
-        $startDate = Carbon::now('Asia/Jakarta')->startOfDay();
-        $endDate = Carbon::now('Asia/Jakarta')->endOfDay();
-        $todayTransactions = Transaksi::with(['pengeluaranRelation', 'pemasukanRelation'])->where('id_user', $userId)->whereBetween('tgl_transaksi', [$startDate, $endDate])->orderBy('tgl_transaksi', 'desc')->get();
-        return response()->json($todayTransactions);
+        $now = Carbon::now('Asia/Jakarta');
+        return response()->json(
+            Transaksi::with(['pengeluaranRelation', 'pemasukanRelation'])
+                ->where('id_user', Auth::id())
+                ->whereBetween('tgl_transaksi', [$now->startOfDay(), $now->copy()->endOfDay()])
+                ->orderBy('tgl_transaksi', 'desc')
+                ->get()
+        );
     }
 
     public function getTransaksiByPengeluaran(Request $request)
     {
-        try {
-            $pengeluaran = $request->query('pengeluaran');
-            $month = $request->query('month');
-            $year = $request->query('year');
-            if (!$pengeluaran || !$month || !$year) return response()->json(['error' => 'Parameter tidak lengkap'], 400);
+        $pengeluaran = $request->query('pengeluaran');
+        $month       = $request->query('month');
+        $year        = $request->query('year');
 
-            $data = Transaksi::with('pengeluaranRelation')->where('id_user', Auth::id())->whereMonth('tgl_transaksi', $month)->whereYear('tgl_transaksi', $year)->get()->filter(fn($t) => $t->pengeluaran == $pengeluaran)->map(fn($t) => (object)['tgl_transaksi' => $t->tgl_transaksi, 'keterangan' => $t->keterangan, 'nominal' => (float)$t->nominal, 'pengeluaran_nama' => $t->pengeluaranRelation->nama ?? 'Unknown'])->values();
-            return response()->json($data);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Terjadi kesalahan server'], 500);
+        if (!$pengeluaran || !$month || !$year) {
+            return response()->json(['error' => 'Parameter tidak lengkap'], 400);
         }
-    }
 
+        $data = Transaksi::with('pengeluaranRelation')
+            ->where('id_user', Auth::id())
+            ->whereMonth('tgl_transaksi', $month)
+            ->whereYear('tgl_transaksi', $year)
+            ->get()
+            ->filter(fn($t) => $t->pengeluaran == $pengeluaran)
+            ->map(fn($t) => (object) [
+                'tgl_transaksi'   => $t->tgl_transaksi,
+                'keterangan'      => $t->keterangan,
+                'nominal'         => (float) $t->nominal,
+                'pengeluaran_nama' => $t->pengeluaranRelation->nama ?? 'Unknown',
+            ])->values();
+
+        return response()->json($data);
+    }
 
     public function AnggaranChart(Request $request)
     {
         $query = HasilProsesAnggaran::where('id_user', Auth::id());
+
         if ($request->filter) {
             [$mulai, $selesai] = explode('_', $request->filter);
             $query->where('tanggal_mulai', $mulai)->where('tanggal_selesai', $selesai);
         }
+
         $anggarans = $query->get();
-        return response()->json(['labels' => $anggarans->pluck('nama_anggaran')->values(), 'ids' => $anggarans->pluck('id_proses_anggaran'), 'datasets' => [['name' => 'Anggaran', 'data' => $anggarans->pluck('nominal_anggaran')->map(fn($v) => (float)$v)->values()], ['name' => 'Realisasi', 'data' => $anggarans->pluck('anggaran_yang_digunakan')->map(fn($v) => (float)$v)->values()], ['name' => 'Sisa', 'data' => $anggarans->pluck('sisa_anggaran')->map(fn($v) => (float)$v)->values()]], 'table' => $anggarans]);
+
+        return response()->json([
+            'labels'   => $anggarans->pluck('nama_anggaran')->values(),
+            'ids'      => $anggarans->pluck('id_proses_anggaran'),
+            'datasets' => [
+                ['name' => 'Anggaran',  'data' => $anggarans->pluck('nominal_anggaran')->map(fn($v) => (float) $v)->values()],
+                ['name' => 'Realisasi', 'data' => $anggarans->pluck('anggaran_yang_digunakan')->map(fn($v) => (float) $v)->values()],
+                ['name' => 'Sisa',      'data' => $anggarans->pluck('sisa_anggaran')->map(fn($v) => (float) $v)->values()],
+            ],
+            'table' => $anggarans,
+        ]);
     }
 
-    function logout()
+    public function logout()
     {
         Auth::logout();
         return redirect('/bimmo')->with('success', 'Successful Log out');
     }
-    public function filter(Request $request)
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+    private function sanitizePeriode(int $value): int
     {
-        if ($request->has('periode')) {
-            $periode = (int)$request->periode;
-            if (!in_array($periode, [2, 6, 12])) $periode = 6;
-
-            $cashflow = Transaksi::where('id_user', Auth::id())
-                ->where('tgl_transaksi', '>=', now()->subMonths($periode - 1)->startOfMonth())
-                ->get()
-                ->groupBy(fn($t) => \Carbon\Carbon::parse($t->tgl_transaksi)->format('Y-m'))
-                ->map(fn($items, $bulan) => (object)[
-                    'bulan' => $bulan,
-                    'total_pemasukan' => $items->sum(fn($t) => (float)$t->nominal_pemasukan),
-                    'total_pengeluaran' => $items->sum(fn($t) => (float)$t->nominal),
-                    'selisih' => $items->sum(fn($t) => (float)$t->nominal_pemasukan) - $items->sum(fn($t) => (float)$t->nominal)
-                ])
-                ->sortBy('bulan')
-                ->values();
-
-            $chartData = [
-                'cashflow' => $cashflow->map(fn($row) => [
-                    'bulan' => \Carbon\Carbon::parse($row->bulan . '-01')->translatedFormat('F Y'),
-                    'total_pemasukan' => (float)$row->total_pemasukan,
-                    'total_pengeluaran' => (float)$row->total_pengeluaran
-                ]),
-            ];
-
-            return response()->json([
-                'cashflow' => view('dashboard.partials.cashflow-table', compact('cashflow'))->render(),
-                'chartData' => $chartData
-            ]);
-        }
-
-        if ($request->has(['bulan', 'tahun'])) {
-            $bulan = (int)$request->bulan;
-            $tahun = (int)$request->tahun;
-
-            $pengeluaranKategori = Transaksi::with('pengeluaranRelation')
-                ->where('id_user', Auth::id())
-                ->whereMonth('tgl_transaksi', $bulan)
-                ->whereYear('tgl_transaksi', $tahun)
-                ->get()
-                ->filter(fn($t) => !empty($t->pengeluaran))
-                ->groupBy('pengeluaran')
-                ->map(fn($items) => (object)[
-                    'kategori' => $items->first()->pengeluaranRelation->nama ?? 'Unknown',
-                    'total' => $items->sum(fn($t) => (float)$t->nominal)
-                ])
-                ->sortByDesc('total')
-                ->values();
-
-            $totalPengeluaranBulan = $pengeluaranKategori->sum('total');
-            $pengeluaranKategori = $pengeluaranKategori->map(function ($row) use ($totalPengeluaranBulan) {
-                $row->persen = $totalPengeluaranBulan > 0 ? round(($row->total / $totalPengeluaranBulan) * 100, 1) : 0;
-                return $row;
-            });
-
-            return response()->json([
-                'expenseBar' => view('dashboard.partials.expense-bar-table', compact('pengeluaranKategori', 'totalPengeluaranBulan'))->render(),
-                'totalPengeluaran' => number_format((float)$totalPengeluaranBulan, 0, ',', '.')
-            ]);
-        }
-
-        return response()->json(['error' => 'Invalid request'], 400);
+        return in_array($value, [2, 6, 12]) ? $value : 6;
     }
 }

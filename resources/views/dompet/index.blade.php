@@ -3,114 +3,7 @@
 @section('title', __('Wallet'))
 
 @push('css')
-<style>
-    /* Header Enhancements */
-    .pagetitle {
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 0.75rem;
-    }
-    .pagetitle h1 {
-        font-size: 1.75rem;
-        letter-spacing: -0.03em;
-        color: #2d3436;
-    }
-    .breadcrumb {
-        font-size: 0.85rem;
-    }
-    .breadcrumb-item a {
-        color: #636e72;
-        text-decoration: none;
-    }
-    .breadcrumb-item a:hover {
-        color: #0984e3;
-    }
-    .breadcrumb-item.active {
-        color: #0984e3;
-        font-weight: 600;
-    }
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "\F285"; /* bi-chevron-right */
-        font-family: "bootstrap-icons";
-        font-size: 0.65rem;
-        color: #b2bec3;
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-    }
-
-    /* PWA & Premium Enhancements (White Theme) */
-    .card-summary {
-        border: 1px solid rgba(0,0,0,0.05);
-        background: #ffffff;
-        color: #2d3436;
-        overflow: hidden;
-        position: relative;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    .balance-amount {
-        color: #4154f1;
-        font-size: 2.25rem;
-        font-weight: 800;
-        letter-spacing: -1px;
-    }
-    .wallet-card {
-        border: 1px solid rgba(0,0,0,0.05);
-        background: #fff;
-    }
-    .wallet-card:hover {
-        box-shadow: 0 15px 30px rgba(65, 84, 241, 0.1) !important;
-        border-color: #4154f1;
-    }
-    .wallet-icon-wrapper {
-        /* static icon */
-    }
-    .wallet-card:hover .wallet-icon-wrapper {
-        /* no transform */
-    }
-    .fab-add {
-        position: fixed;
-        bottom: 2rem;
-        right: 1.5rem;
-        z-index: 1040;
-        width: 60px;
-        height: 60px;
-        display: none; /* Desktop hidden */
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 16px rgba(65, 84, 241, 0.4);
-    }
-
-    @media (max-width: 767.98px) {
-        .fab-add {
-            display: flex;
-        }
-        .btn-add-desktop {
-            display: none;
-        }
-        .balance-amount {
-            font-size: 1.75rem;
-        }
-    }
-
-    [data-bs-theme="dark"] .pagetitle {
-        border-bottom: 1px solid #2d2d2d;
-    }
-    [data-bs-theme="dark"] .pagetitle h1 {
-        color: #e0e0e0;
-    }
-    [data-bs-theme="dark"] .breadcrumb-item a {
-        color: #a0a0a0;
-    }
-    [data-bs-theme="dark"] .breadcrumb-item.active {
-        color: #60a5fa;
-    }
-    [data-bs-theme="dark"] .wallet-card {
-        background: #1e1e1e;
-        border-color: rgba(255,255,255,0.05);
-    }
-    [data-bs-theme="dark"] .card-summary {
-        background: linear-gradient(135deg, #2d3436 0%, #1a1a1a 100%);
-    }
-</style>
+<link href="{{ asset('css/dompet.css') }}?v={{ filemtime(public_path('css/dompet.css')) }}" rel="stylesheet">
 @endpush
 
 @section('container')
@@ -351,9 +244,4 @@
     }
 </script>
 
-<style>
-    .cursor-pointer {
-        cursor: pointer;
-    }
-</style>
 @endsection

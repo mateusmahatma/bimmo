@@ -168,8 +168,39 @@ class TransaksiController extends Controller
             'listPengeluaran' => Pengeluaran::where('id_user', $userId)->get(),
             'avgDailyPengeluaran' => $avgDailyPengeluaran,
             'avgMonthlyPengeluaran' => $avgMonthlyPengeluaran,
-            'dateRange' => $dateRange
+            'dateRange' => $dateRange,
+            'transaksiPageConfig' => $this->transaksiPageScriptConfig(),
         ]);
+    }
+
+    private function transaksiPageScriptConfig(): array
+    {
+        return [
+            'csrfToken' => csrf_token(),
+            'routes' => [
+                'index' => route('transaksi.index'),
+                'exportEmail' => route('transaksi.export.email'),
+                'bulkDelete' => route('transaksi.bulkDelete'),
+                'upload' => route('upload'),
+                'transaksiBase' => url('transaksi'),
+                'dateBase' => url('transaksi/date'),
+            ],
+            'dateRangePicker' => [
+                'ranges' => [
+                    'today' => __('Today'),
+                    'yesterday' => __('Yesterday'),
+                    'thisMonth' => __('This Month'),
+                    'lastMonth' => __('Last Month'),
+                    'thisYear' => __('This Year'),
+                    'lastYear' => __('Last Year'),
+                ],
+                'locale' => [
+                    'apply' => __('Apply'),
+                    'cancel' => __('Cancel'),
+                    'customRange' => __('Custom range'),
+                ],
+            ],
+        ];
     }
 
     private function applyPhpFilters(Request $request, $collection)
