@@ -282,39 +282,11 @@
     color: #a0a0a0 !important;
 }
 
-/* Screen and Print Protection */
-body {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-    overscroll-behavior-y: contain;
-}
-
-img,
-a {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-}
-
+/* Print Protection */
 @media print {
     body {
         display: none !important;
     }
-}
-
-/* Netflix-style Blackout */
-body.protection-active {
-    background: #000 !important;
-    overflow: hidden !important;
-}
-
-body.protection-active>*:not(#protection-overlay):not(script) {
-    visibility: hidden !important;
 }
 
 /* Sensitive Data Masking */

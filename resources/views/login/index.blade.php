@@ -17,28 +17,13 @@
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
     <link href="{{ asset('css/style_login.css') }}?v={{ filemtime(public_path('css/style_login.css')) }}" rel="stylesheet" />
     <link href="/css/all.min.css" rel="stylesheet" />
+
+
     <style>
-        /* Protection Active State */
-        body.protection-active {
-            overflow: hidden !important;
-        }
-
-        body.protection-active > *:not(#protection-overlay):not(script) {
-            filter: blur(25px) !important;
-            opacity: 0.3 !important;
-            pointer-events: none !important;
-            user-select: none !important;
-        }
-
         @media print {
             body {
                 display: none !important;
             }
-        }
-
-        * {
-            user-select: none !important;
-            -webkit-user-drag: none !important;
         }
     </style>
     <script>
@@ -58,18 +43,6 @@
 </head>
 
 <body>
-    <div id="protection-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:#000;justify-content:center;align-items:center;flex-direction:column;font-family:sans-serif;padding: 20px; text-align: center;">
-        <div style="width: 80px; height: 80px; background: #1a1a1a; color: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 1.5rem;">
-            <i class="bi bi-camera-fill"></i>
-        </div>
-        <h2 style="color:#fff; font-weight: 700; margin-bottom: 1rem;">Akses Dibatasi</h2>
-        <p style="color:#aaa; max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">
-            Sistem mendeteksi upaya pengambilan gambar (screenshot/capture). Untuk melindungi data sensitif Anda, akses ke halaman ini telah dikunci.
-        </p>
-        <button onclick="window.location.reload()" style="background: #0984e3; color: white; border: none; padding: 0.8rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer;">
-            Muat Ulang Halaman
-        </button>
-    </div>
     <main class="d-flex w-100 min-vh-100">
         <!-- Banner Kiri (Corporate Look) -->
         <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: linear-gradient(135deg, var(--bs-primary) 0%, #001233 100%); overflow: hidden;">

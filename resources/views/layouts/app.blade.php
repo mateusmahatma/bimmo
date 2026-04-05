@@ -83,7 +83,7 @@
         // Legacy/Shortcut function
         window.setTheme = (theme) => applyTheme(theme);
 
-        // Extreme Source Code Protection
+        // Source Code & Console Protection
         (function() {
             // Robust PWA Detection
             const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
@@ -94,103 +94,46 @@
                 document.documentElement.classList.add('pwa-mode');
             }
 
-            // Disable right-click
-            document.addEventListener('contextmenu', e => e.preventDefault());
-
-            // Disable common shortcuts
+            // Disable common shortcuts ONLY for DevTools
             document.onkeydown = function(e) {
                 if (
                     e.keyCode === 123 || // F12
-                    (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || // Ctrl+Shift+I/J/C
-                    (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
-                    (e.ctrlKey && e.keyCode === 83) // Ctrl+S
+                    (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) // Ctrl+Shift+I/J/C
                 ) {
                     return false;
                 }
             };
 
-            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const isMobileOrPWA = isMobileDevice || isPWAMode;
-
-            let isNavigating = false;
-            window.addEventListener('beforeunload', () => isNavigating = true);
-            window.addEventListener('pagehide', () => isNavigating = true);
-            window.addEventListener('popstate', () => {
-                isNavigating = true;
-                setTimeout(() => isNavigating = false, 1000); // Temporary suppression for back navigation
-            });
-            window.addEventListener('hashchange', () => {
-                isNavigating = true;
-                setTimeout(() => isNavigating = false, 1000);
-            });
-
-            const blockAccess = (force = false) => {
-                if (isLocked && force !== true) return;
-                if (!force && (isMobileOrPWA || isModalOpen())) return; // Skip threshold-based blocking on mobile/PWA/Modal
-                
-                isLocked = true;
-                document.body.classList.remove('protection-active');
-                document.body.innerHTML = `
-                    <div id="protection-overlay" style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#000;color:white;text-align:center;padding:20px;position:fixed;top:0;left:0;width:100%;z-index:9999999;">
-                        <h1 style="color:#dc3545;font-size:3rem;margin-bottom:20px;"><i class="bi bi-camera-fill"></i></h1>
-                        <h2 style="margin-bottom:15px;">Akses Dibatasi Permanen</h2>
-                        <p style="color:#aaa;max-width:500px;line-height:1.6;margin-bottom:30px;">
-                            Sistem mendeteksi upaya pengambilan gambar (screenshot/capture). Untuk melindungi data sensitif Anda, sesi ini telah dikunci secara permanen.
-                        </p>
-                        <button onclick="window.location.reload()" style="padding:12px 30px;border:none;background:#0984e3;color:white;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s ease;">Muat Ulang Halaman</button>
-                    </div>
-                `;
-                document.body.style.overflow = 'hidden';
-                clearClipboard();
-            };
-
-            // Detect DevTools by monitoring window dimensions
-            let threshold = 160;
-            const checkDevTools = () => {
-                const widthDiff = window.outerWidth - window.innerWidth > threshold;
-                const heightDiff = window.outerHeight - window.innerHeight > threshold;
-
-                if (widthDiff || heightDiff) {
-                    blockAccess();
+            // Enhanced Console Protection - "Jangan tampilkan console nya"
+            const swallowConsole = () => {
+                if (window.console) {
+                    const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'clear', 'dir', 'count', 'group', 'groupCollapsed', 'groupEnd', 'time', 'timeEnd', 'profile', 'profileEnd'];
+                    methods.forEach(method => {
+                        window.console[method] = () => {};
+                    });
                 }
             };
-            window.addEventListener('resize', checkDevTools);
-            checkDevTools();
+            
+            // Execute console suppression
+            swallowConsole();
 
-            // Detect DevTools using a specialized getter
-            const devtools = {
-                isOpen: false,
-                orientation: undefined
-            };
-            const threshold2 = 160;
-            const emitEvent = (isOpen, orientation) => {
-                if (isOpen) {
-                    blockAccess();
-                }
-            };
-
+            // Continuous console clearing to be extra sure
             setInterval(() => {
-                const widthThreshold = window.outerWidth - window.innerWidth > threshold2;
-                const heightThreshold = window.outerHeight - window.innerHeight > threshold2;
-                const orientation = widthThreshold ? 'vertical' : 'horizontal';
+                try {
+                    // We use original console.clear if we haven't swallowed it for internal use, 
+                    // but here we just want to keep the console empty if it's open.
+                    // This is a direct way to bypass our own swallowed console if needed, 
+                    // but usually just doing nothing is enough if we override.
+                    // However, we want to prevent any PREVIOUS logs from being visible.
+                    const c = document.createElement('iframe');
+                    c.style.display = 'none';
+                    document.body.appendChild(c);
+                    c.contentWindow.console.clear();
+                    document.body.removeChild(c);
+                } catch(e) {}
+            }, 100);
 
-                if (!(heightThreshold && widthThreshold) &&
-                    ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
-                    if (!devtools.isOpen || devtools.orientation !== orientation) {
-                        emitEvent(true, orientation);
-                    }
-                    devtools.isOpen = true;
-                    devtools.orientation = orientation;
-                } else {
-                    if (devtools.isOpen) {
-                        emitEvent(false, undefined);
-                    }
-                    devtools.isOpen = false;
-                    devtools.orientation = undefined;
-                }
-            }, 500);
-
-            // Robust Debugger Trap via Function constructor
+            // Robust Debugger Trap - This makes the console unusable by pausing execution
             const detector = function() {
                 try {
                     (function() {
@@ -212,198 +155,10 @@
                 } catch (e) {}
             };
 
-            // Start the extreme debugger trap
+            // Start the debugger trap to frustrate DevTools users
             setTimeout(detector, 1000);
 
-            // Continuous console clearing
-            setInterval(() => console.clear(), 100);
-
-            // Hide content on tab switch or minimize
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    document.body.style.filter = 'blur(20px)';
-                    document.title = 'Bimmo - Protected';
-                } else {
-                    document.body.style.filter = '';
-                    document.title = '{{ $title ?? "Bimmo" }}';
-                }
-            });
-
-            let isLocked = false;
-
-            let protectionTimeout;
-
-            // Netflix-style Black Out Protection
-            const hideContent = (isInstant = false) => {
-                const triggerHide = () => {
-                    if (isNavigating) return; // Re-check navigation status right before hiding
-                    document.body.classList.add('protection-active');
-                    const overlay = document.getElementById('protection-overlay');
-                    if (overlay) overlay.style.display = 'flex';
-                };
-
-                if (isInstant || !isMobileOrPWA) {
-                    triggerHide();
-                } else {
-                    // Suppression for legitimate navigation (Back button on mobile)
-                    if (isNavigating) return;
-
-                    // 2s Grace period for mobile/PWA to avoid false positives during system gestures/navigation transitions
-                    clearTimeout(protectionTimeout);
-                    protectionTimeout = setTimeout(triggerHide, 2000);
-                }
-            };
-
-            const showContent = () => {
-                clearTimeout(protectionTimeout); // Cancel pending hide
-                if (isLocked) {
-                    const overlay = document.getElementById('protection-overlay');
-                    if (overlay) overlay.style.display = 'flex';
-                    return;
-                }
-                document.body.classList.remove('protection-active');
-                const overlay = document.getElementById('protection-overlay');
-                if (overlay) overlay.style.display = 'none';
-            };
-
-            let isIgnoringProtection = false;
-            const isModalOpen = () => !!document.querySelector('.modal.show');
-
-            window.addEventListener('blur', () => {
-                if (isIgnoringProtection || isModalOpen()) return;
-                hideContent();
-            });
-            // Ignore protection when interacting with file inputs (avoids black screen on file picker)
-            const handleFileInputInteraction = (e) => {
-                if (e.target.tagName === 'INPUT' && e.target.type === 'file') {
-                    isIgnoringProtection = true;
-                }
-            };
-            document.addEventListener('click', handleFileInputInteraction, true);
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') handleFileInputInteraction(e);
-            }, true);
-
-            window.addEventListener('focus', () => {
-                isIgnoringProtection = false;
-                showContent();
-            });
-
-            // Extreme Focus Sentry - Frame Perfect (requestAnimationFrame)
-            let isPageActive = false;
-            let lastFocusLoss = 0;
-
-            const checkFocus = () => {
-                if (!isPageActive) {
-                    requestAnimationFrame(checkFocus);
-                    return;
-                }
-
-                if (!document.hasFocus()) {
-                    if (!isIgnoringProtection && !isModalOpen()) hideContent();
-                    lastFocusLoss = Date.now();
-                } else {
-                    // Hysteretic recovery: Stay hidden for at least 500ms after focus loss
-                    if (Date.now() - lastFocusLoss > 500) {
-                        showContent();
-                    }
-                }
-                requestAnimationFrame(checkFocus);
-            };
-
-            // Only start the aggressive sentry after initial load and first user interaction
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    isPageActive = true;
-                    requestAnimationFrame(checkFocus);
-                }, 1000); // 1s grace period for reloads
-            });
-
-            // Re-verify activity on user interaction to ensure sentry is running
-            ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(evt => {
-                window.addEventListener(evt, () => {
-                    if (!isPageActive) isPageActive = true;
-                }, {
-                    passive: true
-                });
-            });
-
-            // Mobile Multi-finger Touch Detection (Common screenshot gestures)
-            document.addEventListener('touchstart', (e) => {
-                if (e.touches.length > 2) { // 3 or more fingers
-                    hideContent(true); // Instant hide for multi-finger gestures
-                    clearClipboard();
-                    isLocked = true;
-                }
-            }, {
-                passive: true
-            });
-
-            // Aggressive Protection Logic
-            const clearClipboard = () => {
-                try {
-                    const dummy = document.createElement("input");
-                    dummy.style.position = 'fixed';
-                    dummy.style.opacity = '0';
-                    document.body.appendChild(dummy);
-                    dummy.value = "KONTEN DILINDUNGI - Bimmo - " + new Date().getTime();
-                    dummy.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(dummy);
-                } catch (err) {}
-            };
-
-            // Preemptive Blurring for Modifier Combinations (Win+Shift, Ctrl+Shift, Cmd+Shift)
-            document.addEventListener('keydown', (e) => {
-                // If user starts pressing modifier combinations (often used for screenshots like Win+Shift+S or Cmd+Shift+4)
-                const isModCombo = (e.ctrlKey && e.shiftKey) || (e.metaKey && e.shiftKey);
-                
-                if (isModCombo) {
-                    if (!isIgnoringProtection) hideContent();
-                }
-
-                // F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, etc.
-                if (
-                    e.keyCode === 123 ||
-                    (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
-                    (e.ctrlKey && [85, 83, 80].includes(e.keyCode)) || // U, S, P (Print)
-                    e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44
-                ) {
-                    if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
-                        blockAccess(true); // Permanent forced hard block for Prt Sc
-                    } else {
-                        isLocked = true; // Permanent lock
-                        if (!isIgnoringProtection) hideContent(true); // Instant hide for shortcuts
-                    }
-                    clearClipboard();
-                    e.preventDefault();
-                }
-            });
-
-            document.addEventListener('keyup', (e) => {
-                // Show content again if only modifier keys were pressed and no capture was triggered
-                if (['Meta', 'Shift', 'Control', 'Alt'].includes(e.key)) {
-                    setTimeout(() => {
-                        if (!isLocked && document.hasFocus()) {
-                            showContent();
-                        }
-                    }, 500);
-                }
-
-                if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
-                    blockAccess(true);
-                }
-            });
-
-            // Prevent common capture shortcuts (meta/cmd keys)
-            window.addEventListener('keyup', (e) => {
-                if (e.key === 'Meta' || e.key === 'OS' || e.key === 'Windows') {
-                    // Possible Win+Shift+S attempt
-                    clearClipboard();
-                }
-            });
-
-            // Secondary Print Protection
+            // Print Protection (Media query in CSS handles the rest)
             window.addEventListener('beforeprint', () => {
                 document.body.style.display = 'none';
             });
@@ -415,19 +170,6 @@
 </head>
 
 <body class="{{ auth()->check() ? 'ui-style-' . (auth()->user()->ui_style ?? 'corporate') : '' }}" style="overflow-x: hidden;">
-    <div id="protection-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:#000;justify-content:center;align-items:center;flex-direction:column;font-family:sans-serif;padding: 20px; text-align: center;">
-        <div style="width: 80px; height: 80px; background: #1a1a1a; color: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 1.5rem;">
-            <i class="bi bi-camera-fill"></i>
-        </div>
-        <h2 style="color:#fff; font-weight: 700; margin-bottom: 1rem;">Akses Dibatasi</h2>
-        <p style="color:#aaa; max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">
-            Sistem mendeteksi upaya pengambilan gambar (screenshot/capture). Untuk melindungi data sensitif Anda, akses ke halaman ini telah dikunci.
-        </p>
-        <button onclick="window.location.reload()" style="background: #0984e3; color: white; border: none; padding: 0.8rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer;">
-            Muat Ulang Halaman
-        </button>
-    </div>
-
     @yield('body')
 
     @include('components.feedback-modal')
