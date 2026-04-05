@@ -71,8 +71,7 @@ class BayarPinjamanController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Pembayaran berhasil');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             // Delete uploaded file if transaction fails
             if (isset($bukti_bayar) && $bukti_bayar) {
@@ -142,8 +141,7 @@ class BayarPinjamanController extends Controller
             if ($pinjaman->jumlah_pinjaman <= 0) {
                 $pinjaman->jumlah_pinjaman = 0;
                 $pinjaman->status = 'lunas';
-            }
-            else {
+            } else {
                 $pinjaman->status = 'belum_lunas';
             }
 
@@ -152,8 +150,7 @@ class BayarPinjamanController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Pembayaran berhasil diperbarui');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -170,8 +167,7 @@ class BayarPinjamanController extends Controller
 
         if ($pinjaman->jumlah_pinjaman > 0) {
             $pinjaman->status = 'belum_lunas';
-        }
-        else {
+        } else {
             $pinjaman->status = 'lunas';
         }
 
