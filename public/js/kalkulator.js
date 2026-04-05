@@ -6,6 +6,7 @@ $(document).ready(function () {
     const tanggalMulaiInput = $('#tanggal_mulai');
     const tanggalSelesaiInput = $('#tanggal_selesai');
     const btnReset = $('#btnReset');
+    let tomSelectIncome = null;
     let hasilAnggaranTable = null;
 
     // Toast Notification
@@ -73,6 +74,25 @@ $(document).ready(function () {
         }, cb);
 
         cb(start, end);
+    }
+
+    function initTomSelect() {
+        const el = document.querySelector('#id_pemasukan');
+        if (el) {
+            tomSelectIncome = new TomSelect(el, {
+                plugins: ['remove_button', 'dropdown_input'],
+                maxItems: null,
+                hideSelected: true,
+                closeAfterSelect: false,
+                persist: false,
+                create: false,
+                render: {
+                    no_results: function (data, escape) {
+                        return '<div class="no-results">No results found for "' + escape(data.input) + '"</div>';
+                    },
+                }
+            });
+        }
     }
 
     function fetchData(url = window.location.href, containerSelector = '#history-table-container') {
@@ -260,11 +280,11 @@ $(document).ready(function () {
     function validateForm() {
         const startDate = tanggalMulaiInput.val();
         const endDate = tanggalSelesaiInput.val();
-        const income = $('#monthly_income').val();
+        const incomeTypes = $('#id_pemasukan').val();
 
-        if (!income) {
-            showToast('Pemasukan bulanan harus diisi!', 'danger');
-            $('#monthly_income').focus();
+        if (!incomeTypes || (Array.isArray(incomeTypes) && incomeTypes.length === 0)) {
+            showToast('Silakan pilih jenis pemasukan!', 'danger');
+            if (tomSelectIncome) tomSelectIncome.focus();
             return false;
         }
 
@@ -306,9 +326,8 @@ $(document).ready(function () {
                 if (data.success) {
                     showToast(data.message || 'Budget processed successfully!', 'success');
                     fetchData(); // Manual reload
-                    // Don't reset date range, keep it for user convenience or reset partial
-                    $('#monthly_income').val('');
-                    $('#additional_income').val('');
+                    // Clear Tom Select
+                    if (tomSelectIncome) tomSelectIncome.clear();
                 } else {
                     showToast(data.message || 'Failed to process budget', 'danger');
                 }
@@ -330,8 +349,7 @@ $(document).ready(function () {
 
     // Reset Button
     btnReset.on('click', function () {
-        $('#monthly_income').val('');
-        $('#additional_income').val('');
+        if (tomSelectIncome) tomSelectIncome.clear();
         initDateRangePicker(); // Reset date
     });
 
@@ -368,7 +386,7 @@ $(document).ready(function () {
 
     // Numeric Input Only
     $('input[type="text"]').on('input', function () {
-        // Allow numbers only for income inputs. 
+        // Obsolete handles legacy monthly_income or additional_income if still exist
         if (this.id === 'monthly_income' || this.id === 'additional_income') {
             this.value = this.value.replace(/[^0-9]/g, '');
         }
@@ -382,6 +400,7 @@ $(document).ready(function () {
 
     // Init
     initDateRangePicker();
+    initTomSelect();
     initDataTable();
     initDetailTable();
 });

@@ -4,6 +4,7 @@
 
 @push('css')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
 <style>
     /* Header Enhancements */
     .pagetitle {
@@ -87,8 +88,7 @@
                         <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
                             <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-2"></i>{{ __('Steps:') }}</h6>
                             <ol class="mb-0 ps-3 small">
-                                <li>{!! __('Fill in the <strong>Monthly Fixed Income</strong> field.') !!}</li>
-                                <li>{!! __('Fill in the <strong>Additional Income</strong> field (if any).') !!}</li>
+                                <li>{!! __('Select the <strong>Income Types</strong> to include in the calculation.') !!}</li>
                                 <li>{!! __('Select the <strong>Date Range</strong> for the Budget period.') !!}</li>
                                 <li>{!! __('Click the <strong>Process Budget</strong> button.') !!}</li>
                             </ol>
@@ -104,18 +104,15 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small text-uppercase text-muted">{{ __('Income Information') }}</label>
                                 <div class="mb-3">
-                                    <label for="monthly_income" class="form-label">{{ __('Fixed Income (Monthly)') }}</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light">Rp</span>
-                                        <input type="text" class="form-control" id="monthly_income" name="monthly_income" placeholder="{{ __('Example: 5.000.000') }}" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="additional_income" class="form-label">{{ __('Other Income (Optional)') }}</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light">Rp</span>
-                                        <input type="text" class="form-control" id="additional_income" name="additional_income" placeholder="{{ __('Example: 1.000.000') }}">
-                                    </div>
+                                    <label for="id_pemasukan" class="form-label">{{ __('Income Types') }}</label>
+                                    <select name="id_pemasukan[]" id="id_pemasukan" class="form-control" multiple placeholder="{{ __('Select income types...') }}" required>
+                                        @foreach ($pemasukans as $pemasukan)
+                                        <option value="{{ $pemasukan->id }}" {{ in_array($pemasukan->id, (array) old('id_pemasukan', [])) ? 'selected' : '' }}>
+                                            {{ $pemasukan->nama }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    <div class="form-text small text-muted">{{ __('Select one or more income categories from your transactions.') }}</div>
                                 </div>
                             </div>
 
@@ -190,5 +187,6 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="{{ asset('js/kalkulator.js') }}?v={{ filemtime(public_path('js/kalkulator.js')) }}"></script>
 @endpush

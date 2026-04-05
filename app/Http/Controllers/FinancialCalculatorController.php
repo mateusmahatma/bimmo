@@ -41,16 +41,27 @@ class FinancialCalculatorController extends Controller
             return view('kalkulator._table_list', compact('hasilProses'))->render();
         }
 
-        return view('kalkulator.index', compact('hasilProses'));
+        $pemasukans = \App\Models\Pemasukan::where('id_user', $userId)->get();
+
+        return view('kalkulator.index', compact('hasilProses', 'pemasukans'));
     }
 
     public function store(Request $request)
     {
-        $request->validate(['monthly_income' => 'required|numeric', 'tanggal_mulai' => 'required|date', 'tanggal_selesai' => 'required|date']);
+        $request->validate(['id_pemasukan' => 'required|array', 'tanggal_mulai' => 'required|date', 'tanggal_selesai' => 'required|date']);
         $userId = Auth::id();
-        $totalIncome = (float)$request->input('monthly_income') + (float)($request->input('additional_income') ?? 0);
+        $idPemasukans = $request->input('id_pemasukan');
         $tanggal_mulai = $request->input('tanggal_mulai');
         $tanggal_selesai = $request->input('tanggal_selesai');
+
+        // Sum income transactions in range
+        $allIncomesInRange = Transaksi::where('id_user', $userId)
+            ->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])
+            ->get();
+        
+        $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+            return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
+        })->sum(fn($t) => (float)($t->nominal_pemasukan ?? 0));
 
         $anggarans = Anggaran::where('id_user', $userId)->whereNotNull('id_pengeluaran')->get();
         foreach ($anggarans as $anggaran) {
