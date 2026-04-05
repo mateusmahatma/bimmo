@@ -159,7 +159,7 @@
 @media (max-width: 576px) {
     .sticky-bottom-mobile {
         position: fixed;
-        bottom: 0px;
+        bottom: 60px;
         left: 0;
         right: 0;
         z-index: 1030;
