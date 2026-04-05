@@ -96,10 +96,15 @@ class FinancialCalculatorController extends Controller
             $prosesAnggaran = HasilProsesAnggaran::find($id);
             if (!$prosesAnggaran) return response()->json(['error' => 'Data tidak ditemukan'], 404);
 
-            // Recalculate Income (Budget) if categories exist
-            if (!empty($prosesAnggaran->jenis_pemasukan)) {
-                $idPemasukans = $prosesAnggaran->jenis_pemasukan;
-                if (!is_array($idPemasukans)) $idPemasukans = json_decode($idPemasukans, true) ?? [$idPemasukans];
+            // Recalculate Income (Budget)
+            $idPemasukans = $prosesAnggaran->jenis_pemasukan;
+            if (empty($idPemasukans)) {
+                // For old records, fallback to all user income categories
+                $idPemasukans = Pemasukan::where('id_user', $prosesAnggaran->id_user)->pluck('id')->toArray();
+            }
+
+            if (!empty($idPemasukans)) {
+                if (!is_array($idPemasukans)) $idPemasukans = json_decode((string)$idPemasukans, true) ?? [$idPemasukans];
 
                 $allIncomesInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)
                     ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
@@ -107,7 +112,11 @@ class FinancialCalculatorController extends Controller
                 
                 $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
                     return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
-                })->sum(fn($t) => (float)($t->nominal_pemasukan ?? 0));
+                })->sum(function($t) {
+                    $val = (string)($t->nominal_pemasukan ?? '0');
+                    $cleanVal = str_replace(['.', ','], ['', '.'], $val);
+                    return (float)$cleanVal;
+                });
 
                 $prosesAnggaran->nominal_anggaran = ($prosesAnggaran->persentase_anggaran / 100) * $totalIncome;
             }
@@ -150,10 +159,15 @@ class FinancialCalculatorController extends Controller
             $prosesAnggaran = HasilProsesAnggaran::find($id);
             if (!$prosesAnggaran || $prosesAnggaran->id_user !== Auth::id()) continue;
 
-            // Recalculate Income (Budget) if categories exist
-            if (!empty($prosesAnggaran->jenis_pemasukan)) {
-                $idPemasukans = $prosesAnggaran->jenis_pemasukan;
-                if (!is_array($idPemasukans)) $idPemasukans = json_decode($idPemasukans, true) ?? [$idPemasukans];
+            // Recalculate Income (Budget)
+            $idPemasukans = $prosesAnggaran->jenis_pemasukan;
+            if (empty($idPemasukans)) {
+                // Fallback for old records
+                $idPemasukans = Pemasukan::where('id_user', $prosesAnggaran->id_user)->pluck('id')->toArray();
+            }
+
+            if (!empty($idPemasukans)) {
+                if (!is_array($idPemasukans)) $idPemasukans = json_decode((string)$idPemasukans, true) ?? [$idPemasukans];
 
                 $allIncomesInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)
                     ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
@@ -161,7 +175,11 @@ class FinancialCalculatorController extends Controller
                 
                 $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
                     return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
-                })->sum(fn($t) => (float)($t->nominal_pemasukan ?? 0));
+                })->sum(function($t) {
+                    $val = (string)($t->nominal_pemasukan ?? '0');
+                    $cleanVal = str_replace(['.', ','], ['', '.'], $val);
+                    return (float)$cleanVal;
+                });
 
                 $prosesAnggaran->nominal_anggaran = ($prosesAnggaran->persentase_anggaran / 100) * $totalIncome;
             }

@@ -16,6 +16,7 @@ class HasilProsesAnggaran extends Model
 
     protected $casts = [
         'jenis_pengeluaran' => 'array',
+        'jenis_pemasukan' => 'array',
         'nominal_anggaran' => 'encrypted',
         'anggaran_yang_digunakan' => 'encrypted',
     ];
