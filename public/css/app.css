@@ -694,9 +694,32 @@ body.protection-active>*:not(#protection-overlay):not(script) {
     color: #94a3b8;
 }
 
+
 /* Global FAB Adjustment for Mobile Bottom Nav */
 @media (max-width: 991.98px) {
     .fab-add {
         bottom: 6.5rem !important;
     }
 }
+
+/* PWA Specific Enhancements */
+.pwa-mode body {
+    overscroll-behavior-y: contain; /* Prevents pull-to-refresh and keeps fixed elements stable */
+}
+
+.pwa-mode .mobile-bottom-nav {
+    /* Ensure it remains frozen at the absolute bottom of the viewport */
+    position: fixed !important;
+    bottom: 0 !important;
+    backdrop-filter: blur(10px); /* Premium glass effect for frozen nav */
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-bs-theme="dark"].pwa-mode .mobile-bottom-nav {
+    background-color: rgba(26, 29, 32, 0.9) !important;
+}
+
+/* Ensure dashboard and other scrollable areas respect the frozen nav */
+.pwa-mode main {
+    padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
+}
