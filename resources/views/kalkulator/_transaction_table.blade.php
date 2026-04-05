@@ -29,17 +29,17 @@
         <tbody>
             @forelse ($transaksi as $row)
                 <tr>
-                    <td class="text-center text-secondary fw-medium">{{ $loop->iteration + ($transaksi->currentPage() - 1) * $transaksi->perPage() }}</td>
-                    <td class="text-dark">
+                    <td class="text-center text-secondary fw-medium" data-label="{{ __('No') }}">{{ $loop->iteration + ($transaksi->currentPage() - 1) * $transaksi->perPage() }}</td>
+                    <td class="text-dark" data-label="{{ __('Date') }}">
                         {{ \Carbon\Carbon::parse($row->tgl_transaksi)->locale(app()->getLocale())->isoFormat('D MMM Y') }}
                     </td>
-                    <td class="fw-semibold text-dark">
+                    <td class="fw-semibold text-dark" data-label="{{ __('Category') }}">
                         {{ $row->pengeluaranRelation->nama ?? '-' }}
                     </td>
-                    <td class="text-end fw-bold text-dark">
+                    <td class="text-end fw-bold text-dark" data-label="{{ __('Amount') }}">
                         Rp {{ number_format($row->nominal, 0, ',', '.') }}
                     </td>
-                    <td>
+                    <td data-label="{{ __('Description') }}">
                         @if($row->keterangan)
                             @php
                                 $items = explode("\n", $row->keterangan);

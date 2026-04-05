@@ -51,13 +51,13 @@
                             <input class="form-check-input check-item" type="checkbox" value="{{ $row->hash }}" style="cursor: pointer;">
                         </div>
                     </td>
-                    <td class="text-center text-secondary fw-medium">{{ $loop->iteration + ($hasilProses->currentPage() - 1) * $hasilProses->perPage() }}</td>
-                    <td>
+                    <td class="text-center text-secondary fw-medium" data-label="{{ __('No') }}">{{ $loop->iteration + ($hasilProses->currentPage() - 1) * $hasilProses->perPage() }}</td>
+                    <td data-label="{{ __('Period') }}">
                         <span class="fw-medium text-dark">{{ \Carbon\Carbon::parse($row->tanggal_mulai)->format('d M Y') }}</span><br>
                         <span class="text-muted small">sampai {{ \Carbon\Carbon::parse($row->tanggal_selesai)->format('d M Y') }}</span>
                     </td>
-                    <td class="fw-bold text-dark">{{ $row->nama_anggaran }}</td>
-                    <td>
+                    <td class="fw-bold text-dark" data-label="{{ __('Budget Name') }}">{{ $row->nama_anggaran }}</td>
+                    <td data-label="{{ __('Expense Type') }}">
                         @php
                             $names = explode(', ', $row->nama_jenis_pengeluaran);
                             $limit = 3;
@@ -71,16 +71,16 @@
                             @endif
                         </ul>
                     </td>
-                    <td class="text-center">
+                    <td class="text-center" data-label="{{ __('Pct') }}">
                         <span class="badge bg-light text-dark border-0 shadow-none" style="font-size: 0.75rem; padding: 4px 8px;">{{ number_format($row->persentase_anggaran, 0) }}%</span>
                     </td>
-                    <td class="text-end fw-semibold text-dark">
+                    <td class="text-end fw-semibold text-dark" data-label="{{ __('Budget') }}">
                         Rp {{ number_format($row->nominal_anggaran, 0, ',', '.') }}
                     </td>
-                    <td class="text-end text-danger fw-medium">
+                    <td class="text-end text-danger fw-medium" data-label="{{ __('Used') }}">
                         Rp {{ number_format($row->anggaran_yang_digunakan, 0, ',', '.') }}
                     </td>
-                    <td class="text-end">
+                    <td class="text-end" data-label="{{ __('Remaining') }}">
                         @php $sisa = $row->nominal_anggaran - $row->anggaran_yang_digunakan; @endphp
                         <span class="fw-bold {{ $sisa < 0 ? 'text-danger' : 'text-success' }}">
                             Rp {{ number_format($sisa, 0, ',', '.') }}

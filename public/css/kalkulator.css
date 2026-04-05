@@ -1,0 +1,162 @@
+/* Budget Monitoring Page Enhancements */
+
+/* Card Stack for Mobile History and Detail Tables */
+@media (max-width: 767.98px) {
+    #hasilAnggaranTable, 
+    #hasilAnggaranTable thead, 
+    #hasilAnggaranTable tbody, 
+    #hasilAnggaranTable th, 
+    #hasilAnggaranTable td, 
+    #hasilAnggaranTable tr,
+    #detailAnggaranTable, 
+    #detailAnggaranTable thead, 
+    #detailAnggaranTable tbody, 
+    #detailAnggaranTable th, 
+    #detailAnggaranTable td, 
+    #detailAnggaranTable tr { 
+        display: block !important; 
+    }
+    
+    #hasilAnggaranTable thead tr,
+    #detailAnggaranTable thead tr { 
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    #hasilAnggaranTable tr,
+    #detailAnggaranTable tr {
+        border: 0;
+        margin-bottom: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background-color: var(--bs-card-bg, #fff);
+        padding: 15px;
+        border: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+    }
+
+    [data-bs-theme="dark"] #hasilAnggaranTable tr,
+    [data-bs-theme="dark"] #detailAnggaranTable tr {
+        background-color: #1e293b;
+        border-color: rgba(255,255,255,0.05);
+    }
+    
+    #hasilAnggaranTable td,
+    #detailAnggaranTable td { 
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        position: relative;
+        padding-left: 50% !important; 
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+        text-align: right !important;
+        min-height: 2.5rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    [data-bs-theme="dark"] #hasilAnggaranTable td,
+    [data-bs-theme="dark"] #detailAnggaranTable td {
+        border-bottom-color: rgba(255,255,255,0.05);
+    }
+    
+    #hasilAnggaranTable td:last-child,
+    #detailAnggaranTable td:last-child {
+        border-bottom: 0;
+    }
+
+    #hasilAnggaranTable td:before,
+    #detailAnggaranTable td:before { 
+        position: absolute;
+        top: 0.75rem;
+        left: 15px;
+        width: 45%; 
+        padding-right: 10px; 
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        color: var(--bs-secondary-color, #6c757d);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        content: attr(data-label);
+    }
+
+    /* Column specific adjustments */
+    #hasilAnggaranTable td:nth-of-type(1) { /* Checkbox */
+        padding-left: 15px !important;
+        justify-content: flex-start !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        background: rgba(0,0,0,0.02);
+        margin: -15px -15px 10px -15px;
+        padding: 10px 15px !important;
+        border-radius: 15px 15px 0 0;
+    }
+    #hasilAnggaranTable td:nth-of-type(1):before {
+        display: none;
+    }
+
+    #hasilAnggaranTable td:nth-of-type(2),
+    #detailAnggaranTable td:nth-of-type(1) { /* No Column */
+        display: none !important;
+    }
+
+    /* History Table Expense Type */
+    #hasilAnggaranTable td:nth-of-type(5) { 
+        display: block !important;
+        text-align: left !important;
+        padding-left: 15px !important;
+        padding-top: 2.2rem !important;
+    }
+    #hasilAnggaranTable td:nth-of-type(5):before {
+        width: 100%;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding-bottom: 4px;
+    }
+
+    /* Detail Table Description */
+    #detailAnggaranTable td:nth-of-type(5) { 
+        display: block !important;
+        text-align: left !important;
+        padding-left: 15px !important;
+        padding-top: 2.2rem !important;
+    }
+    #detailAnggaranTable td:nth-of-type(5):before {
+        width: 100%;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding-bottom: 4px;
+    }
+
+    #hasilAnggaranTable td:nth-of-type(10) { /* Action */
+        justify-content: center;
+        padding-left: 15px !important;
+        margin-top: 5px;
+    }
+    #hasilAnggaranTable td:nth-of-type(10):before {
+        display: none;
+    }
+}
+
+/* Toast Overlap Fix */
+@media (max-width: 767.98px) {
+    .toast-container {
+        bottom: 85px !important; /* Move above bottom nav + safe margin */
+        width: 100% !important;
+        left: 0 !important;
+        padding: 10px !important;
+    }
+    .toast {
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
+
+/* Fix sticky header overlap on scroll */
+@media (max-width: 767.98px) {
+    .pagetitle {
+        margin-top: 10px !important;
+    }
+}
+
+/* FAB for consistency if needed - though we might not need it here as it's a calculator */

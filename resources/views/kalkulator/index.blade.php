@@ -5,6 +5,7 @@
 @push('css')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<link href="{{ asset('css/kalkulator.css') }}?v={{ filemtime(public_path('css/kalkulator.css')) }}" rel="stylesheet">
 <style>
     /* Header Enhancements */
     .pagetitle {

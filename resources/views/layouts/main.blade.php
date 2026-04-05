@@ -24,7 +24,7 @@
 
 
             {{-- MOBILE TOP APP BAR --}}
-            <div class="d-md-none py-2 mb-2 border-bottom d-flex align-items-center justify-content-center bg-white shadow-sm" style="position: sticky; top: 0; z-index: 1020;">
+            <div class="d-md-none py-2 mb-2 border-bottom d-flex align-items-center justify-content-center bg-white shadow-sm" style="position: sticky; top: 0; z-index: 1020; padding-top: max(8px, env(safe-area-inset-top)) !important;">
                 <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo" alt="BIMMO" style="height: 25px;">
             </div>
 

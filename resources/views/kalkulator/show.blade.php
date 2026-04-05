@@ -3,6 +3,7 @@
 @section('title', __('Budget Monitoring Detail'))
 
 @push('css')
+<link href="{{ asset('css/kalkulator.css') }}?v={{ filemtime(public_path('css/kalkulator.css')) }}" rel="stylesheet">
 <style>
     /* Header Enhancements */
     .pagetitle {
