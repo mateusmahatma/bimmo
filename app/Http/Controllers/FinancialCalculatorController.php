@@ -78,6 +78,7 @@ class FinancialCalculatorController extends Controller
                 'tanggal_selesai' => $tanggal_selesai,
                 'nama_anggaran' => $anggaran->nama_anggaran,
                 'jenis_pengeluaran' => $anggaran->id_pengeluaran,
+                'jenis_pemasukan' => $idPemasukans,
                 'persentase_anggaran' => $anggaran->persentase_anggaran,
                 'nominal_anggaran' => $nominal,
                 'anggaran_yang_digunakan' => $totalTransaksi,
@@ -94,8 +95,24 @@ class FinancialCalculatorController extends Controller
 
             $prosesAnggaran = HasilProsesAnggaran::find($id);
             if (!$prosesAnggaran) return response()->json(['error' => 'Data tidak ditemukan'], 404);
-            $prosesAnggaran->fill($request->all());
 
+            // Recalculate Income (Budget) if categories exist
+            if (!empty($prosesAnggaran->jenis_pemasukan)) {
+                $idPemasukans = $prosesAnggaran->jenis_pemasukan;
+                if (!is_array($idPemasukans)) $idPemasukans = json_decode($idPemasukans, true) ?? [$idPemasukans];
+
+                $allIncomesInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)
+                    ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                    ->get();
+                
+                $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+                    return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
+                })->sum(fn($t) => (float)($t->nominal_pemasukan ?? 0));
+
+                $prosesAnggaran->nominal_anggaran = ($prosesAnggaran->persentase_anggaran / 100) * $totalIncome;
+            }
+
+            // Recalculate Expenses (Used)
             $jenisPengeluaran = $prosesAnggaran->jenis_pengeluaran;
             if (!is_array($jenisPengeluaran)) {
                 if (is_string($jenisPengeluaran)) {
@@ -112,8 +129,63 @@ class FinancialCalculatorController extends Controller
             $prosesAnggaran->anggaran_yang_digunakan = $totalTransaksi;
             $prosesAnggaran->save();
 
-            return response()->json(['id' => Hashids::encode($prosesAnggaran->id_proses_anggaran), 'anggaran_digunakan_terkini' => number_format($totalTransaksi, 0, ',', '.'), 'sisa_anggaran' => number_format(floatval($prosesAnggaran->nominal_anggaran) - $totalTransaksi, 0, ',', '.')]);
+            return response()->json([
+                'id' => Hashids::encode($prosesAnggaran->id_proses_anggaran),
+                'nominal_anggaran_terkini' => number_format($prosesAnggaran->nominal_anggaran, 0, ',', '.'),
+                'anggaran_digunakan_terkini' => number_format($totalTransaksi, 0, ',', '.'),
+                'sisa_anggaran' => number_format(floatval($prosesAnggaran->nominal_anggaran) - $totalTransaksi, 0, ',', '.')
+            ]);
         }
+    }
+
+    public function bulkSync(Request $request)
+    {
+        $ids = $request->input('ids');
+        if (empty($ids) || !is_array($ids)) return response()->json(['message' => 'No data selected'], 400);
+        $decodedIds = array_filter(array_map(fn($hash) => Hashids::decode($hash)[0] ?? null, $ids));
+        if (empty($decodedIds)) return response()->json(['message' => 'Invalid data'], 400);
+
+        $count = 0;
+        foreach ($decodedIds as $id) {
+            $prosesAnggaran = HasilProsesAnggaran::find($id);
+            if (!$prosesAnggaran || $prosesAnggaran->id_user !== Auth::id()) continue;
+
+            // Recalculate Income (Budget) if categories exist
+            if (!empty($prosesAnggaran->jenis_pemasukan)) {
+                $idPemasukans = $prosesAnggaran->jenis_pemasukan;
+                if (!is_array($idPemasukans)) $idPemasukans = json_decode($idPemasukans, true) ?? [$idPemasukans];
+
+                $allIncomesInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)
+                    ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                    ->get();
+                
+                $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+                    return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
+                })->sum(fn($t) => (float)($t->nominal_pemasukan ?? 0));
+
+                $prosesAnggaran->nominal_anggaran = ($prosesAnggaran->persentase_anggaran / 100) * $totalIncome;
+            }
+
+            // Recalculate Expenses (Used)
+            $jenisPengeluaran = $prosesAnggaran->jenis_pengeluaran;
+            if (!is_array($jenisPengeluaran)) {
+                if (is_string($jenisPengeluaran)) {
+                    $decoded = json_decode($jenisPengeluaran, true);
+                    $jenisPengeluaran = is_array($decoded) ? $decoded : [$jenisPengeluaran];
+                } else {
+                    $jenisPengeluaran = [$jenisPengeluaran];
+                }
+            }
+
+            $allTrxInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])->get();
+            $totalTransaksi = $allTrxInRange->filter(fn($t) => in_array((string)$t->pengeluaran, array_map('strval', $jenisPengeluaran)))->sum(fn($t) => (float)$t->nominal);
+
+            $prosesAnggaran->anggaran_yang_digunakan = $totalTransaksi;
+            $prosesAnggaran->save();
+            $count++;
+        }
+
+        return $count > 0 ? response()->json(['message' => "$count data berhasil disinkronisasi"]) : response()->json(['message' => 'Gagal menyinkronkan data atau data tidak ditemukan'], 404);
     }
 
     public function calculate(Request $request)

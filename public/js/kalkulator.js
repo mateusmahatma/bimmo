@@ -183,6 +183,7 @@ $(document).ready(function () {
         const checked = $('.check-item:checked');
         const count = checked.length;
         const btnBulkDelete = $('#btnBulkDelete');
+        const btnBulkSync = $('#btnBulkSync');
         const countSelected = $('#countSelected');
         const checkAll = $('#checkAll');
 
@@ -192,7 +193,15 @@ $(document).ready(function () {
             if (count > 0) {
                 btnBulkDelete.removeClass('d-none');
             } else {
-                btnBulkDelete.classList ? btnBulkDelete[0].classList.add('d-none') : btnBulkDelete.addClass('d-none');
+                btnBulkDelete.addClass('d-none');
+            }
+        }
+
+        if (btnBulkSync.length > 0) {
+            if (count > 0) {
+                btnBulkSync.removeClass('d-none');
+            } else {
+                btnBulkSync.addClass('d-none');
             }
         }
 
@@ -215,57 +224,93 @@ $(document).ready(function () {
     });
 
     if (btnBulkDelete) {
-        btnBulkDelete.addEventListener('click', function () {
-            const checked = document.querySelectorAll('.check-item:checked');
-            const ids = Array.from(checked).map(cb => cb.value);
-
-            if (ids.length === 0) return;
-
-            Swal.fire({
-                title: 'Hapus Terpilih?',
-                text: `Apakah Anda yakin ingin menghapus ${ids.length} item?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading state
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...';
-                    this.disabled = true;
-
-                    $.ajax({
-                        url: "/kalkulator/bulk-delete",
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: { ids: ids },
-                        success: (response) => {
-                            showToast(response.message || 'Data deleted successfully', 'success');
-                            fetchData(); // Manual reload
-
-                            // Reset button
-                            this.innerHTML = originalText;
-                            this.disabled = false;
-                            this.classList.add('d-none');
-                            $('#checkAll').prop('checked', false);
-                        },
-                        error: (err) => {
-                            console.error(err);
-                            showToast('Failed to delete data', 'danger');
-                            // Reset button
-                            this.innerHTML = originalText;
-                            this.disabled = false;
-                        }
-                    });
-                }
-            });
-        });
+        // ... (existing btnBulkDelete.addEventListener logic is already inside $(document).on pattern? wait)
+        // Actually the code uses btnBulkDelete.addEventListener and also $(document).on for checkAll.
+        // Let's stick to $(document).on for bulk buttons if possible, or follow existing pattern.
     }
+    
+    $(document).on('click', '#btnBulkDelete', function() {
+        const checked = $('.check-item:checked');
+        const ids = checked.map((i, el) => $(el).val()).get();
+        if (ids.length === 0) return;
+
+        Swal.fire({
+            title: 'Hapus Terpilih?',
+            text: `Apakah Anda yakin ingin menghapus ${ids.length} item?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...').prop('disabled', true);
+
+                $.ajax({
+                    url: "/kalkulator/bulk-delete",
+                    type: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    data: { ids: ids },
+                    success: (response) => {
+                        showToast(response.message || 'Data deleted successfully', 'success');
+                        fetchData();
+                        btn.addClass('d-none');
+                    },
+                    error: (err) => {
+                        console.error(err);
+                        showToast('Failed to delete data', 'danger');
+                    },
+                    complete: () => {
+                        btn.html(originalHtml).prop('disabled', false);
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '#btnBulkSync', function() {
+        const checked = $('.check-item:checked');
+        const ids = checked.map((i, el) => $(el).val()).get();
+        if (ids.length === 0) return;
+
+        Swal.fire({
+            title: 'Sinkronisasi Terpilih?',
+            text: `Apakah Anda yakin ingin menyinkronkan ${ids.length} data terpilih?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, sinkronkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sinkronisasi...').prop('disabled', true);
+
+                $.ajax({
+                    url: "/kalkulator/bulk-sync",
+                    type: 'PUT',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    data: { ids: ids },
+                    success: (response) => {
+                        showToast(response.message || 'Data synced successfully', 'success');
+                        fetchData(); // Simplest way is to reload the whole table
+                    },
+                    error: (err) => {
+                        console.error(err);
+                        showToast('Failed to sync data', 'danger');
+                    },
+                    complete: () => {
+                        btn.html(originalHtml).prop('disabled', false);
+                    }
+                });
+            }
+        });
+    });
 
     function parseNumber(val) {
         if (val === null || val === undefined || val === '') return 0;
@@ -380,6 +425,65 @@ $(document).ready(function () {
                         showToast('Gagal menghapus data', 'danger');
                     }
                 });
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-sync-anggaran', function (e) {
+        e.preventDefault();
+        const btn = $(this);
+        const id = btn.data('id');
+        const icon = btn.find('i');
+
+        // Add spinning animation
+        btn.addClass('disabled');
+        icon.addClass('bi-spin');
+
+        $.ajax({
+            url: `/kalkulator/${id}`,
+            type: 'PUT',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: (response) => {
+                showToast('Data berhasil disinkronisasi', 'success');
+                
+                // Find the row and update cell values
+                const row = btn.closest('tr');
+                
+                // Columns (assuming fixed order from _table_list.blade.php)
+                // 7th: nominal_anggaran, 8th: anggaran_yang_digunakan, 9th: sisa_anggaran
+                
+                if (response.nominal_anggaran_terkini) {
+                    row.find('td:nth-child(7)').html(`<span class="fw-semibold text-dark">Rp ${response.nominal_anggaran_terkini}</span>`);
+                }
+                
+                if (response.anggaran_digunakan_terkini) {
+                    row.find('td:nth-child(8)').html(`<span class="text-danger fw-medium">Rp ${response.anggaran_digunakan_terkini}</span>`);
+                }
+                
+                if (response.sisa_anggaran) {
+                    const sisaCell = row.find('td:nth-child(9)');
+                    const sisaStr = response.sisa_anggaran.replace(/\./g, '').replace(',', '.');
+                    const sisaVal = parseFloat(sisaStr);
+                    const sisaClass = sisaVal < 0 ? 'text-danger' : 'text-success';
+                    const badgeClass = sisaVal < 0 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success';
+                    const badgeText = sisaVal < 0 ? 'Melebihi Anggaran' : 'Dalam Anggaran';
+                    
+                    sisaCell.html(`
+                        <span class="fw-bold ${sisaClass}">Rp ${response.sisa_anggaran}</span><br>
+                        <span class="badge ${badgeClass}" style="font-size: 10px;">${badgeText}</span>
+                    `);
+                }
+            },
+            error: (err) => {
+                console.error(err);
+                showToast('Gagal menyinkronkan data', 'danger');
+            },
+            complete: () => {
+                btn.removeClass('disabled');
+                icon.removeClass('bi-spin');
             }
         });
     });

@@ -52,6 +52,15 @@
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
+
+    .bi-spin {
+        animation: spin 1s infinite linear;
+        display: inline-block;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
 </style>
 @endpush
 
@@ -155,6 +164,9 @@
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('List of your budget calculation history.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-success btn-sm d-none rounded-pill" id="btnBulkSync" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <i class="bi bi-arrow-repeat me-1"></i> {{ __('Sync Selected') }}
+                        </button>
                         <button type="button" class="btn btn-outline-danger btn-sm d-none rounded-pill" id="btnBulkDelete" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span id="countSelected">0</span>)
                         </button>

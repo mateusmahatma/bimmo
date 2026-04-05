@@ -102,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('kalkulator.index');
             Route::post('/', 'store')->name('kalkulator.store');
             Route::delete('/bulk-delete', 'bulkDelete')->name('kalkulator.bulkDelete');
+            Route::put('/bulk-sync', 'bulkSync')->name('kalkulator.bulkSync');
             Route::get('/{hash}', 'show')->name('kalkulator.show');
             Route::put('/{hash}', 'update');
             Route::delete('/{hash}', 'destroy');

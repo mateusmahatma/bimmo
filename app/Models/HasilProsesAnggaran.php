@@ -30,6 +30,7 @@ class HasilProsesAnggaran extends Model
         'anggaran_yang_digunakan',
         'sisa_anggaran',
         'id_user',
+        'jenis_pemasukan',
     ];
 
     protected $appends = ['nama_jenis_pengeluaran', 'remaining_budget'];

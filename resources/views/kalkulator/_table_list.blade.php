@@ -93,6 +93,9 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
+                            <button type="button" class="btn btn-outline-success btn-sm rounded-pill btn-sync-anggaran" data-id="{{ $row->hash }}" style="padding: 2px 8px; font-size: 0.7rem;" title="{{ __('Sync Data') }}">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
                             <a href="{{ route('kalkulator.show', $row->hash) }}" class="btn btn-outline-primary btn-sm rounded-pill" style="padding: 2px 8px; font-size: 0.7rem;" title="{{ __('Detail') }}">
                                 <i class="bi bi-eye"></i>
                             </a>
