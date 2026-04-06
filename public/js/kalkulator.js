@@ -455,6 +455,10 @@ $(document).ready(function () {
                 // Columns (assuming fixed order from _table_list.blade.php)
                 // 7th: nominal_anggaran, 8th: anggaran_yang_digunakan, 9th: sisa_anggaran
                 
+                if (response.persentase_anggaran) {
+                    row.find('td:nth-child(6)').html(`<span class="badge bg-light text-dark border-0 shadow-none" style="font-size: 0.75rem; padding: 4px 8px;">${response.persentase_anggaran}%</span>`);
+                }
+                
                 if (response.nominal_anggaran_terkini) {
                     row.find('td:nth-child(7)').html(`<span class="fw-semibold text-dark">Rp ${response.nominal_anggaran_terkini}</span>`);
                 }

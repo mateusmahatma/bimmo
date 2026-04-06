@@ -96,6 +96,16 @@ class FinancialCalculatorController extends Controller
             $prosesAnggaran = HasilProsesAnggaran::find($id);
             if (!$prosesAnggaran) return response()->json(['error' => 'Data tidak ditemukan'], 404);
 
+            // Sync with original Anggaran if exists
+            $originalAnggaran = Anggaran::where('id_user', $prosesAnggaran->id_user)
+                ->where('nama_anggaran', $prosesAnggaran->nama_anggaran)
+                ->first();
+
+            if ($originalAnggaran) {
+                $prosesAnggaran->persentase_anggaran = $originalAnggaran->persentase_anggaran;
+                $prosesAnggaran->jenis_pengeluaran = $originalAnggaran->id_pengeluaran;
+            }
+
             // Recalculate Income (Budget)
             $idPemasukans = $prosesAnggaran->jenis_pemasukan;
             if (empty($idPemasukans)) {
@@ -140,6 +150,8 @@ class FinancialCalculatorController extends Controller
 
             return response()->json([
                 'id' => Hashids::encode($prosesAnggaran->id_proses_anggaran),
+                'persentase_anggaran' => number_format($prosesAnggaran->persentase_anggaran, 0),
+                'nama_jenis_pengeluaran' => $prosesAnggaran->nama_jenis_pengeluaran,
                 'nominal_anggaran_terkini' => number_format($prosesAnggaran->nominal_anggaran, 0, ',', '.'),
                 'anggaran_digunakan_terkini' => number_format($totalTransaksi, 0, ',', '.'),
                 'sisa_anggaran' => number_format(floatval($prosesAnggaran->nominal_anggaran) - $totalTransaksi, 0, ',', '.')
@@ -158,6 +170,16 @@ class FinancialCalculatorController extends Controller
         foreach ($decodedIds as $id) {
             $prosesAnggaran = HasilProsesAnggaran::find($id);
             if (!$prosesAnggaran || $prosesAnggaran->id_user !== Auth::id()) continue;
+
+            // Sync with original Anggaran if exists
+            $originalAnggaran = Anggaran::where('id_user', $prosesAnggaran->id_user)
+                ->where('nama_anggaran', $prosesAnggaran->nama_anggaran)
+                ->first();
+
+            if ($originalAnggaran) {
+                $prosesAnggaran->persentase_anggaran = $originalAnggaran->persentase_anggaran;
+                $prosesAnggaran->jenis_pengeluaran = $originalAnggaran->id_pengeluaran;
+            }
 
             // Recalculate Income (Budget)
             $idPemasukans = $prosesAnggaran->jenis_pemasukan;
