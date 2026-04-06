@@ -128,32 +128,35 @@ class DompetController extends Controller
 
         $wallet = Dompet::where('id_user', Auth::id())->findOrFail($id);
         
-        $pemasukan = Pemasukan::firstOrCreate(
-            ['nama' => $wallet->nama, 'id_user' => Auth::id()],
-            ['kode_pemasukan' => 'M0000']
-        );
+        if ($request->has('record_income')) {
+            $pemasukan = Pemasukan::firstOrCreate(
+                ['nama' => $wallet->nama, 'id_user' => Auth::id()],
+                ['kode_pemasukan' => 'M0000']
+            );
 
-        Transaksi::create([
-            'tgl_transaksi' => now(),
-            'pemasukan' => $pemasukan->id,
-            'nominal_pemasukan' => $request->nominal,
-            'keterangan' => $request->keterangan ?? 'Top up saldo manual',
-            'dompet_id' => $id,
-            'id_user' => Auth::id(),
-            'status' => 1,
-        ]);
+            Transaksi::create([
+                'tgl_transaksi' => now(),
+                'pemasukan' => $pemasukan->id,
+                'nominal_pemasukan' => $request->nominal,
+                'keterangan' => $request->keterangan ?? 'Top up saldo manual',
+                'dompet_id' => $id,
+                'id_user' => Auth::id(),
+                'status' => 1,
+            ]);
+
+            Log::info('Manual top up transaction created', [
+                'wallet_id' => $id,
+                'pemasukan_id' => $pemasukan->id,
+                'nominal' => $request->nominal
+            ]);
+        }
 
         $wallet->saldo = (float)$wallet->saldo + (float)$request->nominal;
         $wallet->save();
 
-        Log::info('Manual top up transaction created', [
-            'wallet_id' => $id,
-            'pemasukan_id' => $pemasukan->id,
-            'nominal' => $request->nominal
-        ]);
-
         return redirect()->route('dompet.show', $id)->with('success', 'Saldo berhasil ditambahkan');
     }
+
 
     public function reports()
     {

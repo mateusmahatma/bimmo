@@ -184,9 +184,15 @@
                     <p class="text-muted small">{{ __('Current balance') }}: <strong class="text-primary">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</strong></p>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">{{ __('Amount to Add') }}</label>
-                        <div class="input-group">
+                        <div class="input-group mb-2">
                             <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
                             <input type="number" name="nominal" class="form-control rounded-end-3 border-start-0" placeholder="0" required>
+                        </div>
+                        <div class="form-check form-switch small">
+                            <input class="form-check-input" type="checkbox" name="record_income" id="recordIncome" value="1" checked>
+                            <label class="form-check-label text-muted" for="recordIncome">
+                                {{ __('Record as income in cash flow?') }}
+                            </label>
                         </div>
                     </div>
                     <div class="mb-0">
