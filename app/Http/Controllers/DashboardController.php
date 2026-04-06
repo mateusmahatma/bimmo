@@ -282,10 +282,14 @@ class DashboardController extends Controller
                 ? $carry + (float) $item->nominal_dana_darurat
                 : $carry - (float) $item->nominal_dana_darurat, 0);
 
-            // Hutang
-            $hutangTotal = $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)->sum('jumlah_pinjaman');
-            $bayarTotal  = $allBayar->filter(fn($b) => Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
-            $totalHutang = $hutangTotal - $bayarTotal;
+            // Hutang (Debt) - Reconstruct historical balance
+            $totalHutang = 0;
+            foreach ($allPinjaman as $p) {
+                if (Carbon::parse($p->start_date) <= $monthEnd) {
+                    $paymentsAfter = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) > $monthEnd)->sum('jumlah_bayar');
+                    $totalHutang += ((float)$p->jumlah_pinjaman + $paymentsAfter);
+                }
+            }
 
             // Dompet (Wallet) - Reconstruct historical balance
             $walletSum = 0;
@@ -325,8 +329,8 @@ class DashboardController extends Controller
                         })->filter(fn($v) => $v['value'] > 0)->values(),
                     'loans'     => $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
                         ->map(function ($p) use ($allBayar, $monthEnd) {
-                            $lunas = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
-                            return ['name' => $p->nama_pinjaman, 'value' => (float) ($p->jumlah_pinjaman - $lunas), 'date' => Carbon::parse($p->start_date)->translatedFormat('d M Y')];
+                            $paymentsAfter = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) > $monthEnd)->sum('jumlah_bayar');
+                            return ['name' => $p->nama_pinjaman, 'value' => (float) ($p->jumlah_pinjaman + $paymentsAfter), 'date' => Carbon::parse($p->start_date)->translatedFormat('d M Y')];
                         })->filter(fn($l) => $l['value'] > 0)->values(),
                 ],
             ];
