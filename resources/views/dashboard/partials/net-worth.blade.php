@@ -38,7 +38,7 @@
             <div class="col-6">
                 <div class="p-3 rounded-0 {{ $uiStyle === 'milenial' ? 'bg-primary bg-opacity-5' : 'stat-card-inner' }}">
                     <p class="section-label mb-1">{{ __('Wealth') }}</p>
-                    <h6 class="fw-bold mb-0 text-success">Rp {{ number_format($totalAset + $totalDanaDarurat, 0, ',', '.') }}</h6>
+                    <h6 class="fw-bold mb-0 text-success">Rp {{ number_format($totalAset + $totalDanaDarurat + $totalSaldoDompet, 0, ',', '.') }}</h6>
                 </div>
             </div>
             <div class="col-6">

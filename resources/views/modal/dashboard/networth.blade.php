@@ -272,10 +272,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (type === 'wealth') {
             title = `Wealth Details - ${data.bulan}`;
-            // Combine assets and emergency fund
+            // Combine assets, emergency fund, and wallets
             items = [
                 ...data.details.assets.map(a => ({ name: a.name, value: a.value, date: a.date, type: 'Asset' })),
-                ...data.details.emergency.map(e => ({ name: e.name, value: e.value, date: e.date, type: 'Emergency Fund' }))
+                ...data.details.emergency.map(e => ({ name: e.name, value: e.value, date: e.date, type: 'Emergency Fund' })),
+                ...data.details.wallets.map(w => ({ name: w.name, value: w.value, date: w.date, type: 'Wallet' }))
             ];
         } else {
             title = `Debt Details - ${data.bulan}`;

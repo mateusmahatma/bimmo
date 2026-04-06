@@ -73,6 +73,7 @@ class DashboardController extends Controller
         $viewModel = new DashboardViewModel(
             totalAset: $wealth['totalAset'],
             totalDanaDarurat: $wealth['totalDanaDarurat'],
+            totalSaldoDompet: $wealth['totalSaldoDompet'],
             totalHutang: $wealth['totalHutang'],
             targetDanaDarurat: $targetDanaDarurat,
             pemasukan: $numbers['pemasukan'],
@@ -244,6 +245,10 @@ class DashboardController extends Controller
         $allDD       = DanaDarurat::where('id_user', $userId)->get();
         $allPinjaman = Pinjaman::where('id_user', $userId)->get();
         $allBayar    = BayarPinjaman::where('id_user', $userId)->get();
+        $allWallets  = \App\Models\Dompet::where('id_user', $userId)->get();
+        $allTrx      = Transaksi::where('id_user', $userId)->whereNotNull('dompet_id')->get();
+
+        $currentWalletTotal = $allWallets->sum(fn($w) => (float)$w->saldo);
 
         $currentMonth = $startPeriod->copy();
 
@@ -270,7 +275,18 @@ class DashboardController extends Controller
             $bayarTotal  = $allBayar->filter(fn($b) => Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');
             $totalHutang = $hutangTotal - $bayarTotal;
 
-            $totalKekayaan = $assetsSum + $ddSum;
+            // Dompet (Wallet) - Reconstruct historical balance
+            $walletSum = 0;
+            foreach ($allWallets as $wallet) {
+                if ($wallet->created_at <= $monthEnd) {
+                    $trxAfter = $allTrx->filter(fn($t) => $t->dompet_id == $wallet->id && Carbon::parse($t->tgl_transaksi) > $monthEnd);
+                    $pemasukanAfter = $trxAfter->sum(fn($t) => (float)$t->nominal_pemasukan);
+                    $pengeluaranAfter = $trxAfter->sum(fn($t) => (float)$t->nominal);
+                    $walletSum += ((float)$wallet->saldo - $pemasukanAfter + $pengeluaranAfter);
+                }
+            }
+
+            $totalKekayaan = $assetsSum + $ddSum + $walletSum;
 
             $netWorthHistory[] = [
                 'bulan'        => $monthStr,
@@ -288,6 +304,13 @@ class DashboardController extends Controller
                         'value' => (float) $d->nominal_dana_darurat * ($d->jenis_transaksi_dana_darurat == 1 ? 1 : -1),
                         'date'  => Carbon::parse($d->tgl_transaksi_dana_darurat)->translatedFormat('d M Y'),
                     ])->values(),
+                    'wallets'   => $allWallets->filter(fn($w) => $w->created_at <= $monthEnd)
+                        ->map(function ($w) use ($allTrx, $monthEnd) {
+                             $trxAfter = $allTrx->filter(fn($t) => $t->dompet_id == $w->id && Carbon::parse($t->tgl_transaksi) > $monthEnd);
+                             $pemasukanAfter = $trxAfter->sum(fn($t) => (float)$t->nominal_pemasukan);
+                             $pengeluaranAfter = $trxAfter->sum(fn($t) => (float)$t->nominal);
+                             return ['name' => $w->nama, 'value' => ((float)$w->saldo - $pemasukanAfter + $pengeluaranAfter), 'date' => $w->created_at->translatedFormat('d M Y')];
+                        })->filter(fn($v) => $v['value'] > 0)->values(),
                     'loans'     => $allPinjaman->filter(fn($p) => Carbon::parse($p->start_date) <= $monthEnd)
                         ->map(function ($p) use ($allBayar, $monthEnd) {
                             $lunas = $allBayar->filter(fn($b) => $b->id_pinjaman == $p->id_pinjaman && Carbon::parse($b->tgl_bayar) <= $monthEnd)->sum('jumlah_bayar');

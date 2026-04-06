@@ -87,10 +87,13 @@ class DashboardDataService
         $totalKeluarDD = DanaDarurat::where('id_user', $this->userId)->where('jenis_transaksi_dana_darurat', 2)->sum('nominal_dana_darurat');
         $totalDanaDarurat = (float) ($totalMasukDD - $totalKeluarDD);
 
+        $totalSaldoDompet = (float) \App\Models\Dompet::where('id_user', $this->userId)->get()->sum('saldo');
+
         return [
             'totalAset'        => $totalAset,
             'totalHutang'      => $totalHutang,
             'totalDanaDarurat' => $totalDanaDarurat,
+            'totalSaldoDompet' => $totalSaldoDompet,
         ];
     }
 

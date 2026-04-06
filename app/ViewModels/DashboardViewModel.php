@@ -7,6 +7,7 @@ class DashboardViewModel
     // Net Worth
     public float $totalAset;
     public float $totalDanaDarurat;
+    public float $totalSaldoDompet;
     public float $totalHutang;
     public float $netWorth;
     public string $netWorthFormatted;
@@ -29,6 +30,7 @@ class DashboardViewModel
     public function __construct(
         float $totalAset,
         float $totalDanaDarurat,
+        float $totalSaldoDompet,
         float $totalHutang,
         float $targetDanaDarurat,
         float $pemasukan,
@@ -40,6 +42,7 @@ class DashboardViewModel
     ) {
         $this->totalAset         = $totalAset;
         $this->totalDanaDarurat  = $totalDanaDarurat;
+        $this->totalSaldoDompet  = $totalSaldoDompet;
         $this->totalHutang       = $totalHutang;
         $this->targetDanaDarurat = $targetDanaDarurat;
 
@@ -55,7 +58,7 @@ class DashboardViewModel
 
     private function computeNetWorth(): void
     {
-        $this->netWorth = ($this->totalAset + $this->totalDanaDarurat) - $this->totalHutang;
+        $this->netWorth = ($this->totalAset + $this->totalDanaDarurat + $this->totalSaldoDompet) - $this->totalHutang;
 
         $formatted = 'Rp ' . number_format(abs($this->netWorth), 0, ',', '.');
         $this->netWorthFormatted = $this->netWorth < 0 ? '-' . $formatted : $formatted;
@@ -63,10 +66,10 @@ class DashboardViewModel
 
     private function computeNetWorthBar(): void
     {
-        $totalVal = ($this->totalAset + $this->totalDanaDarurat) + $this->totalHutang;
+        $totalVal = ($this->totalAset + $this->totalDanaDarurat + $this->totalSaldoDompet) + $this->totalHutang;
 
         $this->assetPercent = $totalVal > 0
-            ? (($this->totalAset + $this->totalDanaDarurat) / $totalVal) * 100
+            ? (($this->totalAset + $this->totalDanaDarurat + $this->totalSaldoDompet) / $totalVal) * 100
             : 0;
 
         $this->debtPercent = $totalVal > 0
@@ -97,6 +100,7 @@ class DashboardViewModel
         return [
             'totalAset'             => $this->totalAset,
             'totalDanaDarurat'      => $this->totalDanaDarurat,
+            'totalSaldoDompet'      => $this->totalSaldoDompet,
             'totalHutang'           => $this->totalHutang,
             'netWorth'              => $this->netWorth,
             'netWorthFormatted'     => $this->netWorthFormatted,
