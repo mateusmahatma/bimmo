@@ -229,6 +229,18 @@ class DashboardController extends Controller
     }
 
     // -------------------------------------------------------------------------
+    // Net Worth Detail Page
+    // -------------------------------------------------------------------------
+    public function netWorth(Request $request)
+    {
+        $userId  = Auth::id();
+        $uiStyle = 'corporate';
+        $periode = $this->sanitizePeriode($request->integer('periode', 6));
+
+        return view('dashboard.net-worth', compact('uiStyle', 'periode'));
+    }
+
+    // -------------------------------------------------------------------------
     // Net Worth History (AJAX)
     // -------------------------------------------------------------------------
     public function getNetWorthHistory(Request $request)

@@ -1,6 +1,6 @@
 <div class="card card-dashboard border-0 shadow-none networth-card {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}"
      style="cursor: pointer;"
-     data-bs-toggle="modal" data-bs-target="#netWorthModal"
+     onclick="window.location='{{ route('dashboard.net-worth') }}'"
      title="{{ __('Click to view Net Worth Details') }}">
     <div class="card-header d-flex justify-content-between align-items-center {{ $uiStyle === 'milenial' ? 'm-card-header-vibrant bg-transparent' : '' }}">
         <div>
@@ -9,12 +9,12 @@
             </h5>
             <p class="text-muted mb-0 mt-1" style="font-size: 0.82rem;">{{ __('Your solvency and wealth status.') }}</p>
         </div>
-        <button type="button"
+        <a href="{{ route('dashboard.net-worth') }}"
             class="btn {{ $uiStyle === 'milenial' ? 'btn-light border-0' : 'btn-outline-primary' }} btn-sm rounded-0 px-3 d-flex align-items-center gap-1"
-            data-bs-toggle="modal" data-bs-target="#netWorthModal">
+            wire:navigate>
             <i class="bi bi-clock-history"></i>
             <span class="fw-semibold" style="font-size: 0.75rem;">{{ __('History') }}</span>
-        </button>
+        </a>
     </div>
     <div class="card-body p-4">
         <div class="text-center mb-4">
