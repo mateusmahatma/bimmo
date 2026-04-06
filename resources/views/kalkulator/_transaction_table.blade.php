@@ -41,19 +41,9 @@
                     </td>
                     <td data-label="{{ __('Description') }}">
                         @if($row->keterangan)
-                            @php
-                                $items = explode("\n", $row->keterangan);
-                                $items = array_filter(array_map('trim', $items));
-                            @endphp
-                            @if(count($items) > 1)
-                                <ol class="mb-0 ps-3 small text-muted">
-                                    @foreach($items as $item)
-                                        <li>{{ $item }}</li>
-                                    @endforeach
-                                </ol>
-                            @else
-                                <span class="text-muted small">{{ $items[0] ?? '-' }}</span>
-                            @endif
+                            <div class="text-muted small" style="max-height: 100px; overflow-y: auto;">
+                                {!! $row->keterangan !!}
+                            </div>
                         @else
                             <span class="text-muted small">-</span>
                         @endif
