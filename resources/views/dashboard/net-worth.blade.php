@@ -1,56 +1,73 @@
 @extends('layouts.main')
 
+@section('title', __('Net Worth Detail'))
+
 @section('container')
-<div class="container-fluid py-4">
-    <div class="row mb-4 align-items-center">
-        <div class="col-8">
-            <h1 class="h3 mb-1 fw-bold text-dark">{{ __('Net Worth Detail') }}</h1>
-            <p class="text-muted small mb-0">{{ __('Track your total assets, emergency fund, and debts over the last few months.') }}</p>
+<div class="pagetitle mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="fw-bold mb-1">{{ __('Net Worth Detail') }}</h1>
+            <nav>
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item active">{{ __('Net Worth') }}</li>
+                </ol>
+            </nav>
         </div>
-        <div class="col-4 text-end">
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4" wire:navigate>
-                <i class="bi bi-arrow-left me-1"></i> {{ __('Back to Dashboard') }}
+        <div>
+            <a href="{{ route('dashboard') }}" class="btn btn-light rounded-pill px-4 shadow-sm border" wire:navigate>
+                <i class="bi bi-arrow-left me-1"></i> {{ __('Back') }}
             </a>
         </div>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-xl-8 col-lg-7">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-                <div class="card-header bg-transparent border-0 pt-4 px-4">
-                    <h5 class="fw-bold mb-0">{{ __('Growth Chart') }}</h5>
+<div class="container-fluid p-0">
+    <div class="row g-4">
+        <!-- Main Chart Card -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0">{{ __('Net Worth Growth') }}</h5>
+                        <p class="text-muted small mb-0">{{ __('Historical trend of your assets and liabilities') }}</p>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light rounded-circle" type="button" id="btnRefreshNetWorth" title="{{ __('Refresh Data') }}">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body p-4">
                     <div id="netWorthLoading" class="text-center p-5">
-                        <div class="spinner-border text-primary" role="status">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-3 text-muted">{{ __('Calculating your wealth history...') }}</p>
+                        <p class="mt-3 text-muted fw-medium">{{ __('Calculating your wealth history...') }}</p>
                     </div>
                     <div id="netWorthContent" style="display: none;">
-                        <div id="netWorthChart" style="min-height: 350px;"></div>
+                        <div id="netWorthChart" style="min-height: 380px;"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-4 col-lg-5">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0">{{ __('Detailed Records') }}</h5>
-                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" id="btnRefreshNetWorth">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+        <!-- History Summary Card -->
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">{{ __('Monthly Data') }}</h5>
+                    <p class="text-muted small mb-0">{{ __('Click on values to see details') }}</p>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                        <table class="table table-hover align-middle mb-0 net-worth-table">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th class="ps-4 fw-600">{{ __('Month') }}</th>
-                                    <th class="text-end fw-600">{{ __('Assets') }}</th>
-                                    <th class="text-end fw-600">{{ __('Debt') }}</th>
-                                    <th class="text-end pe-4 fw-600">{{ __('Net') }}</th>
+                                    <th class="ps-4 fw-600 py-3 border-0 text-uppercase text-secondary">{{ __('Month') }}</th>
+                                    <th class="text-end fw-600 py-3 border-0 text-uppercase text-secondary">{{ __('Assets') }}</th>
+                                    <th class="text-end fw-600 py-3 border-0 text-uppercase text-secondary">{{ __('Debt') }}</th>
+                                    <th class="text-end pe-4 fw-600 py-3 border-0 text-uppercase text-secondary">{{ __('Net') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="netWorthTableBody">
@@ -66,18 +83,23 @@
 
 <!-- Drilling Detail Modal -->
 <div class="modal fade" id="netWorthDetailModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
-    <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold" id="netWorthDetailTitle">Details</h5>
+            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-light">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                        <i class="bi bi-journal-text fs-4 text-primary"></i>
+                    </div>
+                    <h5 class="modal-title fw-bold" id="netWorthDetailTitle">Details</h5>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
-                <div id="netWorthDetailList" style="max-height: 450px; overflow-y: auto;" class="custom-scrollbar">
-                    <!-- Details will be injected here -->
+            <div class="modal-body p-0">
+                <div id="netWorthDetailList" style="max-height: 500px; overflow-y: auto;" class="custom-scrollbar">
+                    <!-- Details will be injected here as a table -->
                 </div>
             </div>
-            <div class="modal-footer border-0 pb-4 px-4">
+            <div class="modal-footer border-0 p-3 bg-light">
                 <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
             </div>
         </div>
@@ -93,16 +115,16 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #bbb; }
     
     .net-worth-row { cursor: pointer; transition: background 0.2s; }
-    .net-worth-row:hover { background-color: rgba(13, 110, 253, 0.05); }
+    .net-worth-row:hover { background-color: rgba(13, 110, 253, 0.03); }
 
-    .detail-item {
-        border-radius: 12px;
-        transition: all 0.2s;
+    .table > :not(caption) > * > * {
+        padding: 0.75rem 0.4rem;
     }
-    .detail-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+    
+    .net-worth-table { font-size: 0.85rem; }
+    .net-worth-table th { font-size: 0.75rem; letter-spacing: 0.5px; }
+    
+    .modal-lg { max-width: 800px; }
 </style>
 @endpush
 
@@ -113,7 +135,7 @@ document.addEventListener('livewire:navigated', function() {
     initNetWorthPage();
 });
 
-// For first load if not using wire:navigate or if Livewire not loaded
+// For first load
 document.addEventListener('DOMContentLoaded', function() {
     if (!window.livewire_navigated_init) {
         initNetWorthPage();
@@ -136,27 +158,27 @@ function initNetWorthPage() {
         const options = {
             series: [
                 {
-                    name: 'Net Worth',
+                    name: '{{ __("Net Worth") }}',
                     type: 'line',
                     data: netWorthTrend
                 },
                 {
-                    name: 'Wealth (Assets + Emergency Fund)',
+                    name: '{{ __("Wealth") }}',
                     type: 'column',
                     data: wealthData
                 },
                 {
-                    name: 'Debt',
+                    name: '{{ __("Debt") }}',
                     type: 'column',
                     data: debtData
                 }
             ],
             chart: {
-                height: 400,
+                height: 380,
                 type: 'line',
                 stacked: false,
-                toolbar: { show: true },
-                fontFamily: 'inherit'
+                toolbar: { show: false },
+                fontFamily: 'Inter, sans-serif'
             },
             stroke: {
                 width: [4, 0, 0],
@@ -164,11 +186,11 @@ function initNetWorthPage() {
             },
             plotOptions: {
                 bar: {
-                    columnWidth: '50%',
-                    borderRadius: 6
+                    columnWidth: '45%',
+                    borderRadius: 8
                 }
             },
-            colors: ['#0d6efd', '#198754', '#dc3545'],
+            colors: ['#4361ee', '#4cc9f0', '#f72585'],
             fill: {
                 opacity: [1, 0.85, 0.85],
                 gradient: {
@@ -181,20 +203,24 @@ function initNetWorthPage() {
             },
             labels: months,
             markers: {
-                size: [6, 0, 0],
-                colors: ['#0d6efd'],
+                size: [5, 0, 0],
+                colors: ['#4361ee'],
                 strokeWidth: 2,
-                hover: { size: 8 }
+                hover: { size: 7 }
             },
             yaxis: {
                 labels: {
                     formatter: function (val) {
                         return "Rp " + new Intl.NumberFormat('id-ID').format(val);
-                    }
+                    },
+                    style: { colors: '#64748b' }
                 }
             },
             xaxis: {
-                type: 'category'
+                type: 'category',
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: { style: { colors: '#64748b' } }
             },
             tooltip: {
                 shared: true,
@@ -209,9 +235,13 @@ function initNetWorthPage() {
                 }
             },
             legend: {
-                position: 'bottom',
-                horizontalAlign: 'center',
-                offsetY: 8
+                position: 'top',
+                horizontalAlign: 'right',
+                offsetY: 0
+            },
+            grid: {
+                borderColor: '#f1f1f1',
+                padding: { bottom: 10 }
             }
         };
 
@@ -235,20 +265,20 @@ function initNetWorthPage() {
             const tr = document.createElement('tr');
             tr.className = 'net-worth-row';
             tr.innerHTML = `
-                <td class="ps-4"><strong>${item.bulan}</strong></td>
+                <td class="ps-4"><span class="fw-bold text-dark">${item.bulan}</span></td>
                 <td class="text-end">
-                    <a href="javascript:void(0)" onclick="showNetWorthDetail(${index}, 'wealth')" class="text-success text-decoration-none fw-semibold">
+                    <button onclick="showNetWorthDetail(${index}, 'wealth')" class="btn btn-link text-success text-decoration-none fw-semibold p-0" style="font-size: 0.85rem;">
                         Rp ${new Intl.NumberFormat('id-ID').format(item.total_aset)}
                         <i class="bi bi-search ms-1 small opacity-50"></i>
-                    </a>
+                    </button>
                 </td>
                 <td class="text-end">
-                    <a href="javascript:void(0)" onclick="showNetWorthDetail(${index}, 'debt')" class="text-danger text-decoration-none fw-semibold">
+                    <button onclick="showNetWorthDetail(${index}, 'debt')" class="btn btn-link text-danger text-decoration-none fw-semibold p-0" style="font-size: 0.85rem;">
                         Rp ${new Intl.NumberFormat('id-ID').format(item.total_hutang)}
                         <i class="bi bi-search ms-1 small opacity-50"></i>
-                    </a>
+                    </button>
                 </td>
-                <td class="text-end pe-4 fw-bold ${item.net_worth >= 0 ? 'text-primary' : 'text-danger'}">Rp ${new Intl.NumberFormat('id-ID').format(item.net_worth)}</td>
+                <td class="text-end pe-4 fw-bold ${item.net_worth >= 0 ? 'text-primary' : 'text-danger'}" style="font-size: 0.85rem;">Rp ${new Intl.NumberFormat('id-ID').format(item.net_worth)}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -334,27 +364,41 @@ function initNetWorthPage() {
         if (items.length === 0) {
             listContainer.innerHTML = '<div class="text-center p-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i> No records found for this month.</div>';
         } else {
+            const table = document.createElement('table');
+            table.className = 'table table-hover align-middle mb-0';
+            table.innerHTML = `
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">{{ __('Name') }}</th>
+                        <th>{{ __('Category') }}</th>
+                        <th class="text-end pe-4">{{ __('Amount') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            `;
+            const tbody = table.querySelector('tbody');
             items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'detail-item d-flex justify-content-between align-items-center p-3 mb-3 border bg-white';
-                div.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <div class="icon-box ${item.class} bg-light p-2 rounded-3 me-3">
-                            <i class="bi ${item.icon} fs-4"></i>
-                        </div>
-                        <div>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light p-2 rounded-3 me-3 text-center ${item.class}" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi ${item.icon} fs-5"></i>
+                            </div>
                             <div class="fw-bold text-dark">${item.name}</div>
-                            <div class="small text-muted">${item.type} • ${item.date}</div>
                         </div>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-bold ${item.value >= 0 ? 'text-success' : 'text-danger'}">
-                            Rp ${new Intl.NumberFormat('id-ID').format(Math.abs(item.value))}
-                        </div>
-                    </div>
+                    </td>
+                    <td><span class="badge bg-light text-dark fw-normal border">${item.type}</span></td>
+                    <td class="text-end pe-4 fw-bold">
+                        <span class="${type === 'wealth' ? 'text-success' : 'text-danger'}">
+                        Rp ${new Intl.NumberFormat('id-ID').format(Math.abs(item.value))}
+                        </span>
+                    </td>
                 `;
-                listContainer.appendChild(div);
-            } );
+                tbody.appendChild(tr);
+            });
+            listContainer.appendChild(table);
         }
 
         modal.show();
