@@ -359,7 +359,7 @@
 /* Row 1: Search + Daterange + Actions */
 .toolbar-row--primary {
     flex-wrap: nowrap;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .toolbar-search {
