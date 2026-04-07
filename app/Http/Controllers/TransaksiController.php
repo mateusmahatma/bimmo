@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\Pemasukan;
 use App\Models\Pengeluaran;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -523,7 +523,7 @@ class TransaksiController extends Controller
         $totalPemasukan = $data->sum(fn($t) => (float)$t->nominal_pemasukan);
         $totalPengeluaran = $data->sum(fn($t) => (float)$t->nominal);
 
-        $pdf = PDF::loadView('transaksi.export_pdf', [
+        $pdf = Pdf::loadView('transaksi.export_pdf', [
             'transaksi' => $data,
             'totalPemasukan' => $totalPemasukan,
             'totalPengeluaran' => $totalPengeluaran,
