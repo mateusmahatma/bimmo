@@ -27,7 +27,7 @@
         <!-- Main Chart Card -->
         <div class="col-xl-8">
             <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
-                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <div class="card-header border-0 pt-4 px-4 d-flex justify-content-between align-items-center" style="background: transparent;">
                     <div>
                         <h5 class="fw-bold mb-0">{{ __('Net Worth Growth') }}</h5>
                         <p class="text-muted small mb-0">{{ __('Historical trend of your assets and liabilities') }}</p>
@@ -55,7 +55,7 @@
         <!-- History Summary Card -->
         <div class="col-xl-4">
             <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
-                <div class="card-header bg-white border-0 pt-4 px-4">
+                <div class="card-header border-0 pt-4 px-4" style="background: transparent;">
                     <h5 class="fw-bold mb-0">{{ __('Monthly Data') }}</h5>
                     <p class="text-muted small mb-0">{{ __('Click on values to see details') }}</p>
                 </div>
@@ -85,7 +85,7 @@
 <div class="modal fade" id="netWorthDetailModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-light">
+            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-body-tertiary">
                 <div class="d-flex align-items-center">
                     <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
                         <i class="bi bi-journal-text fs-4 text-primary"></i>
@@ -99,7 +99,7 @@
                     <!-- Details will be injected here as a table -->
                 </div>
             </div>
-            <div class="modal-footer border-0 p-3 bg-light">
+            <div class="modal-footer border-0 p-3 bg-body-tertiary">
                 <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
             </div>
         </div>

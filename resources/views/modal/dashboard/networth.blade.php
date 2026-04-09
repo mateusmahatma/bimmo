@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             items.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'd-flex justify-content-between align-items-center p-3 mb-2 border rounded shadow-sm bg-white';
+                div.className = 'd-flex justify-content-between align-items-center p-3 mb-2 border rounded shadow-sm bg-body';
                 div.innerHTML = `
                     <div>
                         <div class="fw-bold text-dark">${item.name}</div>

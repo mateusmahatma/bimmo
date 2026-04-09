@@ -55,7 +55,7 @@
             <div class="col-12 col-xl-8">
                 <div class="row g-3">
                     <div class="col-6">
-                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="background: #f8fafc; border-radius: 12px;">
+                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : 'stat-card-inner' }}" style="border-radius: 12px;">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <p class="section-label mb-0">{{ __('Total Income') }}</p>
@@ -85,7 +85,7 @@
                     </div>
 
                     <div class="col-6">
-                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="background: #f8fafc; border-radius: 12px;">
+                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : 'stat-card-inner' }}" style="border-radius: 12px;">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <p class="section-label mb-0">{{ __('Total Expense') }}</p>
@@ -115,7 +115,7 @@
                     </div>
 
                     <div class="col-6">
-                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="background: #f8fafc; border-radius: 12px;">
+                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : 'stat-card-inner' }}" style="border-radius: 12px;">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <p class="section-label mb-0">{{ __('Expense Today') }}</p>
@@ -130,7 +130,7 @@
                     </div>
 
                     <div class="col-6">
-                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="background: #f8fafc; border-radius: 12px;">
+                        <div class="card border-0 shadow-none h-100 {{ $uiStyle === 'milenial' ? 'm-glass-container' : 'stat-card-inner' }}" style="border-radius: 12px;">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <p class="section-label mb-0">{{ __('Next Installment') }}</p>

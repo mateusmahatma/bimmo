@@ -23,7 +23,7 @@
 
         <div class="row g-3 text-center mb-4">
             <div class="col-6">
-                <div class="p-3 rounded-0 {{ $uiStyle === 'milenial' ? 'bg-primary bg-opacity-5' : '' }}" style="{{ $uiStyle !== 'milenial' ? 'background:#f8fafc;' : '' }}">
+                <div class="p-3 rounded-0 {{ $uiStyle === 'milenial' ? 'bg-primary bg-opacity-5' : 'stat-card-inner' }}">
                     <p class="section-label mb-1">{{ __('Actual') }}</p>
                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.88rem;">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h6>
                 </div>
