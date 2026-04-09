@@ -4,7 +4,7 @@
 <div class="card card-dashboard border-0 shadow-sm {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="border-radius: {{ $uiStyle === 'milenial' ? 'var(--m-radius-lg)' : '12px' }};">
     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3 {{ $uiStyle === 'milenial' ? 'm-card-header-vibrant bg-transparent' : 'bg-body' }}">
         <div class="header-title-container">
-            <h5 class="card-title mb-0 fw-bold text-dark {{ $uiStyle === 'milenial' ? 'm-card-title-vibrant' : '' }}" style="font-size: 1.1rem; letter-spacing: -0.01em;">
+            <h5 class="card-title mb-0 fw-bold {{ $uiStyle === 'milenial' ? 'm-card-title-vibrant' : '' }}" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                 Activity Calendar
             </h5>
             <p class="text-muted small mb-0 mt-1 d-none d-sm-block" style="font-size: 0.85rem;">Manage your schedules and financial deadlines.</p>
@@ -270,15 +270,29 @@
     [data-bs-theme="dark"] .fc-theme-bootstrap5 td {
         border-color: #495057 !important;
     }
+    [data-bs-theme="dark"] .fc .fc-col-header-cell {
+        background-color: #343a40 !important;
+    }
     [data-bs-theme="dark"] .fc-col-header-cell-cushion,
-    [data-bs-theme="dark"] .fc-daygrid-day-number {
-        color: #e9ecef !important;
+    [data-bs-theme="dark"] .fc-col-header-cell-cushion a,
+    [data-bs-theme="dark"] .fc-daygrid-day-number,
+    [data-bs-theme="dark"] .fc-daygrid-day-number a {
+        color: #dee2e6 !important;
+        text-decoration: none !important;
+    }
+    [data-bs-theme="dark"] .fc-col-header-cell-cushion,
+    [data-bs-theme="dark"] .fc-col-header-cell-cushion a {
+        color: #adb5bd !important; /* Muted for day names */
     }
     [data-bs-theme="dark"] .fc-daygrid-day.fc-day-today {
         background-color: rgba(13, 110, 253, 0.15) !important;
     }
     [data-bs-theme="dark"] .fc-list-day-cushion {
         background-color: #343a40 !important;
+    }
+    [data-bs-theme="dark"] .fc-list-day-text,
+    [data-bs-theme="dark"] .fc-list-day-side-text {
+        color: #dee2e6 !important;
     }
     [data-bs-theme="dark"] .fc-list-event:hover td {
         background-color: #343a40 !important;
