@@ -124,15 +124,17 @@
     .ql-container.ql-snow {
         border: none !important;
         font-family: inherit;
+        background: transparent !important;
     }
     .ql-toolbar.ql-snow {
         border: none !important;
         border-bottom: 1px solid var(--bs-border-color) !important;
-        background: var(--bs-tertiary-bg);
+        background: var(--bs-tertiary-bg) !important;
         border-radius: 8px 8px 0 0;
     }
     .ql-editor {
         font-size: 0.95rem;
+        color: inherit !important;
     }
  
     .note-text.checked {
@@ -176,11 +178,59 @@
         border-radius: 10px;
     }
 
-    /* Force high contrast for dark mode */
+    /* Force dark mode with hardcoded colors for absolute reliability */
+    [data-bs-theme="dark"] #notesModal .modal-content {
+        background-color: #1a1d21 !important;
+        border: 1px solid #343a40 !important;
+    }
+    [data-bs-theme="dark"] #notesModal .modal-header {
+        background-color: #212529 !important;
+    }
+    [data-bs-theme="dark"] #notesModal .modal-body {
+        background-color: #1a1d21 !important;
+    }
+    [data-bs-theme="dark"] #notesModal .modal-footer {
+        background-color: #212529 !important;
+    }
     [data-bs-theme="dark"] #editor-container {
         background-color: #0d1117 !important;
+        color: #e6edf3 !important;
+        border-color: #30363d !important;
     }
     [data-bs-theme="dark"] .note-card {
         background-color: #0d1117 !important;
+        border-color: #30363d !important;
+    }
+    [data-bs-theme="dark"] .note-card.checked-card {
+        background-color: #161b22 !important;
+        opacity: 0.7;
+    }
+    [data-bs-theme="dark"] .note-text {
+        color: #e6edf3 !important;
+    }
+    [data-bs-theme="dark"] .ql-toolbar.ql-snow {
+        background-color: #212529 !important;
+        border-bottom-color: #30363d !important;
+    }
+    [data-bs-theme="dark"] .ql-container.ql-snow {
+        background-color: transparent !important;
+    }
+    
+    /* Quill Icon Colors in Dark Mode */
+    [data-bs-theme="dark"] .ql-snow .ql-stroke {
+        stroke: #adb5bd !important;
+    }
+    [data-bs-theme="dark"] .ql-snow .ql-fill {
+        fill: #adb5bd !important;
+    }
+    [data-bs-theme="dark"] .ql-snow .ql-picker {
+        color: #adb5bd !important;
+    }
+    [data-bs-theme="dark"] .ql-editor.ql-blank::before {
+        color: #6c757d !important;
+    }
+    [data-bs-theme="dark"] .ql-snow.ql-toolbar button:hover .ql-stroke,
+    [data-bs-theme="dark"] .ql-snow.ql-toolbar button.ql-active .ql-stroke {
+        stroke: #3b82f6 !important;
     }
 </style>

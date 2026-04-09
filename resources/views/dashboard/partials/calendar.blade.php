@@ -2,7 +2,7 @@
     $uiStyle = auth()->user()->ui_style ?? 'corporate';
 @endphp
 <div class="card card-dashboard border-0 shadow-sm {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}" style="border-radius: {{ $uiStyle === 'milenial' ? 'var(--m-radius-lg)' : '12px' }};">
-    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3 {{ $uiStyle === 'milenial' ? 'm-card-header-vibrant bg-transparent' : '' }}">
+    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3 {{ $uiStyle === 'milenial' ? 'm-card-header-vibrant bg-transparent' : 'bg-body' }}">
         <div class="header-title-container">
             <h5 class="card-title mb-0 fw-bold text-dark {{ $uiStyle === 'milenial' ? 'm-card-title-vibrant' : '' }}" style="font-size: 1.1rem; letter-spacing: -0.01em;">
                 Activity Calendar
@@ -10,8 +10,8 @@
             <p class="text-muted small mb-0 mt-1 d-none d-sm-block" style="font-size: 0.85rem;">Manage your schedules and financial deadlines.</p>
         </div>
         <div class="d-flex gap-2 align-items-center flex-grow-1 flex-sm-grow-0 justify-content-end header-actions-container">
-            <div class="input-group input-group-sm rounded-pill overflow-hidden border shadow-sm search-input-group">
-                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+            <div class="input-group input-group-sm rounded-pill overflow-hidden border border-secondary border-opacity-25 shadow-sm search-input-group">
+                <span class="input-group-text border-0"><i class="bi bi-search text-muted"></i></span>
                 <input type="text" id="calendarSearch" class="form-control border-0" placeholder="Search...">
             </div>
             <button class="btn {{ $uiStyle === 'milenial' ? 'btn-primary bg-gradient shadow-sm' : 'btn-primary' }} btn-sm rounded-pill px-3 shadow-sm flex-shrink-0" id="btnNewEvent">
@@ -51,7 +51,7 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: {{ $uiStyle === 'milenial' ? '24px' : '15px' }}; overflow: hidden;">
             <form id="eventForm">
                 <input type="hidden" name="id" id="eventId">
-                <div class="modal-header border-bottom py-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : '' }}">
+                <div class="modal-header border-bottom py-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : 'bg-body-tertiary' }}">
                     <h5 class="modal-title fw-bold" id="addEventModalLabel">Add New Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -61,11 +61,11 @@
                         <label class="form-label small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.05em;">Basic Information</label>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Event Title</label>
-                            <input type="text" name="title" class="form-control rounded-3 shadow-sm border-light" required placeholder="What are you planning?">
+                            <input type="text" name="title" class="form-control rounded-3 shadow-sm" required placeholder="What are you planning?">
                         </div>
                         <div class="mb-0">
                             <label class="form-label small fw-bold">Category</label>
-                            <select name="category" class="form-select rounded-3 shadow-sm border-light" required>
+                            <select name="category" class="form-select rounded-3 shadow-sm" required>
                                 <option value="reminder">Reminder</option>
                                 <option value="task">Task</option>
                                 <option value="meeting">Meeting</option>
@@ -89,22 +89,22 @@
                         <div id="timeInputsContainer" class="row g-2 g-md-3">
                             <div class="col-6 col-md-6 mt-0">
                                 <label class="form-label small fw-bold">Starts At</label>
-                                <input type="datetime-local" name="start_at" class="form-control form-control-sm rounded-3 shadow-sm border-light">
+                                <input type="datetime-local" name="start_at" class="form-control form-control-sm rounded-3 shadow-sm">
                             </div>
                             <div class="col-6 col-md-6 mt-0">
                                 <label class="form-label small fw-bold">Ends At</label>
-                                <input type="datetime-local" name="end_at" class="form-control form-control-sm rounded-3 shadow-sm border-light">
+                                <input type="datetime-local" name="end_at" class="form-control form-control-sm rounded-3 shadow-sm">
                             </div>
                         </div>
 
                         <div id="dateInputsContainer" class="row d-none g-2 g-md-3">
                             <div class="col-6 col-md-6 mt-0">
                                 <label class="form-label small fw-bold">Start Date</label>
-                                <input type="date" name="start_date" class="form-control form-control-sm rounded-3 shadow-sm border-light">
+                                <input type="date" name="start_date" class="form-control form-control-sm rounded-3 shadow-sm">
                             </div>
                             <div class="col-6 col-md-6 mt-0">
                                 <label class="form-label small fw-bold">End Date</label>
-                                <input type="date" name="end_date" class="form-control form-control-sm rounded-3 shadow-sm border-light">
+                                <input type="date" name="end_date" class="form-control form-control-sm rounded-3 shadow-sm">
                             </div>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                         <div id="recurringInputs" class="row d-none g-2 g-md-3">
                             <div class="col-6 col-md-6 mt-0">
                                 <label class="form-label small fw-bold">Frequency</label>
-                                <select name="rrule_freq" id="rruleFreq" class="form-select form-select-sm rounded-3 shadow-sm border-light">
+                                <select name="rrule_freq" id="rruleFreq" class="form-select form-select-sm rounded-3 shadow-sm">
                                     <option value="DAILY">Daily</option>
                                     <option value="WEEKLY">Weekly</option>
                                     <option value="MONTHLY">Monthly</option>
@@ -132,7 +132,7 @@
                             </div>
                             <div class="col-6 col-md-6 mt-0">
                                 <label class="form-label small fw-bold">Ends On</label>
-                                <input type="date" name="rrule_until" id="rruleUntil" class="form-control form-control-sm rounded-3 shadow-sm border-light">
+                                <input type="date" name="rrule_until" id="rruleUntil" class="form-control form-control-sm rounded-3 shadow-sm">
                             </div>
                         </div>
                     </div>
@@ -151,18 +151,18 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-6 d-none" id="emailInputContainer">
-                                <input type="email" name="notification_email" id="notificationEmail" class="form-control form-control-sm rounded-3 shadow-sm border-light" value="{{ auth()->user()->email }}" placeholder="Target email">
+                                <input type="email" name="notification_email" id="notificationEmail" class="form-control form-control-sm rounded-3 shadow-sm" value="{{ auth()->user()->email }}" placeholder="Target email">
                             </div>
                         </div>
 
                         <div class="mb-0">
                             <label class="form-label small fw-bold">Description</label>
-                            <textarea name="description" class="form-control rounded-3 shadow-sm border-light" rows="2" placeholder="Add some notes..."></textarea>
+                            <textarea name="description" class="form-control rounded-3 shadow-sm" rows="2" placeholder="Add some notes..."></textarea>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : '' }}">
-                    <button type="button" class="btn btn-light rounded-pill px-3 px-md-4" data-bs-dismiss="modal">Cancel</button>
+                <div class="modal-footer border-top p-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : 'bg-body-tertiary' }}">
+                    <button type="button" class="btn btn-secondary border-0 rounded-pill px-3 px-md-4" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-3 px-md-4">Save</button>
                 </div>
             </form>
@@ -171,8 +171,8 @@
 </div>
 
 <!-- Event Detail Pop-up -->
-<div id="eventPopover" class="popover shadow-lg border-0" style="display: none; position: absolute; z-index: 1060; max-width: 250px; border-radius: 12px; background: white;">
-    <div class="popover-header fw-bold border-bottom p-2 d-flex justify-content-between align-items-center bg-light" style="border-radius: 12px 12px 0 0;">
+<div id="eventPopover" class="popover shadow-lg border-0" style="display: none; position: absolute; z-index: 1060; max-width: 250px; border-radius: 12px; background: var(--bs-body-bg);">
+    <div class="popover-header fw-bold border-bottom p-2 d-flex justify-content-between align-items-center bg-body-tertiary" style="border-radius: 12px 12px 0 0;">
         <span id="popoverTitle"></span>
         <button type="button" class="btn-close small" id="btnClosePopover" style="font-size: 0.6rem;"></button>
     </div>
@@ -245,13 +245,56 @@
     }
     
     /* Dark Mode Compatibility */
-    body.dark-mode .popover {
+    [data-bs-theme="dark"] .popover {
         background: #2b3035 !important;
         color: white !important;
+        border: 1px solid #495057 !important;
     }
-    body.dark-mode .popover-header {
+    [data-bs-theme="dark"] .popover-header {
         background: #343a40 !important;
         color: white !important;
+        border-color: #495057 !important;
+    }
+    [data-bs-theme="dark"] .popover-body {
+        color: #dee2e6 !important;
+    }
+    [data-bs-theme="dark"] #popoverTime {
+        color: #adb5bd !important;
+    }
+
+    /* FullCalendar Dark Mode Fixes */
+    [data-bs-theme="dark"] .fc-theme-bootstrap5 .fc-scrollgrid {
+        border-color: #495057 !important;
+    }
+    [data-bs-theme="dark"] .fc-theme-bootstrap5 th,
+    [data-bs-theme="dark"] .fc-theme-bootstrap5 td {
+        border-color: #495057 !important;
+    }
+    [data-bs-theme="dark"] .fc-col-header-cell-cushion,
+    [data-bs-theme="dark"] .fc-daygrid-day-number {
+        color: #e9ecef !important;
+    }
+    [data-bs-theme="dark"] .fc-daygrid-day.fc-day-today {
+        background-color: rgba(13, 110, 253, 0.15) !important;
+    }
+    [data-bs-theme="dark"] .fc-list-day-cushion {
+        background-color: #343a40 !important;
+    }
+    [data-bs-theme="dark"] .fc-list-event:hover td {
+        background-color: #343a40 !important;
+    }
+    [data-bs-theme="dark"] .fc .fc-button-primary {
+        background-color: #2c2c2c !important;
+        border-color: #495057 !important;
+        color: #e9ecef !important;
+    }
+    [data-bs-theme="dark"] .fc .fc-button-primary:hover {
+        background-color: #3d3d3d !important;
+    }
+    [data-bs-theme="dark"] .fc .fc-button-primary:disabled {
+        background-color: #1a1a1a !important;
+    }
+    [data-bs-theme="dark"] .fc-theme-bootstrap5 .fc-list {
         border-color: #495057 !important;
     }
     
