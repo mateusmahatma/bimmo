@@ -26,10 +26,10 @@
         <div class="progress-clean mb-4">
             <div class="d-flex h-100">
                 <div class="{{ $uiStyle !== 'milenial' ? 'bg-success' : '' }}"
-                     style="width: {{ $assetPercent }}%; border-radius: 100px 0 0 100px; {{ $uiStyle === 'milenial' ? 'background: var(--m-secondary-gradient);' : '' }}">
+                     style="width: {{ $assetPercent }}%; {{ $uiStyle === 'milenial' ? 'background: var(--m-secondary-gradient);' : '' }}">
                 </div>
                 <div class="{{ $uiStyle !== 'milenial' ? 'bg-danger' : '' }}"
-                     style="width: {{ $debtPercent }}%; border-radius: 0 100px 100px 0; {{ $uiStyle === 'milenial' ? 'background: var(--m-danger-gradient);' : '' }}">
+                     style="width: {{ $debtPercent }}%; {{ $uiStyle === 'milenial' ? 'background: var(--m-danger-gradient);' : '' }}">
                 </div>
             </div>
         </div>

@@ -15,7 +15,7 @@
             </nav>
         </div>
         <div>
-            <a href="{{ route('dashboard') }}" class="btn btn-light rounded-pill px-4 shadow-sm border" wire:navigate>
+            <a href="{{ route('dashboard') }}" class="btn btn-light rounded-0 px-4 shadow-sm border" wire:navigate>
                 <i class="bi bi-arrow-left me-1"></i> {{ __('Back') }}
             </a>
         </div>
@@ -26,14 +26,14 @@
     <div class="row g-4">
         <!-- Main Chart Card -->
         <div class="col-xl-8">
-            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm overflow-hidden rounded-0">
                 <div class="card-header border-0 pt-4 px-4 d-flex justify-content-between align-items-center" style="background: transparent;">
                     <div>
                         <h5 class="fw-bold mb-0">{{ __('Net Worth Growth') }}</h5>
                         <p class="text-muted small mb-0">{{ __('Historical trend of your assets and liabilities') }}</p>
                     </div>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-light rounded-circle" type="button" id="btnRefreshNetWorth" title="{{ __('Refresh Data') }}">
+                        <button class="btn btn-sm btn-light rounded-0" type="button" id="btnRefreshNetWorth" title="{{ __('Refresh Data') }}">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
@@ -54,7 +54,7 @@
 
         <!-- History Summary Card -->
         <div class="col-xl-4">
-            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm overflow-hidden rounded-0">
                 <div class="card-header border-0 pt-4 px-4" style="background: transparent;">
                     <h5 class="fw-bold mb-0">{{ __('Monthly Data') }}</h5>
                     <p class="text-muted small mb-0">{{ __('Click on values to see details') }}</p>
@@ -62,7 +62,7 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0 net-worth-table">
-                            <thead class="bg-light">
+                            <thead class="table-header-strip">
                                 <tr>
                                     <th class="ps-4 fw-600 py-3 border-0 text-uppercase text-secondary">{{ __('Month') }}</th>
                                     <th class="text-end fw-600 py-3 border-0 text-uppercase text-secondary">{{ __('Assets') }}</th>
@@ -84,10 +84,10 @@
 <!-- Drilling Detail Modal -->
 <div class="modal fade" id="netWorthDetailModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-content border-0 shadow-lg rounded-0 overflow-hidden">
             <div class="modal-header border-0 pb-0 pt-4 px-4 bg-body-tertiary">
                 <div class="d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-0 me-3">
                         <i class="bi bi-journal-text fs-4 text-primary"></i>
                     </div>
                     <h5 class="modal-title fw-bold" id="netWorthDetailTitle">Details</h5>
@@ -100,7 +100,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 p-3 bg-body-tertiary">
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                <button type="button" class="btn btn-secondary rounded-0 px-4" data-bs-dismiss="modal">{{ __('Close') }}</button>
             </div>
         </div>
     </div>
@@ -110,12 +110,16 @@
 <style>
     .fw-600 { font-weight: 600; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 0; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 0; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #bbb; }
     
     .net-worth-row { cursor: pointer; transition: background 0.2s; }
     .net-worth-row:hover { background-color: rgba(13, 110, 253, 0.03); }
+
+    [data-bs-theme="dark"] .net-worth-row:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
 
     .table > :not(caption) > * > * {
         padding: 0.75rem 0.4rem;
@@ -125,6 +129,11 @@
     .net-worth-table th { font-size: 0.75rem; letter-spacing: 0.5px; }
     
     .modal-lg { max-width: 800px; }
+
+    /* Dark mode fixes for modal tertiary background */
+    [data-bs-theme="dark"] .bg-body-tertiary {
+        background-color: #2c2c2c !important;
+    }
 </style>
 @endpush
 
@@ -149,6 +158,10 @@ function initNetWorthPage() {
 
     const renderNetWorthChart = (data) => {
         if (!data || data.length === 0) return;
+
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const labelColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f1f1f1';
 
         const months = data.map(item => item.bulan);
         const wealthData = data.map(item => item.total_aset);
@@ -187,14 +200,14 @@ function initNetWorthPage() {
             plotOptions: {
                 bar: {
                     columnWidth: '45%',
-                    borderRadius: 8
+                    borderRadius: 0
                 }
             },
             colors: ['#4361ee', '#4cc9f0', '#f72585'],
             fill: {
                 opacity: [1, 0.85, 0.85],
                 gradient: {
-                    shade: 'light',
+                    shade: isDark ? 'dark' : 'light',
                     type: "vertical",
                     opacityFrom: 0.85,
                     opacityTo: 0.55,
@@ -213,16 +226,17 @@ function initNetWorthPage() {
                     formatter: function (val) {
                         return "Rp " + new Intl.NumberFormat('id-ID').format(val);
                     },
-                    style: { colors: '#64748b' }
+                    style: { colors: labelColor }
                 }
             },
             xaxis: {
                 type: 'category',
                 axisBorder: { show: false },
                 axisTicks: { show: false },
-                labels: { style: { colors: '#64748b' } }
+                labels: { style: { colors: labelColor } }
             },
             tooltip: {
+                theme: isDark ? 'dark' : 'light',
                 shared: true,
                 intersect: false,
                 y: {
@@ -237,10 +251,13 @@ function initNetWorthPage() {
             legend: {
                 position: 'top',
                 horizontalAlign: 'right',
-                offsetY: 0
+                offsetY: 0,
+                labels: {
+                    colors: labelColor
+                }
             },
             grid: {
-                borderColor: '#f1f1f1',
+                borderColor: gridColor,
                 padding: { bottom: 10 }
             }
         };
@@ -362,12 +379,13 @@ function initNetWorthPage() {
         listContainer.innerHTML = '';
 
         if (items.length === 0) {
-            listContainer.innerHTML = '<div class="text-center p-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i> No records found for this month.</div>';
+            listContainer.innerHTML = `<div class="text-center p-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i> {{ __('No records found for this month.') }}</div>`;
         } else {
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
             const table = document.createElement('table');
             table.className = 'table table-hover align-middle mb-0';
             table.innerHTML = `
-                <thead class="table-light">
+                <thead class="${isDark ? 'table-header-strip' : 'table-light'}">
                     <tr>
                         <th class="ps-4">{{ __('Name') }}</th>
                         <th>{{ __('Category') }}</th>
@@ -383,13 +401,13 @@ function initNetWorthPage() {
                 tr.innerHTML = `
                     <td class="ps-4">
                         <div class="d-flex align-items-center">
-                            <div class="bg-light p-2 rounded-3 me-3 text-center ${item.class}" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                            <div class="${isDark ? 'bg-dark' : 'bg-light'} p-2 rounded-0 me-3 text-center ${item.class}" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi ${item.icon} fs-5"></i>
                             </div>
                             <div class="fw-bold text-dark">${item.name}</div>
                         </div>
                     </td>
-                    <td><span class="badge bg-light text-dark fw-normal border">${item.type}</span></td>
+                    <td><span class="badge ${isDark ? 'bg-dark text-light' : 'bg-light text-dark'} fw-normal border rounded-0">${item.type}</span></td>
                     <td class="text-end pe-4 fw-bold">
                         <span class="${type === 'wealth' ? 'text-success' : 'text-danger'}">
                         Rp ${new Intl.NumberFormat('id-ID').format(Math.abs(item.value))}
