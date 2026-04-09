@@ -335,6 +335,52 @@ class FinancialCalculatorController extends Controller
         $namaPengeluaran = Pengeluaran::whereIn('id', $idPengeluaranList)->pluck('nama')->toArray();
         $total = count($namaPengeluaran);
 
-        return view('kalkulator.show', compact('HasilProsesAnggaran', 'total', 'namaPengeluaran', 'transaksi'));
+        // ─── Burn Rate Calculation ───────────────────────────────────────────
+        $burnRate = null;
+        $startDate  = \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_mulai)->startOfDay();
+        $endDate    = \Carbon\Carbon::parse($HasilProsesAnggaran->tanggal_selesai)->endOfDay();
+        $today      = \Carbon\Carbon::now()->startOfDay();
+
+        // Only compute when the period has started
+        if ($today->gte($startDate)) {
+            $totalDays     = (int) $startDate->diffInDays($endDate) + 1;          // total days in period
+            $daysElapsed   = (int) $startDate->diffInDays($today->min($endDate)) + 1; // days passed (capped at end)
+            $daysRemaining = max(0, (int) $today->diffInDays($endDate));           // days left from today
+
+            $totalSpent    = (float) $HasilProsesAnggaran->anggaran_yang_digunakan;
+            $totalBudget   = (float) $HasilProsesAnggaran->nominal_anggaran;
+
+            if ($daysElapsed > 0 && $totalBudget > 0) {
+                $dailyRate           = $totalSpent / $daysElapsed;                 // avg spend per day
+                $projectedTotal      = $dailyRate * $totalDays;                    // projected total if pace continues
+                $projectedRemaining  = $dailyRate * $daysRemaining;               // projected spend in remaining days
+                $spentPercentage     = ($totalSpent / $totalBudget) * 100;
+                $idealPercentage     = ($daysElapsed / $totalDays) * 100;         // ideal % spent by now
+                $daysUntilBudgetOut  = $dailyRate > 0 ? (int) (($totalBudget - $totalSpent) / $dailyRate) : null;
+
+                $isOverBurning       = $projectedTotal > $totalBudget;            // will exceed budget
+                $isBehindPace        = $spentPercentage > ($idealPercentage * 1.2); // spending 20% faster than ideal
+
+                $burnRate = [
+                    'total_days'           => $totalDays,
+                    'days_elapsed'         => $daysElapsed,
+                    'days_remaining'       => $daysRemaining,
+                    'total_spent'          => $totalSpent,
+                    'total_budget'         => $totalBudget,
+                    'daily_rate'           => $dailyRate,
+                    'projected_total'      => $projectedTotal,
+                    'projected_remaining'  => $projectedRemaining,
+                    'spent_percentage'     => $spentPercentage,
+                    'ideal_percentage'     => $idealPercentage,
+                    'days_until_out'       => $daysUntilBudgetOut,
+                    'is_over_burning'      => $isOverBurning,
+                    'is_behind_pace'       => $isBehindPace,
+                    'alert_triggered'      => $isOverBurning || $isBehindPace,
+                ];
+            }
+        }
+        // ────────────────────────────────────────────────────────────────────
+
+        return view('kalkulator.show', compact('HasilProsesAnggaran', 'total', 'namaPengeluaran', 'transaksi', 'burnRate'));
     }
 }

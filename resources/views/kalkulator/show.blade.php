@@ -51,6 +51,77 @@
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
+
+    /* ─── Burn Rate Card ───────────────────────────────────────── */
+    .burn-rate-card {
+        border-radius: 0;
+        border: none;
+        overflow: hidden;
+    }
+    .burn-rate-card.alert-danger-card {
+        background: linear-gradient(135deg, #fff5f5 0%, #fff 60%);
+        border-left: 4px solid #ef4444 !important;
+    }
+    .burn-rate-card.alert-safe-card {
+        background: linear-gradient(135deg, #f0fdf4 0%, #fff 60%);
+        border-left: 4px solid #22c55e !important;
+    }
+    [data-bs-theme="dark"] .burn-rate-card.alert-danger-card {
+        background: linear-gradient(135deg, rgba(239,68,68,.08) 0%, transparent 60%);
+        border-left: 4px solid #ef4444 !important;
+    }
+    [data-bs-theme="dark"] .burn-rate-card.alert-safe-card {
+        background: linear-gradient(135deg, rgba(34,197,94,.08) 0%, transparent 60%);
+        border-left: 4px solid #22c55e !important;
+    }
+    .burn-stat-box {
+        padding: 0.75rem 1rem;
+        background: rgba(255,255,255,0.6);
+        border-radius: 0;
+        border: 1px solid rgba(0,0,0,0.06);
+        transition: transform .15s;
+    }
+    [data-bs-theme="dark"] .burn-stat-box {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.08);
+    }
+    .burn-stat-box:hover { transform: translateY(-1px); }
+    .burn-gauge-wrap { position: relative; }
+    .burn-gauge-bar {
+        height: 10px;
+        border-radius: 999px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+    [data-bs-theme="dark"] .burn-gauge-bar { background: rgba(255,255,255,.1); }
+    .burn-gauge-fill {
+        height: 100%;
+        border-radius: 999px;
+        transition: width .6s ease;
+        position: relative;
+    }
+    .burn-gauge-fill::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; bottom: 0;
+        width: 20px;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,.35));
+    }
+    .burn-ideal-marker {
+        position: absolute;
+        top: -4px;
+        width: 2px;
+        height: 18px;
+        background: #64748b;
+        border-radius: 1px;
+    }
+    .burn-pulse-icon {
+        animation: burn-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes burn-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: .65; transform: scale(1.15); }
+    }
 </style>
 @endpush
 
@@ -148,6 +219,139 @@
                 </div>
             </div>
         </div>
+
+        @if ($burnRate)
+        {{-- ─── Burn Rate Alert Card ──────────────────────────────────────── --}}
+        <div class="col-lg-12">
+            <div class="card-dashboard mb-4 burn-rate-card {{ $burnRate['alert_triggered'] ? 'alert-danger-card' : 'alert-safe-card' }}">
+                <div class="card-body p-4">
+
+                    {{-- Header --}}
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle {{ $burnRate['alert_triggered'] ? 'bg-danger-subtle' : 'bg-success-subtle' }}" style="width:48px;height:48px;flex-shrink:0">
+                            @if($burnRate['alert_triggered'])
+                                <i class="bi bi-fire text-danger fs-4 burn-pulse-icon"></i>
+                            @else
+                                <i class="bi bi-shield-check text-success fs-4"></i>
+                            @endif
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 {{ $burnRate['alert_triggered'] ? 'text-danger' : 'text-success' }}">
+                                {{ __('Burn Rate — Spending Pace') }}
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                @if($burnRate['alert_triggered'])
+                                    {{ __('Warning! You are spending your budget too fast.') }}
+                                @else
+                                    {{ __('Your spending pace is safe and on track.') }}
+                                @endif
+                            </p>
+                        </div>
+                        <div class="ms-auto text-end d-none d-md-block">
+                            <span class="badge {{ $burnRate['alert_triggered'] ? 'bg-danger' : 'bg-success' }} rounded-pill px-3 py-2" style="font-size:.8rem;">
+                                {{ number_format($burnRate['spent_percentage'], 1) }}% {{ __('used') }}
+                            </span>
+                            <div class="text-muted small mt-1">{{ __('after') }} {{ $burnRate['days_elapsed'] }} {{ __('days elapsed') }}</div>
+                        </div>
+                    </div>
+
+                    {{-- Progress Gauge --}}
+                    @php
+                        $fillPct   = min(100, $burnRate['spent_percentage']);
+                        $idealPct  = min(99, $burnRate['ideal_percentage']);
+                        $fillColor = $burnRate['alert_triggered']
+                            ? 'linear-gradient(90deg,#f97316,#ef4444)'
+                            : 'linear-gradient(90deg,#22c55e,#16a34a)';
+                    @endphp
+                    <div class="burn-gauge-wrap mb-1">
+                        <div class="burn-gauge-bar">
+                            <div class="burn-gauge-fill" style="width:{{ $fillPct }}%; background:{{ $fillColor }}"></div>
+                        </div>
+                        <div class="burn-ideal-marker" style="left:{{ $idealPct }}%" title="{{ __('Ideal pace') }}"></div>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted mb-4">
+                        <span>{{ __('Day') }} {{ $burnRate['days_elapsed'] }}</span>
+                        <span class="opacity-75"><i class="bi bi-bar-chart-line me-1"></i>{{ __('Ideal:') }} {{ number_format($burnRate['ideal_percentage'], 1) }}%</span>
+                        <span>{{ __('Day') }} {{ $burnRate['total_days'] }} {{ __('(end)') }}</span>
+                    </div>
+
+                    {{-- Stat Boxes --}}
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="burn-stat-box">
+                                <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size:.7rem;">{{ __('Spend / Day') }}</div>
+                                <div class="fw-bold fs-6 {{ $burnRate['alert_triggered'] ? 'text-danger' : 'text-success' }}">Rp {{ number_format($burnRate['daily_rate'], 0, ',', '.') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="burn-stat-box">
+                                <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size:.7rem;">{{ __('Days Remaining') }}</div>
+                                <div class="fw-bold fs-6">{{ $burnRate['days_remaining'] }} {{ __('days') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="burn-stat-box">
+                                <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size:.7rem;">{{ __('Projected Total Spend') }}</div>
+                                <div class="fw-bold fs-6 {{ $burnRate['projected_total'] > $burnRate['total_budget'] ? 'text-danger' : 'text-success' }}">Rp {{ number_format($burnRate['projected_total'], 0, ',', '.') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="burn-stat-box">
+                                <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size:.7rem;">{{ __('Budget Runs Out In') }}</div>
+                                <div class="fw-bold fs-6 {{ $burnRate['alert_triggered'] ? 'text-danger' : 'text-success' }}">
+                                    @if($burnRate['days_until_out'] !== null && $burnRate['days_until_out'] >= 0)
+                                        ± {{ $burnRate['days_until_out'] }} {{ __('days') }}
+                                    @else
+                                        —
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Alert / Safe Message --}}
+                    @if($burnRate['alert_triggered'])
+                    <div class="alert border-0 mb-0" style="background:rgba(239,68,68,.08);">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-exclamation-triangle-fill text-danger mt-1 flex-shrink-0"></i>
+                            <div>
+                                <strong class="text-danger">{{ __('Your spending rate is too fast!') }}</strong>
+                                <p class="mb-0 small text-muted mt-1">
+                                    {{ __('After') }} <strong>{{ $burnRate['days_elapsed'] }}</strong> {{ __('days, you have already spent') }}
+                                    <strong>{{ number_format($burnRate['spent_percentage'], 1) }}%</strong> {{ __('of your budget.') }}
+                                    {{ __('At this pace, your budget will run out in approximately') }}
+                                    <strong class="text-danger">
+                                        @if($burnRate['days_until_out'] !== null && $burnRate['days_until_out'] >= 0)
+                                            {{ $burnRate['days_until_out'] }} {{ __('more days') }}
+                                        @else
+                                            {{ __('very soon') }}
+                                        @endif
+                                    </strong>.
+                                    {{ __('Consider reducing your daily spending.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <div class="alert border-0 mb-0" style="background:rgba(34,197,94,.08);">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1 flex-shrink-0"></i>
+                            <div>
+                                <strong class="text-success">{{ __('Your spending is under control.') }}</strong>
+                                <p class="mb-0 small text-muted mt-1">
+                                    {{ __('At your current pace, your budget is projected to') }}
+                                    <strong class="text-success">{{ __('last through the end of the period') }}</strong>.
+                                    {{ __('Keep it up!') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- Detail Table -->
         <div class="col-lg-12">
