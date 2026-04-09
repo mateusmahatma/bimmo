@@ -1,0 +1,106 @@
+/* Header Enhancements */
+.pagetitle {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.75rem;
+}
+.pagetitle h1 {
+    font-size: 1.75rem;
+    letter-spacing: -0.03em;
+    color: #2d3436;
+}
+.breadcrumb {
+    font-size: 0.85rem;
+}
+.breadcrumb-item a {
+    color: #636e72;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.breadcrumb-item a:hover {
+    color: #0984e3;
+}
+.breadcrumb-item.active {
+    color: #0984e3;
+    font-weight: 600;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "\F285"; /* bi-chevron-right */
+    font-family: "bootstrap-icons";
+    font-size: 0.65rem;
+    color: #b2bec3;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+[data-bs-theme="dark"] .pagetitle {
+    border-bottom: 1px solid #2d2d2d;
+}
+[data-bs-theme="dark"] .pagetitle h1 {
+    color: #e0e0e0;
+}
+[data-bs-theme="dark"] .breadcrumb-item a {
+    color: #a0a0a0;
+}
+[data-bs-theme="dark"] .breadcrumb-item.active {
+    color: #60a5fa;
+}
+
+.ts-control {
+    border-radius: 0.5rem !important;
+    padding: 0.6rem 1rem !important;
+}
+
+/* CKEditor Dark Mode Fix */
+[data-bs-theme="dark"] .ck-editor__main > .ck-editor__editable {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border-color: #444 !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-toolbar {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button:hover {
+    background-color: #3d3d3d !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button.ck-on {
+    background-color: #4d4d4d !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-list {
+    background-color: #2d2d2d !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-list__item .ck-button {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .ck.ck-list__item .ck-button:hover {
+    background-color: #3d3d3d !important;
+}
+
+/* Migration Guide Inspired Notifications */
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+@keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bg-success-light { background-color: rgba(25, 135, 84, 0.1); }
+.bg-danger-light { background-color: rgba(220, 53, 69, 0.1); }
