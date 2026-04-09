@@ -6,12 +6,18 @@
 button, 
 a, 
 .cursor-pointer,
+.pointer-cursor,
 [role="button"] {
     cursor: pointer !important;
     /* Prevent flickering by forcing hardware acceleration for transitions */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transform: translateZ(0);
+}
+
+input,
+textarea {
+    cursor: text !important;
 }
 
 .py-3 {

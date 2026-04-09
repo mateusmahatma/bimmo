@@ -11,7 +11,7 @@
 (function () {
     'use strict';
 
-    // Source Code & Console Protection
+    // Robust PWA Detection
     const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true ||
         document.referrer.includes('android-app://');
@@ -32,9 +32,10 @@
     });
 
     // Enhanced Console Protection - "Jangan tampilkan console nya"
+    // Optimized for performance
     const swallowConsole = () => {
         if (window.console) {
-            const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'clear', 'dir', 'count', 'group', 'groupCollapsed', 'groupEnd', 'time', 'timeEnd', 'profile', 'profileEnd'];
+            const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'clear'];
             methods.forEach(method => {
                 window.console[method] = () => { };
             });
@@ -43,41 +44,6 @@
 
     swallowConsole();
 
-    // Continuous console clearing via iframe bypass to be absolute
-    setInterval(() => {
-        try {
-            const c = document.createElement('iframe');
-            c.style.display = 'none';
-            document.body.appendChild(c);
-            c.contentWindow.console.clear();
-            document.body.removeChild(c);
-        } catch (e) { }
-    }, 100);
-
-    // Advanced Debugger Trap
-    const detector = function () {
-        try {
-            (function () {
-                (function a() {
-                    try {
-                        (function b(i) {
-                            if (('' + (i / i)).length !== 1 || i % 20 === 0) {
-                                (function () { }).constructor('debugger')();
-                             } else {
-                                debugger;
-                            }
-                            b(++i);
-                        })(0);
-                    } catch (e) {
-                         setTimeout(a, 50);
-                    }
-                })();
-             })();
-        } catch (e) { }
-    };
-
-    setTimeout(detector, 1000);
-
     // Print Protection
     window.addEventListener('beforeprint', () => {
         document.body.style.display = 'none';
@@ -85,5 +51,6 @@
     window.addEventListener('afterprint', () => {
         document.body.style.display = 'block';
     });
+
 
 })();

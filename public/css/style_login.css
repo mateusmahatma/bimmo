@@ -90,20 +90,31 @@ label {
     color: #666;
 }
 
+/* Stable Cursors for Form Fields */
+.form-control {
+    cursor: text !important;
+}
+
+.form-floating label {
+    pointer-events: none; /* Ensure label doesn't intercept clicks/hovers meant for input */
+}
+
 /* Toggle password visibility */
 .password-toggle-icon {
     position: absolute;
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #aaa;
-    cursor: pointer;
+    color: #6c757d;
+    cursor: pointer !important;
     z-index: 10;
+    padding: 10px; /* Increase hit area without affecting positioning */
+    margin-right: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.password-toggle-icon:hover {
-    color: #333;
-}
 
 .tombol-login {
     background: var(--bs-primary);
