@@ -196,6 +196,52 @@
             </div>
         </div> --}}
 
+        <!-- Ubah Nama -->
+        <div class="card mb-4">
+            <div class="card-header">
+                {{ __('Display Name') }}
+            </div>
+            <div class="card-body">
+                @if(session('name_status'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('name_status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if($errors->updateName->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul>
+                            @foreach ($errors->updateName->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                <form action="{{ route('profil.updateName') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-0">
+                        <label for="name" class="form-label">{{ __('Full Name') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text"
+                                   class="form-control @error('name', 'updateName') is-invalid @enderror"
+                                   id="name"
+                                   name="name"
+                                   value="{{ old('name', auth()->user()->name) }}"
+                                   placeholder="{{ __('Enter your full name') }}"
+                                   minlength="2"
+                                   maxlength="255"
+                                   required>
+                            <button type="submit" class="btn btn-primary">{{ __('Save Name') }}</button>
+                        </div>
+                        <div class="form-text text-muted">{{ __('This name will be displayed throughout the application.') }}</div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Informasi Pengguna -->
         <div class="card mb-4">
             <div class="card-header">

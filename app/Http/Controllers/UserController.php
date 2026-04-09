@@ -138,6 +138,27 @@ class UserController extends Controller
         return redirect()->back()->with('email_status', 'Email berhasil diubah!');
     }
 
+    public function updateName(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|min:2|max:255',
+        ], [
+            'name.required' => 'Nama tidak boleh kosong.',
+            'name.min'      => 'Nama minimal 2 karakter.',
+            'name.max'      => 'Nama maksimal 255 karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator, 'updateName');
+        }
+
+        $user = auth()->user();
+        $user->name = $request->name;
+        $user->save();
+
+        return redirect()->back()->with('name_status', 'Nama berhasil diubah!');
+    }
+
     public function updatePhoneNumber(Request $request)
     {
         $validator = Validator::make($request->all(), [
