@@ -83,8 +83,6 @@
         // Legacy/Shortcut function
         window.setTheme = (theme) => applyTheme(theme);
 
-        // Source Code & Console Protection
-        (function() {
             // Robust PWA Detection
             const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
                              window.navigator.standalone === true || 
@@ -105,9 +103,10 @@
             };
 
             // Enhanced Console Protection - "Jangan tampilkan console nya"
+            // Optimized to not impact performance
             const swallowConsole = () => {
                 if (window.console) {
-                    const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'clear', 'dir', 'count', 'group', 'groupCollapsed', 'groupEnd', 'time', 'timeEnd', 'profile', 'profileEnd'];
+                    const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'clear'];
                     methods.forEach(method => {
                         window.console[method] = () => {};
                     });
@@ -117,47 +116,6 @@
             // Execute console suppression
             swallowConsole();
 
-            // Continuous console clearing to be extra sure
-            setInterval(() => {
-                try {
-                    // We use original console.clear if we haven't swallowed it for internal use, 
-                    // but here we just want to keep the console empty if it's open.
-                    // This is a direct way to bypass our own swallowed console if needed, 
-                    // but usually just doing nothing is enough if we override.
-                    // However, we want to prevent any PREVIOUS logs from being visible.
-                    const c = document.createElement('iframe');
-                    c.style.display = 'none';
-                    document.body.appendChild(c);
-                    c.contentWindow.console.clear();
-                    document.body.removeChild(c);
-                } catch(e) {}
-            }, 100);
-
-            // Robust Debugger Trap - This makes the console unusable by pausing execution
-            const detector = function() {
-                try {
-                    (function() {
-                        (function a() {
-                            try {
-                                (function b(i) {
-                                    if (('' + (i / i)).length !== 1 || i % 20 === 0) {
-                                        (function() {}).constructor('debugger')();
-                                    } else {
-                                        debugger;
-                                    }
-                                    b(++i);
-                                })(0);
-                            } catch (e) {
-                                setTimeout(a, 50);
-                            }
-                        })();
-                    })();
-                } catch (e) {}
-            };
-
-            // Start the debugger trap to frustrate DevTools users
-            setTimeout(detector, 1000);
-
             // Print Protection (Media query in CSS handles the rest)
             window.addEventListener('beforeprint', () => {
                 document.body.style.display = 'none';
@@ -165,7 +123,7 @@
             window.addEventListener('afterprint', () => {
                 document.body.style.display = 'block';
             });
-        })();
+
     </script>
 </head>
 

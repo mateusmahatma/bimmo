@@ -1,3 +1,19 @@
+/* Fix Chrome Cursor Flickering & Stability */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button, 
+a, 
+.cursor-pointer,
+[role="button"] {
+    cursor: pointer !important;
+    /* Prevent flickering by forcing hardware acceleration for transitions */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
 .py-3 {
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
