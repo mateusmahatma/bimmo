@@ -34,12 +34,8 @@
     </div>
 
     {{-- Flash Messages --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3 py-2 mb-3" role="alert">
-            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+{{-- Standarized with Toast --}}
+
 
     <!-- Add Thread Modal -->
     <div class="modal fade" id="addThreadModal" tabindex="-1">

@@ -14,12 +14,8 @@
     </div>
 
     {{-- Flash Messages --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3 py-2 mb-3" role="alert">
-            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+{{-- Standarized with Toast --}}
+
 
     {{-- Main Thread --}}
     <div class="card border-0 shadow-sm rounded-4 mb-4">

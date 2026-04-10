@@ -147,12 +147,8 @@
                 </div>
                 <div class="card-body p-3 p-md-4">
 
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
-                            <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+{{-- Standarized with Toast --}}
+
 
                     @if($transaksi->isEmpty())
                         <div class="text-center py-5">

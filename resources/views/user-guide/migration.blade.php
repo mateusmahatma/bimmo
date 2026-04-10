@@ -6,36 +6,8 @@
         <div class="col-lg-10 col-xl-8">
             <!-- Header Section -->
             <div class="text-center mb-5 pb-2">
-                @if(session('success'))
-                <div class="alert alert-success border-0 shadow-sm rounded-4 p-4 mb-5 d-flex align-items-center justify-content-between text-start scale-in">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-box bg-success bg-opacity-10 text-success me-3">
-                            <i class="bi bi-check2-circle fs-3"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1">{{ session('success') }}</h5>
-                            <p class="mb-0 text-muted small">{{ __('Data processed successfully') }}</p>
-                        </div>
-                    </div>
-                    @if(session('redirect_url'))
-                    <a href="{{ session('redirect_url') }}" target="_blank" class="btn btn-success px-4 py-2 rounded-pill fw-bold shadow-sm">
-                        <i class="bi bi-eye me-2"></i> {{ __('Lihat Data') }} {{ session('redirect_name') }}
-                    </a>
-                    @endif
-                </div>
-                @endif
+{{-- Standarized with Toast --}}
 
-                @if(session('error'))
-                <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-5 d-flex align-items-center text-start">
-                    <div class="icon-box bg-danger bg-opacity-10 text-danger me-3">
-                        <i class="bi bi-exclamation-triangle fs-3"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-1">{{ __('Gagal Mengunggah') }}</h5>
-                        <p class="mb-0 text-muted small">{{ session('error') }}</p>
-                    </div>
-                </div>
-                @endif
 
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb justify-content-center bg-transparent p-0 mb-0">

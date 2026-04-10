@@ -347,19 +347,8 @@
                         </div>
                     </div>
 
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
-                            <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+{{-- Standarized with Toast --}}
 
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
-                            <i class="bi bi-exclamation-triangle me-2"></i> {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
 
                     <div id="pinjaman-table-container">
                         @include('pinjaman._table_list')

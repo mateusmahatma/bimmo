@@ -68,12 +68,8 @@
                     <p class="text-muted small">Silakan masukkan kredensial Anda untuk melanjutkan akses ke sistem.</p>
                 </div>
 
-                @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                @endif
+                {{-- Standarized with toast --}}
+
                 
                 <form class="row g-3 needs-validation" action="/login" method="post">
                     @csrf
@@ -210,6 +206,8 @@
             });
         }
     </script>
+    @include('components.toast')
 </body>
+
 
 </html>

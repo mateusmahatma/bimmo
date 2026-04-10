@@ -317,6 +317,8 @@
             });
         }
     </script>
+    @include('components.toast')
 </body>
+
 
 </html>
