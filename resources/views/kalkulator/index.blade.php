@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', __('Budget Calculator'))
+@section('title', __('Budget Monitoring'))
 
 @push('css')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -12,28 +12,35 @@
         border-bottom: 1px solid #e9ecef;
         padding-bottom: 0.75rem;
     }
+
     .pagetitle h1 {
         font-size: 1.75rem;
         letter-spacing: -0.03em;
         color: #2d3436;
     }
+
     .breadcrumb {
         font-size: 0.85rem;
     }
+
     .breadcrumb-item a {
         color: #636e72;
         text-decoration: none;
         transition: color 0.2s;
     }
+
     .breadcrumb-item a:hover {
         color: #0984e3;
     }
+
     .breadcrumb-item.active {
         color: #0984e3;
         font-weight: 600;
     }
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "\F285"; /* bi-chevron-right */
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        content: "\F285";
+        /* bi-chevron-right */
         font-family: "bootstrap-icons";
         font-size: 0.65rem;
         color: #b2bec3;
@@ -44,12 +51,15 @@
     [data-bs-theme="dark"] .pagetitle {
         border-bottom: 1px solid #2d2d2d;
     }
+
     [data-bs-theme="dark"] .pagetitle h1 {
         color: #e0e0e0;
     }
+
     [data-bs-theme="dark"] .breadcrumb-item a {
         color: #a0a0a0;
     }
+
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
@@ -58,9 +68,15 @@
         animation: spin 1s infinite linear;
         display: inline-block;
     }
+
     @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>
 @endpush
@@ -161,7 +177,7 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Process History') }}</h5>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Budget Process History') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('List of your budget calculation history.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
