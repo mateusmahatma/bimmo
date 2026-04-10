@@ -57,6 +57,48 @@
         border-radius: 0.5rem !important;
         padding: 0.6rem 1rem !important;
     }
+
+    /* CKEditor Dark Mode Fix */
+    [data-bs-theme="dark"] .ck-editor__main > .ck-editor__editable {
+        background-color: #1e1e1e !important;
+        color: #ffffff !important;
+        border-color: #444 !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-toolbar {
+        background-color: #2d2d2d !important;
+        border-color: #444 !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button {
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button:hover {
+        background-color: #3d3d3d !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button.ck-on {
+        background-color: #4d4d4d !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-list {
+        background-color: #2d2d2d !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-list__item .ck-button {
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .ck.ck-list__item .ck-button:hover {
+        background-color: #3d3d3d !important;
+    }
+
+    /* Income/Expense Card Dark Mode */
+    [data-bs-theme="dark"] .income-expense-card {
+        background-color: #1e1e1e !important;
+        border-color: #2d2d2d !important;
+    }
 </style>
 @endpush
 
@@ -107,7 +149,7 @@
                         <div class="row g-4 mb-4">
                             <!-- Income Section -->
                             <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #198754 !important;">
+                                <div class="p-3 border rounded-3 bg-white h-100 income-expense-card" style="border-top: 4px solid #198754 !important;">
                                     <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> {{ __('Income') }}</h6>
                                     
                                     <div class="mb-3">
@@ -135,7 +177,7 @@
 
                             <!-- Expense Section -->
                             <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-white h-100" style="border-top: 4px solid #dc3545 !important;">
+                                <div class="p-3 border rounded-3 bg-white h-100 income-expense-card" style="border-top: 4px solid #dc3545 !important;">
                                     <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> {{ __('Expense') }}</h6>
                                     
                                     <div class="mb-3">
