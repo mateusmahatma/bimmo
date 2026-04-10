@@ -51,10 +51,14 @@ class TujuanKeuanganController extends Controller
                     $now = Carbon::now();
                     $months = $now->diffInMonths($deadline);
 
+                    if ($goal->nominal_terkumpul >= $goal->nominal_target) {
+                        return 0;
+                    }
+
                     if ($months <= 0) {
                         $days = $now->diffInDays($deadline);
                         if ($days <= 0)
-                            return 0;
+                            return $goal->nominal_target - $goal->nominal_terkumpul; // Needs to be fulfilled today
                         return ($goal->nominal_target - $goal->nominal_terkumpul) / max($days, 1); // per day if less than a month
                     }
 
@@ -72,11 +76,18 @@ class TujuanKeuanganController extends Controller
 
     public function store(Request $request)
     {
+        // Sanitize nominal input from dots (thousands separator)
+        if ($request->has('nominal_target') && is_string($request->nominal_target)) {
+            $request->merge([
+                'nominal_target' => str_replace('.', '', $request->nominal_target)
+            ]);
+        }
+
         $validated = $request->validate([
             'nama_target' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
             'nominal_target' => 'required|numeric|min:0',
-            'tenggat_waktu' => 'required|date|after:today',
+            'tenggat_waktu' => 'required|date|after_or_equal:today',
             'prioritas' => 'required|in:High,Medium,Low',
         ]);
 
@@ -103,6 +114,9 @@ class TujuanKeuanganController extends Controller
             'nominal_terkumpul' => 'nullable|numeric|min:0'
         ]);
 
+        // Remove null values to avoid database errors on non-nullable columns
+        $validated = array_filter($validated, fn($value) => !is_null($value));
+
         $goal->update($validated);
 
         return redirect()->back()->with('success', 'Goal successfully updated!');
@@ -125,8 +139,15 @@ class TujuanKeuanganController extends Controller
             ->where('id_user', Auth::id())
             ->firstOrFail();
 
+        // Sanitize nominal input from dots (thousands separator)
+        if ($request->has('nominal_tambah') && is_string($request->nominal_tambah)) {
+            $request->merge([
+                'nominal_tambah' => str_replace('.', '', $request->nominal_tambah)
+            ]);
+        }
+
         $validated = $request->validate([
-            'nominal_tambah' => 'required|numeric',
+            'nominal_tambah' => 'required|numeric|min:0.01',
             'keterangan' => 'nullable|string|max:255'
         ]);
 

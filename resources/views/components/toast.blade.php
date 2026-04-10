@@ -1,6 +1,6 @@
 @php
-    $type = session('success') ? 'success' : (session('error') ? 'error' : null);
-    $message = session('success') ?? session('error');
+    $type = session('success') ? 'success' : (session('error') || $errors->any() ? 'error' : null);
+    $message = session('success') ?? session('error') ?? ($errors->any() ? implode(', ', $errors->all()) : null);
     $icon = $type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
     $title = $type === 'success' ? 'Berhasil' : 'Gagal';
 @endphp

@@ -8,17 +8,17 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
         <li>
-            <a class="dropdown-item" href="#" onclick="updateProgress('{{ $goal->id_tujuan_keuangan }}', '{{ $goal->nama_target }}')">
+            <a class="dropdown-item" href="#" onclick="updateProgress('{{ $goal->id_tujuan_keuangan }}', '{{ addslashes($goal->nama_target) }}')">
                 <i class="bi bi-plus-circle me-2 text-success"></i> {{ __('Update Progress') }}
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="simulateGoal('{{ $goal->id_tujuan_keuangan }}', '{{ $goal->nama_target }}', {{ $goal->nominal_target }}, {{ $goal->nominal_terkumpul }})">
+            <a class="dropdown-item" href="#" onclick="simulateGoal('{{ $goal->id_tujuan_keuangan }}', '{{ addslashes($goal->nama_target) }}', {{ $goal->nominal_target }}, {{ $goal->nominal_terkumpul }})">
                 <i class="bi bi-graph-up me-2 text-info"></i> {{ __('Simulate') }}
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="viewHistory('{{ $goal->id_tujuan_keuangan }}', '{{ $goal->nama_target }}', {{ $goal->nominal_target }})">
+            <a class="dropdown-item" href="#" onclick="viewHistory('{{ $goal->id_tujuan_keuangan }}', '{{ addslashes($goal->nama_target) }}', {{ $goal->nominal_target }})">
                 <i class="bi bi-clock-history me-2 text-secondary"></i> {{ __('History') }}
             </a>
         </li>
