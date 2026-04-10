@@ -44,6 +44,11 @@
         border-radius: 20px;
     }
 
+    /* Prevent dropdown clipping in small tables */
+    .table-responsive {
+        min-height: 350px; /* Give enough room for dropdowns even with 1 row */
+    }
+
 </style>
 @endpush
 

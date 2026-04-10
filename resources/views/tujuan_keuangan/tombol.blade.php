@@ -3,6 +3,7 @@
             type="button" 
             data-bs-toggle="dropdown" 
             data-bs-boundary="viewport"
+            data-bs-popper-config='{"strategy":"fixed"}'
             aria-expanded="false">
         <i class="bi bi-three-dots-vertical"></i>
     </button>
