@@ -230,7 +230,7 @@ window.deleteHistoryLog = function (logId) {
                 },
                 success: function (response) {
                     if (response.success) {
-                        Swal.fire('Terhapus!', 'Entri riwayat dihapus dan progres disesuaikan.', 'success');
+                        window.showToast('Terhapus!', 'Entri riwayat dihapus dan progres disesuaikan.', 'success');
                         $('#modalHistory').modal('hide');
                         if ($.fn.DataTable.isDataTable('#goalsTable')) {
                             $('#goalsTable').DataTable().ajax.reload();
@@ -277,7 +277,7 @@ window.deleteGoal = function (id) {
                 },
                 success: function (response) {
                     if (response.success) {
-                        Swal.fire('Terhapus!', 'Tujuan telah dihapus.', 'success');
+                        window.showToast('Terhapus!', 'Tujuan telah dihapus.', 'success');
                         if ($.fn.DataTable.isDataTable('#goalsTable')) {
                             $('#goalsTable').DataTable().ajax.reload();
                         }
