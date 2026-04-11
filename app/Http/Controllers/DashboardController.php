@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Transaksi;
 use App\Models\Pinjaman;
 use App\Models\Aset;
+use App\Models\Anggaran;
+use App\Models\Pemasukan;
 use App\Models\DanaDarurat;
 use App\Models\BayarPinjaman;
 use Carbon\Carbon;
@@ -452,6 +454,78 @@ class DashboardController extends Controller
             ],
             'table' => $anggarans,
         ]);
+    }
+
+    public function syncAnggaran()
+    {
+        $userId = Auth::id();
+        $records = HasilProsesAnggaran::where('id_user', $userId)->get();
+
+        if ($records->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada data anggaran untuk disinkronisasi'], 404);
+        }
+
+        foreach ($records as $prosesAnggaran) {
+            // 1. Sync dengan Anggaran asli jika masih ada (untuk update persentase atau jenis pengeluaran)
+            $originalAnggaran = Anggaran::where('id_user', $userId)
+                ->where('nama_anggaran', $prosesAnggaran->nama_anggaran)
+                ->first();
+
+            if ($originalAnggaran) {
+                $prosesAnggaran->persentase_anggaran = $originalAnggaran->persentase_anggaran;
+                $prosesAnggaran->jenis_pengeluaran = $originalAnggaran->id_pengeluaran;
+            }
+
+            // 2. Rekalkulasi Nominal Anggaran (berdasarkan Pendapatan di rentang waktu)
+            $idPemasukans = $prosesAnggaran->jenis_pemasukan;
+            if (empty($idPemasukans)) {
+                $idPemasukans = Pemasukan::where('id_user', $userId)->pluck('id')->toArray();
+            }
+
+            if (!empty($idPemasukans)) {
+                if (!is_array($idPemasukans)) {
+                    $idPemasukans = json_decode((string)$idPemasukans, true) ?? [$idPemasukans];
+                }
+
+                $allIncomesInRange = Transaksi::where('id_user', $userId)
+                    ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                    ->get();
+
+                $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+                    return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
+                })->sum(function($t) {
+                    $val = (string)($t->nominal_pemasukan ?? '0');
+                    $cleanVal = str_replace(['.', ','], ['', '.'], $val);
+                    return (float)$cleanVal;
+                });
+
+                $prosesAnggaran->nominal_anggaran = ($prosesAnggaran->persentase_anggaran / 100) * $totalIncome;
+            }
+
+            // 3. Rekalkulasi Pengeluaran yang Digunakan
+            $jenisPengeluaran = $prosesAnggaran->jenis_pengeluaran;
+            if (!is_array($jenisPengeluaran)) {
+                if (is_string($jenisPengeluaran)) {
+                    $decoded = json_decode($jenisPengeluaran, true);
+                    $jenisPengeluaran = is_array($decoded) ? $decoded : [$jenisPengeluaran];
+                } else {
+                    $jenisPengeluaran = [$jenisPengeluaran];
+                }
+            }
+
+            $allTrxInRange = Transaksi::where('id_user', $userId)
+                ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                ->get();
+
+            $totalTransaksi = $allTrxInRange->filter(function($t) use ($jenisPengeluaran) {
+                return in_array((string)$t->pengeluaran, array_map('strval', $jenisPengeluaran));
+            })->sum(fn($t) => (float)$t->nominal);
+
+            $prosesAnggaran->anggaran_yang_digunakan = $totalTransaksi;
+            $prosesAnggaran->save();
+        }
+
+        return response()->json(['message' => 'Sinkronisasi berhasil!']);
     }
 
     public function logout()

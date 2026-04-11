@@ -152,6 +152,63 @@
             loadChart(this.value);
         });
 
+        document.getElementById("btnSyncAnggaran")?.addEventListener("click", function() {
+            const btn = this;
+            const icon = btn.querySelector('i');
+            
+            btn.disabled = true;
+            icon.classList.add('fa-spin'); // if using font-awesome
+            icon.style.animation = "spin 1s linear infinite"; // fallback for generic animation
+
+            if (!document.getElementById('sync-style')) {
+                const style = document.createElement('style');
+                style.id = 'sync-style';
+                style.innerHTML = `
+                    @keyframes spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            fetch("{{ route('dashboard.sync-anggaran') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const filter = document.getElementById("filterTanggal")?.value || "";
+                loadChart(filter);
+                
+                // Show toast if available (assuming a showToast function exists or just use alert)
+                if (window.showToast) {
+                    window.showToast('Success', data.message, 'success');
+                } else {
+                    // fall back to default Swal or similar if present
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("Sync error:", err);
+            })
+            .finally(() => {
+                btn.disabled = false;
+                icon.style.animation = "none";
+            });
+        });
+
         loadChart();
     });
 </script>

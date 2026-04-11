@@ -94,6 +94,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/net-worth-history', [DashboardController::class , 'getNetWorthHistory'])->name('dashboard.net-worth-history');
             Route::get('/net-worth', [DashboardController::class , 'netWorth'])->name('dashboard.net-worth');
             Route::post('/toggle-nominal-ajax', [DashboardController::class , 'toggleNominalAjax'])->name('dashboard.toggle-nominal.ajax');
+            Route::post('/sync-anggaran', [DashboardController::class , 'syncAnggaran'])->name('dashboard.sync-anggaran');
         }
         );
 
