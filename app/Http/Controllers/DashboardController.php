@@ -450,7 +450,45 @@ class DashboardController extends Controller
             $query->where('tanggal_mulai', $mulai)->where('tanggal_selesai', $selesai);
         }
 
-        $anggarans = $query->get();
+        $anggarans = $query->get()->map(function($a) {
+            $a->burn_rate = $a->calculateBurnRate();
+            
+            // Calculate breakdown by category
+            $categories = [];
+            $jenisPengeluaran = $a->jenis_pengeluaran;
+            if (!is_array($jenisPengeluaran)) {
+                $jenisPengeluaran = is_string($jenisPengeluaran) ? json_decode($jenisPengeluaran, true) : [$jenisPengeluaran];
+            }
+            
+            if (is_array($jenisPengeluaran) && !empty($jenisPengeluaran)) {
+                $totalNominal = (float)$a->nominal_anggaran;
+                
+                // Fetch all transactions in range (cannot query encrypted columns directly)
+                $allTrxInRange = Transaksi::where('id_user', Auth::id())
+                    ->whereBetween('tgl_transaksi', [$a->tanggal_mulai, $a->tanggal_selesai])
+                    ->get();
+                
+                $categoryNames = \App\Models\Pengeluaran::whereIn('id', $jenisPengeluaran)->pluck('nama', 'id');
+                
+                foreach ($jenisPengeluaran as $id) {
+                    $used = (float)$allTrxInRange->filter(fn($t) => (string)$t->pengeluaran === (string)$id)->sum('nominal');
+                    if ($used > 0) {
+                        $categories[] = [
+                            'id' => $id,
+                            'nama' => $categoryNames[$id] ?? 'Unknown',
+                            'nominal' => $used,
+                            'persentase' => $totalNominal > 0 ? ($used / $totalNominal) * 100 : 0
+                        ];
+                    }
+                }
+                
+                // Urutkan dari yang paling boros (nominal terbesar) dan ambil top 1 saja
+                usort($categories, fn($a, $b) => $b['nominal'] <=> $a['nominal']);
+                $categories = array_slice($categories, 0, 1);
+            }
+            $a->kategori_breakdown = $categories;
+            return $a;
+        });
 
         return response()->json([
             'labels'   => $anggarans->pluck('nama_anggaran')->values(),

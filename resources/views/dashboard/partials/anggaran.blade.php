@@ -8,17 +8,150 @@
 
 <div id="chartAnggaran" style="min-height: 350px;"></div>
 
+{{-- BURN RATE SUMMARY --}}
+<div id="burnRateSummary" class="mt-4 border-top pt-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-speedometer2 text-primary"></i> {{ __('Burn Rate Summary') }}
+        </h6>
+        <span class="text-muted small" style="font-size: 0.7rem;">{{ __('Berdasarkan Periode Terpilih') }}</span>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3" id="burnRateList"></div>
+</div>
 
 @push('anggaran.scripts')
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const uiStyle = "{{ $uiStyle }}";
 
+        function formatIDR(val) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                minimumFractionDigits: 0
+            }).format(val);
+        }
+
+        function renderBurnRate(items) {
+            const container = document.getElementById('burnRateList');
+            if (!container) return;
+            container.innerHTML = "";
+
+            const filteredItems = items.filter(it => it.burn_rate !== null)
+                .sort((a, b) => {
+                    // Urutkan berdasarkan persentase pengeluaran tertinggi
+                    if (b.burn_rate.spent_percentage !== a.burn_rate.spent_percentage) {
+                        return b.burn_rate.spent_percentage - a.burn_rate.spent_percentage;
+                    }
+                    // Jika persentase sama, urutkan berdasarkan nominal pengeluaran tertinggi
+                    return b.burn_rate.total_spent - a.burn_rate.total_spent;
+                });
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = `<div class="col-12"><p class="text-muted small text-center">Pilih periode awal/sedang berjalan untuk melihat burn rate.</p></div>`;
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                const br = item.burn_rate;
+                const statusColor = br.is_over_burning ? 'danger' : (br.is_behind_pace ? 'warning' : 'success');
+                const statusText = br.is_over_burning ? 'Over Budget' : (br.is_behind_pace ? 'Waspada' : 'Aman');
+                
+                let breakdownHtml = "";
+                if (item.kategori_breakdown && item.kategori_breakdown.length > 0) {
+                    const cat = item.kategori_breakdown[0];
+                    breakdownHtml = `
+                        <div class="mt-3 pt-3 border-top">
+                            <p class="text-danger mb-2 fw-bold d-flex align-items-center gap-1" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Pengeluaran Terboros
+                            </p>
+                            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                        <i class="bi bi-tag-fill text-danger" style="font-size: 0.8rem;"></i>
+                                        <span class="text-dark fw-bold text-truncate small" style="font-size: 0.75rem;">${cat.nama}</span>
+                                    </div>
+                                    <div class="text-end flex-shrink-0">
+                                        <div class="fw-bold text-danger" style="font-size: 0.8rem;">${formatIDR(cat.nominal)}</div>
+                                        <div class="text-muted fw-bold" style="font-size: 0.65rem;">${cat.persentase.toFixed(1)}% dari budget</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const card = `
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm ${uiStyle === 'milenial' ? 'm-glass-container' : 'border'}" style="background: rgba(var(--bs-body-bg-rgb), 0.5); transition: transform 0.2s;">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0 fw-bold text-truncate" style="font-size: 0.95rem; max-width: 150px;" title="${item.nama_anggaran}">${item.nama_anggaran}</h6>
+                                    <span class="badge bg-${statusColor}-subtle text-${statusColor} border border-${statusColor}-subtle px-2 py-1" style="font-size: 0.7rem; border-radius: 20px;">
+                                        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> ${statusText}
+                                    </span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small mb-1">
+                                        <span class="text-muted">Progres Budget</span>
+                                        <span class="fw-bold text-${statusColor}">${br.spent_percentage.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px; border-radius: 10px; background-color: rgba(0,0,0,0.05);">
+                                        <div class="progress-bar bg-${statusColor} progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${Math.min(br.spent_percentage, 100)}%; border-radius: 10px;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <div class="p-2 rounded" style="background: rgba(0,0,0,0.02);">
+                                            <div class="text-muted mb-0" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Terpakai</div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">${formatIDR(br.total_spent)}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-2 rounded" style="background: rgba(0,0,0,0.02);">
+                                            <div class="text-muted mb-0" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">${formatIDR(br.total_budget)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                            <i class="bi bi-calendar-event text-primary" style="font-size: 0.9rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size: 0.65rem;">Sisa Waktu</div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">${br.days_remaining} Hari</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                ${breakdownHtml}
+
+                                <div class="mt-3 pt-3 border-top text-end">
+                                    <a href="/kalkulator/${item.hash}" class="btn btn-sm btn-primary rounded-pill px-3" style="font-size: 0.75rem; font-weight: 600;">
+                                        Lihat Transaksi
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        }
+
         function loadChart(filter = "") {
             fetch("{{ route('anggaran.chart') }}?filter=" + filter)
                 .then(res => res.json())
                 .then(data => {
                     const isMobile = window.innerWidth < 768;
+
+                    // Render Burn Rate Summary Table/List
+                    renderBurnRate(data.table || []);
 
                     if (!data.labels.length) {
                         document.querySelector("#chartAnggaran").innerHTML =
