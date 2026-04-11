@@ -186,4 +186,65 @@ class DompetController extends Controller
 
         return redirect()->route('dompet.index')->with('success', 'Dompet berhasil dihapus');
     }
-}
+    public function transfer(Request $request)
+    {
+        $request->validate([
+            'dari_dompet_id' => 'required|exists:dompet,id',
+            'ke_dompet_id' => 'required|exists:dompet,id|different:dari_dompet_id',
+            'nominal' => 'required|numeric|min:1',
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $userId = Auth::id();
+        $dariDompet = Dompet::where('id_user', $userId)->findOrFail($request->dari_dompet_id);
+        $keDompet = Dompet::where('id_user', $userId)->findOrFail($request->ke_dompet_id);
+
+        if ((float)$dariDompet->saldo < (float)$request->nominal) {
+            return redirect()->back()->with('error', 'Saldo dompet asal tidak mencukupi');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($dariDompet, $keDompet, $request, $userId) {
+            // Update balances
+            $dariDompet->saldo = (float)$dariDompet->saldo - (float)$request->nominal;
+            $dariDompet->save();
+
+            $keDompet->saldo = (float)$keDompet->saldo + (float)$request->nominal;
+            $keDompet->save();
+
+            // Create transactions
+            // For Expense (Pengeluaran)
+            $pengeluaran = \App\Models\Pengeluaran::firstOrCreate(
+                ['nama' => 'Transfer Keluar', 'id_user' => $userId],
+                ['kode_pengeluaran' => 'K0000']
+            );
+
+            \App\Models\Transaksi::create([
+                'tgl_transaksi' => now(),
+                'pengeluaran' => $pengeluaran->id,
+                'nominal' => $request->nominal,
+                'keterangan' => 'Transfer ke ' . $keDompet->nama . ($request->keterangan ? ': ' . $request->keterangan : ''),
+                'dompet_id' => $dariDompet->id,
+                'id_user' => $userId,
+                'status' => 1,
+            ]);
+
+            // For Income (Pemasukan)
+            $pemasukan = \App\Models\Pemasukan::firstOrCreate(
+                ['nama' => 'Transfer Masuk', 'id_user' => $userId],
+                ['kode_pemasukan' => 'M0000']
+            );
+
+            \App\Models\Transaksi::create([
+                'tgl_transaksi' => now(),
+                'pemasukan' => $pemasukan->id,
+                'nominal_pemasukan' => $request->nominal,
+                'keterangan' => 'Transfer dari ' . $dariDompet->nama . ($request->keterangan ? ': ' . $request->keterangan : ''),
+                'dompet_id' => $keDompet->id,
+                'id_user' => $userId,
+                'status' => 1,
+            ]);
+        });
+
+        return redirect()->route('dompet.index')->with('success', 'Transfer antar dompet berhasil dilakukan');
+    }
+}

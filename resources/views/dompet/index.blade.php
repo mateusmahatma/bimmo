@@ -53,6 +53,11 @@
                     <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm border" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
                         <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                     </button>
+                    @if(count($wallets) > 1)
+                    <button type="button" class="btn btn-outline-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#transferWalletModal">
+                        <i class="bi bi-arrow-left-right me-1"></i> {{ __('Transfer') }}
+                    </button>
+                    @endif
                     <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm btn-add-desktop" data-bs-toggle="modal" data-bs-target="#addWalletModal">
                         <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet') }}
                     </button>
@@ -230,5 +235,59 @@
         modal.show();
     }
 </script>
+
+<!-- Transfer Wallet Modal -->
+<div class="modal fade" id="transferWalletModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">{{ __('Transfer Between Wallets') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('dompet.transfer') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('From Wallet') }}</label>
+                        <select name="dari_dompet_id" class="form-select rounded-3" required>
+                            <option value="" disabled selected>{{ __('Select Source Wallet') }}</option>
+                            @foreach($wallets as $wallet)
+                                <option value="{{ $wallet->id }}">{{ $wallet->nama }} (Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="text-center mb-3">
+                        <i class="bi bi-arrow-down fs-4 text-primary"></i>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('To Wallet') }}</label>
+                        <select name="ke_dompet_id" class="form-select rounded-3" required>
+                            <option value="" disabled selected>{{ __('Select Destination Wallet') }}</option>
+                            @foreach($wallets as $wallet)
+                                <option value="{{ $wallet->id }}">{{ $wallet->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <hr class="my-4 opacity-10">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('Amount') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
+                            <input type="number" name="nominal" class="form-control rounded-end-3 border-start-0" placeholder="0" min="1" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('Note (Optional)') }}</label>
+                        <input type="text" name="keterangan" class="form-control rounded-3" placeholder="{{ __('e.g. Monthly transfer, rebalancing') }}">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Transfer Now') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @endsection

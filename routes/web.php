@@ -166,6 +166,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Dompet (Wallet)
         Route::get('/dompet/reports', [DompetController::class , 'reports'])->name('dompet.reports');
+        Route::post('/dompet/transfer', [DompetController::class, 'transfer'])->name('dompet.transfer');
         Route::post('/dompet/{id}/add-balance', [DompetController::class , 'addBalance'])->name('dompet.add-balance');
         Route::resource('dompet', DompetController::class);
 
