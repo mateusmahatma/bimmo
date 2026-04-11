@@ -37,8 +37,31 @@ $(document).ready(function () {
     };
 
     // Apply formatting to modal inputs
-    $('#pinjamanModal #jumlah_pinjaman').on('keyup', function () {
+    $('#pinjamanModal #jumlah_pinjaman, #pinjamanModal #nominal_angsuran').on('keyup', function () {
         $(this).val(formatRupiah($(this).val()));
+    });
+
+    // Basic calculation for modal
+    $('#pinjamanModal #jumlah_pinjaman, #pinjamanModal #jangka_waktu').on('change input', function() {
+        const amount = parseRupiah($('#pinjamanModal #jumlah_pinjaman').val());
+        const duration = parseInt($('#pinjamanModal #jangka_waktu').val());
+        if (amount > 0 && duration > 0) {
+            const installment = amount / duration;
+            $('#pinjamanModal #nominal_angsuran').val(formatRupiah(Math.round(installment)));
+        }
+    });
+
+    $('#pinjamanModal #start_date, #pinjamanModal #jangka_waktu').on('change input', function() {
+        const startDateStr = $('#pinjamanModal #start_date').val();
+        const duration = parseInt($('#pinjamanModal #jangka_waktu').val());
+        if (startDateStr && duration > 0) {
+            const startDate = new Date(startDateStr);
+            startDate.setMonth(startDate.getMonth() + duration);
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            $('#pinjamanModal #end_date').val(`${year}-${month}-${day}`);
+        }
     });
 
     let modalEditor;

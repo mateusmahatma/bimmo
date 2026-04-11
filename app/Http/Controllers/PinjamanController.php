@@ -117,7 +117,7 @@ class PinjamanController extends Controller
         $id = Hashids::decode($hash)[0] ?? null;
         abort_if(!$id, 404);
 
-        $data = Pinjaman::where('id', $id)->first();
+        $data = Pinjaman::where('id', $id)->where('id_user', Auth::id())->firstOrFail();
         return response()->json(['result' => $data]);
     }
 
@@ -128,21 +128,24 @@ class PinjamanController extends Controller
 
         $validasi = Validator::make($request->all(), [
             'nama_pinjaman' => 'required',
-            'jumlah_pinjaman' => 'numeric',
+            'jumlah_pinjaman' => 'required|numeric',
             'nominal_angsuran' => 'nullable|numeric',
-            'jangka_waktu' => 'integer',
-            'start_date' => 'date',
-            'end_date' => 'date',
+            'jangka_waktu' => 'nullable|integer',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
             'status' => 'in:lunas,belum_lunas',
             'keterangan' => 'nullable|string',
             'simulasi_cicilan' => 'nullable|string',
         ], [
             'nama_pinjaman.required' => 'Nama wajib diisi',
+            'jumlah_pinjaman.required' => 'Jumlah pinjaman wajib diisi',
         ]);
 
         if ($validasi->fails()) {
             return response()->json(['errors' => $validasi->errors()], 422);
         }
+
+        $pinjaman = Pinjaman::where('id', $id)->where('id_user', Auth::id())->firstOrFail();
 
         $data = [
             'nama_pinjaman' => $request->nama_pinjaman,
@@ -159,7 +162,7 @@ class PinjamanController extends Controller
             $data['simulasi_cicilan'] = json_decode($request->simulasi_cicilan, true);
         }
 
-        Pinjaman::where('id', $id)->update($data);
+        $pinjaman->update($data);
         return response()->json(['success' => "Berhasil melakukan update data"]);
     }
 
