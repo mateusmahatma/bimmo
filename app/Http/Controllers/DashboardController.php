@@ -45,6 +45,10 @@ class DashboardController extends Controller
             'emergency' => $value >= 6  ? ['label' => 'Aman',        'class' => 'success']
                 : ($value >= 3  ? ['label' => 'Cukup',        'class' => 'warning']
                     : ['label' => 'Bahaya',       'class' => 'danger']),
+
+            'debt'      => $value <= 30 ? ['label' => 'Aman',         'class' => 'success']
+                : ($value <= 35 ? ['label' => 'Waspada',      'class' => 'warning']
+                    : ['label' => 'Bahaya',       'class' => 'danger']),
         };
     }
 
@@ -99,6 +103,7 @@ class DashboardController extends Controller
         // 4. Rasio status label
         $expenseStatus   = $this->ratioStatus($rasio['expenseRatio'],    'expense');
         $emergencyStatus = $this->ratioStatus($rasio['danaDaruratBulan'], 'emergency');
+        $debtStatus      = $this->ratioStatus($rasio['debtServiceRatio'], 'debt');
 
         // 5. Filter options anggaran
         $filterOptions = HasilProsesAnggaran::where('id_user', $userId)
@@ -149,8 +154,11 @@ class DashboardController extends Controller
                 'rasio_pengeluaran_pendapatan' => $rasio['rasio_pengeluaran_pendapatan'],
                 'totalAsetPhysical'            => $rasio['totalAsetPhysical'],
                 'totalPinjaman'                => $rasio['totalPinjaman'],
+                'totalCicilanMonth'            => $rasio['totalCicilanMonth'],
+                'debtServiceRatio'             => $rasio['debtServiceRatio'],
                 'expenseStatus'                => $expenseStatus,
                 'emergencyStatus'              => $emergencyStatus,
+                'debtStatus'                   => $debtStatus,
 
                 // Misc
                 'uiStyle'              => $uiStyle,

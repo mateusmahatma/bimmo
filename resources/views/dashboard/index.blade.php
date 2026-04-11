@@ -20,6 +20,7 @@
         {{-- KOLOM KANAN --}}
         <div class="col-12 col-lg-4 d-flex flex-column gap-4">
             @include('dashboard.partials.emergency-fund')
+            @include('dashboard.partials.debt-ratio')
             @include('dashboard.partials.expense-bar')
 
         </div>

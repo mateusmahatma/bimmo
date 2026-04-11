@@ -240,14 +240,24 @@ class DashboardDataService
         $totalPinjaman     = (float) Pinjaman::where('id_user', $this->userId)->sum('jumlah_pinjaman');
         $rasio             = $totalAsetPhysical > 0 ? ($totalPinjaman / $totalAsetPhysical) * 100 : 0;
 
+        $totalCicilanMonth = Pinjaman::where('id_user', $this->userId)
+            ->where('status', 'belum_lunas')
+            ->get()
+            ->sum(fn($p) => min($p->nominal_angsuran, $p->jumlah_pinjaman));
+
         $totalThisMonth = Transaksi::where('id_user', $this->userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float) $t->nominal);
         $totalLastMonth = Transaksi::where('id_user', $this->userId)->where('status', '1')->whereYear('tgl_transaksi', $lastMonth->year)->whereMonth('tgl_transaksi', $lastMonth->month)->get()->sum(fn($t) => (float) $t->nominal);
         $rasio_inflasi  = $totalLastMonth != 0 ? (($totalThisMonth - $totalLastMonth) / $totalLastMonth) * 100 : 0;
 
         $totalPemasukanMonth   = Transaksi::where('id_user', $this->userId)->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float) $t->nominal_pemasukan);
         $totalPengeluaranMonth = Transaksi::where('id_user', $this->userId)->where('status', '1')->whereYear('tgl_transaksi', $now->year)->whereMonth('tgl_transaksi', $now->month)->get()->sum(fn($t) => (float) $t->nominal);
+        
         $rasio_pengeluaran_pendapatan = $totalPemasukanMonth > 0
             ? ($totalPengeluaranMonth / $totalPemasukanMonth) * 100
+            : 0;
+
+        $debtServiceRatio = $totalPemasukanMonth > 0
+            ? ($totalCicilanMonth / $totalPemasukanMonth) * 100
             : 0;
 
         return [
@@ -258,6 +268,8 @@ class DashboardDataService
             'rasio_pengeluaran_pendapatan' => $rasio_pengeluaran_pendapatan,
             'totalAsetPhysical'            => $totalAsetPhysical,
             'totalPinjaman'                => $totalPinjaman,
+            'totalCicilanMonth'            => $totalCicilanMonth,
+            'debtServiceRatio'             => $debtServiceRatio,
         ];
     }
 }
