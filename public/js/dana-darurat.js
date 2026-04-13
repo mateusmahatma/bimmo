@@ -171,7 +171,7 @@ window.initDanaDarurat = function () {
                 render: function (data) {
                     if (!data || data.trim() === '') return '-';
                     // Render HTML wrapped in a div to control its sizing, useful for rich text
-                    return `<div class="keterangan-content ck-content" style="max-height: 120px; overflow-y: auto; font-size: 0.9em;">${data}</div>`;
+                    return `<div class="keterangan-content ck-content">${data}</div>`;
                 }
             },
             {

@@ -66,6 +66,7 @@ class DanaDaruratController extends Controller
                 ->addColumn('aksi', function ($dana) {
                     return view('dana_darurat.tombol')->with('request', $dana);
                 })
+                ->rawColumns(['keterangan', 'aksi'])
                 ->with([
                     'totalDanaDarurat' => $totalDanaDarurat,
                     'targetDanaDarurat' => $targetDanaDarurat,

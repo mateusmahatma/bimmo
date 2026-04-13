@@ -99,6 +99,18 @@
     #danaDaruratTable td:nth-of-type(4):before { content: "Type"; }
     #danaDaruratTable td:nth-of-type(5):before { content: "Amount"; }
     #danaDaruratTable td:nth-of-type(6):before { content: "Note"; }
+
+    /* Specific adjustment for Note column on mobile */
+    #danaDaruratTable td:nth-of-type(6) {
+        text-align: left !important;
+        display: block;
+        padding-left: 15px !important;
+        padding-top: 2.5rem !important; 
+    }
+    #danaDaruratTable td:nth-of-type(6) .keterangan-content {
+        font-size: 0.95rem;
+    }
+
     #danaDaruratTable td:nth-of-type(9):before { content: "Action"; top: 1.1rem; }
 
     #danaDaruratTable td:nth-of-type(9) {
@@ -128,3 +140,43 @@
     background-color: #1e1e1e;
     border-color: rgba(255,255,255,0.05);
 }
+
+/* CKEditor content styling for Notes */
+.keterangan-content.ck-content {
+    line-height: 1.4;
+    word-wrap: break-word;
+    max-height: 150px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Custom Scrollbar for Notes */
+.keterangan-content.ck-content::-webkit-scrollbar {
+    width: 4px;
+}
+.keterangan-content.ck-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.keterangan-content.ck-content::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+[data-bs-theme="dark"] .keterangan-content.ck-content::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+}
+
+.keterangan-content.ck-content p {
+    margin-bottom: 0.4rem;
+}
+.keterangan-content.ck-content p:last-child {
+    margin-bottom: 0;
+}
+.keterangan-content.ck-content ul, 
+.keterangan-content.ck-content ol {
+    padding-left: 1.25rem;
+    margin-bottom: 0.4rem;
+}
+[data-bs-theme="dark"] .keterangan-content.ck-content {
+    color: #dee2e6;
+}
+
