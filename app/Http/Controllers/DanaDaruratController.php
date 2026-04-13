@@ -153,12 +153,14 @@ class DanaDaruratController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         $dana = new DanaDarurat();
         $dana->id_user = Auth::id();
 
-        return view('dana_darurat.create', compact('dana'));
+        $type = $request->query('type');
+
+        return view('dana_darurat.create', compact('dana', 'type'));
     }
 
     /**

@@ -65,8 +65,11 @@
                         <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('dana-darurat.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop">
-                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Data') }}
+                        <a href="{{ route('dana-darurat.create', ['type' => 1]) }}" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm">
+                            <i class="bi bi-arrow-down-circle me-1"></i> {{ __('Deposit') }}
+                        </a>
+                        <a href="{{ route('dana-darurat.create', ['type' => 2]) }}" class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm text-dark">
+                            <i class="bi bi-arrow-up-circle me-1"></i> {{ __('Withdrawal') }}
                         </a>
                     </div>
                 </div>
@@ -99,10 +102,15 @@
         </div>
     </div>
 
-    <!-- Floating Action Button for Mobile -->
-    <a href="{{ route('dana-darurat.create') }}" class="btn btn-primary fab-add" title="{{ __('Add Data') }}">
-        <i class="bi bi-plus-lg fs-2"></i>
-    </a>
+    <!-- Floating Action Buttons for Mobile -->
+    <div class="fab-container d-md-none" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050; display: flex; flex-direction: column; gap: 10px;">
+        <a href="{{ route('dana-darurat.create', ['type' => 2]) }}" class="btn btn-warning rounded-circle shadow d-flex align-items-center justify-content-center text-dark" style="width: 56px; height: 56px;" title="{{ __('Withdrawal') }}">
+            <i class="bi bi-arrow-up fs-4"></i>
+        </a>
+        <a href="{{ route('dana-darurat.create', ['type' => 1]) }}" class="btn btn-success rounded-circle shadow d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;" title="{{ __('Deposit') }}">
+            <i class="bi bi-arrow-down fs-4"></i>
+        </a>
+    </div>
 </section>
 
 @include('modal.dana_darurat.index')

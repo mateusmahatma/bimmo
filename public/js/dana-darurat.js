@@ -165,7 +165,15 @@ window.initDanaDarurat = function () {
                     return parseFloat(data).toLocaleString("id-ID", { style: "currency", currency: "IDR" });
                 }
             },
-            { data: 'keterangan', className: 'align-middle text-center' },
+            { 
+                data: 'keterangan', 
+                className: 'align-middle text-start',
+                render: function (data) {
+                    if (!data || data.trim() === '') return '-';
+                    // Render HTML wrapped in a div to control its sizing, useful for rich text
+                    return `<div class="keterangan-content ck-content" style="max-height: 120px; overflow-y: auto; font-size: 0.9em;">${data}</div>`;
+                }
+            },
             {
                 data: 'created_at',
                 className: 'align-middle text-center text-muted small',

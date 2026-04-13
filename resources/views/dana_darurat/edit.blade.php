@@ -50,6 +50,24 @@
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
+
+    /* CKEditor Dark Mode Styles */
+    [data-bs-theme="dark"] .ck.ck-editor__main > .ck-editor__editable {
+        background-color: #212529 !important;
+        border-color: #3b4248 !important;
+        color: #dee2e6 !important;
+    }
+    [data-bs-theme="dark"] .ck.ck-toolbar {
+        background-color: #343a40 !important;
+        border-color: #3b4248 !important;
+    }
+    [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button {
+        color: #dee2e6 !important;
+    }
+    [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button:hover,
+    [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button.ck-on {
+        background-color: #495057 !important;
+    }
 </style>
 @endpush
 
@@ -132,3 +150,19 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof ClassicEditor !== 'undefined') {
+            ClassicEditor
+                .create(document.querySelector('#keterangan'), {
+                    toolbar: [ 'heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote' ]
+                })
+                .catch(error => {
+                    console.error('Error initializing CKEditor:', error);
+                });
+        }
+    });
+</script>
+@endpush

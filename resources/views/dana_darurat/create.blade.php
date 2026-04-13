@@ -50,6 +50,24 @@
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
+
+    /* CKEditor Dark Mode Styles */
+    [data-bs-theme="dark"] .ck.ck-editor__main > .ck-editor__editable {
+        background-color: #212529 !important;
+        border-color: #3b4248 !important;
+        color: #dee2e6 !important;
+    }
+    [data-bs-theme="dark"] .ck.ck-toolbar {
+        background-color: #343a40 !important;
+        border-color: #3b4248 !important;
+    }
+    [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button {
+        color: #dee2e6 !important;
+    }
+    [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button:hover,
+    [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button.ck-on {
+        background-color: #495057 !important;
+    }
 </style>
 @endpush
 
@@ -100,8 +118,8 @@
                                 <label for="jenis_transaksi_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Type') }} <span class="text-danger">*</span></label>
                                 <select name="jenis_transaksi_dana_darurat" id="jenis_transaksi_dana_darurat" class="form-select form-select-lg" required>
                                     <option value="">-- {{ __('Select Status') }} --</option>
-                                    <option value="1" {{ old('jenis_transaksi_dana_darurat') == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
-                                    <option value="2" {{ old('jenis_transaksi_dana_darurat') == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
+                                    <option value="1" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
+                                    <option value="2" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
@@ -132,3 +150,19 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof ClassicEditor !== 'undefined') {
+            ClassicEditor
+                .create(document.querySelector('#keterangan'), {
+                    toolbar: [ 'heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote' ]
+                })
+                .catch(error => {
+                    console.error('Error initializing CKEditor:', error);
+                });
+        }
+    });
+</script>
+@endpush
