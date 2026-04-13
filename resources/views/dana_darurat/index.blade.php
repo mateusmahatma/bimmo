@@ -3,143 +3,12 @@
 @section('title', __('Emergency Fund'))
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="{{ asset('vendors/datatables/dataTables.bootstrap5.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/dana_darurat.css') }}">
 @endpush
 
 @section('container')
 
-<style>
-    /* PWA & Premium Enhancements (White Theme) */
-    .card-summary {
-        border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05);
-        background: #ffffff;
-        color: #2d3436;
-        overflow: hidden;
-        position: relative;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    .balance-amount {
-        color: #f5576c;
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-    }
-
-    .fab-add {
-        position: fixed;
-        bottom: 2rem;
-        right: 1.5rem;
-        z-index: 1040;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: none; /* Desktop hidden */
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 16px rgba(245, 87, 108, 0.4);
-    }
-
-    @media (max-width: 767.98px) {
-        .fab-add {
-            display: flex;
-        }
-        .btn-add-desktop {
-            display: none;
-        }
-        
-        #danaDaruratTable, 
-        #danaDaruratTable thead, 
-        #danaDaruratTable tbody, 
-        #danaDaruratTable th, 
-        #danaDaruratTable td, 
-        #danaDaruratTable tr { 
-            display: block; 
-        }
-
-        /* Hide table headers */
-        #danaDaruratTable thead tr { 
-            position: absolute;
-            top: -9999px; left: -9999px;
-        }
-
-        #danaDaruratTable tr {
-            border: 0;
-            margin-bottom: 1.5rem;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            background-color: #fff;
-            padding: 15px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        #danaDaruratTable td {
-            border: none;
-            border-bottom: 1px solid #f8f9fa;
-            position: relative;
-            padding-left: 45%; 
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            text-align: right;
-            white-space: normal;
-            min-height: 3rem;
-        }
-        
-        #danaDaruratTable td:last-child {
-            border-bottom: 0;
-        }
-
-        #danaDaruratTable td:before { 
-            position: absolute;
-            top: 1rem;
-            left: 15px;
-            width: 40%; 
-            padding-right: 10px; 
-            white-space: nowrap;
-            text-align: left;
-            font-weight: bold;
-            color: #6c757d;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-
-        /* Column Labels */
-        #danaDaruratTable td:nth-of-type(1):before { content: "Select"; }
-        #danaDaruratTable td:nth-of-type(2):before { content: "No"; }
-        #danaDaruratTable td:nth-of-type(3):before { content: "Date"; }
-        #danaDaruratTable td:nth-of-type(4):before { content: "Type"; }
-        #danaDaruratTable td:nth-of-type(5):before { content: "Amount"; }
-        #danaDaruratTable td:nth-of-type(6):before { content: "Note"; }
-        #danaDaruratTable td:nth-of-type(9):before { content: "Action"; top: 1.1rem; }
-
-        #danaDaruratTable td:nth-of-type(9) {
-             padding-left: 10px;
-             text-align: center;
-             display: flex;
-             justify-content: center;
-             gap: 10px;
-             border-bottom: 0;
-        }
-        #danaDaruratTable td:nth-of-type(9):before { 
-            display: none;
-        }
-        
-        /* Hide ID/Created/Updated on mobile */
-        #danaDaruratTable td:nth-of-type(2), 
-        #danaDaruratTable td:nth-of-type(7), 
-        #danaDaruratTable td:nth-of-type(8) {
-            display: none;
-        }
-    }
-
-    [data-bs-theme="dark"] .card-summary {
-        background: linear-gradient(135deg, #3d0b0b 0%, #611124 100%);
-    }
-    [data-bs-theme="dark"] #danaDaruratTable tr {
-        background-color: #1e1e1e;
-        border-color: rgba(255,255,255,0.05);
-    }
-</style>
 
 <div class="pagetitle mb-4">
     <h1 class="fw-bold mb-1">{{ __('Emergency Fund') }}</h1>
@@ -242,10 +111,10 @@
 @endsection
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('vendors/jquery/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ asset('vendors/moment/moment.min.js') }}"></script>
+<script src="{{ asset('vendors/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('vendors/datatables/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <script src="{{ asset('js/dana-darurat.js') }}?v={{ filemtime(public_path('js/dana-darurat.js')) }}"></script>
 @endpush

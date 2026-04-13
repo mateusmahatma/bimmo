@@ -1,0 +1,130 @@
+/* PWA & Premium Enhancements (White Theme) */
+.card-summary {
+    border-radius: 0;
+    border: 1px solid rgba(0,0,0,0.05);
+    background: #ffffff;
+    color: #2d3436;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.balance-amount {
+    color: #f5576c;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.fab-add {
+    position: fixed;
+    bottom: 2rem;
+    right: 1.5rem;
+    z-index: 1040;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: none; /* Desktop hidden */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(245, 87, 108, 0.4);
+}
+
+@media (max-width: 767.98px) {
+    .fab-add {
+        display: flex;
+    }
+    .btn-add-desktop {
+        display: none;
+    }
+    
+    #danaDaruratTable, 
+    #danaDaruratTable thead, 
+    #danaDaruratTable tbody, 
+    #danaDaruratTable th, 
+    #danaDaruratTable td, 
+    #danaDaruratTable tr { 
+        display: block; 
+    }
+
+    /* Hide table headers */
+    #danaDaruratTable thead tr { 
+        position: absolute;
+        top: -9999px; left: -9999px;
+    }
+
+    #danaDaruratTable tr {
+        border: 0;
+        margin-bottom: 1.5rem;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        background-color: #fff;
+        padding: 15px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    #danaDaruratTable td {
+        border: none;
+        border-bottom: 1px solid #f8f9fa;
+        position: relative;
+        padding-left: 45%; 
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        text-align: right;
+        white-space: normal;
+        min-height: 3rem;
+    }
+    
+    #danaDaruratTable td:last-child {
+        border-bottom: 0;
+    }
+
+    #danaDaruratTable td:before { 
+        position: absolute;
+        top: 1rem;
+        left: 15px;
+        width: 40%; 
+        padding-right: 10px; 
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #6c757d;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+
+    /* Column Labels */
+    #danaDaruratTable td:nth-of-type(1):before { content: "Select"; }
+    #danaDaruratTable td:nth-of-type(2):before { content: "No"; }
+    #danaDaruratTable td:nth-of-type(3):before { content: "Date"; }
+    #danaDaruratTable td:nth-of-type(4):before { content: "Type"; }
+    #danaDaruratTable td:nth-of-type(5):before { content: "Amount"; }
+    #danaDaruratTable td:nth-of-type(6):before { content: "Note"; }
+    #danaDaruratTable td:nth-of-type(9):before { content: "Action"; top: 1.1rem; }
+
+    #danaDaruratTable td:nth-of-type(9) {
+         padding-left: 10px;
+         text-align: center;
+         display: flex;
+         justify-content: center;
+         gap: 10px;
+         border-bottom: 0;
+    }
+    #danaDaruratTable td:nth-of-type(9):before { 
+        display: none;
+    }
+    
+    /* Hide ID/Created/Updated on mobile */
+    #danaDaruratTable td:nth-of-type(2), 
+    #danaDaruratTable td:nth-of-type(7), 
+    #danaDaruratTable td:nth-of-type(8) {
+        display: none;
+    }
+}
+
+[data-bs-theme="dark"] .card-summary {
+    background: linear-gradient(135deg, #3d0b0b 0%, #611124 100%);
+}
+[data-bs-theme="dark"] #danaDaruratTable tr {
+    background-color: #1e1e1e;
+    border-color: rgba(255,255,255,0.05);
+}

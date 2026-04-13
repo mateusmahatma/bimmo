@@ -27,10 +27,9 @@
 
 
     @stack('css')
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@6.1.10/index.global.min.js"></script>
+    <script src="{{ asset('vendors/fullcalendar/index.global.min.js') }}"></script>
+    <script src="{{ asset('vendors/rrule/rrule.min.js') }}"></script>
+    <script src="{{ asset('vendors/fullcalendar/rrule.global.min.js') }}"></script>
 
     <script>
         (function() {
