@@ -8,10 +8,13 @@ use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $notes = Note::where('id_user', Auth::id())->orderBy('created_at', 'desc')->get();
-        return response()->json($notes);
+        if ($request->wantsJson()) {
+            return response()->json($notes);
+        }
+        return view('notes.index');
     }
 
     public function store(Request $request)
@@ -62,6 +65,12 @@ class NoteController extends Controller
 
         $note->delete();
 
+        return response()->json(['success' => true]);
+    }
+
+    public function clearCompleted()
+    {
+        Note::where('id_user', Auth::id())->where('is_checked', true)->delete();
         return response()->json(['success' => true]);
     }
 }

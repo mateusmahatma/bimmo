@@ -150,6 +150,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('aset', AsetController::class);
         Route::resource('events', EventController::class);
         Route::resource('barang', BarangController::class);
+        Route::post('notes/clear-completed', [NoteController::class, 'clearCompleted'])->name('notes.clear-completed');
         Route::resource('notes', NoteController::class);
 
         // Threads

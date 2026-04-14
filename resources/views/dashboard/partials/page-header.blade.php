@@ -14,12 +14,11 @@
         </div>
     </div>
     <div class="d-flex gap-2">
-        <button type="button"
-            class="btn {{ $uiStyle === 'milenial' ? 'btn-light glass-card border-0' : 'btn-outline-secondary' }} btn-sm rounded-0 px-3 d-flex align-items-center gap-2"
-            data-bs-toggle="modal" data-bs-target="#notesModal">
+        <a href="{{ route('notes.index') }}"
+            class="btn {{ $uiStyle === 'milenial' ? 'btn-light glass-card border-0' : 'btn-outline-secondary' }} btn-sm rounded-0 px-3 d-flex align-items-center gap-2">
             <i class="bi bi-sticky fs-6 text-primary"></i>
             <span class="fw-semibold">{{ __('Notes') }}</span>
-        </button>
+        </a>
         <a href="{{ route('transaksi.create') }}"
             class="btn btn-primary btn-sm rounded-0 px-3 d-flex align-items-center gap-2">
             <i class="bi bi-plus-circle-fill fs-6"></i>
