@@ -276,28 +276,23 @@ $(document).ready(function () {
         e.stopPropagation();
         const id = $(this).data('id');
 
-        Swal.fire({
-            title: 'Yakin mau hapus data ini?',
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/pinjaman/' + id,
-                    type: 'DELETE',
-                    success: function () {
-                        showToast('Data Berhasil dihapus', 'success');
-                        fetchPinjaman();
-                    },
-                    error: function () {
-                        showToast('Gagal menghapus data', 'danger');
-                    }
-                });
+        window.confirmAction({
+            title: 'Are you sure?',
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
+                try {
+                    await fetch('/pinjaman/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                            'Accept': 'application/json'
+                        }
+                    });
+                    showToast('Data processed successfully', 'success');
+                    fetchPinjaman();
+                } catch (e) {
+                    showToast('Failed to delete data', 'danger');
+                }
             }
         });
     });
@@ -341,35 +336,32 @@ $(document).ready(function () {
         const ids = $('.check-item:checked').map(function () { return $(this).val(); }).get();
         if (ids.length === 0) return;
 
-        Swal.fire({
-            title: `Hapus ${ids.length} pinjaman?`,
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus terpilih!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        window.confirmAction({
+            title: `Delete ${ids.length} loans?`,
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
                 const btn = $(this);
                 const originalHtml = btn.html();
-                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menghapus...');
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
-                $.ajax({
-                    url: '/pinjaman/bulk-delete',
-                    type: 'DELETE',
-                    data: { ids: ids },
-                    success: function (response) {
-                        showToast(response.message, 'success');
-                        fetchPinjaman();
-                        btn.addClass('d-none').prop('disabled', false).html(originalHtml);
-                    },
-                    error: function (xhr) {
-                        showToast('Gagal menghapus pinjaman terpilih.', 'danger');
-                        btn.prop('disabled', false).html(originalHtml);
-                    }
-                });
+                try {
+                    const response = await fetch('/pinjaman/bulk-delete', {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ ids: ids })
+                    });
+                    const res = await response.json();
+                    showToast(res.message || 'Data processed successfully', 'success');
+                    fetchPinjaman();
+                    btn.addClass('d-none').prop('disabled', false).html(originalHtml);
+                } catch (e) {
+                    showToast('Failed to delete selected loans.', 'danger');
+                    btn.prop('disabled', false).html(originalHtml);
+                }
             }
         });
     });

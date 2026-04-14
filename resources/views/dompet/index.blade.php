@@ -218,42 +218,23 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteWalletModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">{{ __('Delete Wallet') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="deleteWalletForm" method="POST">
-                @csrf
-                @method('DELETE')
-                <div class="modal-body text-center py-4">
-                    <div class="mb-3 text-danger">
-                        <i class="bi bi-exclamation-octagon display-4"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">{{ __('Delete Wallet') }} <span id="deleteWalletName"></span>?</h5>
-                    <p class="text-muted small px-4">{{ __('This action cannot be undone. Wallets can only be deleted if they have no transaction history.') }}</p>
-                </div>
-                <div class="modal-footer border-0 pt-0 justify-content-center">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4">{{ __('Yes, Delete') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
     function confirmDelete(id, name) {
-        const modal = new bootstrap.Modal(document.getElementById('deleteWalletModal'));
-        const form = document.getElementById('deleteWalletForm');
-        const nameSpan = document.getElementById('deleteWalletName');
-        
-        form.action = `/dompet/${id}`;
-        nameSpan.textContent = name;
-        modal.show();
+        window.confirmAction({
+            title: 'Delete Wallet?',
+            text: `Are you sure you want to delete "${name}"? Deleted data cannot be recovered!`,
+            onConfirm: () => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/dompet/${id}`;
+                form.innerHTML = `
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="DELETE">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 </script>
 

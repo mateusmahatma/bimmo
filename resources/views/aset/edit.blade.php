@@ -244,20 +244,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function confirmDelete() {
-        Swal.fire({
-            title: "{{ __('Are you sure?') }}",
-            text: "{{ __('This action cannot be undone!') }}",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: "{{ __('Yes, delete it!') }}",
-            cancelButtonText: "{{ __('Cancel') }}"
-        }).then((result) => {
-            if (result.isConfirmed) {
+        window.confirmAction({
+            title: '{{ __("Are you sure?") }}',
+            text: '{{ __("Deleted data cannot be recovered!") }}',
+            onConfirm: () => {
                 document.getElementById('deleteForm').submit();
             }
-        })
+        });
     }
 </script>
 @endpush

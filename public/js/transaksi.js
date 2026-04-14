@@ -624,30 +624,23 @@ const TransaksiCRUD = {
         $("body").on("click", ".tombol-del-transaksi", function (e) {
             e.preventDefault();
 
-            Swal.fire({
-                title: "Yakin mau hapus data ini?",
-                html: `Data yang dihapus tidak dapat dikembalikan!`,
-                showCancelButton: true,
-                confirmButtonColor: "var(--bs-danger)",
-                cancelButtonColor: "var(--bs-primary)",
-                confirmButtonText: "Ya, hapus!",
-                cancelButtonText: "Batal"
-            }).then((result) => {
-                if (result.isConfirmed) {
+            window.confirmAction({
+                title: "Are you sure?",
+                text: "Deleted data cannot be recovered!",
+                onConfirm: async () => {
                     const id = $(this).data("id");
 
-                    $.ajax({
-                        url: TransaksiConfig.urls.delete(id),
-                        type: "DELETE",
-                        success: function () {
-                            ToastHandler.show("Data berhasil dihapus", "success");
-                            DataTableHandler.reload();
-                        },
-                        error: function () {
-                            ToastHandler.show("Data gagal dihapus", "danger");
-                            DataTableHandler.reload();
-                        }
-                    });
+                    try {
+                        await $.ajax({
+                            url: TransaksiConfig.urls.delete(id),
+                            type: "DELETE"
+                        });
+                        ToastHandler.show("Data successfully deleted", "success");
+                        DataTableHandler.reload();
+                    } catch (e) {
+                        ToastHandler.show("Failed to delete data", "danger");
+                        DataTableHandler.reload();
+                    }
                 }
             });
         });
@@ -711,13 +704,8 @@ const DownloadHandler = {
     downloadPDF() {
         const dateRange = DateRangeHandler.getDateRange();
 
-        Swal.fire({
-            title: "Sedang mendownload...",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
+        // Simple loading toast
+        ToastHandler.show("Downloading PDF...", "info");
 
         $.ajax({
             url: TransaksiConfig.urls.downloadPdf,
@@ -737,20 +725,11 @@ const DownloadHandler = {
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
 
-                Swal.fire({
-                    icon: "success",
-                    title: "File berhasil di download!",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                ToastHandler.show("File successfully downloaded!", "success");
             },
             error: function (xhr, status, error) {
                 console.error("Error downloading file:", error);
-                Swal.fire({
-                    icon: "error",
-                    title: "Terjadi kesalahan!",
-                    text: "Kesalahan saat mendownload file."
-                });
+                ToastHandler.show("Failed to download file.", "danger");
             }
         });
     },
@@ -758,13 +737,7 @@ const DownloadHandler = {
     downloadExcel() {
         const dateRange = DateRangeHandler.getDateRange();
 
-        Swal.fire({
-            title: "Sedang mendownload...",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
+        ToastHandler.show("Downloading Excel...", "info");
 
         $.ajax({
             url: TransaksiConfig.urls.downloadExcel,
@@ -784,20 +757,11 @@ const DownloadHandler = {
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
 
-                Swal.fire({
-                    icon: "success",
-                    title: "File berhasil di download!",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                ToastHandler.show("File successfully downloaded!", "success");
             },
             error: function (xhr, status, error) {
                 console.error("Error downloading file:", error);
-                Swal.fire({
-                    icon: "error",
-                    title: "Terjadi kesalahan!",
-                    text: "Kesalahan saat mendownload file."
-                });
+                ToastHandler.show("Failed to download file.", "danger");
             }
         });
     },
@@ -857,76 +821,44 @@ const UploadHandler = {
         $("#uploadForm").submit(function (e) {
             e.preventDefault();
 
-            Swal.fire({
-                title: "Yakin ingin upload file?",
-                text: "Pastikan file yang Anda unggah sudah sesuai.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Ya, unggah!",
-                cancelButtonText: "Batal"
-            }).then((result) => {
-                if (result.isConfirmed) {
+            window.confirmAction({
+                title: "Upload file?",
+                text: "Make sure the file is correct before uploading.",
+                onConfirm: async () => {
                     const formData = new FormData(this);
                     const submitButton = $(this).find('button[type="submit"]');
 
                     submitButton
-                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Proses Unggah...')
+                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
                         .prop("disabled", true);
 
-                    $.ajax({
-                        url: TransaksiConfig.urls.upload,
-                        method: "POST",
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function (response) {
-                            if (response.success) {
-                                $("#uploadModal").modal("hide");
-                                DataTableHandler.reload();
+                    try {
+                        const response = await $.ajax({
+                            url: TransaksiConfig.urls.upload,
+                            method: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false
+                        });
 
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Data Berhasil di Unggah",
-                                    timer: 3000,
-                                    showConfirmButton: false,
-                                    toast: true,
-                                    position: "top",
-                                    customClass: {
-                                        title: "swal2-title-create",
-                                        popup: "swal2-popup-create"
-                                    },
-                                    iconColor: "#ffffff"
-                                });
-
-                                $("#uploadForm")[0].reset();
-                            } else {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error!",
-                                    text: response.message || "Unggah gagal.",
-                                    confirmButtonColor: "#d33"
-                                });
-                            }
-                        },
-                        error: function (xhr) {
-                            const errorMessage = xhr.responseJSON && xhr.responseJSON.message
-                                ? xhr.responseJSON.message
-                                : "Terjadi kesalahan saat unggah.";
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error!",
-                                text: errorMessage,
-                                confirmButtonColor: "#d33"
-                            });
-                        },
-                        complete: function () {
-                            submitButton
-                                .prop("disabled", false)
-                                .html('<i class="fa fa-upload"></i> Unggah');
+                        if (response.success) {
+                            $("#uploadModal").modal("hide");
+                            DataTableHandler.reload();
+                            ToastHandler.show("File uploaded successfully", "success");
+                            $("#uploadForm")[0].reset();
+                        } else {
+                            ToastHandler.show(response.message || "Upload failed.", "danger");
                         }
-                    });
+                    } catch (xhr) {
+                        const errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : "Error during upload.";
+                        ToastHandler.show(errorMessage, "danger");
+                    } finally {
+                        submitButton
+                            .prop("disabled", false)
+                            .html('<i class="fa fa-upload"></i> Unggah');
+                    }
                 }
             });
         });
@@ -945,66 +877,43 @@ const ImportHandler = {
         importForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
-            Swal.fire({
-                title: "Yakin ingin mengimpor file?",
-                html: `Pastikan data sudah sesuai sebelum melakukan import.`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Ya, impor!",
-                cancelButtonText: "Batal"
-            }).then((result) => {
-                if (result.isConfirmed) {
+            window.confirmAction({
+                title: "Import data?",
+                text: "Make sure the file format is correct.",
+                onConfirm: async () => {
                     const form = e.target;
                     const formData = new FormData(form);
                     const importBtn = document.getElementById("importBtn");
 
                     importBtn.disabled = true;
+                    importBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
-                    const xhr = new XMLHttpRequest();
-                    xhr.open("POST", form.action, true);
-                    xhr.setRequestHeader(
-                        "X-CSRF-TOKEN",
-                        document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    );
+                    try {
+                        const response = await fetch(form.action, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "X-Requested-With": "XMLHttpRequest",
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                            }
+                        });
+                        const data = await response.json();
 
-                    xhr.onload = function () {
-                        const data = JSON.parse(xhr.responseText);
-                        if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+                        if (response.ok && data.success) {
                             form.reset();
                             $("#importExcelModal").modal("hide");
-
-                            ToastHandler.show("Data berhasil diimpor!", "success");
+                            ToastHandler.show("Data successfully imported!", "success");
                             DataTableHandler.reload();
                         } else {
-                            const message = data.message || "Terjadi kesalahan saat mengimpor file.";
-                            Swal.fire({
-                                title: "Error!",
-                                text: message,
-                                icon: "error",
-                                confirmButtonColor: "#d33"
-                            });
-                            ToastHandler.show("Error: " + message, "danger");
+                            const message = data.message || "Failed to import file.";
+                            ToastHandler.show(message, "danger");
                         }
-                    };
-
-                    xhr.onerror = function () {
-                        Swal.fire({
-                            title: "Error!",
-                            text: "Gagal terhubung ke server.",
-                            icon: "error",
-                            confirmButtonColor: "#d33"
-                        });
-                        ToastHandler.show("Gagal terhubung ke server.", "danger");
-                    };
-
-                    xhr.onloadend = function () {
+                    } catch (error) {
+                        ToastHandler.show("Failed to connect to server.", "danger");
+                    } finally {
                         importBtn.disabled = false;
                         importBtn.innerHTML = '<i class="fa fa-upload"></i> Impor';
-                    };
-
-                    xhr.send(formData);
+                    }
                 }
             });
         });

@@ -205,6 +205,64 @@
                     });
             };
         });
+
+        /**
+         * Standardized Delete Confirmation
+         * @param {Object} options { title, text, onConfirm, confirmText, cancelText }
+         */
+        window.confirmAction = function(options) {
+            const modalId = 'globalConfirmDeleteModal';
+            let modalElement = document.getElementById(modalId);
+            
+            if (!modalElement) {
+                const modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content shadow border-0" style="border-radius: 16px;">
+                                <div class="modal-body text-center p-4">
+                                    <div class="mb-3">
+                                        <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-2 modal-title-inject"></h5>
+                                    <p class="text-muted small mb-4 modal-text-inject"></p>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">${options.cancelText || '{{ __("No, Cancel") }}'}</button>
+                                        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold btn-confirm-inject">${options.confirmText || '{{ __("Yes, Delete") }}'}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                modalElement = document.getElementById(modalId);
+            }
+
+            const bsModal = new bootstrap.Modal(modalElement);
+            modalElement.querySelector('.modal-title-inject').textContent = options.title || '{{ __("Are you sure?") }}';
+            modalElement.querySelector('.modal-text-inject').textContent = options.text || '{{ __("Deleted data cannot be recovered!") }}';
+            
+            const confirmBtn = modalElement.querySelector('.btn-confirm-inject');
+            
+            const handleConfirm = async () => {
+                confirmBtn.disabled = true;
+                const originalText = confirmBtn.textContent;
+                confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> ...';
+                
+                await options.onConfirm();
+                
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = originalText;
+                bsModal.hide();
+                confirmBtn.removeEventListener('click', handleConfirm);
+            };
+
+            // Remove previous listeners
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            newConfirmBtn.addEventListener('click', handleConfirm);
+
+            bsModal.show();
+        };
     </script>
     @include('components.toast')
 </body>

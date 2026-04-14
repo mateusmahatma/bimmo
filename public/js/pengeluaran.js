@@ -149,28 +149,20 @@ $(document).ready(function () {
         e.stopPropagation();
         const id = $(this).data('id');
 
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            html: 'Data yang dihapus tidak dapat dikembalikan!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: `/pengeluaran/${id}`,
-                    type: 'DELETE',
-                    success: () => {
-                        showToast('Data berhasil dihapus', 'success');
-                        fetchPengeluaran();
-                    },
-                    error: () => {
-                        showToast('Gagal menghapus, data mungkin sedang digunakan', 'danger');
-                    }
-                });
+        window.confirmAction({
+            title: 'Are you sure?',
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
+                try {
+                    await $.ajax({
+                        url: `/pengeluaran/${id}`,
+                        type: 'DELETE'
+                    });
+                    showToast('Data processed successfully', 'success');
+                    fetchPengeluaran();
+                } catch (e) {
+                    showToast('Failed to delete, data might be in use', 'danger');
+                }
             }
         });
     });
@@ -202,7 +194,7 @@ $(document).ready(function () {
             updateUI();
         });
 
-        $('.check-item').off('change').on('change', function () {
+        tableContainer.off('change', '.check-item').on('change', '.check-item', function () {
             updateUI();
         });
 
@@ -214,35 +206,27 @@ $(document).ready(function () {
         const ids = $('.check-item:checked').map(function () { return $(this).val(); }).get();
         if (!ids.length) return;
 
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: `Anda akan menghapus ${ids.length} kategori pengeluaran!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        window.confirmAction({
+            title: `Delete ${ids.length} categories?`,
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
                 const btn = $(this);
                 const originalHtml = btn.html();
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
-                $.ajax({
-                    url: "/pengeluaran/bulk-delete",
-                    type: 'DELETE',
-                    data: { ids: ids },
-                    success: function (response) {
-                        showToast(response.message || 'Berhasil dihapus', 'success');
-                        fetchPengeluaran();
-                        btn.addClass('d-none').prop('disabled', false).html(originalHtml);
-                    },
-                    error: function () {
-                        showToast('Gagal menghapus kategori yang dipilih.', 'danger');
-                        btn.prop('disabled', false).html(originalHtml);
-                    }
-                });
+                try {
+                    const response = await $.ajax({
+                        url: "/pengeluaran/bulk-delete",
+                        type: 'DELETE',
+                        data: { ids: ids }
+                    });
+                    showToast(response.message || 'Successfully deleted', 'success');
+                    fetchPengeluaran();
+                    btn.addClass('d-none').prop('disabled', false).html(originalHtml);
+                } catch (e) {
+                    showToast('Failed to delete selected categories.', 'danger');
+                    btn.prop('disabled', false).html(originalHtml);
+                }
             }
         });
     });

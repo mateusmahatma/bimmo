@@ -211,33 +211,28 @@ window.viewHistory = function (id, name, target) {
 }
 
 window.deleteHistoryLog = function (logId) {
-    Swal.fire({
-        title: 'Hapus entri ini?',
-        text: "Ini juga akan mengurangi progres jumlah yang terkumpul.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: `/tujuan-keuangan/log/${logId}`,
-                type: 'DELETE',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.success) {
-                        window.showToast('Terhapus!', 'Entri riwayat dihapus dan progres disesuaikan.', 'success');
-                        $('#modalHistory').modal('hide');
-                        if ($.fn.DataTable.isDataTable('#goalsTable')) {
-                            $('#goalsTable').DataTable().ajax.reload();
-                        }
+    window.confirmAction({
+        title: 'Delete this entry?',
+        text: 'This will also reduce the progress of collected amounts.',
+        onConfirm: async () => {
+            try {
+                const response = await $.ajax({
+                    url: `/tujuan-keuangan/log/${logId}`,
+                    type: 'DELETE',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                if (response.success) {
+                    showToast('Entry deleted successfully.', 'success');
+                    $('#modalHistory').modal('hide');
+                    if ($.fn.DataTable.isDataTable('#goalsTable')) {
+                        $('#goalsTable').DataTable().ajax.reload();
                     }
                 }
-            });
+            } catch (e) {
+                showToast('Failed to delete history entry.', 'danger');
+            }
         }
     });
 }
@@ -258,32 +253,27 @@ window.simulateGoal = function (id, name, target, collected) {
 }
 
 window.deleteGoal = function (id) {
-    Swal.fire({
-        title: 'Apakah Anda yakin?',
-        text: "Anda tidak akan dapat mengembalikan ini!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: `/tujuan-keuangan/${id}`,
-                type: 'DELETE',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.success) {
-                        window.showToast('Terhapus!', 'Tujuan telah dihapus.', 'success');
-                        if ($.fn.DataTable.isDataTable('#goalsTable')) {
-                            $('#goalsTable').DataTable().ajax.reload();
-                        }
+    window.confirmAction({
+        title: 'Are you sure?',
+        text: 'Deleted data cannot be recovered!',
+        onConfirm: async () => {
+            try {
+                const response = await $.ajax({
+                    url: `/tujuan-keuangan/${id}`,
+                    type: 'DELETE',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                if (response.success) {
+                    showToast('Goal deleted successfully.', 'success');
+                    if ($.fn.DataTable.isDataTable('#goalsTable')) {
+                        $('#goalsTable').DataTable().ajax.reload();
                     }
                 }
-            });
+            } catch (e) {
+                showToast('Failed to delete goal.', 'danger');
+            }
         }
     });
 }

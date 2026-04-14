@@ -238,32 +238,22 @@ $(document).ready(function () {
         e.preventDefault();
         const id = $(this).data('id');
 
-        Swal.fire({
-            title: 'Apakah Anda yakin ingin menghapus data ini?',
-            html: 'Data yang dihapus tidak dapat dikembalikan!',
-            showCancelButton: true,
-            confirmButtonColor: '#012970',
-            cancelButtonColor: '#DB504A',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            customClass: {
-                popup: 'dark-mode'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/barang/' + id,
-                    type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function () {
-                        showToast('Data berhasil dihapus', 'success');
-                        $('#barangTable').DataTable().ajax.reload();
-                    },
-                    error: function () {
-                        showToast('Data gagal dihapus', 'danger');
-                        $('#barangTable').DataTable().ajax.reload();
-                    }
-                });
+        window.confirmAction({
+            title: 'Are you sure?',
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
+                try {
+                    await $.ajax({
+                        url: '/barang/' + id,
+                        type: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                    });
+                    showToast('Data processed successfully', 'success');
+                    $('#barangTable').DataTable().ajax.reload();
+                } catch (e) {
+                    showToast('Data failed to delete', 'danger');
+                    $('#barangTable').DataTable().ajax.reload();
+                }
             }
         });
     });

@@ -84,6 +84,25 @@
         </div>
     </div>
 </section>
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow border-0" style="border-radius: 16px;">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">{{ __('Are you sure?') }}</h5>
+                <p class="text-muted small mb-4">{{ __('Deleted data cannot be recovered!') }}</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" id="btnConfirmDelete">{{ __('Yes, Delete') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('css')
@@ -218,6 +237,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearCompletedBtn = document.getElementById('clearCompletedBtn');
     const collapseIcon = document.getElementById('collapseIcon');
     const completedHeader = document.querySelector('[data-bs-target="#completedSection"]');
+    const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+    let deleteAction = null;
 
     // Handle collapse icon rotation
     const completedSection = document.getElementById('completedSection');
@@ -256,6 +278,14 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelEditBtn.addEventListener('click', resetForm);
     clearCompletedBtn.addEventListener('click', clearAllCompleted);
 
+    btnConfirmDelete.addEventListener('click', async () => {
+        if (deleteAction) {
+            await deleteAction();
+            confirmDeleteModal.hide();
+            deleteAction = null;
+        }
+    });
+
     async function saveNote() {
         const content = quill.root.innerHTML.trim();
         if (content === '<p><br></p>' || !content) return;
@@ -285,18 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function clearAllCompleted() {
-        const result = await Swal.fire({
-            title: '{{ __("Are you sure?") }}',
-            text: '{{ __("Deleted data cannot be recovered!") }}',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: '{{ __("Yes, Delete") }}',
-            cancelButtonText: '{{ __("Cancel") }}'
-        });
-
-        if (result.isConfirmed) {
+        deleteAction = async () => {
             try {
                 const response = await fetch("{{ route('notes.clear-completed') }}", {
                     method: 'POST',
@@ -311,7 +330,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
                 }
             } catch (e) { console.error(e); }
-        }
+        };
+        confirmDeleteModal.show();
     }
 
     function resetForm() {
@@ -418,28 +438,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Listeners for delete
         container.querySelectorAll('.delete-note').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const result = await Swal.fire({
-                    title: '{{ __("Are you sure?") }}',
-                    text: '{{ __("Deleted data cannot be recovered!") }}',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: '{{ __("Yes, Delete") }}',
-                    cancelButtonText: '{{ __("Cancel") }}'
-                });
-                if (!result.isConfirmed) return;
-
+            btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
-                try {
-                    await fetch(`/notes/${id}`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-                    });
-                    loadNotes();
-                    showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
-                } catch (e) { console.error(e); }
+                deleteAction = async () => {
+                    try {
+                        await fetch(`/notes/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                        });
+                        loadNotes();
+                        showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
+                    } catch (e) { console.error(e); }
+                };
+                confirmDeleteModal.show();
             });
         });
     }

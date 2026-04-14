@@ -234,39 +234,30 @@ $(document).ready(function () {
         const ids = checked.map((i, el) => $(el).val()).get();
         if (ids.length === 0) return;
 
-        Swal.fire({
-            title: 'Hapus Terpilih?',
-            text: `Apakah Anda yakin ingin menghapus ${ids.length} item?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        window.confirmAction({
+            title: 'Delete selected?',
+            text: `Are you sure you want to delete ${ids.length} items?`,
+            onConfirm: async () => {
                 const btn = $(this);
                 const originalHtml = btn.html();
-                btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghapus...').prop('disabled', true);
+                btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop('disabled', true);
 
-                $.ajax({
-                    url: "/kalkulator/bulk-delete",
-                    type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    data: { ids: ids },
-                    success: (response) => {
-                        showToast(response.message || 'Data deleted successfully', 'success');
-                        fetchData();
-                        btn.addClass('d-none');
-                    },
-                    error: (err) => {
-                        console.error(err);
-                        showToast('Failed to delete data', 'danger');
-                    },
-                    complete: () => {
-                        btn.html(originalHtml).prop('disabled', false);
-                    }
-                });
+                try {
+                    const response = await $.ajax({
+                        url: "/kalkulator/bulk-delete",
+                        type: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        data: { ids: ids }
+                    });
+                    showToast(response.message || 'Data deleted successfully', 'success');
+                    fetchData();
+                    btn.addClass('d-none');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Failed to delete data', 'danger');
+                } finally {
+                    btn.html(originalHtml).prop('disabled', false);
+                }
             }
         });
     });
@@ -276,38 +267,29 @@ $(document).ready(function () {
         const ids = checked.map((i, el) => $(el).val()).get();
         if (ids.length === 0) return;
 
-        Swal.fire({
-            title: 'Sinkronisasi Terpilih?',
-            text: `Apakah Anda yakin ingin menyinkronkan ${ids.length} data terpilih?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#198754',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, sinkronkan!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        window.confirmAction({
+            title: 'Sync selected?',
+            text: `Sync ${ids.length} selected data?`,
+            onConfirm: async () => {
                 const btn = $(this);
                 const originalHtml = btn.html();
-                btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sinkronisasi...').prop('disabled', true);
+                btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop('disabled', true);
 
-                $.ajax({
-                    url: "/kalkulator/bulk-sync",
-                    type: 'PUT',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    data: { ids: ids },
-                    success: (response) => {
-                        showToast(response.message || 'Data synced successfully', 'success');
-                        fetchData(); // Simplest way is to reload the whole table
-                    },
-                    error: (err) => {
-                        console.error(err);
-                        showToast('Failed to sync data', 'danger');
-                    },
-                    complete: () => {
-                        btn.html(originalHtml).prop('disabled', false);
-                    }
-                });
+                try {
+                    const response = await $.ajax({
+                        url: "/kalkulator/bulk-sync",
+                        type: 'PUT',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                        data: { ids: ids }
+                    });
+                    showToast(response.message || 'Data synced successfully', 'success');
+                    fetchData();
+                } catch (err) {
+                    console.error(err);
+                    showToast('Failed to sync data', 'danger');
+                } finally {
+                    btn.html(originalHtml).prop('disabled', false);
+                }
             }
         });
     });
@@ -401,30 +383,21 @@ $(document).ready(function () {
     $('body').on('click', '.tombol-del-proses-anggaran', function (e) {
         e.preventDefault();
         const id = $(this).data('id');
-        Swal.fire({
-            title: 'Hapus Riwayat?',
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: `/kalkulator/${id}`,
-                    type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: () => {
-                        showToast('Data deleted successfully', 'success');
-                        fetchData(); // Manual reload
-                    },
-                    error: () => {
-                        showToast('Gagal menghapus data', 'danger');
-                    }
-                });
+        window.confirmAction({
+            title: 'Delete history?',
+            text: "Deleted data cannot be recovered!",
+            onConfirm: async () => {
+                try {
+                    await $.ajax({
+                        url: `/kalkulator/${id}`,
+                        type: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                    });
+                    showToast('History deleted successfully', 'success');
+                    fetchData();
+                } catch (e) {
+                    showToast('Failed to delete history', 'danger');
+                }
             }
         });
     });

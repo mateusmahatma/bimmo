@@ -288,41 +288,23 @@
             e.preventDefault();
             const id = $(this).data('id');
             
-            Swal.fire({
-                title: "{{ __('Are you sure?') }}",
-                text: "{{ __('This action cannot be undone!') }}",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: "{{ __('Yes, delete it!') }}",
-                cancelButtonText: "{{ __('Cancel') }}"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/aset/${id}`,
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: "{{ __('Deleted!') }}",
-                                text: "{{ __('Asset has been deleted successfully.') }}",
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                            table.ajax.reload(null, false);
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: "{{ __('Oops...') }}",
-                                text: "{{ __('Something went wrong while deleting the asset.') }}"
-                            });
-                        }
-                    });
+            window.confirmAction({
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Deleted data cannot be recovered!") }}',
+                onConfirm: async () => {
+                    try {
+                        await $.ajax({
+                            url: `/aset/${id}`,
+                            type: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        showToast('{{ __("Asset has been deleted successfully.") }}', 'success');
+                        table.ajax.reload(null, false);
+                    } catch (e) {
+                        showToast('{{ __("Something went wrong while deleting the asset.") }}', 'danger');
+                    }
                 }
             });
         });

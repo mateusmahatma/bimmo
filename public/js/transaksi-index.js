@@ -299,7 +299,6 @@
 
         updateExportLinks();
 
-        var btnBulkDelete = document.getElementById('btnBulkDelete');
         if (btnBulkDelete) {
             btnBulkDelete.addEventListener('click', function () {
                 var checked = document.querySelectorAll('.check-item:checked');
@@ -309,38 +308,40 @@
 
                 if (ids.length === 0) return;
 
-                if (confirm('Are you sure you want to delete ' + ids.length + ' transactions?')) {
-                    var btn = this;
-                    var originalText = btn.innerHTML;
-                    btn.innerHTML =
-                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
-                    btn.disabled = true;
+                window.confirmAction({
+                    title: 'Delete selected transactions?',
+                    text: 'Deleted data cannot be recovered!',
+                    onConfirm: async () => {
+                        var btn = this;
+                        var originalText = btn.innerHTML;
+                        btn.innerHTML =
+                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+                        btn.disabled = true;
 
-                    fetch(routes.bulkDelete, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({ ids: ids })
-                    })
-                        .then(function (response) {
-                            if (response.ok) return response.json();
-                            throw new Error('Something went wrong');
-                        })
-                        .then(function () {
-                            fetchTransactions();
+                        try {
+                            const response = await fetch(routes.bulkDelete, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify({ ids: ids })
+                            });
+                            if (response.ok) {
+                                fetchTransactions();
+                                btn.classList.add('d-none');
+                            } else {
+                                alert('Failed to delete transactions.');
+                            }
+                        } catch (e) {
+                            console.error('Error:', e);
+                            alert('Failed to delete transactions.');
+                        } finally {
                             btn.innerHTML = originalText;
                             btn.disabled = false;
-                            btn.classList.add('d-none');
-                        })
-                        .catch(function (error) {
-                            console.error('Error:', error);
-                            alert('Failed to delete transactions. Please try again.');
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                        });
-                }
+                        }
+                    }
+                });
             });
         }
 
@@ -348,28 +349,29 @@
             if (e.target.classList.contains('form-delete')) {
                 e.preventDefault();
 
-                if (confirm('Yakin ingin menghapus transaksi ini?')) {
-                    var form = e.target;
-                    var url = form.getAttribute('action');
-                    var btn = form.querySelector('button');
-                    var originalContent = btn.innerHTML;
+                window.confirmAction({
+                    title: 'Are you sure?',
+                    text: 'Deleted data cannot be recovered!',
+                    onConfirm: async () => {
+                        var form = e.target;
+                        var url = form.getAttribute('action');
+                        var btn = form.querySelector('button');
+                        var originalContent = btn.innerHTML;
 
-                    btn.innerHTML =
-                        '<span class="spinner-border spinner-border-sm" role="status"></span>';
-                    btn.disabled = true;
+                        btn.innerHTML =
+                            '<span class="spinner-border spinner-border-sm" role="status"></span>';
+                        btn.disabled = true;
 
-                    fetch(url, {
-                        method: 'POST',
-                        body: new FormData(form),
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': csrfToken
-                        }
-                    })
-                        .then(function (response) {
-                            return response.json();
-                        })
-                        .then(function (data) {
+                        try {
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                body: new FormData(form),
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': csrfToken
+                                }
+                            });
+                            const data = await response.json();
                             if (data.success) {
                                 fetchTransactions();
                             } else {
@@ -377,14 +379,14 @@
                                 btn.innerHTML = originalContent;
                                 btn.disabled = false;
                             }
-                        })
-                        .catch(function (error) {
+                        } catch (error) {
                             console.error('Error:', error);
                             alert('Terjadi kesalahan saat menghapus data');
                             btn.innerHTML = originalContent;
                             btn.disabled = false;
-                        });
-                }
+                        }
+                    }
+                });
             }
         });
 
@@ -451,23 +453,24 @@
             if (!delBtn) return;
 
             var id = delBtn.getAttribute('data-id');
-            if (confirm('Yakin ingin menghapus file bukti ini?')) {
-                var originalContent = delBtn.innerHTML;
-                delBtn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm" role="status"></span>';
-                delBtn.disabled = true;
+            window.confirmAction({
+                title: 'Delete this proof?',
+                text: 'The file will be permanently removed.',
+                onConfirm: async () => {
+                    var originalContent = delBtn.innerHTML;
+                    delBtn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm" role="status"></span>';
+                    delBtn.disabled = true;
 
-                fetch(routes.transaksiBase + '/' + id + '/file', {
-                    method: 'DELETE',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                })
-                    .then(function (response) {
-                        return response.json();
-                    })
-                    .then(function (data) {
+                    try {
+                        const response = await fetch(routes.transaksiBase + '/' + id + '/file', {
+                            method: 'DELETE',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        const data = await response.json();
                         if (data.success) {
                             fetchTransactions();
                         } else {
@@ -475,14 +478,14 @@
                             delBtn.innerHTML = originalContent;
                             delBtn.disabled = false;
                         }
-                    })
-                    .catch(function (error) {
+                    } catch (error) {
                         console.error('Error:', error);
                         alert('Terjadi kesalahan saat menghapus file');
                         delBtn.innerHTML = originalContent;
                         delBtn.disabled = false;
-                    });
-            }
+                    }
+                }
+            });
         });
 
         var btnGoToDate = document.getElementById('btnGoToDate');

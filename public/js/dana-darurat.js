@@ -311,32 +311,22 @@ window.initDanaDarurat = function () {
         e.preventDefault();
         const id = $(this).data('id');
 
-        Swal.fire({
-            title: 'Apakah Anda yakin ingin menghapus data ini?',
-            html: 'Data yang dihapus tidak dapat dikembalikan!',
-            showCancelButton: true,
-            confirmButtonColor: '#012970',
-            cancelButtonColor: '#DB504A',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            customClass: {
-                popup: 'dark-mode'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/dana-darurat/' + id,
-                    type: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function () {
-                        showToast('Data berhasil dihapus', 'success');
-                        table.ajax.reload();
-                    },
-                    error: function () {
-                        showToast('Gagal menghapus data', 'danger');
-                        table.ajax.reload();
-                    }
-                });
+        window.confirmAction({
+            title: 'Are you sure?',
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
+                try {
+                    await $.ajax({
+                        url: '/dana-darurat/' + id,
+                        type: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                    });
+                    showToast('Data processed successfully', 'success');
+                    table.ajax.reload();
+                } catch (e) {
+                    showToast('Failed to delete data', 'danger');
+                    table.ajax.reload();
+                }
             }
         });
     });
@@ -382,37 +372,28 @@ window.initDanaDarurat = function () {
 
         if (ids.length === 0) return;
 
-        Swal.fire({
-            title: `Hapus ${ids.length} data?`,
-            text: "Anda tidak akan dapat mengembalikan ini!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus yang dipilih!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Show loading on button
+        window.confirmAction({
+            title: `Delete ${ids.length} items?`,
+            text: 'Deleted data cannot be recovered!',
+            onConfirm: async () => {
                 const OriginalBtnText = $(this).html();
                 $(this).html('<span class="spinner-border spinner-border-sm"></span> Deleting...').prop('disabled', true);
 
-                $.ajax({
-                    url: '/dana-darurat/bulk-delete',
-                    type: 'DELETE',
-                    data: { ids: ids },
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function (response) {
-                        showToast(response.message, 'success');
-                        table.ajax.reload();
-                        $('#checkAll').prop('checked', false);
-                        $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
-                    },
-                    error: function (xhr) {
-                        showToast('Failed to delete selected data.', 'danger');
-                        $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
-                    }
-                });
+                try {
+                    const response = await $.ajax({
+                        url: '/dana-darurat/bulk-delete',
+                        type: 'DELETE',
+                        data: { ids: ids },
+                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                    });
+                    showToast(response.message || 'Data processed successfully', 'success');
+                    table.ajax.reload();
+                    $('#checkAll').prop('checked', false);
+                    $('#btnBulkDelete').addClass('d-none').prop('disabled', false).html(OriginalBtnText);
+                } catch (xhr) {
+                    showToast('Failed to delete selected data.', 'danger');
+                    $('#btnBulkDelete').prop('disabled', false).html(OriginalBtnText);
+                }
             }
         });
     });
