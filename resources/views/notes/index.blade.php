@@ -278,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.success) {
                 resetForm();
                 loadNotes();
+                showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
             }
         } catch (e) { console.error(e); }
         addNoteBtn.disabled = false;
@@ -285,13 +286,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function clearAllCompleted() {
         const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: "This will permanently delete all completed reminders.",
+            title: '{{ __("Are you sure?") }}',
+            text: '{{ __("Deleted data cannot be recovered!") }}',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, empty it!'
+            confirmButtonText: '{{ __("Yes, Delete") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
         });
 
         if (result.isConfirmed) {
@@ -306,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const res = await response.json();
                 if (res.success) {
                     loadNotes();
-                    Swal.fire('Deleted!', 'Completed reminders have been cleared.', 'success');
+                    showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
                 }
             } catch (e) { console.error(e); }
         }
@@ -418,10 +420,14 @@ document.addEventListener('DOMContentLoaded', function() {
         container.querySelectorAll('.delete-note').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const result = await Swal.fire({
-                    title: 'Delete this reminder?',
-                    icon: 'question',
+                    title: '{{ __("Are you sure?") }}',
+                    text: '{{ __("Deleted data cannot be recovered!") }}',
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it'
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ __("Yes, Delete") }}',
+                    cancelButtonText: '{{ __("Cancel") }}'
                 });
                 if (!result.isConfirmed) return;
 
@@ -432,6 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
                     });
                     loadNotes();
+                    showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
                 } catch (e) { console.error(e); }
             });
         });
