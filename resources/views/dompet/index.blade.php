@@ -3,6 +3,7 @@
 @section('title', __('Wallet'))
 
 @push('css')
+<link href="{{ asset('vendors/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
 <link href="{{ asset('css/dompet.css') }}?v={{ filemtime(public_path('css/dompet.css')) }}" rel="stylesheet">
 @endpush
 
@@ -89,51 +90,69 @@
                 </div>
             </div>
 
-            <div class="row g-4">
-                @if(count($wallets) > 0)
-                    @foreach($wallets as $wallet)
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card {{ $uiStyle === 'milenial' ? 'm-wallet-item-card glass-card' : 'wallet-card shadow-sm' }} border-0 h-100 position-relative">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-start justify-content-between mb-3">
-                                    <div class="{{ $uiStyle === 'milenial' ? 'm-wallet-icon' : 'wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary' }} d-flex align-items-center justify-content-center shadow-sm" style="{{ $uiStyle === 'corporate' ? 'width: 56px; height: 56px; border: 1px solid rgba(65, 84, 241, 0.1);' : '' }}">
-                                        @if($wallet->ikon)
-                                            @if(str_starts_with($wallet->ikon, 'uploads/'))
-                                                <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 32px; height: 32px; object-fit: contain;">
-                                            @else
-                                                <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}" alt="{{ $wallet->ikon }}" style="width: 32px; height: 32px; object-fit: contain;">
-                                            @endif
-                                        @else
-                                            <i class="bi bi-wallet2 fs-3 {{ $uiStyle === 'milenial' ? 'text-primary' : '' }}"></i>
-                                        @endif
-                                    </div>
-                                    <div class="dropdown">
-                                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
-                                            <i class="bi bi-three-dots-vertical fs-5"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
-                                            <li><a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
-                                                <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
-                                            </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                
-                                <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none stretched-link">
-                                    <p class="{{ $uiStyle === 'milenial' ? 'm-wallet-name' : 'text-uppercase text-muted fw-bold mb-1' }}" style="{{ $uiStyle === 'corporate' ? 'font-size: 0.7rem; letter-spacing: 1px;' : '' }}">{{ $wallet->nama }}</p>
-                                    <h4 class="{{ $uiStyle === 'milenial' ? 'm-wallet-amount' : 'fw-bold mb-0 text-dark' }}">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</h4>
-                                    
-                                    <div class="mt-4 d-flex align-items-center text-primary fw-semibold small">
-                                        <span>{{ __('View Details') }}</span>
-                                        <i class="bi bi-arrow-right ms-2 transition-icon"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body {{ count($wallets) > 0 ? 'p-4' : 'p-0' }}">
+                    @if(count($wallets) > 0)
+                    <div class="table-responsive">
+                        <table id="dompetTable" class="table table-hover align-middle mb-0" style="width: 100%;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="ps-4">{{ __('Wallet') }}</th>
+                                    <th scope="col">{{ __('Balance') }}</th>
+                                    <th scope="col" class="text-end pe-4">{{ __('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    @foreach($wallets as $wallet)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="{{ $uiStyle === 'milenial' ? 'm-wallet-icon' : 'wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary' }} d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 40px; height: 40px; {{ $uiStyle === 'corporate' ? 'border: 1px solid rgba(65, 84, 241, 0.1);' : '' }}">
+                                                    @if($wallet->ikon)
+                                                        @if(str_starts_with($wallet->ikon, 'uploads/'))
+                                                            <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 24px; height: 24px; object-fit: contain;">
+                                                        @else
+                                                            <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}" alt="{{ $wallet->ikon }}" style="width: 24px; height: 24px; object-fit: contain;">
+                                                        @endif
+                                                    @else
+                                                        <i class="bi bi-wallet2 fs-5 {{ $uiStyle === 'milenial' ? 'text-primary' : '' }}"></i>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none fw-bold text-dark">{{ $wallet->nama }}</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-order="{{ $wallet->saldo }}">
+                                            <span class="fw-semibold text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <div class="dropdown">
+                                                <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
+                                                    <i class="bi bi-three-dots-vertical fs-5"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
+                                                    <li>
+                                                        <a class="dropdown-item py-2 px-3 text-primary d-flex align-items-center" href="{{ route('dompet.show', $wallet->id) }}">
+                                                            <i class="bi bi-eye me-2"></i> {{ __('View Details') }}
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
+                                                            <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                    @endforeach
-                @else
-                    <div class="col-12 text-center py-5">
+                    @else
+                    <div class="text-center py-5">
                         <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
                             <i class="bi bi-wallet2 text-muted display-4"></i>
                         </div>
@@ -143,7 +162,8 @@
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet Now') }}
                         </button>
                     </div>
-                @endif
+                    @endif
+                </div>
             </div>
         </div>
         
@@ -289,5 +309,12 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="{{ asset('vendors/jquery/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ asset('vendors/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('vendors/datatables/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('js/dompet.js') }}?v={{ filemtime(public_path('js/dompet.js')) }}"></script>
+@endpush
 
 @endsection
