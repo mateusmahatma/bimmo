@@ -14,7 +14,7 @@
         <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
             <i class="bi bi-speedometer2 text-primary"></i> {{ __('Burn Rate Summary') }}
         </h6>
-        <span class="text-muted small" style="font-size: 0.7rem;">{{ __('Berdasarkan Periode Terpilih') }}</span>
+        <span class="opacity-75 small" style="font-size: 0.7rem;">{{ __('Berdasarkan Periode Terpilih') }}</span>
     </div>
     <div class="row row-cols-1 row-cols-md-2 g-3" id="burnRateList"></div>
 </div>
@@ -33,6 +33,7 @@
         }
 
         function renderBurnRate(items) {
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
             const container = document.getElementById('burnRateList');
             if (!container) return;
             container.innerHTML = "";
@@ -57,23 +58,31 @@
                 const statusColor = br.is_over_burning ? 'danger' : (br.is_behind_pace ? 'warning' : 'success');
                 const statusText = br.is_over_burning ? 'Over Budget' : (br.is_behind_pace ? 'Waspada' : 'Aman');
                 
+                // Custom Premium Aesthetic
+                const cardBiggerBg = isDark ? '#14171a' : '#ffffff';
+                const cardInnerBg = isDark ? '#1a1d21' : '#ffffff';
+                const subBoxBg = isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
+                const borderColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+                const textColor = isDark ? '#e2e8f0' : '#1e293b';
+                const mutedColor = isDark ? '#94a3b8' : '#64748b';
+
                 let breakdownHtml = "";
                 if (item.kategori_breakdown && item.kategori_breakdown.length > 0) {
                     const cat = item.kategori_breakdown[0];
                     breakdownHtml = `
-                        <div class="mt-3 pt-3 border-top">
+                        <div class="mt-3 pt-3" style="border-top: 1px solid ${borderColor};">
                             <p class="text-danger mb-2 fw-bold d-flex align-items-center gap-1" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <i class="bi bi-exclamation-triangle-fill"></i> Pengeluaran Terboros
                             </p>
-                            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle">
+                            <div class="p-2 rounded" style="background: rgba(var(--bs-danger-rgb), 0.08); border: 1px solid rgba(var(--bs-danger-rgb), 0.15);">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div class="d-flex align-items-center gap-2 overflow-hidden">
                                         <i class="bi bi-tag-fill text-danger" style="font-size: 0.8rem;"></i>
-                                        <span class="text-dark fw-bold text-truncate small" style="font-size: 0.75rem;">${cat.nama}</span>
+                                        <span class="fw-bold text-truncate small" style="font-size: 0.75rem; color: ${textColor};">${cat.nama}</span>
                                     </div>
                                     <div class="text-end flex-shrink-0">
                                         <div class="fw-bold text-danger" style="font-size: 0.8rem;">${formatIDR(cat.nominal)}</div>
-                                        <div class="text-muted fw-bold" style="font-size: 0.65rem;">${cat.persentase.toFixed(1)}% dari budget</div>
+                                        <div class="fw-bold opacity-75" style="font-size: 0.65rem; color: ${statusColor === 'danger' ? 'var(--bs-danger)' : mutedColor};">${cat.persentase.toFixed(1)}% dari budget</div>
                                     </div>
                                 </div>
                             </div>
@@ -83,10 +92,10 @@
 
                 const card = `
                     <div class="col">
-                        <div class="card h-100 border-0 shadow-sm ${uiStyle === 'milenial' ? 'm-glass-container' : 'border'}" style="background: rgba(var(--bs-body-bg-rgb), 0.5); transition: transform 0.2s;">
+                        <div class="card h-100 border-0 shadow-sm" style="background: ${cardInnerBg}; border: 1px solid ${borderColor} !important; border-radius: 16px; transition: all 0.3s ease; overflow: hidden;">
                             <div class="card-body p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="card-title mb-0 fw-bold text-truncate" style="font-size: 0.95rem; max-width: 150px;" title="${item.nama_anggaran}">${item.nama_anggaran}</h6>
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h6 class="card-title mb-0 fw-bold text-truncate" style="font-size: 0.95rem; max-width: 150px; color: ${textColor};" title="${item.nama_anggaran}">${item.nama_anggaran}</h6>
                                     <span class="badge bg-${statusColor}-subtle text-${statusColor} border border-${statusColor}-subtle px-2 py-1" style="font-size: 0.7rem; border-radius: 20px;">
                                         <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> ${statusText}
                                     </span>
@@ -94,46 +103,46 @@
                                 
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between small mb-1">
-                                        <span class="text-muted">Progres Budget</span>
+                                        <span style="color: ${mutedColor}; font-size: 0.75rem;">Progres Budget</span>
                                         <span class="fw-bold text-${statusColor}">${br.spent_percentage.toFixed(1)}%</span>
                                     </div>
-                                    <div class="progress" style="height: 8px; border-radius: 10px; background-color: rgba(0,0,0,0.05);">
-                                        <div class="progress-bar bg-${statusColor} progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${Math.min(br.spent_percentage, 100)}%; border-radius: 10px;"></div>
+                                    <div class="progress" style="height: 10px; border-radius: 10px; background-color: ${subBoxBg}; overflow: hidden;">
+                                        <div class="progress-bar bg-${statusColor} progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${Math.min(br.spent_percentage, 100)}%; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
                                     </div>
                                 </div>
 
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
-                                        <div class="p-2 rounded" style="background: rgba(0,0,0,0.02);">
-                                            <div class="text-muted mb-0" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Terpakai</div>
-                                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">${formatIDR(br.total_spent)}</div>
+                                        <div class="p-2 rounded-3" style="background: ${subBoxBg}; border: 1px solid ${borderColor};">
+                                            <div style="color: ${mutedColor}; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Terpakai</div>
+                                            <div class="fw-bold" style="font-size: 0.85rem; color: ${textColor};">${formatIDR(br.total_spent)}</div>
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="p-2 rounded" style="background: rgba(0,0,0,0.02);">
-                                            <div class="text-muted mb-0" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</div>
-                                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">${formatIDR(br.total_budget)}</div>
+                                        <div class="p-2 rounded-3" style="background: ${subBoxBg}; border: 1px solid ${borderColor};">
+                                            <div style="color: ${mutedColor}; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Budget</div>
+                                            <div class="fw-bold" style="font-size: 0.85rem; color: ${textColor};">${formatIDR(br.total_budget)}</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                            <i class="bi bi-calendar-event text-primary" style="font-size: 0.9rem;"></i>
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(var(--bs-primary-rgb), 0.1); color: var(--bs-primary);">
+                                            <i class="bi bi-calendar-event" style="font-size: 0.9rem;"></i>
                                         </div>
                                         <div>
-                                            <div class="text-muted" style="font-size: 0.65rem;">Sisa Waktu</div>
-                                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">${br.days_remaining} Hari</div>
+                                            <div style="color: ${mutedColor}; font-size: 0.65rem; font-weight: 600;">Sisa Waktu</div>
+                                            <div class="fw-bold" style="font-size: 0.85rem; color: ${textColor};">${br.days_remaining} Hari</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 ${breakdownHtml}
 
-                                <div class="mt-3 pt-3 border-top text-end">
-                                    <a href="/kalkulator/${item.hash}" class="btn btn-sm btn-primary rounded-pill px-3" style="font-size: 0.75rem; font-weight: 600;">
-                                        Lihat Transaksi
+                                <div class="mt-3 pt-3 text-end" style="border-top: 1px solid ${borderColor};">
+                                    <a href="/kalkulator/${item.hash}" class="btn btn-sm btn-primary rounded-pill px-3 py-1 shadow-sm" style="font-size: 0.75rem; font-weight: 600;">
+                                        Detail <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </div>
                             </div>
