@@ -17,9 +17,9 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Smart Reminders') }}</h5>
+                        <h5 class="card-title mb-0 fw-bold" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Smart Reminders') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage your tasks with rich formatting and efficiency.') }}</p>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                 <div class="card-body pt-4">
                     <!-- Add Note Form -->
                     <div class="mb-5">
-                        <div id="editor-container" class="bg-light rounded-3 mb-2" style="height: 150px; border: 1px solid var(--bs-border-color);"></div>
+                        <div id="editor-container" class="rounded-3 mb-2" style="height: 150px; border: 1px solid var(--bs-border-color);"></div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             <small class="text-muted"><kbd>Enter</kbd> {{ __('to save') }}</small>
                             <div class="d-flex gap-2">
@@ -128,7 +128,7 @@
 
     .note-text.checked {
         text-decoration: line-through;
-        opacity: 0.6;
+        opacity: 0.5;
     }
 
     .action-btns {
@@ -180,16 +180,27 @@
     }
     .ql-editor {
         font-size: 0.95rem;
+        color: var(--bs-body-color);
+    }
+
+    #editor-container {
+        background: var(--bs-tertiary-bg);
     }
 
     /* Dark Mode Overrides */
     [data-bs-theme="dark"] .card-header { background-color: #212529 !important; }
     [data-bs-theme="dark"] .note-card { background-color: #1a1d21 !important; border-color: #343a40 !important; }
     [data-bs-theme="dark"] .note-card.checked-card { background-color: #161b22 !important; }
-    [data-bs-theme="dark"] .ql-toolbar.ql-snow { background-color: #212529 !important; border-bottom-color: #343a40 !important; }
+    [data-bs-theme="dark"] .note-text { color: #f8f9fa !important; }
+    [data-bs-theme="dark"] .note-text * { color: #f8f9fa !important; }
+    [data-bs-theme="dark"] .ql-toolbar.ql-snow { background-color: #1a1d21 !important; border-bottom-color: #343a40 !important; }
+    [data-bs-theme="dark"] .ql-container.ql-snow { background-color: #111418 !important; }
+    [data-bs-theme="dark"] .ql-editor { color: #f8f9fa !important; }
+    [data-bs-theme="dark"] .ql-editor * { color: #f8f9fa !important; }
     [data-bs-theme="dark"] .ql-snow .ql-stroke { stroke: #adb5bd !important; }
     [data-bs-theme="dark"] .ql-snow .ql-fill { fill: #adb5bd !important; }
     [data-bs-theme="dark"] .ql-snow .ql-picker { color: #adb5bd !important; }
+    [data-bs-theme="dark"] .ql-editor.ql-blank::before { color: #6c757d !important; }
 </style>
 @endpush
 
