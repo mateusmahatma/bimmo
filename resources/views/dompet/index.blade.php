@@ -55,11 +55,11 @@
                         <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                     </button>
                     @if(count($wallets) > 1)
-                    <button type="button" class="btn btn-outline-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#transferWalletModal">
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#transferWalletModal">
                         <i class="bi bi-arrow-left-right me-1"></i> {{ __('Transfer') }}
                     </button>
                     @endif
-                    <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm btn-add-desktop" data-bs-toggle="modal" data-bs-target="#addWalletModal">
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop" data-bs-toggle="modal" data-bs-target="#addWalletModal">
                         <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet') }}
                     </button>
                 </div>
@@ -158,7 +158,7 @@
                         </div>
                         <h5 class="fw-bold text-dark">{{ __('No wallets yet') }}</h5>
                         <p class="text-muted">{{ __('Start managing your finances by adding your first wallet.') }}</p>
-                        <button type="button" class="btn btn-primary rounded-pill mt-2 px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addWalletModal">
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill mt-2 px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addWalletModal">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet Now') }}
                         </button>
                     </div>
@@ -166,12 +166,13 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Floating Action Button for Mobile -->
-        <button type="button" class="btn btn-primary fab-add" data-bs-toggle="modal" data-bs-target="#addWalletModal" title="{{ __('Add Wallet') }}">
-            <i class="bi bi-plus-lg fs-2"></i>
-        </button>
-    </section>
+    </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <button type="button" class="btn btn-primary fab-add" data-bs-toggle="modal" data-bs-target="#addWalletModal" title="{{ __('Add Wallet') }}">
+        <i class="bi bi-plus-lg fs-2"></i>
+    </button>
+</section>
 
 <!-- Add Wallet Modal -->
 <div class="modal fade" id="addWalletModal" tabindex="-1">
