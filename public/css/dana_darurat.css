@@ -180,3 +180,117 @@
     color: #dee2e6;
 }
 
+/* ============================================================
+   DataTables Controls — custom dom (dt-top-bar / dt-bottom-bar)
+   Padding exactly matches card-header: py-3 (1rem) px-card (1.25rem)
+   ============================================================ */
+
+/* Top bar: Show entries ← → Search */
+#danaDaruratTable_wrapper .dt-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background-color: #fff;
+    border-bottom: 1px solid #edf2f9;
+}
+
+/* Bottom bar: Info ← → Pagination */
+#danaDaruratTable_wrapper .dt-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 1.25rem;
+    background-color: #fff;
+}
+
+/* Dark mode */
+[data-bs-theme="dark"] #danaDaruratTable_wrapper .dt-top-bar,
+[data-bs-theme="dark"] #danaDaruratTable_wrapper .dt-bottom-bar {
+    background-color: #1e1e1e;
+    border-color: rgba(255,255,255,0.07);
+}
+
+/* Label text (Show _X_ entries / Search:) */
+.dataTables_length label,
+.dataTables_filter label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 0.4rem;
+}
+
+/* Show entries dropdown */
+.dataTables_length select {
+    border-radius: 6px !important;
+    padding: 0.3rem 1.8rem 0.3rem 0.6rem !important;
+    border: 1px solid #dee2e6 !important;
+    font-size: 0.85rem;
+    box-shadow: none !important;
+    height: auto;
+}
+
+/* Search input — kotak, tanpa border-radius */
+.dataTables_filter input {
+    border-radius: 4px !important;
+    padding: 0.35rem 0.75rem !important;
+    border: 1px solid #dee2e6 !important;
+    margin-left: 0 !important;
+    box-shadow: none !important;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.dataTables_filter input:focus {
+    border-color: #f5576c !important;
+    box-shadow: none !important;
+}
+
+/* Dark mode inputs */
+[data-bs-theme="dark"] .dataTables_length select,
+[data-bs-theme="dark"] .dataTables_filter input {
+    background-color: #2b2b2b !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Info text */
+.dataTables_info {
+    font-size: 0.82rem;
+    color: #6c757d;
+}
+
+/* Pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-link {
+    border-radius: 6px;
+    margin: 0 2px;
+    border: none;
+    color: #6c757d;
+    font-size: 0.82rem;
+    padding: 0.35rem 0.7rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #f5576c;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(245, 87, 108, 0.3);
+}
+
+.pagination .page-link:hover {
+    background-color: #f8f9fa;
+    color: #f5576c;
+}
+
+[data-bs-theme="dark"] .pagination .page-link:hover {
+    background-color: #2d2d2d;
+}
+

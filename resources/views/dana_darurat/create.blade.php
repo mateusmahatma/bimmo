@@ -117,17 +117,28 @@
                             <div class="col-md-6">
                                 <label for="jenis_transaksi_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Type') }} <span class="text-danger">*</span></label>
                                 <select name="jenis_transaksi_dana_darurat" id="jenis_transaksi_dana_darurat" class="form-select form-select-lg" required>
-                                    <option value="">-- {{ __('Select Status') }} --</option>
-                                    <option value="1" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
-                                    <option value="2" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
-                                </select>
+                                     <option value="">-- {{ __('Select Status') }} --</option>
+                                     <option value="1" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
+                                     <option value="2" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
+                                 </select>
+                                 <div id="infoSaldo" class="mt-2 p-2 bg-light rounded border-start border-4 border-warning small {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? '' : 'd-none' }}">
+                                    <i class="bi bi-info-circle me-1 text-warning"></i> {{ __('Current balance') }}: <span class="fw-bold text-dark">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</span>
+                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="nominal_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Amount (Rp)') }} <span class="text-danger">*</span></label>
                                 <div class="input-group input-group-lg">
                                     <span class="input-group-text bg-light text-muted fw-bold">Rp</span>
-                                    <input type="number" class="form-control" name="nominal_dana_darurat" id="nominal_dana_darurat" placeholder="0"
-                                        value="{{ old('nominal_dana_darurat') }}" required>
+                                    <input type="text" class="form-control" name="nominal_dana_darurat" id="nominal_dana_darurat" placeholder="0"
+                                        value="{{ old('nominal_dana_darurat') }}" inputmode="numeric" required>
+                                </div>
+                                <div id="containerTarikSemua" class="mt-2 {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? '' : 'd-none' }}">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="tarikSemuaSaldo" style="cursor: pointer;">
+                                        <label class="form-check-label small" for="tarikSemuaSaldo" style="cursor: pointer;">
+                                            {{ __('Withdraw all balance') }} (Tarik semua saldo)
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -138,8 +149,8 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{{ route('dana-darurat.index') }}" class="btn btn-light btn-lg px-4 rounded-pill">{{ __('Cancel') }}</a>
-                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                            <a href="{{ route('dana-darurat.index') }}" class="btn btn-light px-4 rounded-pill">{{ __('Cancel') }}</a>
+                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
                                 <i class="bi bi-check-lg me-2"></i> {{ __('Save Data') }}
                             </button>
                         </div>
@@ -163,6 +174,65 @@
                     console.error('Error initializing CKEditor:', error);
                 });
         }
+
+        const typeSelect = document.getElementById('jenis_transaksi_dana_darurat');
+        const nominalInput = document.getElementById('nominal_dana_darurat');
+        const tarikSemuaCheckbox = document.getElementById('tarikSemuaSaldo');
+        const infoSaldo = document.getElementById('infoSaldo');
+        const containerTarikSemua = document.getElementById('containerTarikSemua');
+        const currentBalance = {{ $totalDanaDarurat }};
+
+        // Format Rupiah Function
+        function formatRupiah(angka, prefix) {
+            let number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp ' + rupiah : '');
+        }
+
+        nominalInput.addEventListener('keyup', function(e) {
+            this.value = formatRupiah(this.value);
+        });
+
+        // Format initial value if exists
+        if (nominalInput.value) {
+            nominalInput.value = formatRupiah(nominalInput.value);
+        }
+
+        typeSelect.addEventListener('change', function() {
+            if (this.value == '2') {
+                infoSaldo.classList.remove('d-none');
+                containerTarikSemua.classList.remove('d-none');
+            } else {
+                infoSaldo.classList.add('d-none');
+                containerTarikSemua.classList.add('d-none');
+                tarikSemuaCheckbox.checked = false;
+                nominalInput.readOnly = false;
+            }
+        });
+
+        tarikSemuaCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                nominalInput.value = formatRupiah(currentBalance.toString());
+                nominalInput.readOnly = true;
+            } else {
+                nominalInput.readOnly = false;
+            }
+        });
+
+        // Clean dots before submit
+        document.querySelector('form').addEventListener('submit', function() {
+            nominalInput.value = nominalInput.value.replace(/\./g, '');
+        });
     });
 </script>
 @endpush

@@ -73,6 +73,8 @@ window.initDanaDarurat = function () {
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"
         },
+        order: [[2, 'desc']],
+        dom: '<"dt-top-bar"lf>t<"dt-bottom-bar"ip>',
         ajax: {
             url: '/dana-darurat',
             type: 'GET',

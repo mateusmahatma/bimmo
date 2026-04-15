@@ -156,12 +156,24 @@ class DanaDaruratController extends Controller
      */
     public function create(Request $request)
     {
+        $userId = Auth::id();
         $dana = new DanaDarurat();
-        $dana->id_user = Auth::id();
+        $dana->id_user = $userId;
 
         $type = $request->query('type');
 
-        return view('dana_darurat.create', compact('dana', 'type'));
+        // Hitung Total Dana Darurat
+        $totalMasuk = DanaDarurat::where('id_user', $userId)
+            ->where('jenis_transaksi_dana_darurat', 1)
+            ->sum('nominal_dana_darurat');
+
+        $totalKeluar = DanaDarurat::where('id_user', $userId)
+            ->where('jenis_transaksi_dana_darurat', 2)
+            ->sum('nominal_dana_darurat');
+
+        $totalDanaDarurat = $totalMasuk - $totalKeluar;
+
+        return view('dana_darurat.create', compact('dana', 'type', 'totalDanaDarurat'));
     }
 
     /**
@@ -195,9 +207,21 @@ class DanaDaruratController extends Controller
      */
     public function edit($id)
     {
-        $dana = DanaDarurat::where('id_dana_darurat', $id)->first();
+        $userId = Auth::id();
+        $dana = DanaDarurat::where('id_dana_darurat', $id)->where('id_user', $userId)->firstOrFail();
 
-        return view('dana_darurat.edit', compact('dana'));
+        // Hitung Total Dana Darurat (untuk info saldo)
+        $totalMasuk = DanaDarurat::where('id_user', $userId)
+            ->where('jenis_transaksi_dana_darurat', 1)
+            ->sum('nominal_dana_darurat');
+
+        $totalKeluar = DanaDarurat::where('id_user', $userId)
+            ->where('jenis_transaksi_dana_darurat', 2)
+            ->sum('nominal_dana_darurat');
+
+        $totalDanaDarurat = $totalMasuk - $totalKeluar;
+
+        return view('dana_darurat.edit', compact('dana', 'totalDanaDarurat'));
     }
 
     /**
