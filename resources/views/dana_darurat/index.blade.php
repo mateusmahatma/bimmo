@@ -4,7 +4,7 @@
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('vendors/datatables/dataTables.bootstrap5.min.css') }}">
-<link rel="stylesheet" href="{{ asset('css/dana_darurat.css') }}">
+<link rel="stylesheet" href="{{ asset('css/dana_darurat.css') }}?v={{ filemtime(public_path('css/dana_darurat.css')) }}">
 @endpush
 
 @section('container')
