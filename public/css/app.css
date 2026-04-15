@@ -3,8 +3,8 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-button, 
-a, 
+button,
+a,
 .cursor-pointer,
 .pointer-cursor,
 [role="button"] {
@@ -30,6 +30,25 @@ input[type="time"],
 input:not([type]),
 textarea {
     cursor: text !important;
+}
+
+[data-bs-theme="dark"] input[type="text"],
+[data-bs-theme="dark"] input[type="password"],
+[data-bs-theme="dark"] input[type="email"],
+[data-bs-theme="dark"] input[type="number"],
+[data-bs-theme="dark"] input[type="tel"],
+[data-bs-theme="dark"] input[type="url"],
+[data-bs-theme="dark"] input[type="search"],
+[data-bs-theme="dark"] input[type="date"],
+[data-bs-theme="dark"] input[type="datetime-local"],
+[data-bs-theme="dark"] input[type="month"],
+[data-bs-theme="dark"] input[type="week"],
+[data-bs-theme="dark"] input[type="time"],
+[data-bs-theme="dark"] input:not([type]),
+[data-bs-theme="dark"] textarea {
+    background-color: #333 !important;
+    color: #eee !important;
+    border: 1px solid #555 !important;
 }
 
 input[type="checkbox"],
@@ -62,7 +81,7 @@ input[type="image"],
     padding: 1.25rem 1.25rem 1.1rem;
     border: 1px solid #f0f0f0;
     height: 100%;
-    transition: box-shadow .2s ease;
+    transition: box-shadow 0.2s ease;
 }
 
 .summary-card:hover {
@@ -80,8 +99,8 @@ input[type="image"],
     font-size: 0.75rem;
     color: #6c757d;
     text-transform: uppercase;
-    letter-spacing: .04em;
-    margin-bottom: .4rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.4rem;
 }
 
 /* Angka besar */
@@ -94,7 +113,7 @@ input[type="image"],
 /* Status kecil */
 .summary-card .status {
     font-size: 0.75rem;
-    margin-top: .3rem;
+    margin-top: 0.3rem;
     color: #6c757d;
 }
 
@@ -346,7 +365,6 @@ input[type="image"],
     filter: blur(0);
 }
 
-
 /* =========================================
    GLOBAL PAGETITLE & BREADCRUMB
    ========================================= */
@@ -383,7 +401,7 @@ input[type="image"],
     font-weight: 600;
 }
 
-.breadcrumb-item+.breadcrumb-item::before {
+.breadcrumb-item + .breadcrumb-item::before {
     content: "\F285";
     /* bi-chevron-right */
     font-family: "bootstrap-icons";
@@ -618,11 +636,11 @@ input[type="image"],
 
 /* Responsive Dashboard Tables — Stack on Mobile */
 @media (max-width: 575.98px) {
-    .table-dashboard, 
-    .table-dashboard thead, 
-    .table-dashboard tbody, 
-    .table-dashboard th, 
-    .table-dashboard td, 
+    .table-dashboard,
+    .table-dashboard thead,
+    .table-dashboard tbody,
+    .table-dashboard th,
+    .table-dashboard td,
     .table-dashboard tr {
         display: block;
         width: 100%;
@@ -633,7 +651,7 @@ input[type="image"],
     }
 
     .table-dashboard tr {
-        border-bottom: 1px solid rgba(0,0,0,0.06);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         padding: 12px 15px;
         position: relative;
     }
@@ -669,7 +687,6 @@ input[type="image"],
         color: #444;
     }
 }
-
 
 /* Alert Minimal */
 .alert-minimal {
@@ -739,7 +756,9 @@ input[type="image"],
     background-color: #2563eb;
     /* Primary blue */
     z-index: 999999;
-    transition: width 0.3s ease, opacity 0.3s ease;
+    transition:
+        width 0.3s ease,
+        opacity 0.3s ease;
     box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
     opacity: 0;
     pointer-events: none;
@@ -765,7 +784,6 @@ input[type="image"],
     background: rgba(255, 255, 255, 0.07);
     color: #94a3b8;
 }
-
 
 /* Global FAB Adjustment for Mobile Bottom Nav */
 @media (max-width: 991.98px) {
@@ -794,4 +812,4 @@ input[type="image"],
 /* Ensure dashboard and other scrollable areas respect the frozen nav */
 .pwa-mode main {
     padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
-}
+}
