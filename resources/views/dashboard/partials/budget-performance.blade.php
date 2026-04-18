@@ -1,3 +1,7 @@
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/dashboard/anggaran.css') }}?v={{ filemtime(public_path('css/dashboard/anggaran.css')) }}">
+@endpush
+
 <div class="card card-dashboard border-0 shadow-none {{ $uiStyle === 'milenial' ? 'm-glass-container' : '' }}">
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 {{ $uiStyle === 'milenial' ? 'm-card-header-vibrant bg-transparent' : '' }}">
         <div>
@@ -19,8 +23,34 @@
         </div>
     </div>
     <div class="card-body p-3 p-md-4">
-        @include('dashboard.partials.anggaran')
-        @stack('anggaran-css')
-        @stack('anggaran.scripts')
+        @include('dashboard.partials.budget-performance-content')
     </div>
 </div>
+
+@push('scripts')
+<script>
+    window.dashboardBudgetConfig = {
+        uiStyle: @json($uiStyle),
+        chartUrl: "{{ route('anggaran.chart') }}",
+        syncUrl: "{{ route('dashboard.sync-anggaran') }}",
+        csrfToken: "{{ csrf_token() }}",
+        labels: {
+            noData: @json(__('Tidak ada data anggaran.')),
+            noBurnRateData: @json(__('Pilih periode awal/sedang berjalan untuk melihat burn rate.')),
+            burnRateSummary: @json(__('Burn Rate Summary')),
+            selectedPeriod: @json(__('Berdasarkan Periode Terpilih')),
+            overBudget: @json(__('Over Budget')),
+            warning: @json(__('Waspada')),
+            safe: @json(__('Aman')),
+            highestExpense: @json(__('Pengeluaran Terboros')),
+            spentLabel: @json(__('Terpakai')),
+            budgetLabel: @json(__('Budget')),
+            remainingDays: @json(__('Sisa Waktu')),
+            daysSuffix: @json(__('Hari')),
+            detail: @json(__('Detail')),
+            success: @json(__('Success')),
+        },
+    };
+</script>
+<script src="{{ asset('js/dashboard-budget-performance.js') }}?v={{ filemtime(public_path('js/dashboard-budget-performance.js')) }}"></script>
+@endpush

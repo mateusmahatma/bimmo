@@ -16,9 +16,6 @@
         </select>
     </div>
     <div class="card-body p-3 p-md-4">
-        <div id="cashflowChart" style="height: 300px;"></div>
-        <div id="cashflowTableContainer" class="table-responsive mt-3">
-            @include('dashboard.partials.cashflow-table', ['cashflow' => $cashflow])
-        </div>
+        @include('dashboard.partials.cash-flow-content')
     </div>
 </div>
