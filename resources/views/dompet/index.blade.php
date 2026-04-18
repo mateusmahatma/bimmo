@@ -17,31 +17,27 @@
         </ol>
     </nav>
 </div>
-{{-- Standarized with Toast --}}
 
 
 <section class="section">
     <div class="row">
-@php
-    $uiStyle = auth()->user()->ui_style ?? 'corporate';
-@endphp
 
-<div class="col-lg-12 mb-4">
-    <div class="card {{ $uiStyle === 'milenial' ? 'm-wallet-balance-card border-0 shadow-lg' : 'card-summary' }} mb-4">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h5 class="card-title mb-1 fw-bold {{ $uiStyle === 'milenial' ? 'text-white text-uppercase ls-1' : 'text-dark opacity-75' }}" style="font-size: {{ $uiStyle === 'milenial' ? '0.9rem' : '1.1rem' }};">{{ __('Total Balance') }}</h5>
-                    <p class="{{ $uiStyle === 'milenial' ? 'text-white opacity-75' : 'text-muted' }} small mb-0">{{ __('Combined balance from all your active wallets.') }}</p>
-                </div>
-                <div class="text-end">
-                    <p class="small mb-0 {{ $uiStyle === 'milenial' ? 'text-white opacity-50' : 'text-muted' }} d-md-none text-start">{{ __('Current Total') }}</p>
-                    <h2 class="{{ $uiStyle === 'milenial' ? 'text-white' : 'balance-amount text-dark' }} mb-0 fw-bold" style="font-size: {{ $uiStyle === 'milenial' ? '2.5rem' : '' }}; letter-spacing: -1px;">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
+        <div class="col-lg-12 mb-4">
+            <div class="card card-summary mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h5 class="card-title mb-1 fw-bold">{{ __('Total Balance') }}</h5>
+                            <p class="text-muted small mb-0">{{ __('Combined balance from all your active wallets.') }}</p>
+                        </div>
+                        <div class="text-end">
+                            <p class="small mb-0 text-muted d-md-none text-start">{{ __('Current Total') }}</p>
+                            <h2 class="balance-amount text-dark mb-0 fw-bold">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- Wallets Grid -->
         <div class="col-12">
@@ -103,51 +99,53 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                    @foreach($wallets as $wallet)
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center">
-                                                <div class="{{ $uiStyle === 'milenial' ? 'm-wallet-icon' : 'wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary' }} d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 40px; height: 40px; {{ $uiStyle === 'corporate' ? 'border: 1px solid rgba(65, 84, 241, 0.1);' : '' }}">
-                                                    @if($wallet->ikon)
-                                                        @if(str_starts_with($wallet->ikon, 'uploads/'))
-                                                            <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 24px; height: 24px; object-fit: contain;">
-                                                        @else
-                                                            <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}" alt="{{ $wallet->ikon }}" style="width: 24px; height: 24px; object-fit: contain;">
-                                                        @endif
-                                                    @else
-                                                        <i class="bi bi-wallet2 fs-5 {{ $uiStyle === 'milenial' ? 'text-primary' : '' }}"></i>
-                                                    @endif
-                                                </div>
-                                                <div>
-                                                    <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none fw-bold text-dark">{{ $wallet->nama }}</a>
-                                                </div>
+                                @foreach($wallets as $wallet)
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 40px; height: 40px; border: 1px solid rgba(65, 84, 241, 0.1);">
+                                                @if($wallet->ikon)
+                                                @if(str_starts_with($wallet->ikon, 'uploads/'))
+                                                <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 24px; height: 24px; object-fit: contain;">
+                                                @else
+                                                <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}" alt="{{ $wallet->ikon }}" style="width: 24px; height: 24px; object-fit: contain;">
+                                                @endif
+                                                @else
+                                                <i class="bi bi-wallet2 fs-5"></i>
+                                                @endif
                                             </div>
-                                        </td>
-                                        <td data-order="{{ $wallet->saldo }}">
-                                            <span class="fw-semibold text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</span>
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            <div class="dropdown">
-                                                <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
-                                                    <i class="bi bi-three-dots-vertical fs-5"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
-                                                    <li>
-                                                        <a class="dropdown-item py-2 px-3 text-primary d-flex align-items-center" href="{{ route('dompet.show', $wallet->id) }}">
-                                                            <i class="bi bi-eye me-2"></i> {{ __('View Details') }}
-                                                        </a>
-                                                    </li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li>
-                                                        <a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
-                                                            <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
-                                                        </a>
-                                                    </li>
-                                                </ul>
+                                            <div>
+                                                <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none fw-bold text-dark">{{ $wallet->nama }}</a>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
+                                        </div>
+                                    </td>
+                                    <td data-order="{{ $wallet->saldo }}">
+                                        <span class="fw-semibold text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="dropdown">
+                                            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
+                                                <i class="bi bi-three-dots-vertical fs-5"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
+                                                <li>
+                                                    <a class="dropdown-item py-2 px-3 text-primary d-flex align-items-center" href="{{ route('dompet.show', $wallet->id) }}">
+                                                        <i class="bi bi-eye me-2"></i> {{ __('View Details') }}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
+                                                        <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -254,7 +252,7 @@
                         <select name="dari_dompet_id" class="form-select rounded-3" required>
                             <option value="" disabled selected>{{ __('Select Source Wallet') }}</option>
                             @foreach($wallets as $wallet)
-                                <option value="{{ $wallet->id }}">{{ $wallet->nama }} (Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }})</option>
+                            <option value="{{ $wallet->id }}">{{ $wallet->nama }} (Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }})</option>
                             @endforeach
                         </select>
                     </div>
@@ -266,7 +264,7 @@
                         <select name="ke_dompet_id" class="form-select rounded-3" required>
                             <option value="" disabled selected>{{ __('Select Destination Wallet') }}</option>
                             @foreach($wallets as $wallet)
-                                <option value="{{ $wallet->id }}">{{ $wallet->nama }}</option>
+                            <option value="{{ $wallet->id }}">{{ $wallet->nama }}</option>
                             @endforeach
                         </select>
                     </div>
