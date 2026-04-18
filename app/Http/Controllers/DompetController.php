@@ -157,6 +157,19 @@ class DompetController extends Controller
         return redirect()->route('dompet.show', $id)->with('success', 'Saldo berhasil ditambahkan');
     }
 
+    public function updateBalance(Request $request, $id)
+    {
+        $request->validate([
+            'saldo' => 'required|numeric|min:0',
+        ]);
+
+        $wallet = Dompet::where('id_user', Auth::id())->findOrFail($id);
+        $wallet->saldo = (float) $request->saldo;
+        $wallet->save();
+
+        return redirect()->route('dompet.index')->with('success', 'Nominal dompet berhasil diperbarui');
+    }
+
 
     public function reports()
     {
@@ -247,4 +260,4 @@ class DompetController extends Controller
 
         return redirect()->route('dompet.index')->with('success', 'Transfer antar dompet berhasil dilakukan');
     }
-}
+}

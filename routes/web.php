@@ -170,6 +170,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dompet/reports', [DompetController::class , 'reports'])->name('dompet.reports');
         Route::post('/dompet/transfer', [DompetController::class, 'transfer'])->name('dompet.transfer');
         Route::post('/dompet/{id}/add-balance', [DompetController::class , 'addBalance'])->name('dompet.add-balance');
+        Route::put('/dompet/{id}/balance', [DompetController::class , 'updateBalance'])->name('dompet.update-balance');
         Route::resource('dompet', DompetController::class);
 
         // Transaksi

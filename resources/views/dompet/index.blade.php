@@ -134,6 +134,15 @@
                                                     </a>
                                                 </li>
                                                 <li>
+                                                    <a
+                                                        class="dropdown-item py-2 px-3 text-warning d-flex align-items-center"
+                                                        href="#"
+                                                        onclick="openEditBalanceModal('{{ $wallet->id }}', @js($wallet->nama), '{{ (float) $wallet->saldo }}')"
+                                                    >
+                                                        <i class="bi bi-pencil-square me-2"></i> {{ __('Edit Balance') }}
+                                                    </a>
+                                                </li>
+                                                <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
                                                 <li>
@@ -216,6 +225,41 @@
     </div>
 </div>
 
+<!-- Edit Balance Modal -->
+<div class="modal fade" id="editBalanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold">{{ __('Edit Wallet Balance') }}</h5>
+                    <p class="text-muted small mb-0" id="editBalanceWalletName"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editBalanceForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="alert alert-light border small text-muted mb-3">
+                        {{ __('Use this for manual balance correction only. This change does not create a cash flow transaction.') }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">{{ __('Current Balance') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
+                            <input type="number" name="saldo" id="editBalanceInput" class="form-control rounded-end-3 border-start-0" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Save Changes') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function confirmDelete(id, name) {
         window.confirmAction({
@@ -233,6 +277,16 @@
                 form.submit();
             }
         });
+    }
+
+    function openEditBalanceModal(id, name, saldo) {
+        document.getElementById('editBalanceWalletName').textContent = name;
+        document.getElementById('editBalanceInput').value = saldo;
+        document.getElementById('editBalanceForm').action = `/dompet/${id}/balance`;
+
+        const modalElement = document.getElementById('editBalanceModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.show();
     }
 </script>
 
