@@ -54,6 +54,29 @@ function initCalendar() {
             // Backend now provides colors, but we can add subtle styles if needed
             info.el.style.borderRadius = '5px';
             info.el.classList.add('shadow-sm');
+
+            // Completed marker: small green pill with white check (per-event or per-occurrence for recurring)
+            const target = info.el.querySelector('.fc-event-title') || info.el.querySelector('.fc-event-main') || info.el;
+            const existing = info.el.querySelector('.event-done-icon');
+            const completed = isEventCompleted(info.event);
+
+            if (!completed) {
+                info.el.classList.remove('event-completed');
+                if (existing) existing.remove();
+                return;
+            }
+
+            info.el.classList.add('event-completed');
+            if (target && !existing) {
+                const badge = document.createElement('span');
+                badge.className = 'event-done-icon d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle';
+                badge.style.width = '14px';
+                badge.style.height = '14px';
+                badge.style.marginLeft = '6px';
+                badge.style.verticalAlign = 'middle';
+                badge.innerHTML = '<i class="bi bi-check" style="font-size: .75rem; line-height: 1;"></i>';
+                target.appendChild(badge);
+            }
         }
     });
 
@@ -61,10 +84,7 @@ function initCalendar() {
         calendar.render();
     }, 10);
 
-    // Sync agenda list whenever events are loaded/changed
-    calendar.on('eventsSet', function (events) {
-        updateAgendaList(events, calendar);
-    });
+    // (Agenda list removed)
 
     window.addEventListener('resize', function () {
         if (calendar && calendar.view) {
@@ -91,17 +111,19 @@ function initCalendar() {
     const timeInputs = document.getElementById('timeInputsContainer');
     const dateInputs = document.getElementById('dateInputsContainer');
 
-    allDaySwitch.addEventListener('change', function () {
-        if (this.checked) {
-            timeInputs.classList.add('d-none');
-            dateInputs.classList.remove('d-none');
-            const startVal = timeInputs.querySelector('[name="start_at"]').value;
-            if (startVal) dateInputs.querySelector('[name="start_date"]').value = startVal.split('T')[0];
-        } else {
-            timeInputs.classList.remove('d-none');
-            dateInputs.classList.add('d-none');
-        }
-    });
+    if (allDaySwitch && timeInputs && dateInputs) {
+        allDaySwitch.addEventListener('change', function () {
+            if (this.checked) {
+                timeInputs.classList.add('d-none');
+                dateInputs.classList.remove('d-none');
+                const startVal = timeInputs.querySelector('[name="start_at"]')?.value;
+                if (startVal) dateInputs.querySelector('[name="start_date"]').value = startVal.split('T')[0];
+            } else {
+                timeInputs.classList.remove('d-none');
+                dateInputs.classList.add('d-none');
+            }
+        });
+    }
 
     // Helper to get local ISO string without 'Z' for datetime-local
     function toLocalISO(date) {
@@ -116,13 +138,15 @@ function initCalendar() {
     const emailInput = document.getElementById('notificationEmail');
     const userEmail = emailInput ? emailInput.value : '';
 
-    emailSwitch.addEventListener('change', function () {
-        if (this.checked) {
-            emailContainer.classList.remove('d-none');
-        } else {
-            emailContainer.classList.add('d-none');
-        }
-    });
+    if (emailSwitch && emailContainer) {
+        emailSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                emailContainer.classList.remove('d-none');
+            } else {
+                emailContainer.classList.add('d-none');
+            }
+        });
+    }
 
     const recurringSwitch = document.getElementById('recurringSwitch');
     const recurringInputs = document.getElementById('recurringInputs');
@@ -257,11 +281,11 @@ function initCalendar() {
     }
 
     // Handle Form Submission (Store or Update)
-    form.addEventListener('submit', function (e) {
+    if (form) form.addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const eventId = document.getElementById('eventId').value;
-        const isAllDay = allDaySwitch.checked;
+        const isAllDay = !!allDaySwitch?.checked;
 
         const startVal = isAllDay ? formData.get('start_date') : formData.get('start_at');
         const endVal = isAllDay ? formData.get('end_date') : formData.get('end_at');
@@ -272,7 +296,7 @@ function initCalendar() {
         }
 
         let rruleStr = null;
-        if (recurringSwitch.checked) {
+        if (recurringSwitch?.checked) {
             // Include DTSTART in the string for maximum compatibility with RRule plugin
             const dtStart = startVal.replace(/[-:]/g, '');
             // If it's all day, we just need the date part
@@ -292,8 +316,8 @@ function initCalendar() {
             all_day: isAllDay ? 1 : 0,
             start_at: startVal,
             end_at: endVal || null,
-            send_email: emailSwitch.checked ? 1 : 0,
-            notification_email: emailInput.value,
+            send_email: emailSwitch?.checked ? 1 : 0,
+            notification_email: emailInput?.value || null,
             rrule: rruleStr
         };
 
@@ -438,6 +462,48 @@ function initCalendar() {
         }
     }
 
+    function getOccurrenceKey(event) {
+        if (!event) return null;
+        if (event.allDay) {
+            // FullCalendar gives stable YYYY-MM-DD for all-day occurrences
+            const ymd = event.startStr || (event.start ? event.start.toISOString().slice(0, 10) : null);
+            return ymd ? `DATE:${ymd}` : null;
+        }
+        const iso = event.start ? event.start.toISOString() : null;
+        return iso ? `TIME:${iso}` : null;
+    }
+
+    function isEventCompleted(event) {
+        if (!event) return false;
+
+        const list = event.extendedProps?.completed_occurrences || [];
+
+        // Prefer per-occurrence completion when the backend provides it (works for recurring instances too)
+        if (Array.isArray(list) && list.length > 0) {
+            const key = getOccurrenceKey(event);
+            if (key && list.includes(key)) return true;
+
+            // Backward-compatible/fuzzy match for older stored values (iso strings)
+            const eventMs = event.start ? event.start.getTime() : NaN;
+            if (!Number.isFinite(eventMs)) return false;
+
+            return list.some(s => {
+                if (typeof s === 'string' && s.startsWith('DATE:') && event.allDay) {
+                    return s === key;
+                }
+                if (typeof s === 'string' && (s.startsWith('TIME:'))) {
+                    const ms = new Date(s.slice(5)).getTime();
+                    return Number.isFinite(ms) && Math.abs(ms - eventMs) < 5 * 60000;
+                }
+                const ms = new Date(s).getTime();
+                return Number.isFinite(ms) && Math.abs(ms - eventMs) < 5 * 60000; // tolerate TZ/seconds drift
+            });
+        }
+
+        // Fallback: single status flag (non-recurring)
+        return event.extendedProps?.status === 'completed';
+    }
+
     function openEventDetailModal(event) {
         if (!detailModal) return;
 
@@ -460,6 +526,55 @@ function initCalendar() {
             } else {
                 badgeEl.style.display = 'none';
             }
+        }
+
+        const btnDone = document.getElementById('btnDetailDone');
+        const isCompleted = isEventCompleted(event);
+        if (btnDone) {
+            btnDone.disabled = !!isCompleted;
+            btnDone.innerHTML = isCompleted
+                ? '<i class="bi bi-check-circle-fill me-1"></i>Sudah Done'
+                : '<i class="bi bi-check2-circle me-1"></i>Done';
+            btnDone.onclick = function () {
+                if (isCompleted) return;
+
+                const isRecurring = Array.isArray(event.extendedProps?.completed_occurrences) || !!event.extendedProps?.rrule;
+                const occurrenceKey = isRecurring ? getOccurrenceKey(event) : null;
+                fetch(`${eventsBaseUrl}/${event.id}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        _method: 'PUT',
+                        status: 'completed',
+                        ...(occurrenceKey ? { occurrence_key: occurrenceKey } : {})
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                }).then(resp => resp.json())
+                    .then(() => {
+                        if (isRecurring) {
+                            const current = Array.isArray(event.extendedProps?.completed_occurrences)
+                                ? [...event.extendedProps.completed_occurrences]
+                                : [];
+                            if (occurrenceKey) current.push(occurrenceKey);
+                            event.setExtendedProp('completed_occurrences', current);
+                        } else {
+                            event.setExtendedProp('status', 'completed');
+                        }
+                        if (calendar) {
+                            if (typeof calendar.rerenderEvents === 'function') {
+                                calendar.rerenderEvents();
+                            }
+                            // Ensure UI updates even for recurring instances (rebuild from server)
+                            if (typeof calendar.refetchEvents === 'function') {
+                                calendar.refetchEvents();
+                            }
+                        }
+                        detailModal.hide();
+                    })
+                    .catch(err => console.error(err));
+            };
         }
 
         const btnEdit = document.getElementById('btnDetailEdit');
@@ -499,65 +614,7 @@ function initCalendar() {
         detailModal.show();
     }
 
-    function updateAgendaList(events, calendarInstance) {
-        const sectionEl = document.getElementById('agendaSection');
-        const emptyEl = document.getElementById('agendaEmpty');
-        const listEl = document.getElementById('agendaList');
-        const countEl = document.getElementById('agendaCount');
-        if (!sectionEl || !emptyEl || !listEl) return;
-
-        const escapeHtml = (s) => String(s ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-
-        const now = new Date();
-        const upcoming = (events || [])
-            .filter(ev => ev.start && (ev.end ? ev.end >= now : ev.start >= new Date(now.getTime() - 86400000)))
-            .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0))
-            .slice(0, 6);
-
-        if (upcoming.length === 0) {
-            sectionEl.style.display = 'none';
-            emptyEl.style.display = '';
-            listEl.innerHTML = '';
-            if (countEl) countEl.innerText = '';
-            return;
-        }
-
-        emptyEl.style.display = 'none';
-        sectionEl.style.display = '';
-        if (countEl) countEl.innerText = `${upcoming.length} agenda`;
-
-        listEl.innerHTML = upcoming.map(ev => {
-            const meta = categoryMeta(ev.extendedProps?.category);
-            const time = formatEventTime(ev);
-            const safeTitle = escapeHtml(ev.title || 'Agenda');
-            const safeTime = escapeHtml(time);
-            const safeId = escapeHtml(ev.id);
-            return `
-                <button type="button" class="list-group-item list-group-item-action d-flex align-items-start gap-2 py-2" data-agenda-id="${safeId}">
-                    <span class="badge ${meta.badge} mt-1" style="width: 10px; height: 10px; border-radius: 999px;">&nbsp;</span>
-                    <span class="flex-grow-1">
-                        <div class="fw-semibold small mb-0">${safeTitle}</div>
-                        <div class="text-muted small">${safeTime}</div>
-                    </span>
-                    <i class="bi bi-chevron-right text-muted small mt-1"></i>
-                </button>
-            `;
-        }).join('');
-
-        // Delegate click to open modal
-        listEl.querySelectorAll('[data-agenda-id]').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const id = this.getAttribute('data-agenda-id');
-                const ev = calendarInstance.getEventById(id) || calendarInstance.getEvents().find(e => String(e.id) === String(id));
-                if (ev) openEventDetailModal(ev);
-            });
-        });
-    }
+    // (Agenda list removed)
 
     // Simple calendar filtering/search logic
     const calendarSearch = document.getElementById('calendarSearch');

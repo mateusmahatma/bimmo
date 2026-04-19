@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventOccurrenceStatus;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class EventController extends Controller
 {
@@ -12,6 +14,16 @@ class EventController extends Controller
     {
         $start = Carbon::parse($request->query('start'));
         $end = Carbon::parse($request->query('end'));
+        $startUtc = $start->copy()->utc();
+        $endUtc = $end->copy()->utc();
+
+        $occurrenceStatuses = collect();
+        if (Schema::hasTable('event_occurrence_statuses')) {
+            $occurrenceStatuses = EventOccurrenceStatus::where('id_user', auth()->id())
+                ->whereBetween('occurrence_start', [$startUtc->toDateTimeString(), $endUtc->toDateTimeString()])
+                ->get()
+                ->groupBy('event_id');
+        }
 
         $events = Event::where('id_user', auth()->id())
             ->where(function ($query) use ($start, $end) {
@@ -26,6 +38,9 @@ class EventController extends Controller
             })
             ->get()
             ->map(function ($event) {
+            // placeholder; overwritten below with range-scoped occurrence completion list if available
+            $completedOccurrences = [];
+
             $colors = [
                 'reminder' => '#0dcaf0',
                 'task' => '#0d6efd',
@@ -52,7 +67,8 @@ class EventController extends Controller
                     'description' => $event->description,
                     'send_email' => $event->send_email,
                     'notification_email' => $event->notification_email,
-                    'rrule' => $event->rrule
+                    'rrule' => $event->rrule,
+                    'completed_occurrences' => $completedOccurrences,
                 ]
             ];
 
@@ -72,6 +88,32 @@ class EventController extends Controller
             else {
                 $eventData['end'] = $event->end_at ? ($isAllDay ? $event->end_at->format('Y-m-d') : $event->end_at->toIso8601String()) : null;
             }
+
+            return $eventData;
+        });
+
+        // Inject per-range completed occurrences for recurring events (or any event, harmless)
+        $events = $events->map(function ($eventData) use ($occurrenceStatuses) {
+            $eventId = $eventData['id'] ?? null;
+            if (!$eventId) return $eventData;
+
+            $items = $occurrenceStatuses->get($eventId, collect());
+            if ($items->isEmpty()) return $eventData;
+
+            $eventData['extendedProps']['completed_occurrences'] = $items
+                ->map(function ($row) {
+                    // Return stable keys for both timed and all-day occurrences.
+                    // - TIME:<isoZ> for timed events
+                    // - DATE:<YYYY-MM-DD> for all-day events (client uses event.startStr)
+                    $utc = $row->occurrence_start->copy()->utc();
+                    return [
+                        'TIME:' . $utc->toIso8601String(),
+                        'DATE:' . $utc->format('Y-m-d'),
+                    ];
+                })
+                ->flatten()
+                ->values()
+                ->all();
 
             return $eventData;
         });
@@ -132,7 +174,48 @@ class EventController extends Controller
                 'send_email' => 'nullable|boolean',
                 'notification_email' => 'nullable|email|max:255',
                 'rrule' => 'nullable|string',
+                'occurrence_start' => 'nullable|date',
+                'occurrence_key' => 'nullable|string',
             ]);
+
+            // For recurring events, allow marking a single occurrence as completed without changing the whole series.
+            if ($event->rrule && (($validated['status'] ?? null) === 'completed') && (!empty($validated['occurrence_key']) || !empty($validated['occurrence_start']))) {
+                if (!Schema::hasTable('event_occurrence_statuses')) {
+                    return response()->json(['message' => 'Occurrence status table not found. Please run migrations.'], 500);
+                }
+
+                $occurrenceStartUtc = null;
+
+                if (!empty($validated['occurrence_key'])) {
+                    $key = $validated['occurrence_key'];
+                    if (str_starts_with($key, 'DATE:')) {
+                        $date = substr($key, 5);
+                        $occurrenceStartUtc = Carbon::parse($date, 'UTC')->startOfDay();
+                    } elseif (str_starts_with($key, 'TIME:')) {
+                        $iso = substr($key, 5);
+                        $occurrenceStartUtc = Carbon::parse($iso)->utc();
+                    } else {
+                        // Backward-compatible: treat as ISO datetime
+                        $occurrenceStartUtc = Carbon::parse($key)->utc();
+                    }
+                } else {
+                    // Backward-compatible payload
+                    $occurrenceStartUtc = Carbon::parse($validated['occurrence_start'])->utc();
+                }
+
+                EventOccurrenceStatus::updateOrCreate(
+                    [
+                        'event_id' => $event->id,
+                        'id_user' => auth()->id(),
+                        'occurrence_start' => $occurrenceStartUtc->toDateTimeString(),
+                    ],
+                    [
+                        'status' => 'completed',
+                    ]
+                );
+
+                return response()->json(['success' => true]);
+            }
 
             $event->update(array_filter($validated, fn($value) => $value !== null));
 
