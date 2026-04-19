@@ -1,1 +1,22 @@
 @import url('style.css');
+
+/* Sync button (Budget Performance) */
+#btnSyncAnggaran,
+#btnSyncAnggaran:hover,
+#btnSyncAnggaran:focus,
+#btnSyncAnggaran:active,
+#btnSyncAnggaran:disabled {
+    color: #fff !important;
+    background-color: #012c77 !important;
+    border: 1px solid #012c77 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+#btnSyncAnggaran i,
+#btnSyncAnggaran:hover i,
+#btnSyncAnggaran:focus i,
+#btnSyncAnggaran:active i,
+#btnSyncAnggaran:disabled i {
+    color: #fff !important;
+}

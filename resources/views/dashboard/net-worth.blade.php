@@ -2,7 +2,7 @@
 
 @section('title', __('Net Worth Detail'))
 
-@push('styles')
+@push('css')
 <link href="{{ asset('css/dashboard/net-worth.css') }}?v={{ filemtime(public_path('css/dashboard/net-worth.css')) }}" rel="stylesheet">
 @endpush
 

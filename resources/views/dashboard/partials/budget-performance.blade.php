@@ -1,4 +1,4 @@
-@push('styles')
+@push('css')
 <link rel="stylesheet" href="{{ asset('css/dashboard/anggaran.css') }}?v={{ filemtime(public_path('css/dashboard/anggaran.css')) }}">
 @endpush
 
