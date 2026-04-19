@@ -183,7 +183,7 @@ class TransaksiController extends Controller
                 'bulkDelete' => route('transaksi.bulkDelete'),
                 'upload' => route('upload'),
                 'transaksiBase' => url('transaksi'),
-                'dateBase' => url('transaksi/date'),
+                'dateBase' => url(route('transaksi.byDate', ['date' => '__DATE__'])),
             ],
             'dateRangePicker' => [
                 'ranges' => [

@@ -12,9 +12,23 @@
                 </div>
             </div>
             <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Batal') }}</button>
-                <button type="button" id="btnGoToDate" class="btn btn-primary rounded-pill px-4">{{ __('Buka') }}</button>
+                <button type="button" class="btn btn-light rounded-pill px-4"
+                    data-bs-dismiss="modal">{{ __('Batal') }}</button>
+                <button type="button" id="btnGoToDate"
+                    class="btn btn-primary rounded-pill px-4">
+                    {{ __('Buka') }}
+                </button>
             </div>
         </div>
     </div>
+</div>
+
+<script>
+    document.getElementById('btnGoToDate').addEventListener('click', function() {
+        const date = document.getElementById('input_open_date').value;
+        window.location.href = '{{ url("transaksi/date") }}/' + date;
+    });
+</script>
+</div>
+</div>
 </div>
