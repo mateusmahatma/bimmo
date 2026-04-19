@@ -29,7 +29,9 @@ function initCalendar() {
         events: eventsBaseUrl,
 
         eventClick: function (info) {
-            showPopover(info.event, info.el);
+            // Center modal detail when agenda clicked
+            info.jsEvent?.preventDefault?.();
+            openEventDetailModal(info.event);
         },
 
         select: function (info) {
@@ -58,6 +60,11 @@ function initCalendar() {
     setTimeout(() => {
         calendar.render();
     }, 10);
+
+    // Sync agenda list whenever events are loaded/changed
+    calendar.on('eventsSet', function (events) {
+        updateAgendaList(events, calendar);
+    });
 
     window.addEventListener('resize', function () {
         if (calendar && calendar.view) {
@@ -414,6 +421,142 @@ function initCalendar() {
             }
         });
         window.calendarPopoverListenerAdded = true;
+    }
+
+    // Event detail modal (dashboard agenda click)
+    const detailModalEl = document.getElementById('eventDetailModal');
+    const detailModal = detailModalEl ? bootstrap.Modal.getOrCreateInstance(detailModalEl) : null;
+    let currentDetailEventId = null;
+
+    function categoryMeta(category) {
+        switch ((category || '').toLowerCase()) {
+            case 'reminder': return { label: 'Reminder', badge: 'bg-info' };
+            case 'task': return { label: 'Task', badge: 'bg-primary' };
+            case 'meeting': return { label: 'Meeting', badge: 'bg-warning text-dark' };
+            case 'deadline': return { label: 'Deadline', badge: 'bg-danger' };
+            default: return { label: category || '', badge: 'bg-secondary' };
+        }
+    }
+
+    function openEventDetailModal(event) {
+        if (!detailModal) return;
+
+        currentDetailEventId = event.id;
+        const titleEl = document.getElementById('eventDetailModalLabel');
+        const timeEl = document.getElementById('detailTime');
+        const descEl = document.getElementById('detailDesc');
+        const badgeEl = document.getElementById('detailCategoryBadge');
+
+        if (titleEl) titleEl.innerText = event.title || 'Agenda';
+        if (timeEl) timeEl.innerText = formatEventTime(event);
+        if (descEl) descEl.innerText = event.extendedProps?.description || 'No description';
+
+        const meta = categoryMeta(event.extendedProps?.category);
+        if (badgeEl) {
+            if (meta.label) {
+                badgeEl.style.display = '';
+                badgeEl.className = `badge rounded-pill ${meta.badge}`;
+                badgeEl.innerText = meta.label;
+            } else {
+                badgeEl.style.display = 'none';
+            }
+        }
+
+        const btnEdit = document.getElementById('btnDetailEdit');
+        if (btnEdit) {
+            btnEdit.onclick = function () {
+                openEventModal({
+                    id: event.id,
+                    title: event.title,
+                    start: event.start,
+                    end: event.end,
+                    allDay: event.allDay,
+                    category: event.extendedProps?.category,
+                    description: event.extendedProps?.description,
+                    rrule: event.extendedProps?.rrule,
+                    extendedProps: event.extendedProps
+                });
+                detailModal.hide();
+            };
+        }
+
+        const btnDelete = document.getElementById('btnDetailDelete');
+        if (btnDelete) {
+            btnDelete.onclick = function () {
+                if (!confirm('Delete this event?')) return;
+                fetch(`${eventsBaseUrl}/${event.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                }).then(() => {
+                    event.remove();
+                    detailModal.hide();
+                });
+            };
+        }
+
+        detailModal.show();
+    }
+
+    function updateAgendaList(events, calendarInstance) {
+        const sectionEl = document.getElementById('agendaSection');
+        const emptyEl = document.getElementById('agendaEmpty');
+        const listEl = document.getElementById('agendaList');
+        const countEl = document.getElementById('agendaCount');
+        if (!sectionEl || !emptyEl || !listEl) return;
+
+        const escapeHtml = (s) => String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        const now = new Date();
+        const upcoming = (events || [])
+            .filter(ev => ev.start && (ev.end ? ev.end >= now : ev.start >= new Date(now.getTime() - 86400000)))
+            .sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0))
+            .slice(0, 6);
+
+        if (upcoming.length === 0) {
+            sectionEl.style.display = 'none';
+            emptyEl.style.display = '';
+            listEl.innerHTML = '';
+            if (countEl) countEl.innerText = '';
+            return;
+        }
+
+        emptyEl.style.display = 'none';
+        sectionEl.style.display = '';
+        if (countEl) countEl.innerText = `${upcoming.length} agenda`;
+
+        listEl.innerHTML = upcoming.map(ev => {
+            const meta = categoryMeta(ev.extendedProps?.category);
+            const time = formatEventTime(ev);
+            const safeTitle = escapeHtml(ev.title || 'Agenda');
+            const safeTime = escapeHtml(time);
+            const safeId = escapeHtml(ev.id);
+            return `
+                <button type="button" class="list-group-item list-group-item-action d-flex align-items-start gap-2 py-2" data-agenda-id="${safeId}">
+                    <span class="badge ${meta.badge} mt-1" style="width: 10px; height: 10px; border-radius: 999px;">&nbsp;</span>
+                    <span class="flex-grow-1">
+                        <div class="fw-semibold small mb-0">${safeTitle}</div>
+                        <div class="text-muted small">${safeTime}</div>
+                    </span>
+                    <i class="bi bi-chevron-right text-muted small mt-1"></i>
+                </button>
+            `;
+        }).join('');
+
+        // Delegate click to open modal
+        listEl.querySelectorAll('[data-agenda-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-agenda-id');
+                const ev = calendarInstance.getEventById(id) || calendarInstance.getEvents().find(e => String(e.id) === String(id));
+                if (ev) openEventDetailModal(ev);
+            });
+        });
     }
 
     // Simple calendar filtering/search logic

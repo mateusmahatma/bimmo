@@ -20,6 +20,18 @@
         </div>
     </div>
     <div class="card-body p-2 p-md-4">
+        {{-- Agenda list (only shown when events exist) --}}
+        <div class="mb-3" id="agendaSection" style="display: none;">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <div class="fw-bold small text-muted text-uppercase" style="letter-spacing: .06em;">Agenda</div>
+                <div class="small text-muted" id="agendaCount"></div>
+            </div>
+            <div class="list-group list-group-flush border rounded-3 overflow-hidden" id="agendaList"></div>
+        </div>
+        <div class="mb-3 text-muted small" id="agendaEmpty" style="display: none;">
+            Belum ada agenda pada periode ini.
+        </div>
+
         <div class="row mb-3 g-2">
             <div class="col-12 d-flex flex-wrap gap-2 justify-content-start overflow-auto pb-1 calendar-filters" style="scrollbar-width: none; -ms-overflow-style: none;">
                 <style>.calendar-filters::-webkit-scrollbar { display: none; }</style>
@@ -171,6 +183,32 @@
 </div>
 
 <!-- Event Detail Pop-up -->
+<div class="modal fade" id="eventDetailModal" tabindex="-1" aria-labelledby="eventDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: {{ $uiStyle === 'milenial' ? '24px' : '15px' }}; overflow: hidden;">
+            <div class="modal-header border-bottom py-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : 'bg-body-tertiary' }}">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge rounded-pill" id="detailCategoryBadge" style="display:none;">&nbsp;</span>
+                    <h5 class="modal-title fw-bold mb-0" id="eventDetailModalLabel"></h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4">
+                <div class="small text-muted mb-2" id="detailTime"></div>
+                <div class="mb-0" id="detailDesc"></div>
+            </div>
+            <div class="modal-footer border-top p-3 {{ $uiStyle === 'milenial' ? 'bg-light bg-opacity-50' : 'bg-body-tertiary' }}">
+                <button type="button" class="btn btn-outline-danger" id="btnDetailDelete">
+                    <i class="bi bi-trash me-1"></i>Hapus
+                </button>
+                <button type="button" class="btn btn-primary" id="btnDetailEdit">
+                    <i class="bi bi-pencil me-1"></i>Edit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="eventPopover" class="popover shadow-lg border-0" style="display: none; position: absolute; z-index: 1060; max-width: 250px; border-radius: 12px; background: var(--bs-body-bg);">
     <div class="popover-header fw-bold border-bottom p-2 d-flex justify-content-between align-items-center bg-body-tertiary" style="border-radius: 12px 12px 0 0;">
         <span id="popoverTitle"></span>
