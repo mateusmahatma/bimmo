@@ -105,12 +105,21 @@
                 <h5 class="card-title mb-0 fw-bold text-dark">{{ __('Track Your Goals') }}</h5>
                 <p class="text-muted small mb-0 mt-1">{{ __('Monitor progress and reach your financial targets.') }}</p>
             </div>
+            <div class="d-flex align-items-center gap-2">
+                <small class="text-muted" id="bulkSelectedCount" data-selected-label="{{ __('selected') }}" style="display:none;">0 {{ __('selected') }}</small>
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="bulkDeleteGoalsBtn" disabled>
+                    <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }}
+                </button>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table id="goalsTable" class="table table-hover align-middle mb-0" style="width:100%">
                     <thead class="bg-light">
                         <tr>
+                            <th class="py-3 text-center">
+                                <input type="checkbox" class="form-check-input" id="selectAllGoals" aria-label="Select all goals">
+                            </th>
                             <th class="py-3 text-center">{{ __('No') }}</th>
                             <th class="py-3">{{ __('Goal Name') }}</th>
                             <th class="py-3">{{ __('Category') }}</th>

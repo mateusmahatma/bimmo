@@ -1,4 +1,5 @@
 let isTujuanKeuanganInitialized = false;
+window.__tujuanKeuanganSelectedGoalIds = window.__tujuanKeuanganSelectedGoalIds || new Set();
 
 window.initTujuanKeuangan = function () {
     if (!$('#goalsTable').length) return;
@@ -37,6 +38,24 @@ window.initTujuanKeuangan = function () {
         scrollX: true,
         autoWidth: false,
         columns: [
+            {
+                data: 'id_tujuan_keuangan',
+                name: 'id_tujuan_keuangan',
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function (data) {
+                    const id = String(data);
+                    return `
+                        <input
+                            type="checkbox"
+                            class="form-check-input goal-select"
+                            value="${id}"
+                            aria-label="Select goal ${id}"
+                        >
+                    `;
+                }
+            },
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
             { data: 'nama_target', name: 'nama_target' },
             { data: 'kategori', name: 'kategori' },
@@ -103,6 +122,118 @@ window.initTujuanKeuangan = function () {
             { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center' }
         ]
     });
+
+    const selectedIds = window.__tujuanKeuanganSelectedGoalIds;
+
+    function updateBulkUI() {
+        const count = selectedIds.size;
+        const $count = $('#bulkSelectedCount');
+        const $btn = $('#bulkDeleteGoalsBtn');
+        const selectedLabel = $count.data('selected-label') || 'selected';
+
+        if (count > 0) {
+            $count.text(`${count} ${selectedLabel}`).show();
+            $btn.prop('disabled', false);
+        } else {
+            $count.hide();
+            $btn.prop('disabled', true);
+        }
+    }
+
+    function syncSelectAllState() {
+        const $selectAll = $('#selectAllGoals');
+        if (!$selectAll.length) return;
+
+        if (!$.fn.DataTable.isDataTable('#goalsTable')) {
+            $selectAll.prop('checked', false).prop('indeterminate', false);
+            return;
+        }
+
+        const nodes = table.rows({ page: 'current' }).nodes().toArray();
+        const checkboxes = nodes.map(n => $(n).find('input.goal-select')[0]).filter(Boolean);
+
+        if (checkboxes.length === 0) {
+            $selectAll.prop('checked', false).prop('indeterminate', false);
+            return;
+        }
+
+        const checkedCount = checkboxes.filter(cb => cb.checked).length;
+        $selectAll.prop('checked', checkedCount === checkboxes.length);
+        $selectAll.prop('indeterminate', checkedCount > 0 && checkedCount < checkboxes.length);
+    }
+
+    table.on('draw', function () {
+        // Re-apply checked state for current page based on global selection
+        $('#goalsTable tbody input.goal-select').each(function () {
+            const id = String($(this).val());
+            $(this).prop('checked', selectedIds.has(id));
+        });
+        syncSelectAllState();
+        updateBulkUI();
+    });
+
+    // Bulk selection handlers (delegated)
+    $(document)
+        .off('change.tujuan_keuangan', '#selectAllGoals')
+        .on('change.tujuan_keuangan', '#selectAllGoals', function () {
+            const checked = $(this).is(':checked');
+            $('#goalsTable tbody input.goal-select').each(function () {
+                const id = String($(this).val());
+                $(this).prop('checked', checked);
+                if (checked) selectedIds.add(id);
+                else selectedIds.delete(id);
+            });
+            syncSelectAllState();
+            updateBulkUI();
+        });
+
+    $(document)
+        .off('change.tujuan_keuangan', '#goalsTable tbody input.goal-select')
+        .on('change.tujuan_keuangan', '#goalsTable tbody input.goal-select', function () {
+            const id = String($(this).val());
+            if ($(this).is(':checked')) selectedIds.add(id);
+            else selectedIds.delete(id);
+            syncSelectAllState();
+            updateBulkUI();
+        });
+
+    $(document)
+        .off('click.tujuan_keuangan', '#bulkDeleteGoalsBtn')
+        .on('click.tujuan_keuangan', '#bulkDeleteGoalsBtn', function () {
+            if (selectedIds.size === 0) return;
+
+            const ids = Array.from(selectedIds);
+            window.confirmAction({
+                title: 'Delete selected goals?',
+                text: `You are about to delete ${ids.length} goal(s). This cannot be undone!`,
+                onConfirm: async () => {
+                    try {
+                        const response = await $.ajax({
+                            url: '/tujuan-keuangan/bulk-delete',
+                            type: 'DELETE',
+                            data: {
+                                ids: ids,
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        if (response.success) {
+                            selectedIds.clear();
+                            $('#selectAllGoals').prop('checked', false).prop('indeterminate', false);
+                            updateBulkUI();
+                            showToast(response.message || 'Goals deleted successfully.', 'success');
+                            if ($.fn.DataTable.isDataTable('#goalsTable')) {
+                                $('#goalsTable').DataTable().ajax.reload(null, false);
+                            }
+                        } else {
+                            showToast(response.message || 'Failed to delete goals.', 'danger');
+                        }
+                    } catch (e) {
+                        showToast('Failed to delete goals.', 'danger');
+                    }
+                }
+            });
+        });
 
     // Handle Filters
     $('#filter_kategori, #filter_prioritas').off('change').on('change', function () {

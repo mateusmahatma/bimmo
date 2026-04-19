@@ -133,6 +133,32 @@ class TujuanKeuanganController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tujuan_keuangan,id_tujuan_keuangan',
+        ]);
+
+        $ids = $validated['ids'];
+
+        $deleted = TujuanKeuangan::whereIn('id_tujuan_keuangan', $ids)
+            ->where('id_user', Auth::id())
+            ->delete();
+
+        if ($deleted) {
+            return response()->json([
+                'success' => true,
+                'message' => "$deleted goals deleted successfully.",
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No goals found or authorized to delete.',
+        ], 404);
+    }
+
     public function updateProgress(Request $request, $id)
     {
         $goal = TujuanKeuangan::where('id_tujuan_keuangan', $id)
