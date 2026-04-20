@@ -33,6 +33,15 @@ class TransaksiController extends Controller
     {
         $userId = Auth::id();
 
+        // Backward compatible: support legacy query params (?start=...&end=...)
+        // used by some shortcut links.
+        if ($request->filled('start') && !$request->filled('start_date')) {
+            $request->merge(['start_date' => $request->input('start')]);
+        }
+        if ($request->filled('end') && !$request->filled('end_date')) {
+            $request->merge(['end_date' => $request->input('end')]);
+        }
+
         // Default to this month if no filter is applied
         if (!$request->filled('start_date') && !$request->filled('end_date')) {
             $request->merge([

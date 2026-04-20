@@ -313,26 +313,27 @@
                         {{-- Row 2: Quick Date Shortcuts + Mobile Actions --}}
                         <div class="toolbar-row toolbar-row--shortcuts">
 
-                            {{-- Quick Date Shortcuts --}}
-                            <div class="toolbar-quick-dates">
-                                @php
-                                $shortcuts = [
-                                __('Today') => ['start' => date('Y-m-d'), 'end' => date('Y-m-d')],
-                                __('Yesterday') => ['start' => date('Y-m-d', strtotime('-1 day')), 'end' => date('Y-m-d', strtotime('-1 day'))],
-                                __('This Month') => ['start' => date('Y-m-01'), 'end' => date('Y-m-t')],
-                                __('Last Month') => ['start' => date('Y-m-01', strtotime('-1 month')),'end' => date('Y-m-t', strtotime('-1 month'))],
-                                __('This Year') => ['start' => date('Y-01-01'), 'end' => date('Y-12-31')],
-                                __('Last Year') => ['start' => date('Y-01-01', strtotime('-1 year')),'end' => date('Y-12-31', strtotime('-1 year'))],
-                                ];
-                                @endphp
+                                 {{-- Quick Date Shortcuts --}}
+                                 <div class="toolbar-quick-dates">
+                                     @php
+                                    $baseQuery = request()->except(['start', 'end', 'start_date', 'end_date']);
+                                     $shortcuts = [
+                                     __('Today') => ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')],
+                                     __('Yesterday') => ['start_date' => date('Y-m-d', strtotime('-1 day')), 'end_date' => date('Y-m-d', strtotime('-1 day'))],
+                                     __('This Month') => ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')],
+                                     __('Last Month') => ['start_date' => date('Y-m-01', strtotime('-1 month')),'end_date' => date('Y-m-t', strtotime('-1 month'))],
+                                     __('This Year') => ['start_date' => date('Y-01-01'), 'end_date' => date('Y-12-31')],
+                                     __('Last Year') => ['start_date' => date('Y-01-01', strtotime('-1 year')),'end_date' => date('Y-12-31', strtotime('-1 year'))],
+                                     ];
+                                     @endphp
 
-                                @foreach ($shortcuts as $label => $range)
-                                <a href="{{ route('transaksi.index', array_merge(request()->query(), $range)) }}"
-                                    class="btn btn-outline-secondary btn-xs rounded-pill"
-                                    title="{{ $label }}">
-                                    {{ $label }}
-                                </a>
-                                @endforeach
+                                     @foreach ($shortcuts as $label => $range)
+                                     <a href="{{ route('transaksi.index', array_merge($baseQuery, $range)) }}"
+                                         class="btn btn-outline-secondary btn-xs rounded-pill"
+                                         title="{{ $label }}">
+                                         {{ $label }}
+                                     </a>
+                                     @endforeach
                             </div>
 
                             {{-- Mobile Action Buttons --}}
