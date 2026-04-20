@@ -13,10 +13,11 @@ class Note extends Model
         'id_user',
         'content',
         'is_checked',
+        'is_pinned',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class , 'id_user');
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

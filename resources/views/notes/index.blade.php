@@ -56,7 +56,7 @@
                         <!-- Completed Notes -->
                         <div class="mt-4 pt-3 border-top">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="text-uppercase fw-bold text-secondary small ls-1 mb-0 d-flex align-items-center gap-2 pointer" 
+                                <h6 class="text-uppercase fw-bold text-secondary small ls-1 mb-0 d-flex align-items-center gap-2 pointer"
                                     data-bs-toggle="collapse" data-bs-target="#completedSection" aria-expanded="true">
                                     <i class="bi bi-check2-all"></i>
                                     {{ __('Completed') }}
@@ -66,7 +66,7 @@
                                     <i class="bi bi-trash3 me-1"></i>{{ __('Empty') }}
                                 </button>
                             </div>
-                            
+
                             <div class="collapse show" id="completedSection">
                                 <div id="completedNotesList" class="d-flex flex-column gap-2 opacity-75">
                                     <!-- Completed notes loaded via AJAX -->
@@ -109,8 +109,10 @@
 <!-- Quill.js - Corporate Rich Text -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
-    .pointer { cursor: pointer; }
-    
+    .pointer {
+        cursor: pointer;
+    }
+
     .note-card {
         background: var(--bs-body-bg);
         border: 1px solid var(--bs-border-color);
@@ -124,7 +126,13 @@
 
     .note-card:hover {
         border-color: var(--bs-primary);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .note-card.pinned {
+        border-left: 4px solid #f59e0b;
+        /* amber */
+        box-shadow: 0 6px 20px rgba(245, 159, 11, 0.06);
     }
 
     .note-card.checked-card {
@@ -181,7 +189,7 @@
     .transition-icon {
         transition: transform 0.3s ease;
     }
-    
+
     .collapsed .transition-icon {
         transform: rotate(-90deg);
     }
@@ -191,12 +199,14 @@
         border: none !important;
         font-family: inherit;
     }
+
     .ql-toolbar.ql-snow {
         border: none !important;
         border-bottom: 1px solid var(--bs-border-color) !important;
         background: var(--bs-light) !important;
         border-radius: 8px 8px 0 0;
     }
+
     .ql-editor {
         font-size: 0.95rem;
         color: var(--bs-body-color);
@@ -207,19 +217,59 @@
     }
 
     /* Dark Mode Overrides */
-    [data-bs-theme="dark"] .card-header { background-color: #212529 !important; }
-    [data-bs-theme="dark"] .note-card { background-color: #1a1d21 !important; border-color: #343a40 !important; }
-    [data-bs-theme="dark"] .note-card.checked-card { background-color: #161b22 !important; }
-    [data-bs-theme="dark"] .note-text { color: #f8f9fa !important; }
-    [data-bs-theme="dark"] .note-text * { color: #f8f9fa !important; }
-    [data-bs-theme="dark"] .ql-toolbar.ql-snow { background-color: #1a1d21 !important; border-bottom-color: #343a40 !important; }
-    [data-bs-theme="dark"] .ql-container.ql-snow { background-color: #111418 !important; }
-    [data-bs-theme="dark"] .ql-editor { color: #f8f9fa !important; }
-    [data-bs-theme="dark"] .ql-editor * { color: #f8f9fa !important; }
-    [data-bs-theme="dark"] .ql-snow .ql-stroke { stroke: #adb5bd !important; }
-    [data-bs-theme="dark"] .ql-snow .ql-fill { fill: #adb5bd !important; }
-    [data-bs-theme="dark"] .ql-snow .ql-picker { color: #adb5bd !important; }
-    [data-bs-theme="dark"] .ql-editor.ql-blank::before { color: #6c757d !important; }
+    [data-bs-theme="dark"] .card-header {
+        background-color: #212529 !important;
+    }
+
+    [data-bs-theme="dark"] .note-card {
+        background-color: #1a1d21 !important;
+        border-color: #343a40 !important;
+    }
+
+    [data-bs-theme="dark"] .note-card.checked-card {
+        background-color: #161b22 !important;
+    }
+
+    [data-bs-theme="dark"] .note-text {
+        color: #f8f9fa !important;
+    }
+
+    [data-bs-theme="dark"] .note-text * {
+        color: #f8f9fa !important;
+    }
+
+    [data-bs-theme="dark"] .ql-toolbar.ql-snow {
+        background-color: #1a1d21 !important;
+        border-bottom-color: #343a40 !important;
+    }
+
+    [data-bs-theme="dark"] .ql-container.ql-snow {
+        background-color: #111418 !important;
+    }
+
+    [data-bs-theme="dark"] .ql-editor {
+        color: #f8f9fa !important;
+    }
+
+    [data-bs-theme="dark"] .ql-editor * {
+        color: #f8f9fa !important;
+    }
+
+    [data-bs-theme="dark"] .ql-snow .ql-stroke {
+        stroke: #adb5bd !important;
+    }
+
+    [data-bs-theme="dark"] .ql-snow .ql-fill {
+        fill: #adb5bd !important;
+    }
+
+    [data-bs-theme="dark"] .ql-snow .ql-picker {
+        color: #adb5bd !important;
+    }
+
+    [data-bs-theme="dark"] .ql-editor.ql-blank::before {
+        color: #6c757d !important;
+    }
 </style>
 @endpush
 
@@ -227,160 +277,174 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const activeNotesList = document.getElementById('activeNotesList');
-    const completedNotesList = document.getElementById('completedNotesList');
-    const addNoteBtn = document.getElementById('addNewNoteBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const btnNoteText = document.getElementById('btnNoteText');
-    const notesLoading = document.getElementById('notesLoading');
-    const clearCompletedBtn = document.getElementById('clearCompletedBtn');
-    const collapseIcon = document.getElementById('collapseIcon');
-    const completedHeader = document.querySelector('[data-bs-target="#completedSection"]');
-    const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-    const btnConfirmDelete = document.getElementById('btnConfirmDelete');
-    let deleteAction = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        const activeNotesList = document.getElementById('activeNotesList');
+        const completedNotesList = document.getElementById('completedNotesList');
+        const addNoteBtn = document.getElementById('addNewNoteBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const btnNoteText = document.getElementById('btnNoteText');
+        const notesLoading = document.getElementById('notesLoading');
+        const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const completedHeader = document.querySelector('[data-bs-target="#completedSection"]');
+        const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+        let deleteAction = null;
 
-    // Handle collapse icon rotation
-    const completedSection = document.getElementById('completedSection');
-    completedSection.addEventListener('show.bs.collapse', () => {
-        completedHeader.classList.remove('collapsed');
-    });
-    completedSection.addEventListener('hide.bs.collapse', () => {
-        completedHeader.classList.add('collapsed');
-    });
+        // Handle collapse icon rotation
+        const completedSection = document.getElementById('completedSection');
+        completedSection.addEventListener('show.bs.collapse', () => {
+            completedHeader.classList.remove('collapsed');
+        });
+        completedSection.addEventListener('hide.bs.collapse', () => {
+            completedHeader.classList.add('collapsed');
+        });
 
-    let quill = new Quill('#editor-container', {
-        theme: 'snow',
-        placeholder: 'Write your reminder here...',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                ['clean']
-            ],
-            keyboard: {
-                bindings: {
-                    handleEnter: {
-                        key: 13,
-                        handler: function () {
-                            saveNote();
+        let quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Write your reminder here...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{
+                        'list': 'ordered'
+                    }, {
+                        'list': 'bullet'
+                    }],
+                    ['clean']
+                ],
+                keyboard: {
+                    bindings: {
+                        handleEnter: {
+                            key: 13,
+                            handler: function() {
+                                saveNote();
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
 
-    let editingNoteId = null;
+        let editingNoteId = null;
 
-    addNoteBtn.addEventListener('click', saveNote);
-    cancelEditBtn.addEventListener('click', resetForm);
-    clearCompletedBtn.addEventListener('click', clearAllCompleted);
+        addNoteBtn.addEventListener('click', saveNote);
+        cancelEditBtn.addEventListener('click', resetForm);
+        clearCompletedBtn.addEventListener('click', clearAllCompleted);
 
-    btnConfirmDelete.addEventListener('click', async () => {
-        if (deleteAction) {
-            await deleteAction();
-            confirmDeleteModal.hide();
-            deleteAction = null;
-        }
-    });
-
-    async function saveNote() {
-        const content = quill.root.innerHTML.trim();
-        if (content === '<p><br></p>' || !content) return;
-
-        addNoteBtn.disabled = true;
-        const url = editingNoteId ? `/notes/${editingNoteId}` : '/notes';
-        const method = editingNoteId ? 'PUT' : 'POST';
-
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ content })
-            });
-            const res = await response.json();
-            if (res.success) {
-                resetForm();
-                loadNotes();
-                showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
+        btnConfirmDelete.addEventListener('click', async () => {
+            if (deleteAction) {
+                await deleteAction();
+                confirmDeleteModal.hide();
+                deleteAction = null;
             }
-        } catch (e) { console.error(e); }
-        addNoteBtn.disabled = false;
-    }
+        });
 
-    async function clearAllCompleted() {
-        deleteAction = async () => {
+        async function saveNote() {
+            const content = quill.root.innerHTML.trim();
+            if (content === '<p><br></p>' || !content) return;
+
+            addNoteBtn.disabled = true;
+            const url = editingNoteId ? `/notes/${editingNoteId}` : '/notes';
+            const method = editingNoteId ? 'PUT' : 'POST';
+
             try {
-                const response = await fetch("{{ route('notes.clear-completed') }}", {
-                    method: 'POST',
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
                         'Accept': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({
+                        content
+                    })
                 });
                 const res = await response.json();
                 if (res.success) {
+                    resetForm();
                     loadNotes();
                     showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
                 }
-            } catch (e) { console.error(e); }
-        };
-        confirmDeleteModal.show();
-    }
-
-    function resetForm() {
-        quill.setContents([]);
-        editingNoteId = null;
-        btnNoteText.textContent = 'Add Reminder';
-        cancelEditBtn.classList.add('d-none');
-        addNoteBtn.querySelector('i').classList.replace('bi-check-lg', 'bi-plus-lg');
-    }
-
-    async function loadNotes() {
-        notesLoading.classList.remove('d-none');
-        
-        try {
-            const response = await fetch('/notes', {
-                headers: { 'Accept': 'application/json' }
-            });
-            const notes = await response.json();
-
-            activeNotesList.innerHTML = '';
-            completedNotesList.innerHTML = '';
-
-            const active = notes.filter(n => !n.is_checked);
-            const completed = notes.filter(n => n.is_checked);
-
-            if (completed.length > 0) {
-                clearCompletedBtn.classList.remove('d-none');
-            } else {
-                clearCompletedBtn.classList.add('d-none');
+            } catch (e) {
+                console.error(e);
             }
+            addNoteBtn.disabled = false;
+        }
 
-            renderNoteSection(activeNotesList, active, 'active');
-            renderNoteSection(completedNotesList, completed, 'completed');
+        async function clearAllCompleted() {
+            deleteAction = async () => {
+                try {
+                    const response = await fetch("{{ route('notes.clear-completed') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const res = await response.json();
+                    if (res.success) {
+                        loadNotes();
+                        showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+            confirmDeleteModal.show();
+        }
 
-        } catch (e) { console.error(e); }
-        notesLoading.classList.add('d-none');
-    }
+        function resetForm() {
+            quill.setContents([]);
+            editingNoteId = null;
+            btnNoteText.textContent = 'Add Reminder';
+            cancelEditBtn.classList.add('d-none');
+            addNoteBtn.querySelector('i').classList.replace('bi-check-lg', 'bi-plus-lg');
+        }
 
-    function renderNoteSection(container, notes, type) {
-        if (notes.length === 0) {
-            container.innerHTML = `
+        async function loadNotes() {
+            notesLoading.classList.remove('d-none');
+
+            try {
+                const response = await fetch('/notes', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                const notes = await response.json();
+
+                activeNotesList.innerHTML = '';
+                completedNotesList.innerHTML = '';
+
+                const active = notes.filter(n => !n.is_checked);
+                const completed = notes.filter(n => n.is_checked);
+
+                if (completed.length > 0) {
+                    clearCompletedBtn.classList.remove('d-none');
+                } else {
+                    clearCompletedBtn.classList.add('d-none');
+                }
+
+                renderNoteSection(activeNotesList, active, 'active');
+                renderNoteSection(completedNotesList, completed, 'completed');
+
+            } catch (e) {
+                console.error(e);
+            }
+            notesLoading.classList.add('d-none');
+        }
+
+        function renderNoteSection(container, notes, type) {
+            if (notes.length === 0) {
+                container.innerHTML = `
                 <div class="text-center py-4 opacity-50 border rounded-3 border-dashed" style="border-style: dashed !important;">
                     <p class="small mb-0">${type === 'active' ? 'No active reminders yet.' : 'Empty'}</p>
                 </div>`;
-            return;
-        }
+                return;
+            }
 
-        container.innerHTML = notes.map(note => `
-            <div class="note-card ${note.is_checked ? 'checked-card' : ''}" data-id="${note.id}">
+            container.innerHTML = notes.map(note => `
+            <div class="note-card ${note.is_checked ? 'checked-card' : ''} ${note.is_pinned ? 'pinned' : ''}" data-id="${note.id}">
                 <div class="d-flex align-items-start gap-3 flex-grow-1">
                     <div class="form-check mb-0">
                         <input class="form-check-input note-checkbox" type="checkbox" data-id="${note.id}" ${note.is_checked ? 'checked' : ''}>
@@ -390,6 +454,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
                 <div class="action-btns ms-2">
+                    <button class="btn-note-action pin-note" data-id="${note.id}" data-pinned="${note.is_pinned ? '1' : '0'}" title="${note.is_pinned ? 'Unpin' : 'Pin'}">
+                        <i class="${note.is_pinned ? 'bi bi-pin-fill text-warning' : 'bi bi-pin'}"></i>
+                    </button>
                     <button class="btn-note-action edit-note" data-id="${note.id}" title="Edit">
                         <i class="bi bi-pencil-square"></i>
                     </button>
@@ -400,63 +467,103 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `).join('');
 
-        // Listeners for checkbox
-        container.querySelectorAll('.note-checkbox').forEach(cb => {
-            cb.addEventListener('change', async (e) => {
-                const id = e.target.dataset.id;
-                try {
-                    await fetch(`/notes/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ is_checked: e.target.checked })
-                    });
-                    loadNotes();
-                } catch (e) { console.error(e); }
-            });
-        });
-
-        // Listeners for edit
-        container.querySelectorAll('.edit-note').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.dataset.id;
-                const noteData = await (await fetch('/notes', { headers: { 'Accept': 'application/json' } })).json();
-                const note = noteData.find(n => n.id == id);
-                if (note) {
-                    editingNoteId = id;
-                    quill.root.innerHTML = note.content;
-                    btnNoteText.textContent = 'Update';
-                    cancelEditBtn.classList.remove('d-none');
-                    addNoteBtn.querySelector('i').classList.replace('bi-plus-lg', 'bi-check-lg');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Listeners for delete
-        container.querySelectorAll('.delete-note').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.dataset.id;
-                deleteAction = async () => {
+            // Listeners for checkbox
+            container.querySelectorAll('.note-checkbox').forEach(cb => {
+                cb.addEventListener('change', async (e) => {
+                    const id = e.target.dataset.id;
                     try {
                         await fetch(`/notes/${id}`, {
-                            method: 'DELETE',
-                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                            method: 'PUT',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                is_checked: e.target.checked
+                            })
                         });
                         loadNotes();
-                        showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
-                    } catch (e) { console.error(e); }
-                };
-                confirmDeleteModal.show();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
             });
-        });
-    }
 
-    // Initial load
-    loadNotes();
-});
+            // Listeners for edit
+            container.querySelectorAll('.edit-note').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const noteData = await (await fetch('/notes', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })).json();
+                    const note = noteData.find(n => n.id == id);
+                    if (note) {
+                        editingNoteId = id;
+                        quill.root.innerHTML = note.content;
+                        btnNoteText.textContent = 'Update';
+                        cancelEditBtn.classList.remove('d-none');
+                        addNoteBtn.querySelector('i').classList.replace('bi-plus-lg', 'bi-check-lg');
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Listeners for delete
+            container.querySelectorAll('.delete-note').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    deleteAction = async () => {
+                        try {
+                            await fetch(`/notes/${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                }
+                            });
+                            loadNotes();
+                            showToast('{{ __("Success") }}', '{{ __("Data processed successfully") }}', 'success');
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    };
+                    confirmDeleteModal.show();
+                });
+            });
+
+            // Listeners for pin/unpin
+            container.querySelectorAll('.pin-note').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const currentlyPinned = btn.dataset.pinned === '1';
+                    try {
+                        await fetch(`/notes/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                is_pinned: !currentlyPinned
+                            })
+                        });
+                        loadNotes();
+                        showToast('{{ __("Success") }}', currentlyPinned ? '{{ __("Unpinned") }}' : '{{ __("Pinned") }}', 'success');
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            });
+        }
+
+        // Initial load
+        loadNotes();
+    });
 </script>
 @endpush

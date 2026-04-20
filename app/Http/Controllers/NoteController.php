@@ -10,7 +10,11 @@ class NoteController extends Controller
 {
     public function index(Request $request)
     {
-        $notes = Note::where('id_user', Auth::id())->orderBy('created_at', 'desc')->get();
+        // Show pinned notes first, then most recent
+        $notes = Note::where('id_user', Auth::id())
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
         if ($request->wantsJson()) {
             return response()->json($notes);
         }
@@ -31,6 +35,7 @@ class NoteController extends Controller
             'id_user' => Auth::id(),
             'content' => $sanitizedContent,
             'is_checked' => false,
+            'is_pinned' => false,
         ]);
 
         return response()->json(['success' => true, 'note' => $note]);
@@ -45,6 +50,11 @@ class NoteController extends Controller
         $updateData = [];
         if ($request->has('is_checked')) {
             $updateData['is_checked'] = $request->is_checked;
+        }
+
+        if ($request->has('is_pinned')) {
+            // ensure boolean
+            $updateData['is_pinned'] = (bool) $request->is_pinned;
         }
 
         if ($request->has('content')) {
