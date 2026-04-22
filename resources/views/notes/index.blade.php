@@ -40,6 +40,22 @@
                         </div>
                     </div>
 
+                    <!-- Search -->
+                    <div class="mb-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="notesSearchInput" placeholder="{{ __('Search reminders...') }}"
+                                autocomplete="off">
+                            <button class="btn btn-outline-secondary d-none" type="button" id="notesSearchClearBtn"
+                                aria-label="{{ __('Clear search') }}">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-2" id="notesSearchHint"></small>
+                    </div>
+
                     <!-- Notes List -->
                     <div id="notesContainer" style="min-height: 200px;">
                         <!-- Active Notes -->
@@ -285,11 +301,17 @@
         const btnNoteText = document.getElementById('btnNoteText');
         const notesLoading = document.getElementById('notesLoading');
         const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+        const notesSearchInput = document.getElementById('notesSearchInput');
+        const notesSearchClearBtn = document.getElementById('notesSearchClearBtn');
+        const notesSearchHint = document.getElementById('notesSearchHint');
         const collapseIcon = document.getElementById('collapseIcon');
         const completedHeader = document.querySelector('[data-bs-target="#completedSection"]');
         const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
         const btnConfirmDelete = document.getElementById('btnConfirmDelete');
         let deleteAction = null;
+        let allNotes = [];
+        let searchQuery = '';
+        let searchDebounceTimer = null;
 
         // Handle collapse icon rotation
         const completedSection = document.getElementById('completedSection');
@@ -331,6 +353,81 @@
         addNoteBtn.addEventListener('click', saveNote);
         cancelEditBtn.addEventListener('click', resetForm);
         clearCompletedBtn.addEventListener('click', clearAllCompleted);
+
+        function normalizeQuery(value) {
+            return (value || '').toString().trim().toLowerCase();
+        }
+
+        function htmlToText(html) {
+            const el = document.createElement('div');
+            el.innerHTML = html || '';
+            return (el.textContent || el.innerText || '').trim();
+        }
+
+        function updateSearchHint(visibleCount, totalCount) {
+            const q = normalizeQuery(searchQuery);
+            if (!notesSearchHint) return;
+            if (!q) {
+                notesSearchHint.textContent = totalCount > 0 ? `${totalCount} {{ __('items') }}` : '';
+                return;
+            }
+            notesSearchHint.textContent = `${visibleCount} / ${totalCount} {{ __('matched') }}`;
+        }
+
+        function applyFiltersAndRender() {
+            const q = normalizeQuery(searchQuery);
+            const filteredNotes = q ? allNotes.filter(n => htmlToText(n.content).toLowerCase().includes(q)) : allNotes;
+
+            activeNotesList.innerHTML = '';
+            completedNotesList.innerHTML = '';
+
+            const active = filteredNotes.filter(n => !n.is_checked);
+            const completed = filteredNotes.filter(n => n.is_checked);
+
+            // Clear button visibility should follow overall completed state (not the search result)
+            const hasCompleted = allNotes.some(n => n.is_checked);
+            if (hasCompleted) {
+                clearCompletedBtn.classList.remove('d-none');
+            } else {
+                clearCompletedBtn.classList.add('d-none');
+            }
+
+            renderNoteSection(activeNotesList, active, 'active');
+            renderNoteSection(completedNotesList, completed, 'completed');
+
+            updateSearchHint(filteredNotes.length, allNotes.length);
+        }
+
+        if (notesSearchInput) {
+            notesSearchInput.addEventListener('input', () => {
+                searchQuery = notesSearchInput.value;
+                if (notesSearchClearBtn) {
+                    notesSearchClearBtn.classList.toggle('d-none', !notesSearchInput.value);
+                }
+                if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(() => applyFiltersAndRender(), 120);
+            });
+
+            notesSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    notesSearchInput.value = '';
+                    searchQuery = '';
+                    if (notesSearchClearBtn) notesSearchClearBtn.classList.add('d-none');
+                    applyFiltersAndRender();
+                }
+            });
+        }
+
+        if (notesSearchClearBtn) {
+            notesSearchClearBtn.addEventListener('click', () => {
+                if (!notesSearchInput) return;
+                notesSearchInput.value = '';
+                searchQuery = '';
+                notesSearchClearBtn.classList.add('d-none');
+                notesSearchInput.focus();
+                applyFiltersAndRender();
+            });
+        }
 
         btnConfirmDelete.addEventListener('click', async () => {
             if (deleteAction) {
@@ -411,22 +508,8 @@
                         'Accept': 'application/json'
                     }
                 });
-                const notes = await response.json();
-
-                activeNotesList.innerHTML = '';
-                completedNotesList.innerHTML = '';
-
-                const active = notes.filter(n => !n.is_checked);
-                const completed = notes.filter(n => n.is_checked);
-
-                if (completed.length > 0) {
-                    clearCompletedBtn.classList.remove('d-none');
-                } else {
-                    clearCompletedBtn.classList.add('d-none');
-                }
-
-                renderNoteSection(activeNotesList, active, 'active');
-                renderNoteSection(completedNotesList, completed, 'completed');
+                allNotes = await response.json();
+                applyFiltersAndRender();
 
             } catch (e) {
                 console.error(e);
@@ -494,12 +577,7 @@
             container.querySelectorAll('.edit-note').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const id = btn.dataset.id;
-                    const noteData = await (await fetch('/notes', {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    })).json();
-                    const note = noteData.find(n => n.id == id);
+                    const note = allNotes.find(n => n.id == id);
                     if (note) {
                         editingNoteId = id;
                         quill.root.innerHTML = note.content;
