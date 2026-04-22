@@ -28,8 +28,6 @@
                 <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo" alt="BIMMO" style="height: 25px;">
             </div>
 
-
-
             <div id="spa-container">
                 @yield('container')
             </div>
@@ -43,22 +41,25 @@
 <style>
     @media (max-width: 767.98px) {
         main {
-            padding-bottom: 90px !important; /* Space for bottom nav */
+            padding-bottom: 90px !important;
+            /* Space for bottom nav */
         }
     }
 </style>
 
 @if(auth()->check())
-    <script>
-        function updateLanguage(lang) {
-            fetch("{{ route('user.update.language') }}", {
+<script>
+    function updateLanguage(lang) {
+        fetch("{{ route('user.update.language') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": "{{ csrf_token() }}",
                     "Accept": "application/json"
                 },
-                body: JSON.stringify({ language: lang })
+                body: JSON.stringify({
+                    language: lang
+                })
             })
             .then(response => response.json())
             .then(data => {
@@ -74,9 +75,9 @@
                 console.error('Error:', error);
                 alert('Terjadi kesalahan.');
             });
-        }
-    </script>
+    }
+</script>
 
-    <script src="{{ asset('js/ckeditor.js') }}"></script>
+<script src="{{ asset('js/ckeditor.js') }}"></script>
 @endif
 @endsection
