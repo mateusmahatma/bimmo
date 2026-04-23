@@ -15,8 +15,8 @@
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('notes.index') }}"
-            class="btn {{ $uiStyle === 'milenial' ? 'btn-light glass-card border-0' : 'btn-outline-secondary' }} btn-sm rounded-0 px-3 d-flex align-items-center gap-2">
-            <i class="bi bi-sticky fs-6 text-primary"></i>
+            class="btn btn-warning btn-sm rounded-0 px-3 d-flex align-items-center gap-2">
+            <i class="bi bi-sticky fs-6"></i>
             <span class="fw-semibold">{{ __('Notes') }}</span>
         </a>
         <a href="{{ route('transaksi.create') }}"
