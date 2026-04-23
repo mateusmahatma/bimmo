@@ -72,12 +72,12 @@
     </div>
     <main class="d-flex w-100 min-vh-100">
         <!-- Banner Kiri (Corporate Look) -->
-        <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: linear-gradient(135deg, var(--bs-primary) 0%, #001233 100%); overflow: hidden;">
+        <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: #ffffffff 100%; overflow: hidden;">
             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
             <div class="text-center p-5 z-2">
-                <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-4" style="max-width: 180px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
-                <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.5px;">Bimmo Portal</h1>
-                <p class="lead" style="color: rgba(255,255,255,0.85); font-weight: 300;">Manajemen Keuangan & Aset Terpadu</p>
+                <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-4" style="max-width: 180px;">
+                <!-- <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.5px;">Bimmo Portal</h1> -->
+                <p class="lead" style="color: rgba(0, 0, 0, 0.85); font-weight: 300;">Budgeting Investment Money Movement Optimization</p>
             </div>
         </div>
 
@@ -89,7 +89,7 @@
                     <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-2" style="max-width: 90px;">
                     <h4 class="fw-bold" style="color: var(--bs-primary);">Bimmo Portal</h4>
                 </div>
-                
+
                 <div class="mb-3 mt-2 mt-lg-3 text-center text-lg-start">
                     <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">Registrasi Akun</h4>
                     <p class="text-muted small mb-0">Lengkapi data diri Anda untuk membuat akun baru.</p>
@@ -97,7 +97,7 @@
 
                 <form class="row g-2 needs-validation" action="/daftar" method="post">
                     @csrf
-                    
+
                     <div class="col-12">
                         <div class="form-floating">
                             <input type="text" name="name" class="form-control rounded-3 py-2 px-3 h-auto @error('name') is-invalid @enderror" id="yourName" placeholder="Full Name" value="{{ old('name') }}" required style="border-color: #dee2e6; box-shadow: none;" onfocus="this.style.borderColor='var(--bs-primary)'; this.style.boxShadow='0 0 0 0.25rem rgba(1,41,112,0.1)';" onblur="this.style.borderColor='#dee2e6'; this.style.boxShadow='none';" />
@@ -144,7 +144,7 @@
                     <div class="col-12 mt-2">
                         <div class="form-check form-check-inline-custom mb-1">
                             <input class="form-check-input" style="cursor: pointer; width: 0.9rem; height: 0.9rem; margin-top: 0.25rem;" name="terms" type="checkbox" value="" id="acceptTerms" required />
-                            <label class="form-check-label text-muted ms-1" style="cursor: pointer; font-size: 0.8rem;" for="acceptTerms">Saya setuju dengan 
+                            <label class="form-check-label text-muted ms-1" style="cursor: pointer; font-size: 0.8rem;" for="acceptTerms">Saya setuju dengan
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#openModal" class="fw-semibold text-primary text-decoration-none">Syarat & Ketentuan</a>
                             </label>
                             <div class="invalid-feedback"></div>
@@ -156,7 +156,7 @@
                             Buat Akun
                         </button>
                     </div>
-                    
+
                     <div class="col-12 text-center mt-2">
                         <p class="mb-0 text-muted" style="font-size: 0.8rem;">Sudah memiliki akun? <a href="/bimmo" class="fw-semibold text-primary text-decoration-none">Masuk di sini</a></p>
                     </div>
@@ -168,9 +168,11 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="mt-auto py-2 text-center w-100">
-                <small class="text-muted" style="font-size: 0.75rem;">&copy; <script>document.write(new Date().getFullYear())</script> Bimmo. All rights reserved.</small>
+                <small class="text-muted" style="font-size: 0.75rem;">&copy; <script>
+                        document.write(new Date().getFullYear())
+                    </script> Bimmo. All rights reserved.</small>
             </div>
         </div>
 
@@ -251,17 +253,17 @@
                     });
                 } else {
                     const modal = new bootstrap.Modal(document.getElementById('pwaInstructionModal'));
-                    
+
                     // Detect device for specific message
                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                     const deviceText = document.getElementById('pwaDeviceText');
                     const list = document.getElementById('instructionList');
-                    
+
                     if (isIOS) {
                         deviceText.innerText = "Khusus pengguna iPhone/iPad, instalasi harus dilakukan secara manual melalui Safari.";
                         list.innerHTML = '<li>Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas) di bawah layar.</li><li>Gulir ke bawah dan pilih <strong>"Add to Home Screen"</strong>.</li>';
                     }
-                    
+
                     modal.show();
                 }
             });
@@ -270,7 +272,9 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swPath = "{{ asset('sw.js') }}";
-                navigator.serviceWorker.register(swPath, { scope: '/' })
+                navigator.serviceWorker.register(swPath, {
+                        scope: '/'
+                    })
                     .then(reg => {
                         reg.update();
                     })

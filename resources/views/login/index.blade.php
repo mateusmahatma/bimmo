@@ -45,12 +45,12 @@
 <body>
     <main class="d-flex w-100 min-vh-100">
         <!-- Banner Kiri (Corporate Look) -->
-        <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: linear-gradient(135deg, var(--bs-primary) 0%, #001233 100%); overflow: hidden;">
+        <div class="d-none d-lg-flex col-lg-6 flex-column justify-content-center align-items-center text-white position-relative" style="background: #ffffffff 100%; overflow: hidden;">
             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
             <div class="text-center p-5 z-2">
-                <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-4" style="max-width: 180px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
-                <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.5px;">Bimmo Portal</h1>
-                <p class="lead" style="color: rgba(255,255,255,0.85); font-weight: 300;">Manajemen Keuangan & Aset Terpadu</p>
+                <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-4" style="max-width: 180px;">
+                <!-- <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.5px;">Bimmo Portal</h1> -->
+                <p class="lead" style="color: rgba(0, 0, 0, 0.85); font-weight: 300;">Budgeting Investment Money Movement Optimization</p>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
                     <img src="/img/bimmo.png" alt="Bimmo Logo" class="mb-2" style="max-width: 100px;">
                     <h3 class="fw-bold" style="color: var(--bs-primary);">Bimmo Portal</h3>
                 </div>
-                
+
                 <div class="mt-2 mt-lg-3 mb-4 text-center text-lg-start">
                     <h3 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">Selamat Datang</h3>
                     <p class="text-muted small">Silakan masukkan kredensial Anda untuk melanjutkan akses ke sistem.</p>
@@ -70,7 +70,7 @@
 
                 {{-- Standarized with toast --}}
 
-                
+
                 <form class="row g-3 needs-validation" action="/login" method="post">
                     @csrf
                     <div class="col-12">
@@ -91,11 +91,11 @@
                             <a href="/lupa-password" class="text-decoration-none small text-primary fw-semibold">Lupa Password?</a>
                         </div>
                     </div>
-                    
+
                     <div class="col-12 mt-3">
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold tombol-login" style="border-radius: 8px; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(1, 41, 112, 0.2); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">Masuk ke Portal</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold tombol-login" style="border-radius: 8px; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(1, 41, 112, 0.2); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">Masuk</button>
                     </div>
-                    
+
                     <div class="col-12 text-center mt-2">
                         <p class="small mb-0 text-muted">Belum memiliki akun? <a href="/daftar" class="fw-semibold text-primary text-decoration-none">Daftar Sekarang</a></p>
                     </div>
@@ -107,9 +107,11 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="mt-auto py-3 text-center w-100">
-                <small class="text-muted">&copy; <script>document.write(new Date().getFullYear())</script> Bimmo. All rights reserved.</small>
+                <small class="text-muted">&copy; <script>
+                        document.write(new Date().getFullYear())
+                    </script> Bimmo. All rights reserved.</small>
             </div>
         </div>
 
@@ -179,17 +181,17 @@
                     });
                 } else {
                     const modal = new bootstrap.Modal(document.getElementById('pwaInstructionModal'));
-                    
+
                     // Detect device for specific message
                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                     const deviceText = document.getElementById('pwaDeviceText');
                     const list = document.getElementById('instructionList');
-                    
+
                     if (isIOS) {
                         deviceText.innerText = "Khusus pengguna iPhone/iPad, instalasi harus dilakukan secara manual melalui Safari.";
                         list.innerHTML = '<li>Tekan tombol <strong>Share</strong> (ikon kotak dengan panah ke atas) di bawah layar.</li><li>Gulir ke bawah dan pilih <strong>"Add to Home Screen"</strong>.</li>';
                     }
-                    
+
                     modal.show();
                 }
             });
@@ -198,7 +200,9 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swPath = "{{ asset('sw.js') }}";
-                navigator.serviceWorker.register(swPath, { scope: '/' })
+                navigator.serviceWorker.register(swPath, {
+                        scope: '/'
+                    })
                     .then(reg => {
                         reg.update();
                     })
