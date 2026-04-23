@@ -27,12 +27,17 @@
                 <div class="card-body pt-4">
                     <!-- Add Note Form -->
                     <div class="mb-5">
-                        <div id="editor-container" class="rounded-3 mb-2" style="height: 150px; border: 1px solid var(--bs-border-color);"></div>
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <small class="text-muted"><kbd>Enter</kbd> {{ __('to save') }}</small>
+                        <div id="noteEditorWrapper" class="d-none">
+                            <div id="editor-container" class="rounded-3 mb-2" style="height: 150px; border: 1px solid var(--bs-border-color);"></div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted"><kbd>Enter</kbd> {{ __('to save') }}</small>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center mt-2">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-secondary btn-sm px-3 rounded-pill d-none" id="cancelEditBtn">{{ __('Cancel') }}</button>
-                                <button class="btn btn-primary btn-sm px-4 rounded-pill d-flex align-items-center gap-2" id="addNewNoteBtn">
+                                <button class="btn btn-primary btn-sm px-4 btn-no-radius d-flex align-items-center gap-2" id="addNewNoteBtn" type="button">
                                     <i class="bi bi-plus-lg"></i>
                                     <span class="fw-bold" id="btnNoteText">{{ __('Add Reminder') }}</span>
                                 </button>
@@ -286,6 +291,10 @@
     [data-bs-theme="dark"] .ql-editor.ql-blank::before {
         color: #6c757d !important;
     }
+
+    .btn-no-radius {
+        border-radius: 0 !important;
+    }
 </style>
 @endpush
 
@@ -299,6 +308,7 @@
         const addNoteBtn = document.getElementById('addNewNoteBtn');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
         const btnNoteText = document.getElementById('btnNoteText');
+        const noteEditorWrapper = document.getElementById('noteEditorWrapper');
         const notesLoading = document.getElementById('notesLoading');
         const clearCompletedBtn = document.getElementById('clearCompletedBtn');
         const notesSearchInput = document.getElementById('notesSearchInput');
@@ -349,10 +359,34 @@
         });
 
         let editingNoteId = null;
+        let isEditorOpen = false;
 
-        addNoteBtn.addEventListener('click', saveNote);
+        addNoteBtn.addEventListener('click', () => {
+            if (!isEditorOpen) {
+                openEditorForNew();
+                return;
+            }
+            saveNote();
+        });
         cancelEditBtn.addEventListener('click', resetForm);
         clearCompletedBtn.addEventListener('click', clearAllCompleted);
+
+        function openEditor() {
+            if (noteEditorWrapper) noteEditorWrapper.classList.remove('d-none');
+            isEditorOpen = true;
+            setTimeout(() => quill.focus(), 0);
+        }
+
+        function openEditorForNew() {
+            if (!isEditorOpen) {
+                openEditor();
+            }
+            editingNoteId = null;
+            quill.setContents([]);
+            btnNoteText.textContent = 'Save';
+            cancelEditBtn.classList.remove('d-none');
+            addNoteBtn.querySelector('i').classList.replace('bi-plus-lg', 'bi-check-lg');
+        }
 
         function normalizeQuery(value) {
             return (value || '').toString().trim().toLowerCase();
@@ -497,6 +531,8 @@
             btnNoteText.textContent = 'Add Reminder';
             cancelEditBtn.classList.add('d-none');
             addNoteBtn.querySelector('i').classList.replace('bi-check-lg', 'bi-plus-lg');
+            if (noteEditorWrapper) noteEditorWrapper.classList.add('d-none');
+            isEditorOpen = false;
         }
 
         async function loadNotes() {
@@ -580,6 +616,7 @@
                     const note = allNotes.find(n => n.id == id);
                     if (note) {
                         editingNoteId = id;
+                        openEditor();
                         quill.root.innerHTML = note.content;
                         btnNoteText.textContent = 'Update';
                         cancelEditBtn.classList.remove('d-none');
