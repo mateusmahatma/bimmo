@@ -1,6 +1,5 @@
 /* TomSelect */
 .ts-control {
-    border-radius: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
     border-color: #dee2e6 !important;
     box-shadow: none !important;
@@ -13,7 +12,6 @@
 }
 
 .ts-dropdown {
-    border-radius: 0.5rem !important;
     margin-top: 5px !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
 }
@@ -33,7 +31,6 @@
 
 /* Cards */
 .card-dashboard {
-    border-radius: 20px;
     border: 1px solid rgba(0, 0, 0, 0.05);
     background: #ffffff;
     color: #2d3436;
@@ -52,7 +49,6 @@
     z-index: 1040;
     width: 60px;
     height: 60px;
-    border-radius: 50%;
     display: none;
     align-items: center;
     justify-content: center;
@@ -87,7 +83,6 @@
     #transaksiTable tr {
         border: 0;
         margin-bottom: 1.5rem;
-        border-radius: 20px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         background-color: #fff;
         padding: 15px;
@@ -200,7 +195,6 @@
 
 .date-card {
     background: #fff;
-    border-radius: 16px;
     border: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: box-shadow 0.2s, border-color 0.2s;
@@ -219,7 +213,6 @@
     width: 52px;
     min-width: 52px;
     background: linear-gradient(135deg, #0d6efd, #0984e3);
-    border-radius: 12px;
     color: #fff;
     padding: 6px 4px;
 }
@@ -285,10 +278,6 @@
 .transaksi-daily-avg-label {
     font-size: 0.65rem;
     letter-spacing: 0.5px;
-}
-
-.transaksi-main-card {
-    border-radius: 12px;
 }
 
 .transaksi-section-title {
