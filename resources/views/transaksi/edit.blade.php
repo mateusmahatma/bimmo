@@ -5,101 +5,7 @@
 @section('container')
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-<style>
-    /* Header Enhancements */
-    .pagetitle {
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 0.75rem;
-    }
-    .pagetitle h1 {
-        font-size: 1.75rem;
-        letter-spacing: -0.03em;
-        color: #2d3436;
-    }
-    .breadcrumb {
-        font-size: 0.85rem;
-    }
-    .breadcrumb-item a {
-        color: #636e72;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-    .breadcrumb-item a:hover {
-        color: #0984e3;
-    }
-    .breadcrumb-item.active {
-        color: #0984e3;
-        font-weight: 600;
-    }
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "\F285"; /* bi-chevron-right */
-        font-family: "bootstrap-icons";
-        font-size: 0.65rem;
-        color: #b2bec3;
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-    }
-
-    [data-bs-theme="dark"] .pagetitle {
-        border-bottom: 1px solid #2d2d2d;
-    }
-    [data-bs-theme="dark"] .pagetitle h1 {
-        color: #e0e0e0;
-    }
-    [data-bs-theme="dark"] .breadcrumb-item a {
-        color: #a0a0a0;
-    }
-    [data-bs-theme="dark"] .breadcrumb-item.active {
-        color: #60a5fa;
-    }
-
-    .ts-control {
-        border-radius: 0.5rem !important;
-        padding: 0.6rem 1rem !important;
-    }
-
-    /* CKEditor Dark Mode Fix */
-    [data-bs-theme="dark"] .ck-editor__main > .ck-editor__editable {
-        background-color: #1e1e1e !important;
-        color: #ffffff !important;
-        border-color: #444 !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-toolbar {
-        background-color: #2d2d2d !important;
-        border-color: #444 !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button {
-        color: #ffffff !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button:hover {
-        background-color: #3d3d3d !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-toolbar .ck-toolbar__items .ck-button.ck-on {
-        background-color: #4d4d4d !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-list {
-        background-color: #2d2d2d !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-list__item .ck-button {
-        color: #ffffff !important;
-    }
-
-    [data-bs-theme="dark"] .ck.ck-list__item .ck-button:hover {
-        background-color: #3d3d3d !important;
-    }
-
-    /* Income/Expense Card Dark Mode */
-    [data-bs-theme="dark"] .income-expense-card {
-        background-color: #1e1e1e !important;
-        border-color: #2d2d2d !important;
-    }
-</style>
+<link href="{{ asset('css/transaksi-create.css') }}?v={{ filemtime(public_path('css/transaksi-create.css')) }}" rel="stylesheet">
 @endpush
 
 <div class="pagetitle mb-4">
@@ -114,8 +20,8 @@
 </div>
 
 <section class="section">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+    <div class="row justify-content-center transaksi-form-page">
+        <div class="col-12 col-xl-11 col-xxl-11">
             <div class="card-dashboard">
                 <div class="card-body p-4">
                     
@@ -138,22 +44,72 @@
                     <form action="{{ route('transaksi.update', $hashId) }}" method="POST">
                         @csrf
                         @method('PUT')
+
+                        @php
+                            $hasOldIncome = (bool) old('pemasukan') || (bool) old('nominal_pemasukan');
+                            $hasOldExpense = (bool) old('pengeluaran') || (bool) old('nominal');
+                            $hasIncome = $hasOldIncome || !empty(old('pemasukan', $transaksi->pemasukan));
+                            $hasExpense = $hasOldExpense || !empty(old('pengeluaran', $transaksi->pengeluaran));
+                            $initialMode = ($hasIncome && $hasExpense) ? 'both' : ($hasExpense ? 'expense' : 'income');
+                        @endphp
                         
-                        <!-- Date Section -->
-                        <div class="mb-4">
-                            <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Date') }} <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" 
-                                value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi) }}" required>
+                        <div class="row g-4 mb-4">
+                            <!-- Date Section -->
+                            <div class="col-lg-6">
+                                <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">
+                                    {{ __('Transaction Date') }}
+                                    <span class="text-danger">*</span>
+                                    <span class="required-hint">wajib diisi</span>
+                                </label>
+                                <input type="date" class="form-control" id="tgl_transaksi" name="tgl_transaksi" 
+                                    value="{{ old('tgl_transaksi', $transaksi->tgl_transaksi) }}" required>
+                            </div>
+
+                            <!-- Wallet Selection -->
+                            <div class="col-lg-6">
+                                <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">{{ __('Select Wallet') }}</label>
+                                <select class="form-select" id="dompet_id" name="dompet_id">
+                                    <option value="">- {{ __('Select Wallet') }} -</option>
+                                    @foreach ($dompet as $d)
+                                    <option value="{{ $d->id }}" {{ old('dompet_id', $transaksi->dompet_id) == $d->id ? 'selected' : '' }}>
+                                        {{ $d->nama }} (Rp {{ number_format((float)$d->saldo, 0, ',', '.') }})
+                                    </option>
+                                    @endforeach
+                                </select>
+                                <div class="form-text small">{{ __('Changing the wallet will revert the balance update from the old wallet.') }}</div>
+                            </div>
                         </div>
 
-                        <div class="row g-4 mb-4">
+                        <!-- Transaction Type Selectors -->
+                        <div class="mb-3 transaksi-type-toggle" data-initial-mode="{{ $initialMode }}">
+                            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+                                <label class="form-label fw-bold small text-uppercase text-muted m-0">{{ __('Transaction Type') }}</label>
+                                <div class="btn-group transaksi-type-toggle__group" role="group" aria-label="{{ __('Transaction Type') }}">
+                                    <button type="button" class="btn btn-outline-secondary" id="modeIncome">
+                                        <i class="bi bi-arrow-down-circle me-2"></i>{{ __('Income') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="modeExpense">
+                                        <i class="bi bi-arrow-up-circle me-2"></i>{{ __('Expense') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="modeBoth">
+                                        <i class="bi bi-arrows-collapse me-2"></i>{{ __('Both') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-text small">{{ __('Select one or both') }}</div>
+                        </div>
+
+                        <div class="row g-4 mb-4" id="transaksiTypePanelsRow">
                             <!-- Income Section -->
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-white h-100 income-expense-card" style="border-top: 4px solid #198754 !important;">
+                            <div class="col-md-6 collapse {{ $initialMode !== 'expense' ? 'show' : '' }}" id="pemasukanSection">
+                                <div class="transaksi-panel transaksi-panel--income p-4 border bg-white income-expense-card" style="border-top: 5px solid #198754 !important;">
                                     <h6 class="text-success fw-bold mb-3"><i class="bi bi-arrow-down-circle me-2"></i> {{ __('Income') }}</h6>
                                     
                                     <div class="mb-3">
-                                        <label for="pemasukan" class="form-label small text-muted">{{ __('Category') }}</label>
+                                        <label for="pemasukan" class="form-label small text-muted">
+                                            {{ __('Category') }}
+                                            <span class="required-hint">wajib diisi (jika pilih pemasukan)</span>
+                                        </label>
                                         <select class="form-select" id="pemasukan" name="pemasukan">
                                             <option value="">- {{ __('Select Income') }} -</option>
                                             @foreach ($pemasukan as $item)
@@ -165,7 +121,10 @@
                                     </div>
                                     
                                     <div class="mb-2">
-                                        <label for="nominal_pemasukan" class="form-label small text-muted">{{ __('Amount') }}</label>
+                                        <label for="nominal_pemasukan" class="form-label small text-muted">
+                                            {{ __('Amount') }}
+                                            <span class="required-hint">wajib diisi (jika pilih pemasukan)</span>
+                                        </label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-success text-white fw-bold">Rp</span>
                                             <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control fw-bold text-success" 
@@ -176,12 +135,15 @@
                             </div>
 
                             <!-- Expense Section -->
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-white h-100 income-expense-card" style="border-top: 4px solid #dc3545 !important;">
+                            <div class="col-md-6 collapse {{ $initialMode !== 'income' ? 'show' : '' }}" id="pengeluaranSection">
+                                <div class="transaksi-panel transaksi-panel--expense p-4 border bg-white income-expense-card" style="border-top: 5px solid #dc3545 !important;">
                                     <h6 class="text-danger fw-bold mb-3"><i class="bi bi-arrow-up-circle me-2"></i> {{ __('Expense') }}</h6>
                                     
                                     <div class="mb-3">
-                                        <label for="pengeluaran" class="form-label small text-muted">{{ __('Category') }}</label>
+                                        <label for="pengeluaran" class="form-label small text-muted">
+                                            {{ __('Category') }}
+                                            <span class="required-hint">wajib diisi (jika pilih pengeluaran)</span>
+                                        </label>
                                         <select class="form-select" id="pengeluaran" name="pengeluaran">
                                             <option value="">- {{ __('Select Expense') }} -</option>
                                             @foreach ($pengeluaran as $item)
@@ -193,7 +155,10 @@
                                     </div>
                                     
                                     <div class="mb-2">
-                                        <label for="nominal" class="form-label small text-muted">{{ __('Amount') }}</label>
+                                        <label for="nominal" class="form-label small text-muted">
+                                            {{ __('Amount') }}
+                                            <span class="required-hint">wajib diisi (jika pilih pengeluaran)</span>
+                                        </label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-danger text-white fw-bold">Rp</span>
                                             <input type="number" id="nominal" name="nominal" class="form-control fw-bold text-danger" 
@@ -204,20 +169,6 @@
                             </div>
                         </div>
 
-                        <!-- Wallet Selection -->
-                        <div class="mb-4">
-                            <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">{{ __('Select Wallet') }}</label>
-                            <select class="form-select form-select-lg" id="dompet_id" name="dompet_id">
-                                <option value="">- {{ __('Select Wallet') }} -</option>
-                                @foreach ($dompet as $d)
-                                <option value="{{ $d->id }}" {{ old('dompet_id', $transaksi->dompet_id) == $d->id ? 'selected' : '' }}>
-                                    {{ $d->nama }} (Rp {{ number_format((float)$d->saldo, 0, ',', '.') }})
-                                </option>
-                                @endforeach
-                            </select>
-                            <div class="form-text small">{{ __('Changing the wallet will revert the balance update from the old wallet.') }}</div>
-                        </div>
-
                         <!-- Description -->
                         <div class="mb-4">
                             <label for="keterangan" class="form-label fw-bold small text-uppercase text-muted">{{ __('Description / Notes') }}</label>
@@ -225,10 +176,10 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ route('transaksi.index') }}" class="btn btn-light btn-lg border shadow-sm">
+                            <a href="{{ route('transaksi.index') }}" class="btn btn-light border shadow-sm">
                                 <i class="bi bi-arrow-left me-2"></i> {{ __('Cancel') }}
                             </a>
-                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                            <button type="submit" class="btn btn-success shadow-sm">
                                 <i class="bi bi-check-lg me-2"></i> {{ __('Update Transaction') }}
                             </button>
                         </div>
@@ -273,6 +224,75 @@
         if (typeof TomSelect !== 'undefined') {
              if(document.getElementById('pemasukan')) new TomSelect('#pemasukan', { allowEmptyOption: true, placeholder: '- {{ __('Select Income') }} -' });
              if(document.getElementById('pengeluaran')) new TomSelect('#pengeluaran', { allowEmptyOption: true, placeholder: '- {{ __('Select Expense') }} -' });
+        }
+
+        // Transaction type segmented control
+        const typeToggleEl = document.querySelector('.transaksi-type-toggle');
+        const modeIncomeBtn = document.getElementById('modeIncome');
+        const modeExpenseBtn = document.getElementById('modeExpense');
+        const modeBothBtn = document.getElementById('modeBoth');
+        const pemasukanSectionEl = document.getElementById('pemasukanSection');
+        const pengeluaranSectionEl = document.getElementById('pengeluaranSection');
+
+        const setActiveMode = (mode) => {
+            const setActive = (btn, isActive) => {
+                if (!btn) return;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            };
+            setActive(modeIncomeBtn, mode === 'income');
+            setActive(modeExpenseBtn, mode === 'expense');
+            setActive(modeBothBtn, mode === 'both');
+        };
+
+        const setMode = (mode) => {
+            if (!pemasukanSectionEl || !pengeluaranSectionEl || typeof bootstrap === 'undefined') return;
+
+            const incomeCollapse = bootstrap.Collapse.getOrCreateInstance(pemasukanSectionEl, { toggle: false });
+            const expenseCollapse = bootstrap.Collapse.getOrCreateInstance(pengeluaranSectionEl, { toggle: false });
+
+            const isEditLayout =
+                pemasukanSectionEl.classList.contains('col-md-6') ||
+                pemasukanSectionEl.classList.contains('col-md-12') ||
+                pengeluaranSectionEl.classList.contains('col-md-6') ||
+                pengeluaranSectionEl.classList.contains('col-md-12');
+
+            const setCols = (el, cls) => {
+                el.classList.remove('col-md-6', 'col-md-12');
+                el.classList.add(cls);
+            };
+
+            if (isEditLayout) {
+                if (mode === 'both') {
+                    setCols(pemasukanSectionEl, 'col-md-6');
+                    setCols(pengeluaranSectionEl, 'col-md-6');
+                } else {
+                    setCols(pemasukanSectionEl, 'col-md-12');
+                    setCols(pengeluaranSectionEl, 'col-md-12');
+                }
+            }
+
+            if (mode === 'income') {
+                incomeCollapse.show();
+                expenseCollapse.hide();
+            } else if (mode === 'expense') {
+                incomeCollapse.hide();
+                expenseCollapse.show();
+            } else {
+                incomeCollapse.show();
+                expenseCollapse.show();
+            }
+
+            setActiveMode(mode);
+        };
+
+        if (modeIncomeBtn) modeIncomeBtn.addEventListener('click', () => setMode('income'));
+        if (modeExpenseBtn) modeExpenseBtn.addEventListener('click', () => setMode('expense'));
+        if (modeBothBtn) modeBothBtn.addEventListener('click', () => setMode('both'));
+
+        if (typeToggleEl) {
+            const initialMode = typeToggleEl.dataset.initialMode || 'income';
+            setMode(initialMode);
         }
     });
 </script>

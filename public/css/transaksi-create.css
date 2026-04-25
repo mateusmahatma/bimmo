@@ -17,10 +17,10 @@
     transition: color 0.2s;
 }
 .breadcrumb-item a:hover {
-    color: #0984e3;
+    color: #0d6efd;
 }
 .breadcrumb-item.active {
-    color: #0984e3;
+    color: #0d6efd;
     font-weight: 600;
 }
 .breadcrumb-item + .breadcrumb-item::before {
@@ -46,8 +46,110 @@
 }
 
 .ts-control {
-    border-radius: 0.5rem !important;
+    border-radius: 0 !important;
     padding: 0.6rem 1rem !important;
+}
+
+/* Transaksi Form — clean, corporate, no radius (scoped) */
+.transaksi-form-page .form-control,
+.transaksi-form-page .form-select,
+.transaksi-form-page .input-group-text,
+.transaksi-form-page .btn,
+.transaksi-form-page .ts-control,
+.transaksi-form-page .ts-dropdown,
+.transaksi-form-page .ts-wrapper,
+.transaksi-form-page .alert,
+.transaksi-form-page .breadcrumb,
+.transaksi-form-page .dropdown-menu {
+    border-radius: 0 !important;
+}
+
+.transaksi-form-page .shadow,
+.transaksi-form-page .shadow-sm,
+.transaksi-form-page .shadow-lg {
+    box-shadow: none !important;
+}
+
+.transaksi-form-page .form-control:focus,
+.transaksi-form-page .form-select:focus,
+.transaksi-form-page .ts-control:focus {
+    box-shadow: none !important;
+}
+
+.transaksi-panel {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .transaksi-panel {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    background-color: #1e2128 !important;
+}
+
+.required-hint {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 1px 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-bs-theme="dark"] .required-hint {
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.transaksi-type-toggle__group .btn {
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #334155;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.45rem 0.75rem;
+    letter-spacing: 0.02em;
+}
+
+.transaksi-type-toggle__group {
+    display: flex;
+    width: 100%;
+}
+
+.transaksi-type-toggle__group .btn {
+    flex: 1 1 0;
+    white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+    .transaksi-type-toggle__group {
+        width: 420px;
+    }
+}
+
+.transaksi-type-toggle__group .btn:hover {
+    border-color: rgba(0, 0, 0, 0.18);
+    color: #0f172a;
+}
+
+.transaksi-type-toggle__group .btn.active {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .transaksi-type-toggle__group .btn {
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .transaksi-type-toggle__group .btn:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #e2e8f0;
 }
 
 /* CKEditor Dark Mode Fix */
@@ -97,7 +199,7 @@
 .icon-box {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;

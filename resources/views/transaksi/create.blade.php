@@ -20,8 +20,8 @@
 </div>
 
 <section class="section">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+    <div class="row justify-content-center transaksi-form-page">
+        <div class="col-12 col-xl-11 col-xxl-11">
             <div class="card-dashboard">
                 <div class="card-body p-4">
                     
@@ -40,38 +40,67 @@
 
                     <form action="{{ route('transaksi.store') }}" method="POST" id="transactionForm">
                         @csrf
-                        
-                        <!-- Date Section -->
-                        <div class="mb-4">
-                            <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Date') }} <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control form-control-lg" id="tgl_transaksi" name="tgl_transaksi" value="{{ old('tgl_transaksi', $defaultDate ?? date('Y-m-d')) }}" required>
-                        </div>
 
-                        <!-- Transaction Type Selectors -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small text-uppercase text-muted d-block">{{ __('Transaction Type') }} ({{ __('Select one or both') }})</label>
-                            <div class="row g-2">
-                                <div class="col">
-                                    <button type="button" class="btn btn-outline-success w-100 py-3 fw-bold" id="togglePemasukan" data-bs-toggle="collapse" data-bs-target="#pemasukanSection" aria-expanded="true" aria-controls="pemasukanSection">
-                                        <i class="bi bi-arrow-down-circle me-2"></i> {{ __('Income') }}
-                                    </button>
-                                </div>
-                                <div class="col">
-                                    <button type="button" class="btn btn-outline-danger w-100 py-3 fw-bold" id="togglePengeluaran" data-bs-toggle="collapse" data-bs-target="#pengeluaranSection" aria-expanded="false" aria-controls="pengeluaranSection">
-                                        <i class="bi bi-arrow-up-circle me-2"></i> {{ __('Expense') }}
-                                    </button>
-                                </div>
+                        @php
+                            $hasOldIncome = (bool) old('pemasukan') || (bool) old('nominal_pemasukan');
+                            $hasOldExpense = (bool) old('pengeluaran') || (bool) old('nominal');
+                            $initialMode = $hasOldIncome && $hasOldExpense ? 'both' : ($hasOldExpense ? 'expense' : 'income');
+                        @endphp
+                        
+                        <div class="row g-4 mb-4">
+                            <!-- Date Section -->
+                            <div class="col-lg-6">
+                                <label for="tgl_transaksi" class="form-label fw-bold small text-uppercase text-muted">
+                                    {{ __('Transaction Date') }}
+                                    <span class="text-danger">*</span>
+                                    <span class="required-hint">wajib diisi</span>
+                                </label>
+                                <input type="date" class="form-control" id="tgl_transaksi" name="tgl_transaksi" value="{{ old('tgl_transaksi', $defaultDate ?? date('Y-m-d')) }}" required>
+                            </div>
+
+                            <!-- Wallet Selection -->
+                            <div class="col-lg-6">
+                                <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">{{ __('Select Wallet') }}</label>
+                                <select class="form-select" id="dompet_id" name="dompet_id">
+                                    <option value="">- {{ __('Select Wallet') }} -</option>
+                                    @foreach ($dompet as $d)
+                                    <option value="{{ $d->id }}">{{ $d->nama }} (Rp {{ number_format((float)$d->saldo, 0, ',', '.') }})</option>
+                                    @endforeach
+                                </select>
+                                <div class="form-text small">{{ __('Transaction will affect the balance of the selected wallet.') }}</div>
                             </div>
                         </div>
 
+                        <!-- Transaction Type Selectors -->
+                        <div class="mb-4 transaksi-type-toggle" data-initial-mode="{{ $initialMode }}">
+                            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+                                <label class="form-label fw-bold small text-uppercase text-muted m-0">{{ __('Transaction Type') }}</label>
+                                <div class="btn-group transaksi-type-toggle__group" role="group" aria-label="{{ __('Transaction Type') }}">
+                                    <button type="button" class="btn btn-outline-secondary" id="modeIncome">
+                                        <i class="bi bi-arrow-down-circle me-2"></i>{{ __('Income') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="modeExpense">
+                                        <i class="bi bi-arrow-up-circle me-2"></i>{{ __('Expense') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="modeBoth">
+                                        <i class="bi bi-arrows-collapse me-2"></i>{{ __('Both') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-text small">{{ __('Select one or both') }}</div>
+                        </div>
+
                         <!-- Category & Amount Sections -->
-                        <div class="mb-4">
+                        <div class="row g-4 mb-4" id="transaksiTypePanelsRow">
                             <!-- Income Section -->
-                            <div class="collapse show" id="pemasukanSection">
-                                <div class="p-4 border rounded-4 bg-white shadow-sm mb-3" style="border-top: 5px solid #198754 !important;">
+                            <div class="col-md-6 collapse {{ $initialMode !== 'expense' ? 'show' : '' }}" id="pemasukanSection">
+                                <div class="transaksi-panel transaksi-panel--income p-4 border bg-white mb-3" style="border-top: 5px solid #198754 !important;">
                                     <div class="row g-3">
                                         <div class="col-md-7">
-                                            <label for="pemasukan" class="form-label fw-bold small text-muted text-uppercase">{{ __('Income Category') }}</label>
+                                            <label for="pemasukan" class="form-label fw-bold small text-muted text-uppercase">
+                                                {{ __('Income Category') }}
+                                                <span class="required-hint">wajib diisi (jika pilih pemasukan)</span>
+                                            </label>
                                             <select class="form-select" id="pemasukan" name="pemasukan">
                                                 <option value="">- {{ __('Select Income') }} -</option>
                                                 @foreach ($pemasukan as $item)
@@ -80,8 +109,11 @@
                                             </select>
                                         </div>
                                         <div class="col-md-5">
-                                            <label for="nominal_pemasukan" class="form-label fw-bold small text-muted text-uppercase">{{ __('Amount') }}</label>
-                                            <div class="input-group input-group-lg">
+                                            <label for="nominal_pemasukan" class="form-label fw-bold small text-muted text-uppercase">
+                                                {{ __('Amount') }}
+                                                <span class="required-hint">wajib diisi (jika pilih pemasukan)</span>
+                                            </label>
+                                            <div class="input-group">
                                                 <span class="input-group-text bg-success text-white fw-bold border-0">Rp</span>
                                                 <input type="number" id="nominal_pemasukan" name="nominal_pemasukan" class="form-control fw-bold text-success border-start-0" placeholder="0">
                                             </div>
@@ -91,11 +123,14 @@
                             </div>
 
                             <!-- Expense Section -->
-                            <div class="collapse" id="pengeluaranSection">
-                                <div class="p-4 border rounded-4 bg-white shadow-sm" style="border-top: 5px solid #dc3545 !important;">
+                            <div class="col-md-6 collapse {{ $initialMode !== 'income' ? 'show' : '' }}" id="pengeluaranSection">
+                                <div class="transaksi-panel transaksi-panel--expense p-4 border bg-white" style="border-top: 5px solid #dc3545 !important;">
                                     <div class="row g-3">
                                         <div class="col-md-7">
-                                            <label for="pengeluaran" class="form-label fw-bold small text-muted text-uppercase">{{ __('Expense Category') }}</label>
+                                            <label for="pengeluaran" class="form-label fw-bold small text-muted text-uppercase">
+                                                {{ __('Expense Category') }}
+                                                <span class="required-hint">wajib diisi (jika pilih pengeluaran)</span>
+                                            </label>
                                             <select class="form-select" id="pengeluaran" name="pengeluaran">
                                                 <option value="">- {{ __('Select Expense') }} -</option>
                                                 @foreach ($pengeluaran as $item)
@@ -104,8 +139,11 @@
                                             </select>
                                         </div>
                                         <div class="col-md-5">
-                                            <label for="nominal" class="form-label fw-bold small text-muted text-uppercase">{{ __('Amount') }}</label>
-                                            <div class="input-group input-group-lg">
+                                            <label for="nominal" class="form-label fw-bold small text-muted text-uppercase">
+                                                {{ __('Amount') }}
+                                                <span class="required-hint">wajib diisi (jika pilih pengeluaran)</span>
+                                            </label>
+                                            <div class="input-group">
                                                 <span class="input-group-text bg-danger text-white fw-bold border-0">Rp</span>
                                                 <input type="number" id="nominal" name="nominal" class="form-control fw-bold text-danger border-start-0" placeholder="0">
                                             </div>
@@ -113,18 +151,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Wallet Selection -->
-                        <div class="mb-4">
-                            <label for="dompet_id" class="form-label fw-bold small text-uppercase text-muted">{{ __('Select Wallet') }}</label>
-                            <select class="form-select form-select-lg" id="dompet_id" name="dompet_id">
-                                <option value="">- {{ __('Select Wallet') }} -</option>
-                                @foreach ($dompet as $d)
-                                <option value="{{ $d->id }}">{{ $d->nama }} (Rp {{ number_format((float)$d->saldo, 0, ',', '.') }})</option>
-                                @endforeach
-                            </select>
-                            <div class="form-text small">{{ __('Transaction will affect the balance of the selected wallet.') }}</div>
                         </div>
 
                         <!-- Description -->
@@ -190,7 +216,7 @@
                         </div> --}}
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <button type="submit" class="btn btn-primary shadow-sm">
                                 <i class="bi bi-check-lg me-2"></i> {{ __('Save Transaction') }}
                             </button>
                         </div>
@@ -233,28 +259,74 @@
             });
         }
 
-        // Handle Active State for Toggle Buttons
-        const togglePemasukan = document.getElementById('togglePemasukan');
-        const togglePengeluaran = document.getElementById('togglePengeluaran');
+        // Transaction type segmented control
+        const typeToggleEl = document.querySelector('.transaksi-type-toggle');
+        const modeIncomeBtn = document.getElementById('modeIncome');
+        const modeExpenseBtn = document.getElementById('modeExpense');
+        const modeBothBtn = document.getElementById('modeBoth');
         const pemasukanSectionEl = document.getElementById('pemasukanSection');
         const pengeluaranSectionEl = document.getElementById('pengeluaranSection');
 
-        pemasukanSectionEl.addEventListener('show.bs.collapse', () => {
-            togglePemasukan.classList.add('active', 'bg-success', 'text-white');
-        });
-        pemasukanSectionEl.addEventListener('hide.bs.collapse', () => {
-            togglePemasukan.classList.remove('active', 'bg-success', 'text-white');
-        });
-        pengeluaranSectionEl.addEventListener('show.bs.collapse', () => {
-            togglePengeluaran.classList.add('active', 'bg-danger', 'text-white');
-        });
-        pengeluaranSectionEl.addEventListener('hide.bs.collapse', () => {
-            togglePengeluaran.classList.remove('active', 'bg-danger', 'text-white');
-        });
+        const setActiveMode = (mode) => {
+            const setActive = (btn, isActive) => {
+                if (!btn) return;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            };
+            setActive(modeIncomeBtn, mode === 'income');
+            setActive(modeExpenseBtn, mode === 'expense');
+            setActive(modeBothBtn, mode === 'both');
+        };
 
-        // Initial state for active buttons if sections are expanded
-        if (pemasukanSectionEl.classList.contains('show')) togglePemasukan.classList.add('active', 'bg-success', 'text-white');
-        if (pengeluaranSectionEl.classList.contains('show')) togglePengeluaran.classList.add('active', 'bg-danger', 'text-white');
+        const setMode = (mode) => {
+            if (!pemasukanSectionEl || !pengeluaranSectionEl || typeof bootstrap === 'undefined') return;
+
+            const incomeCollapse = bootstrap.Collapse.getOrCreateInstance(pemasukanSectionEl, { toggle: false });
+            const expenseCollapse = bootstrap.Collapse.getOrCreateInstance(pengeluaranSectionEl, { toggle: false });
+
+            const isGridLayout =
+                pemasukanSectionEl.classList.contains('col-md-6') ||
+                pemasukanSectionEl.classList.contains('col-md-12') ||
+                pengeluaranSectionEl.classList.contains('col-md-6') ||
+                pengeluaranSectionEl.classList.contains('col-md-12');
+
+            const setCols = (el, cls) => {
+                el.classList.remove('col-md-6', 'col-md-12');
+                el.classList.add(cls);
+            };
+
+            if (isGridLayout) {
+                if (mode === 'both') {
+                    setCols(pemasukanSectionEl, 'col-md-6');
+                    setCols(pengeluaranSectionEl, 'col-md-6');
+                } else {
+                    setCols(pemasukanSectionEl, 'col-md-12');
+                    setCols(pengeluaranSectionEl, 'col-md-12');
+                }
+            }
+
+            if (mode === 'income') {
+                incomeCollapse.show();
+                expenseCollapse.hide();
+            } else if (mode === 'expense') {
+                incomeCollapse.hide();
+                expenseCollapse.show();
+            } else {
+                incomeCollapse.show();
+                expenseCollapse.show();
+            }
+
+            setActiveMode(mode);
+        };
+
+        if (modeIncomeBtn) modeIncomeBtn.addEventListener('click', () => setMode('income'));
+        if (modeExpenseBtn) modeExpenseBtn.addEventListener('click', () => setMode('expense'));
+        if (modeBothBtn) modeBothBtn.addEventListener('click', () => setMode('both'));
+
+        if (typeToggleEl) {
+            const initialMode = typeToggleEl.dataset.initialMode || 'income';
+            setMode(initialMode);
+        }
 
         // Form Validation Logic
         let editorInstance;
@@ -354,7 +426,7 @@
             .then(data => {
                 // Render Success Alert (Migration Guide Style)
                 alertPlaceholder.innerHTML = `
-                    <div class="alert alert-success border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center justify-content-between text-start scale-in">
+                    <div class="alert alert-success border-0 p-4 mb-4 d-flex align-items-center justify-content-between text-start scale-in">
                         <div class="d-flex align-items-center">
                             <div class="icon-box bg-success-light text-success me-3">
                                 <i class="bi bi-check2-circle fs-3"></i>
@@ -364,7 +436,7 @@
                                 <p class="mb-0 text-muted small">{{ __('Data processed successfully') }}</p>
                             </div>
                         </div>
-                        <a href="${data.redirect_url}" class="btn btn-success px-4 py-2 rounded-pill fw-bold shadow-sm">
+                        <a href="${data.redirect_url}" class="btn btn-success px-4 py-2 fw-bold">
                             <i class="bi bi-eye me-2"></i> {{ __('Lihat Data') }} ${data.redirect_name}
                         </a>
                     </div>
@@ -382,7 +454,7 @@
             .catch(error => {
                 console.error('Error:', error);
                 alertPlaceholder.innerHTML = `
-                    <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center text-start scale-in">
+                    <div class="alert alert-danger border-0 p-4 mb-4 d-flex align-items-center text-start scale-in">
                         <div class="icon-box bg-danger-light text-danger me-3">
                             <i class="bi bi-exclamation-triangle fs-3"></i>
                         </div>
