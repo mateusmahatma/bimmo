@@ -132,7 +132,7 @@
                         <h6 class="fw-bold text-dark text-uppercase mb-1 transaksi-period-heading">
                             {{ __('Period Expense') }}
                         </h6>
-                        <span class="badge bg-light text-secondary border fw-normal rounded-pill px-2 py-1 mb-2
+                        <span class="badge bg-light text-secondary border fw-normal  px-2 py-1 mb-2
                                          transaksi-badge-date-range"
                             id="avg-date-range">
                             <i class="bi bi-calendar3 me-1"></i> {{ $dateRange }}
@@ -204,7 +204,7 @@
                                     value="{{ request('end_date') }}">
                                 <div id="transaksiDaterange"
                                     class="form-control form-control-sm transaksi-daterange
-                                                d-flex align-items-center gap-2 rounded-pill"
+                                                d-flex align-items-center gap-2 "
                                     role="button"
                                     tabindex="0"
                                     title="{{ __('Date Range') }}">
@@ -220,7 +220,7 @@
                             <div class="toolbar-actions d-none d-lg-flex align-items-center gap-2">
 
                                 {{-- Filter --}}
-                                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3
+                                <button class="btn btn-outline-secondary btn-sm  px-3
                                                    d-flex align-items-center gap-1"
                                     type="button"
                                     data-bs-toggle="collapse"
@@ -231,7 +231,7 @@
 
                                 {{-- Export --}}
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-success btn-sm dropdown-toggle rounded-pill px-3
+                                    <button class="btn btn-outline-success btn-sm dropdown-toggle  px-3
                                                        d-flex align-items-center gap-1"
                                         type="button"
                                         data-bs-toggle="dropdown">
@@ -271,7 +271,7 @@
 
                                 {{-- Import --}}
                                 <button type="button"
-                                    class="btn btn-success btn-sm rounded-pill px-3
+                                    class="btn btn-success btn-sm  px-3
                                                    d-flex align-items-center gap-1"
                                     data-bs-toggle="modal"
                                     data-bs-target="#importExcelModal">
@@ -291,7 +291,7 @@
 
                                 {{-- Pick Date --}}
                                 <button type="button"
-                                    class="btn btn-outline-primary btn-sm rounded-pill px-3
+                                    class="btn btn-outline-primary btn-sm  px-3
                                                    d-flex align-items-center gap-1"
                                     data-bs-toggle="modal"
                                     data-bs-target="#openDateModal">
@@ -301,7 +301,7 @@
 
                                 {{-- Add Transaction --}}
                                 <a href="{{ route('transaksi.create') }}"
-                                    class="btn btn-primary btn-sm rounded-pill px-3
+                                    class="btn btn-primary btn-sm  px-3
                                               d-flex align-items-center gap-1 btn-add-desktop">
                                     <i class="bi bi-plus-lg"></i>
                                     <span>{{ __('Add Transaction') }}</span>
@@ -313,34 +313,34 @@
                         {{-- Row 2: Quick Date Shortcuts + Mobile Actions --}}
                         <div class="toolbar-row toolbar-row--shortcuts">
 
-                                 {{-- Quick Date Shortcuts --}}
-                                 <div class="toolbar-quick-dates">
-                                     @php
-                                    $baseQuery = request()->except(['start', 'end', 'start_date', 'end_date']);
-                                     $shortcuts = [
-                                     __('Today') => ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')],
-                                     __('Yesterday') => ['start_date' => date('Y-m-d', strtotime('-1 day')), 'end_date' => date('Y-m-d', strtotime('-1 day'))],
-                                     __('This Month') => ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')],
-                                     __('Last Month') => ['start_date' => date('Y-m-01', strtotime('-1 month')),'end_date' => date('Y-m-t', strtotime('-1 month'))],
-                                     __('This Year') => ['start_date' => date('Y-01-01'), 'end_date' => date('Y-12-31')],
-                                     __('Last Year') => ['start_date' => date('Y-01-01', strtotime('-1 year')),'end_date' => date('Y-12-31', strtotime('-1 year'))],
-                                     ];
-                                     @endphp
+                            {{-- Quick Date Shortcuts --}}
+                            <div class="toolbar-quick-dates">
+                                @php
+                                $baseQuery = request()->except(['start', 'end', 'start_date', 'end_date']);
+                                $shortcuts = [
+                                __('Today') => ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')],
+                                __('Yesterday') => ['start_date' => date('Y-m-d', strtotime('-1 day')), 'end_date' => date('Y-m-d', strtotime('-1 day'))],
+                                __('This Month') => ['start_date' => date('Y-m-01'), 'end_date' => date('Y-m-t')],
+                                __('Last Month') => ['start_date' => date('Y-m-01', strtotime('-1 month')),'end_date' => date('Y-m-t', strtotime('-1 month'))],
+                                __('This Year') => ['start_date' => date('Y-01-01'), 'end_date' => date('Y-12-31')],
+                                __('Last Year') => ['start_date' => date('Y-01-01', strtotime('-1 year')),'end_date' => date('Y-12-31', strtotime('-1 year'))],
+                                ];
+                                @endphp
 
-                                     @foreach ($shortcuts as $label => $range)
-                                     <a href="{{ route('transaksi.index', array_merge($baseQuery, $range)) }}"
-                                         class="btn btn-outline-secondary btn-xs rounded-pill"
-                                         title="{{ $label }}">
-                                         {{ $label }}
-                                     </a>
-                                     @endforeach
+                                @foreach ($shortcuts as $label => $range)
+                                <a href="{{ route('transaksi.index', array_merge($baseQuery, $range)) }}"
+                                    class="btn btn-outline-secondary btn-xs "
+                                    title="{{ $label }}">
+                                    {{ $label }}
+                                </a>
+                                @endforeach
                             </div>
 
                             {{-- Mobile Action Buttons --}}
                             <div class="toolbar-mobile-actions d-flex d-lg-none align-items-center gap-2 ms-auto">
 
                                 {{-- Filter --}}
-                                <button class="btn btn-outline-secondary btn-xs rounded-pill
+                                <button class="btn btn-outline-secondary btn-xs
                                                    d-flex align-items-center gap-1"
                                     type="button"
                                     data-bs-toggle="collapse"
@@ -351,7 +351,7 @@
 
                                 {{-- Export --}}
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-success btn-xs rounded-pill dropdown-toggle
+                                    <button class="btn btn-outline-success btn-xs  dropdown-toggle
                                                        d-flex align-items-center gap-1"
                                         type="button"
                                         data-bs-toggle="dropdown">
@@ -390,7 +390,7 @@
 
                                 {{-- Import --}}
                                 <button type="button"
-                                    class="btn btn-success btn-xs rounded-pill d-flex align-items-center gap-1"
+                                    class="btn btn-success btn-xs  d-flex align-items-center gap-1"
                                     data-bs-toggle="modal"
                                     data-bs-target="#importExcelModal">
                                     <i class="bi bi-upload"></i>
@@ -474,7 +474,7 @@
                                     </a>
                                     <button type="button"
                                         id="btnApplyFilter"
-                                        class="btn btn-primary btn-sm rounded-pill px-4">
+                                        class="btn btn-primary btn-sm  px-4">
                                         {{ __('Apply Filter') }}
                                     </button>
                                 </div>
