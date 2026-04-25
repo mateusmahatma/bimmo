@@ -25,11 +25,11 @@
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Daftar Periode Anggaran') }}</h5>
-                        <p class="text-muted small mb-0 mt-1">{{ __('Buat periode untuk digunakan saat proses budget monitoring.') }}</p>
+                        <p class="text-muted small mb-0 mt-1">{{ __('Create a period to be used during the budget monitoring process.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#periodeAnggaranModal" style="padding: 2px 10px; font-size: 0.75rem;">
-                            <i class="bi bi-plus-lg me-1"></i> {{ __('Tambah Periode Anggaran') }}
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Budget Period Data') }}
                         </button>
                     </div>
                 </div>
