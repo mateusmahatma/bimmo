@@ -72,6 +72,12 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Dashboard numbers not found'], 422);
         }
 
+        $goals = session('dashboard_goals');
+        if (!$goals) {
+            $service = new DashboardDataService(Auth::id());
+            $goals = $service->getFinancialGoalsSummary();
+        }
+
         return response()->json([
             'show' => $newShow,
             'data' => [
@@ -80,6 +86,8 @@ class DashboardController extends Controller
                 'pengeluaran' => $this->maskNominal($numbers['pengeluaran'], $newShow),
                 'hari_ini' => $this->maskNominal($numbers['hari_ini'], $newShow),
                 'cicilan_besok' => $this->maskNominal($numbers['cicilan_besok'] ?? 0, $newShow),
+                'financial_goals_collected' => $this->maskNominal((float) ($goals['totalCollectedActive'] ?? 0), $newShow),
+                'financial_goals_target' => $this->maskNominal((float) ($goals['totalTargetActive'] ?? 0), $newShow),
             ],
         ]);
     }
@@ -396,6 +404,7 @@ class DashboardController extends Controller
         $kategori = $service->getPengeluaranKategori($bulan, $tahun);
         $today = $service->getTransaksiHariIni();
         $rasio = $service->getRasioData($cashflow);
+        $goals = $service->getFinancialGoalsSummary();
 
         $viewModel = new DashboardViewModel(
             totalAset: $wealth['totalAset'],
@@ -413,6 +422,7 @@ class DashboardController extends Controller
 
         $showNominal = session('show_nominal', false);
         session(['dashboard_numbers' => $numbers]);
+        session(['dashboard_goals' => $goals]);
 
         return array_merge($viewModel->toArray(), [
             'cashflow' => $cashflow,
@@ -451,6 +461,17 @@ class DashboardController extends Controller
             'totalNominalToday' => $today['totalKeluarHariIni'],
             'totalNominalMonthExp' => $numbers['pengeluaran'],
             'totalNominalMonthInc' => $numbers['pemasukan'],
+
+            'financialGoalsActiveCount' => $goals['activeCount'],
+            'financialGoalsOverallPercent' => $goals['overallPercent'],
+            'financialGoalsNextDue' => $goals['nextDue'],
+            'financialGoalsItems' => collect($goals['items'])->map(function ($item) use ($showNominal) {
+                $item['collectedView'] = $this->maskNominal((float) ($item['collected'] ?? 0), $showNominal);
+                $item['targetView'] = $this->maskNominal((float) ($item['target'] ?? 0), $showNominal);
+                return $item;
+            })->all(),
+            'financialGoalsTotalCollectedView' => $this->maskNominal((float) ($goals['totalCollectedActive'] ?? 0), $showNominal),
+            'financialGoalsTotalTargetView' => $this->maskNominal((float) ($goals['totalTargetActive'] ?? 0), $showNominal),
         ]);
     }
 

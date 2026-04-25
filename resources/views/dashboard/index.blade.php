@@ -14,6 +14,7 @@
             @include('dashboard.partials.financial-summary')
             @include('dashboard.partials.cash-flow')
             @include('dashboard.partials.net-worth')
+            @include('dashboard.partials.financial-goals')
 
         </div>
 

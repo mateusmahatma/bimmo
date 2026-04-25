@@ -6,6 +6,7 @@ use App\Models\Transaksi;
 use App\Models\Pinjaman;
 use App\Models\Aset;
 use App\Models\DanaDarurat;
+use App\Models\TujuanKeuangan;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -215,6 +216,52 @@ class DashboardDataService
             'transaksiHariIni'   => $transaksiHariIni,
             'totalMasukHariIni'  => $transaksiHariIni->where('jenis', 'pemasukan')->sum('nominal'),
             'totalKeluarHariIni' => $transaksiHariIni->where('jenis', 'pengeluaran')->sum('nominal'),
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Tujuan Keuangan (Financial Goals) - ringkasan dashboard
+    // -------------------------------------------------------------------------
+    public function getFinancialGoalsSummary(int $limit = 3): array
+    {
+        $allGoals = TujuanKeuangan::where('id_user', $this->userId)
+            ->orderBy('tenggat_waktu')
+            ->get();
+
+        $activeGoals = $allGoals->filter(function ($goal) {
+            return (float) $goal->nominal_terkumpul < (float) $goal->nominal_target;
+        })->values();
+
+        $totalTargetActive = (float) $activeGoals->sum(fn($g) => (float) $g->nominal_target);
+        $totalCollectedActive = (float) $activeGoals->sum(fn($g) => (float) $g->nominal_terkumpul);
+
+        $overallPercent = $totalTargetActive > 0
+            ? round(min(100, ($totalCollectedActive / $totalTargetActive) * 100), 1)
+            : 0;
+
+        $nextDue = $activeGoals->isNotEmpty()
+            ? Carbon::parse($activeGoals->first()->tenggat_waktu)->toDateString()
+            : null;
+
+        $items = $activeGoals->take($limit)->map(function ($goal) {
+            return [
+                'id' => (int) $goal->id_tujuan_keuangan,
+                'name' => $goal->nama_target,
+                'category' => $goal->kategori,
+                'priority' => $goal->prioritas,
+                'target' => (float) $goal->nominal_target,
+                'collected' => (float) $goal->nominal_terkumpul,
+                'due' => Carbon::parse($goal->tenggat_waktu)->toDateString(),
+            ];
+        })->values()->all();
+
+        return [
+            'activeCount' => (int) $activeGoals->count(),
+            'totalTargetActive' => $totalTargetActive,
+            'totalCollectedActive' => $totalCollectedActive,
+            'overallPercent' => $overallPercent,
+            'nextDue' => $nextDue,
+            'items' => $items,
         ];
     }
 
