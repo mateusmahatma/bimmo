@@ -52,10 +52,10 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Nama Periode') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Tanggal Mulai') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Tanggal Selesai') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center" style="width: 10%;">{{ __('Aksi') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Name Period') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Start Date') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Completion Date') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center" style="width: 10%;">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -83,7 +83,7 @@
                                     <td colspan="4" class="text-center py-5">
                                         <div class="text-muted">
                                             <i class="bi bi-calendar2-x fs-1 opacity-25"></i>
-                                            <p class="mt-2 mb-0">{{ __('Belum ada periode anggaran.') }}</p>
+                                            <p class="mt-2 mb-0">{{ __('There is no budget period yet.') }}</p>
                                         </div>
                                     </td>
                                 </tr>
