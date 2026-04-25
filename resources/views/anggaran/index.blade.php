@@ -24,7 +24,7 @@
             <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Daftar Periode Anggaran') }}</h5>
+                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('List of Budget Periods') }}</h5>
                         <p class="text-muted small mb-0 mt-1">{{ __('Create a period to be used during the budget monitoring process.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
@@ -52,10 +52,10 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Name Period') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Start Date') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center">{{ __('Completion Date') }}</th>
-                                    <th class="text-secondary small text-uppercase fw-bold py-3 text-center" style="width: 10%;">{{ __('Action') }}</th>
+                                    <th class="text-secondary small fw-bold py-3">{{ __('Name Period') }}</th>
+                                    <th class="text-secondary small fw-bold py-3 text-center">{{ __('Start Date') }}</th>
+                                    <th class="text-secondary small fw-bold py-3 text-center">{{ __('Completion Date') }}</th>
+                                    <th class="text-secondary small fw-bold py-3 text-center" style="width: 10%;">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -115,16 +115,16 @@
                 </div>
                 <div class="modal-body pt-4">
                     <div class="mb-3">
-                        <label class="form-label fw-medium small text-uppercase text-muted required" for="nama_periode">{{ __('Nama Periode') }}</label>
+                        <label class="form-label fw-medium small  text-muted required" for="nama_periode">{{ __('Nama Periode') }}</label>
                         <input type="text" id="nama_periode" class="form-control" name="nama_periode" placeholder="{{ __('Contoh: April 2026') }}" required>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-uppercase text-muted required" for="tanggal_mulai">{{ __('Tanggal Mulai') }}</label>
+                            <label class="form-label fw-medium small  text-muted required" for="tanggal_mulai">{{ __('Tanggal Mulai') }}</label>
                             <input type="date" id="tanggal_mulai" class="form-control" name="tanggal_mulai" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-uppercase text-muted required" for="tanggal_selesai">{{ __('Tanggal Selesai') }}</label>
+                            <label class="form-label fw-medium small  text-muted required" for="tanggal_selesai">{{ __('Tanggal Selesai') }}</label>
                             <input type="date" id="tanggal_selesai" class="form-control" name="tanggal_selesai" required>
                         </div>
                     </div>
