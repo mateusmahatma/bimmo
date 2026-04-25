@@ -9,11 +9,11 @@
 @section('container')
 
 <div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">{{ __('Periode Anggaran') }}</h1>
+    <h1 class="fw-bold mb-1">{{ __('Budget Period') }}</h1>
     <nav>
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-            <li class="breadcrumb-item active">{{ __('Anggaran') }}</li>
+            <li class="breadcrumb-item active">{{ __('Budget Period') }}</li>
         </ol>
     </nav>
 </div>
