@@ -333,6 +333,36 @@
             }).observe(mainContainer);
         }, 200);
     }
-})();
 
+    /**
+     * Global danger alerts (persist dismiss per period)
+     */
+    const initGlobalDangerAlerts = () => {
+        const alerts = document.querySelectorAll(".global-danger-alert[data-alert-id]");
+        if (!alerts.length) return;
+
+        alerts.forEach((alertEl) => {
+            const alertId = alertEl.getAttribute("data-alert-id") || "";
+            const alertVersion = alertEl.getAttribute("data-alert-version") || "";
+            if (!alertId || !alertVersion) return;
+
+            const storageKey = `bimmo:dismissedAlert:${alertId}:${alertVersion}`;
+            if (localStorage.getItem(storageKey)) {
+                alertEl.classList.remove("show");
+                alertEl.style.display = "none";
+                return;
+            }
+
+            alertEl.addEventListener("closed.bs.alert", () => {
+                try {
+                    localStorage.setItem(storageKey, String(Date.now()));
+                } catch (_) {
+                    // ignore storage errors
+                }
+            });
+        });
+    };
+
+    window.addEventListener("load", initGlobalDangerAlerts);
+})();
 

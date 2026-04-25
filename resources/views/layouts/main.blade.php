@@ -28,6 +28,8 @@
                 <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo" alt="BIMMO" style="height: 25px;">
             </div>
 
+            @include('components.global-danger-alerts')
+
             <div id="spa-container">
                 @yield('container')
             </div>

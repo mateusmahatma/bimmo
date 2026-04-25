@@ -24,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->make('router')->pushMiddlewareToGroup('web', \App\Http\Middleware\SetLocale::class);
+        $this->app->make('router')->pushMiddlewareToGroup('web', \App\Http\Middleware\InjectGlobalDangerAlerts::class);
     }
 }
