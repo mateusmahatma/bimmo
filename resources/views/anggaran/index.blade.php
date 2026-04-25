@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', __('Periode Anggaran'))
+@section('title', __('Budget Period'))
 
 @push('css')
 <link href="{{ asset('css/anggaran.css') }}?v={{ filemtime(public_path('css/anggaran.css')) }}" rel="stylesheet">
