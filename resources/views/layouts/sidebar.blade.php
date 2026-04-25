@@ -1,5 +1,5 @@
 @php
-    $uiStyle = auth()->user()->ui_style ?? 'corporate';
+$uiStyle = auth()->user()->ui_style ?? 'corporate';
 @endphp
 <aside class="sidebar d-flex flex-column {{ $uiStyle === 'milenial' ? 'm-glass-sidebar' : '' }}">
     <div class="sidebar-header p-4 d-flex align-items-center justify-content-between border-bottom mb-2">
@@ -7,12 +7,12 @@
             <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo me-2" style="height: 22px; width: auto;" alt="BIMMO">
         </a>
         <div class="d-flex align-items-center gap-1">
-            <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}" 
-                    style="font-size: 0.65rem; border-radius: 0;" 
-                    onclick="updateLanguage('id')">ID</button>
-            <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'en' ? 'btn-primary' : 'btn-outline-secondary' }}" 
-                    style="font-size: 0.65rem; border-radius: 0;" 
-                    onclick="updateLanguage('en')">EN</button>
+            <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                style="font-size: 0.65rem; border-radius: 0;"
+                onclick="updateLanguage('id')">ID</button>
+            <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'en' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                style="font-size: 0.65rem; border-radius: 0;"
+                onclick="updateLanguage('en')">EN</button>
         </div>
     </div>
 
@@ -46,14 +46,14 @@
                 <div class="collapse {{ Request()->is('anggaran*','kalkulator*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAnggaran">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request()->is('anggaran') ? 'active' : '' }}" href="{{ route('anggaran.index') }}"
-                            wire:navigate>
-                                {{ __('Budget Categories') }}
+                            <a class="nav-link sub-link {{ Request()->is('anggaran*') ? 'active' : '' }}" href="{{ route('anggaran.index') }}"
+                                wire:navigate>
+                                {{ __('Budget Period') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request()->is('kalkulator') ? 'active' : '' }}" href="{{ route('kalkulator.index') }}"
-                            wire:navigate>
+                            <a class="nav-link sub-link {{ Request()->is('kalkulator*') ? 'active' : '' }}" href="{{ route('kalkulator.index') }}"
+                                wire:navigate>
                                 {{ __('Budget Monitoring') }}
                             </a>
                         </li>
@@ -64,10 +64,10 @@
             <!-- Assets -->
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {{ Request::is('aset*') ? 'active' : '' }}"
-                data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAset" role="button">
-                <i class="bi bi-box-seam me-3"></i>
-                <span>{{ __('Assets') }}</span>
-                <i class="bi bi-chevron-down ms-auto small"></i>
+                    data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAset" role="button">
+                    <i class="bi bi-box-seam me-3"></i>
+                    <span>{{ __('Assets') }}</span>
+                    <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
 
                 <div class="collapse {{ Request::is('aset*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAset">
@@ -148,20 +148,20 @@
         {{-- Baris compact: User Guide | Send Feedback | Donate --}}
         <div class="d-flex align-items-center justify-content-around px-2 pb-1">
             <a href="{{ route('panduan.index') }}"
-               class="sidebar-compact-btn {{ request()->is('panduan*') ? 'active' : '' }}"
-               title="{{ __('User Guide') }}" wire:navigate>
+                class="sidebar-compact-btn {{ request()->is('panduan*') ? 'active' : '' }}"
+                title="{{ __('User Guide') }}" wire:navigate>
                 <i class="bi bi-book"></i>
                 <span>{{ __('Guide') }}</span>
             </a>
             <a href="#" class="sidebar-compact-btn"
-               data-bs-toggle="modal" data-bs-target="#feedbackModal"
-               title="{{ __('Send Feedback') }}">
+                data-bs-toggle="modal" data-bs-target="#feedbackModal"
+                title="{{ __('Send Feedback') }}">
                 <i class="bi bi-bug"></i>
                 <span>{{ __('Feedback') }}</span>
             </a>
             <a href="#" class="sidebar-compact-btn text-success"
-               data-bs-toggle="modal" data-bs-target="#donateModal"
-               title="{{ __('Coffee') }}">
+                data-bs-toggle="modal" data-bs-target="#donateModal"
+                title="{{ __('Coffee') }}">
                 <i class="bi bi-cup-hot"></i>
                 <span>{{ __('Coffee') }}</span>
             </a>

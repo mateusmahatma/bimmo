@@ -10,6 +10,12 @@ $(document).ready(function () {
     let currentDirection = 'desc';
     let currentSearch = '';
 
+    if (!window.ANGGARAN_BASE_URL) {
+        return;
+    }
+
+    const baseUrl = String(window.ANGGARAN_BASE_URL).replace(/\/$/, '');
+
     // Toast Notification
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
@@ -61,7 +67,7 @@ $(document).ready(function () {
     initTomSelect();
 
     // Fetch Data Function
-    function fetchAnggaran(url = '/anggaran') {
+    function fetchAnggaran(url = baseUrl) {
         const urlObj = new URL(url, window.location.origin);
         if (currentSearch) urlObj.searchParams.set('search', currentSearch);
         urlObj.searchParams.set('sort', currentSort);
@@ -177,7 +183,7 @@ $(document).ready(function () {
         const data = getFormData();
         if (!validateForm(data)) return;
 
-        const url = isUpdate ? '/anggaran/' + id : '/anggaran';
+        const url = isUpdate ? `${baseUrl}/${id}` : baseUrl;
         const type = isUpdate ? 'PUT' : 'POST';
 
         $('.tombol-simpan-anggaran').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...');
@@ -218,7 +224,7 @@ $(document).ready(function () {
         e.stopPropagation();
         const id = $(this).data('id');
 
-        $.get('/anggaran/' + id + '/edit', function (res) {
+        $.get(`${baseUrl}/${id}/edit`, function (res) {
             const anggaran = res.result;
 
             $('#anggaranModalLabel').text('Edit Anggaran');
@@ -269,7 +275,7 @@ $(document).ready(function () {
             onConfirm: async () => {
                 try {
                     await $.ajax({
-                        url: '/anggaran/' + id,
+                        url: `${baseUrl}/${id}`,
                         type: 'DELETE'
                     });
                     showToast('Data processed successfully', 'success');
@@ -319,7 +325,7 @@ $(document).ready(function () {
             onConfirm: async () => {
                 try {
                     const response = await $.ajax({
-                        url: '/anggaran/bulk-delete',
+                        url: `${baseUrl}/bulk-delete`,
                         type: 'DELETE',
                         data: { ids: ids }
                     });

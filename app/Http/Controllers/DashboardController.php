@@ -317,6 +317,11 @@ class DashboardController extends Controller
         foreach ($records as $prosesAnggaran) {
             $originalAnggaran = Anggaran::where('id_user', $userId)
                 ->where('nama_anggaran', $prosesAnggaran->nama_anggaran)
+                ->when(
+                    !empty($prosesAnggaran->id_periode_anggaran),
+                    fn($q) => $q->where('id_periode_anggaran', $prosesAnggaran->id_periode_anggaran),
+                    fn($q) => $q->whereNull('id_periode_anggaran')
+                )
                 ->first();
 
             if ($originalAnggaran) {

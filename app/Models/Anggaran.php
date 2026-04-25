@@ -19,6 +19,7 @@ class Anggaran extends Model
         'persentase_anggaran',
         'id_pengeluaran',
         'id_user',
+        'id_periode_anggaran',
     ];
 
     // Cast id_pengeluaran sebagai array otomatis

@@ -9,20 +9,41 @@
     /* Responsive Fab & Table */
     /* PWA & Premium Enhancements (White Theme) */
     .card-summary {
-        border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
         background: #ffffff;
         color: #2d3436;
         overflow: hidden;
         position: relative;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     }
-    
-    .status-badge { border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
-    .bg-baik { background-color: #d1e7dd; color: #0f5132; }
-    .bg-kurang { background-color: #fff3cd; color: #664d03; }
-    .bg-rusak { background-color: #f8d7da; color: #842029; }
-    .bg-hilang { background-color: #e2e3e5; color: #41464b; }
+
+    .status-badge {
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .bg-baik {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .bg-kurang {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    .bg-rusak {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .bg-hilang {
+        background-color: #e2e3e5;
+        color: #41464b;
+    }
 
     .fab-add {
         position: fixed;
@@ -32,7 +53,8 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        display: none; /* Desktop hidden */
+        display: none;
+        /* Desktop hidden */
         align-items: center;
         justify-content: center;
         box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
@@ -42,57 +64,59 @@
         .fab-add {
             display: flex;
         }
+
         .btn-add-desktop {
             display: none;
         }
-        
-        #asetTable, 
-        #asetTable thead, 
-        #asetTable tbody, 
-        #asetTable th, 
-        #asetTable td, 
-        #asetTable tr { 
-            display: block; 
+
+        #asetTable,
+        #asetTable thead,
+        #asetTable tbody,
+        #asetTable th,
+        #asetTable td,
+        #asetTable tr {
+            display: block;
         }
 
         /* Hide table headers */
-        #asetTable thead tr { 
+        #asetTable thead tr {
             position: absolute;
-            top: -9999px; left: -9999px;
+            top: -9999px;
+            left: -9999px;
         }
 
         #asetTable tr {
             border: 0;
             margin-bottom: 1.5rem;
             border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             background-color: #fff;
             padding: 15px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         #asetTable td {
             border: none;
             border-bottom: 1px solid #f8f9fa;
             position: relative;
-            padding-left: 45%; 
+            padding-left: 45%;
             padding-top: 1rem;
             padding-bottom: 1rem;
             text-align: right;
             white-space: normal;
             min-height: 3rem;
         }
-        
+
         #asetTable td:last-child {
             border-bottom: 0;
         }
 
-        #asetTable td:before { 
+        #asetTable td:before {
             position: absolute;
             top: 1rem;
             left: 15px;
-            width: 40%; 
-            padding-right: 10px; 
+            width: 40%;
+            padding-right: 10px;
             white-space: nowrap;
             text-align: left;
             font-weight: bold;
@@ -102,24 +126,50 @@
         }
 
         /* Column Labels */
-        #asetTable td:nth-of-type(1):before { content: "Code"; }
-        #asetTable td:nth-of-type(2):before { content: "Asset Name"; }
-        #asetTable td:nth-of-type(3):before { content: "Category"; }
-        #asetTable td:nth-of-type(4):before { content: "Purchased"; }
-        #asetTable td:nth-of-type(5):before { content: "Value"; }
-        #asetTable td:nth-of-type(6):before { content: "Condition"; }
-        #asetTable td:nth-of-type(7):before { content: "Action"; top: 1.1rem; }
+        #asetTable td:nth-of-type(1):before {
+            content: "Code";
+        }
+
+        #asetTable td:nth-of-type(2):before {
+            content: "Asset Name";
+        }
+
+        #asetTable td:nth-of-type(3):before {
+            content: "Category";
+        }
+
+        #asetTable td:nth-of-type(4):before {
+            content: "Location";
+        }
+
+        #asetTable td:nth-of-type(5):before {
+            content: "Purchased";
+        }
+
+        #asetTable td:nth-of-type(6):before {
+            content: "Value";
+        }
+
+        #asetTable td:nth-of-type(7):before {
+            content: "Condition";
+        }
+
+        #asetTable td:nth-of-type(8):before {
+            content: "Action";
+            top: 1.1rem;
+        }
 
         /* Special handling for Action cell */
-        #asetTable td:nth-of-type(7) {
-             padding-left: 10px;
-             text-align: center;
-             display: flex;
-             justify-content: center;
-             gap: 10px;
-             border-bottom: 0;
+        #asetTable td:nth-of-type(8) {
+            padding-left: 10px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            border-bottom: 0;
         }
-        #asetTable td:nth-of-type(7):before { 
+
+        #asetTable td:nth-of-type(8):before {
             display: none;
         }
     }
@@ -127,9 +177,10 @@
     [data-bs-theme="dark"] .card-summary {
         background: linear-gradient(135deg, #2d1b4e 0%, #1a237e 100%);
     }
+
     [data-bs-theme="dark"] #asetTable tr {
         background-color: #1e1e1e;
-        border-color: rgba(255,255,255,0.05);
+        border-color: rgba(255, 255, 255, 0.05);
     }
 </style>
 @endpush
@@ -164,7 +215,7 @@
         </div>
 
         <div class="col-md-12 mb-4">
-            <div class="card border-0 shadow-sm p-3" style="border-radius: 12px;">
+            <div class="card border-0 shadow-sm p-3">
                 <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
                     <div class="d-flex flex-wrap gap-2">
                         <select id="filterKondisi" class="form-select form-select-sm" style="width: auto; min-width: 140px;">
@@ -189,7 +240,7 @@
                         </select>
                     </div>
                     <div class="btn-add-desktop">
-                        <a href="{{ route('aset.create') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <a href="{{ route('aset.create') }}" class="btn btn-primary btn-sm px-3 shadow-sm">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Asset') }}
                         </a>
                     </div>
@@ -200,7 +251,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
                     <div class="table-responsive p-3">
                         <table id="asetTable" class="table table-hover align-middle mb-0" style="width:100%">
@@ -209,6 +260,7 @@
                                     <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Code') }}</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Asset Name') }}</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Category') }}</th>
+                                    <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Location') }}</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Purchase Date') }}</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Current Value (Book)') }}</th>
                                     <th class="text-secondary small text-uppercase fw-bold py-3">{{ __('Condition') }}</th>
@@ -242,30 +294,56 @@
             serverSide: true,
             ajax: {
                 url: "{{ route('aset.index') }}",
-                data: function (d) {
+                data: function(d) {
                     d.kondisi = $('#filterKondisi').val();
                     d.kategori = $('#filterKategori').val();
                     d.status = $('#filterStatus').val();
                 }
             },
-            columns: [
-                {data: 'kode_aset', name: 'kode_aset'},
-                {data: 'nama_aset', name: 'nama_aset'},
-                {data: 'kategori', name: 'kategori'},
-                {data: 'tanggal_pembelian', name: 'tanggal_pembelian'},
-                {data: 'nilai_buku', name: 'nilai_buku', orderable: false, searchable: false},
+            columns: [{
+                    data: 'kode_aset',
+                    name: 'kode_aset'
+                },
                 {
-                    data: 'kondisi', 
+                    data: 'nama_aset',
+                    name: 'nama_aset'
+                },
+                {
+                    data: 'kategori',
+                    name: 'kategori'
+                },
+                {
+                    data: 'lokasi',
+                    name: 'lokasi'
+                },
+                {
+                    data: 'tanggal_pembelian',
+                    name: 'tanggal_pembelian'
+                },
+                {
+                    data: 'nilai_buku',
+                    name: 'nilai_buku',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'kondisi',
                     name: 'kondisi',
                     render: function(data) {
                         let badgeClass = 'bg-baik';
-                        if(data == 'Kurang Baik') badgeClass = 'bg-kurang';
-                        if(data == 'Rusak Berat') badgeClass = 'bg-rusak';
-                        if(data == 'Hilang') badgeClass = 'bg-hilang';
+                        if (data == 'Kurang Baik') badgeClass = 'bg-kurang';
+                        if (data == 'Rusak Berat') badgeClass = 'bg-rusak';
+                        if (data == 'Hilang') badgeClass = 'bg-hilang';
                         return `<span class="status-badge ${badgeClass}">${data}</span>`;
                     }
                 },
-                {data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center'},
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center'
+                },
             ],
             language: {
                 paginate: {
@@ -284,10 +362,10 @@
         });
 
         // AJAX Delete Handler
-        $('body').on('click', '.delete-aset', function (e) {
+        $('body').on('click', '.delete-aset', function(e) {
             e.preventDefault();
             const id = $(this).data('id');
-            
+
             window.confirmAction({
                 title: '{{ __("Are you sure?") }}',
                 text: '{{ __("Deleted data cannot be recovered!") }}',

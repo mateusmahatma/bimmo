@@ -11,7 +11,7 @@
     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
         <li>
             <a class="dropdown-item tombol-edit-anggaran no-loader"
-                href="{{ route('anggaran.edit', $request->id_anggaran) }}"
+                href="#"
                 data-id="{{ $request->id_anggaran }}">
                 <i class="bi bi-pencil me-2 text-warning"></i> {{ __('Edit') }}
             </a>

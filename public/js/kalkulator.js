@@ -9,6 +9,8 @@ $(document).ready(function () {
     let tomSelectIncome = null;
     let hasilAnggaranTable = null;
 
+    const processPeriodeUrl = window.KALKULATOR_PROCESS_PERIODE_URL || null;
+
     // Toast Notification
     function showToast(message, type) {
         let toastContainer = document.querySelector('.toast-container');
@@ -135,7 +137,24 @@ $(document).ready(function () {
             url.searchParams.set('search', search);
             url.searchParams.set('page', 1);
             fetchData(url.toString());
+            window.history.replaceState(null, '', url.toString());
         }, 500);
+    });
+
+    // Periode Filter (History)
+    $(document).on('change', '#historyPeriodeFilter', function () {
+        const val = $(this).val();
+        const url = new URL(window.location.href);
+
+        if (val) {
+            url.searchParams.set('id_periode_anggaran', val);
+        } else {
+            url.searchParams.delete('id_periode_anggaran');
+        }
+
+        url.searchParams.set('page', 1);
+        fetchData(url.toString());
+        window.history.replaceState(null, '', url.toString());
     });
 
     $('#detailSearch').on('keyup', function () {
@@ -146,6 +165,7 @@ $(document).ready(function () {
             url.searchParams.set('search', search);
             url.searchParams.set('page', 1);
             fetchDetailData(url.toString());
+            window.history.replaceState(null, '', url.toString());
         }, 500);
     });
 
@@ -159,6 +179,7 @@ $(document).ready(function () {
         } else {
             fetchData(url);
         }
+        window.history.replaceState(null, '', url);
     });
 
     // Sorting Click
@@ -171,6 +192,7 @@ $(document).ready(function () {
         } else {
             fetchData(url);
         }
+        window.history.replaceState(null, '', url);
     });
 
     function initDataTable() {
@@ -372,6 +394,55 @@ $(document).ready(function () {
     btnProses.on('click', function (e) {
         e.preventDefault();
         submitForm();
+    });
+
+    // Proses Budget (By Periode Anggaran) on /kalkulator
+    $(document).on('click', '#btnProsesPeriode', function (e) {
+        e.preventDefault();
+        if (!processPeriodeUrl) return;
+
+        const periodeId = $('#id_periode_anggaran').val();
+        if (!periodeId) {
+            showToast('Silakan pilih periode anggaran!', 'danger');
+            return;
+        }
+
+        const btn = $(this);
+        const spinner = $('#btnProsesPeriodeSpinner');
+        spinner.removeClass('d-none');
+        btn.prop('disabled', true);
+
+        fetch(processPeriodeUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            body: JSON.stringify({ id_periode_anggaran: parseInt(periodeId, 10) })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message || 'Budget processed successfully!', 'success');
+                    const modalEl = document.getElementById('prosesPeriodeModal');
+                    if (modalEl) {
+                        const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        inst.hide();
+                    }
+                    fetchData();
+                } else {
+                    showToast(data.message || 'Failed to process budget', 'danger');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('An error occurred: ' + err.message, 'danger');
+            })
+            .finally(() => {
+                spinner.addClass('d-none');
+                btn.prop('disabled', false);
+            });
     });
 
     // Reset Button

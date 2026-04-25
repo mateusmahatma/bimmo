@@ -11,6 +11,8 @@ use App\Models\HasilProsesAnggaran;
 use Yajra\DataTables\DataTables;
 use App\Models\Transaksi;
 use App\Models\Pengeluaran;
+use App\Models\Pemasukan;
+use App\Models\PeriodeAnggaran;
 use Vinkla\Hashids\Facades\Hashids;
 
 class FinancialCalculatorController extends Controller
@@ -19,6 +21,14 @@ class FinancialCalculatorController extends Controller
     {
         $userId = Auth::id();
         $query = HasilProsesAnggaran::where('id_user', $userId);
+
+        // Filter by Periode Anggaran (optional)
+        $periodeFilter = $request->input('id_periode_anggaran');
+        if ($periodeFilter === 'global') {
+            $query->whereNull('id_periode_anggaran');
+        } elseif ($periodeFilter !== null && $periodeFilter !== '' && ctype_digit((string) $periodeFilter)) {
+            $query->where('id_periode_anggaran', (int) $periodeFilter);
+        }
 
         // Search
         if ($request->has('search') && !empty($request->search)) {
@@ -41,9 +51,131 @@ class FinancialCalculatorController extends Controller
             return view('kalkulator._table_list', compact('hasilProses'))->render();
         }
 
-        $pemasukans = \App\Models\Pemasukan::where('id_user', $userId)->get();
+        $periods = PeriodeAnggaran::where('id_user', $userId)->orderBy('tanggal_mulai', 'desc')->get();
 
-        return view('kalkulator.index', compact('hasilProses', 'pemasukans'));
+        return view('kalkulator.index', compact('hasilProses', 'periods'));
+    }
+
+    public function detail(Request $request)
+    {
+        $userId = Auth::id();
+        $query = HasilProsesAnggaran::where('id_user', $userId);
+
+        // Filter by Periode Anggaran (optional)
+        $periodeFilter = $request->input('id_periode_anggaran');
+        if ($periodeFilter !== null && $periodeFilter !== '' && ctype_digit((string) $periodeFilter)) {
+            $query->where('id_periode_anggaran', (int) $periodeFilter);
+        }
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_anggaran', 'like', "%{$search}%")
+                    ->orWhere('tanggal_mulai', 'like', "%{$search}%")
+                    ->orWhere('tanggal_selesai', 'like', "%{$search}%");
+            });
+        }
+
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+        $query->orderBy($sort, $direction);
+
+        $hasilProses = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
+            return view('kalkulator._table_list', compact('hasilProses'))->render();
+        }
+
+        $pemasukans = Pemasukan::where('id_user', $userId)->get();
+
+        return view('kalkulator.detail', compact('hasilProses', 'pemasukans'));
+    }
+
+    public function processPeriode(Request $request)
+    {
+        $userId = Auth::id();
+        $validated = $request->validate([
+            'id_periode_anggaran' => ['required', 'integer'],
+        ]);
+
+        $periode = PeriodeAnggaran::where('id_user', $userId)
+            ->where('id_periode_anggaran', $validated['id_periode_anggaran'])
+            ->firstOrFail();
+
+        $tanggal_mulai = $periode->tanggal_mulai->format('Y-m-d');
+        $tanggal_selesai = $periode->tanggal_selesai->format('Y-m-d');
+
+        $idPemasukans = Pemasukan::where('id_user', $userId)->pluck('id')->toArray();
+
+        $allIncomesInRange = Transaksi::where('id_user', $userId)
+            ->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])
+            ->get();
+
+        $totalIncome = $allIncomesInRange->filter(function ($t) use ($idPemasukans) {
+            return in_array((string) $t->pemasukan, array_map('strval', $idPemasukans));
+        })->sum(fn($t) => (float) ($t->nominal_pemasukan ?? 0));
+
+        $anggarans = Anggaran::where('id_user', $userId)
+            ->where('id_periode_anggaran', $periode->id_periode_anggaran)
+            ->whereNotNull('id_pengeluaran')
+            ->get();
+
+        if ($anggarans->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anggaran untuk periode ini belum dibuat. Silakan tambah anggaran di halaman detail periode terlebih dahulu.',
+            ], 422);
+        }
+
+        $created = 0;
+        $updatedCount = 0;
+
+        foreach ($anggarans as $anggaran) {
+            $jenisPengeluaran = is_array($anggaran->id_pengeluaran) ? $anggaran->id_pengeluaran : json_decode($anggaran->id_pengeluaran, true);
+            if (!is_array($jenisPengeluaran)) $jenisPengeluaran = [$anggaran->id_pengeluaran];
+
+            $allTrxInRange = Transaksi::where('id_user', $userId)->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])->get();
+            $totalTransaksi = $allTrxInRange
+                ->filter(fn($t) => in_array((string) $t->pengeluaran, array_map('strval', $jenisPengeluaran)))
+                ->sum(fn($t) => (float) $t->nominal);
+
+            $nominal = ($anggaran->persentase_anggaran / 100) * $totalIncome;
+
+            $existing = HasilProsesAnggaran::where('id_user', $userId)
+                ->where('id_periode_anggaran', $periode->id_periode_anggaran)
+                ->where('nama_anggaran', $anggaran->nama_anggaran)
+                ->whereDate('tanggal_mulai', $tanggal_mulai)
+                ->whereDate('tanggal_selesai', $tanggal_selesai)
+                ->first();
+
+            $payload = [
+                'tanggal_mulai' => $tanggal_mulai,
+                'tanggal_selesai' => $tanggal_selesai,
+                'nama_anggaran' => $anggaran->nama_anggaran,
+                'jenis_pengeluaran' => $anggaran->id_pengeluaran,
+                'jenis_pemasukan' => $idPemasukans,
+                'persentase_anggaran' => $anggaran->persentase_anggaran,
+                'nominal_anggaran' => $nominal,
+                'anggaran_yang_digunakan' => $totalTransaksi,
+                'id_user' => $userId,
+                'id_periode_anggaran' => $periode->id_periode_anggaran,
+            ];
+
+            if ($existing) {
+                $existing->update($payload);
+                $updatedCount++;
+            } else {
+                HasilProsesAnggaran::create($payload);
+                $created++;
+            }
+        }
+
+        $msgParts = [];
+        if ($created > 0) $msgParts[] = "$created dibuat";
+        if ($updatedCount > 0) $msgParts[] = "$updatedCount diperbarui";
+        $msg = 'Data anggaran berhasil diproses' . (count($msgParts) ? ' (' . implode(', ', $msgParts) . ').' : '.');
+
+        return response()->json(['success' => true, 'message' => $msg]);
     }
 
     public function store(Request $request)
@@ -58,12 +190,16 @@ class FinancialCalculatorController extends Controller
         $allIncomesInRange = Transaksi::where('id_user', $userId)
             ->whereBetween('tgl_transaksi', [$tanggal_mulai, $tanggal_selesai])
             ->get();
-        
-        $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+
+        $totalIncome = $allIncomesInRange->filter(function ($t) use ($idPemasukans) {
             return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
         })->sum(fn($t) => (float)($t->nominal_pemasukan ?? 0));
 
-        $anggarans = Anggaran::where('id_user', $userId)->whereNotNull('id_pengeluaran')->get();
+        // Flow lama (kalkulator detail) tetap pakai anggaran global agar tidak mencampur periode baru
+        $anggarans = Anggaran::where('id_user', $userId)
+            ->whereNull('id_periode_anggaran')
+            ->whereNotNull('id_pengeluaran')
+            ->get();
         foreach ($anggarans as $anggaran) {
             $jenisPengeluaran = is_array($anggaran->id_pengeluaran) ? $anggaran->id_pengeluaran : json_decode($anggaran->id_pengeluaran, true);
             if (!is_array($jenisPengeluaran)) $jenisPengeluaran = [$anggaran->id_pengeluaran];
@@ -99,6 +235,11 @@ class FinancialCalculatorController extends Controller
             // Sync with original Anggaran if exists
             $originalAnggaran = Anggaran::where('id_user', $prosesAnggaran->id_user)
                 ->where('nama_anggaran', $prosesAnggaran->nama_anggaran)
+                ->when(
+                    !empty($prosesAnggaran->id_periode_anggaran),
+                    fn($q) => $q->where('id_periode_anggaran', $prosesAnggaran->id_periode_anggaran),
+                    fn($q) => $q->whereNull('id_periode_anggaran')
+                )
                 ->first();
 
             if ($originalAnggaran) {
@@ -119,10 +260,10 @@ class FinancialCalculatorController extends Controller
                 $allIncomesInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)
                     ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
                     ->get();
-                
-                $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+
+                $totalIncome = $allIncomesInRange->filter(function ($t) use ($idPemasukans) {
                     return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
-                })->sum(function($t) {
+                })->sum(function ($t) {
                     $val = (string)($t->nominal_pemasukan ?? '0');
                     $cleanVal = str_replace(['.', ','], ['', '.'], $val);
                     return (float)$cleanVal;
@@ -174,6 +315,11 @@ class FinancialCalculatorController extends Controller
             // Sync with original Anggaran if exists
             $originalAnggaran = Anggaran::where('id_user', $prosesAnggaran->id_user)
                 ->where('nama_anggaran', $prosesAnggaran->nama_anggaran)
+                ->when(
+                    !empty($prosesAnggaran->id_periode_anggaran),
+                    fn($q) => $q->where('id_periode_anggaran', $prosesAnggaran->id_periode_anggaran),
+                    fn($q) => $q->whereNull('id_periode_anggaran')
+                )
                 ->first();
 
             if ($originalAnggaran) {
@@ -194,10 +340,10 @@ class FinancialCalculatorController extends Controller
                 $allIncomesInRange = Transaksi::where('id_user', $prosesAnggaran->id_user)
                     ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
                     ->get();
-                
-                $totalIncome = $allIncomesInRange->filter(function($t) use ($idPemasukans) {
+
+                $totalIncome = $allIncomesInRange->filter(function ($t) use ($idPemasukans) {
                     return in_array((string)$t->pemasukan, array_map('strval', $idPemasukans));
-                })->sum(function($t) {
+                })->sum(function ($t) {
                     $val = (string)($t->nominal_pemasukan ?? '0');
                     $cleanVal = str_replace(['.', ','], ['', '.'], $val);
                     return (float)$cleanVal;

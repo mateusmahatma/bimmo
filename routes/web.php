@@ -12,6 +12,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\FinancialCalculatorController;
 use App\Http\Controllers\PinjamanController;
 use App\Http\Controllers\AnggaranController;
+use App\Http\Controllers\PeriodeAnggaranController;
 use App\Http\Controllers\BayarPinjamanController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\LupaPasswordController;
@@ -100,7 +101,9 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(FinancialCalculatorController::class)->prefix('kalkulator')->group(
         function () {
             Route::get('/', 'index')->name('kalkulator.index');
+            Route::get('/detail', 'detail')->name('kalkulator.detail');
             Route::post('/', 'store')->name('kalkulator.store');
+            Route::post('/process-periode', 'processPeriode')->name('kalkulator.processPeriode');
             Route::delete('/bulk-delete', 'bulkDelete')->name('kalkulator.bulkDelete');
             Route::put('/bulk-sync', 'bulkSync')->name('kalkulator.bulkSync');
             Route::get('/{hash}', 'show')->name('kalkulator.show');
@@ -162,8 +165,22 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pemasukan', PemasukanController::class);
     Route::delete('/pengeluaran/bulk-delete', [PengeluaranController::class, 'bulkDelete'])->name('pengeluaran.bulkDelete');
     Route::resource('pengeluaran', PengeluaranController::class);
-    Route::delete('/anggaran/bulk-delete', [AnggaranController::class, 'bulkDelete'])->name('anggaran.bulkDelete');
-    Route::resource('anggaran', AnggaranController::class);
+
+    // Anggaran (Periode -> Detail -> Kategori)
+    Route::prefix('anggaran')->group(function () {
+        // Periode Anggaran (halaman utama /anggaran)
+        Route::get('/', [PeriodeAnggaranController::class, 'index'])->name('anggaran.index');
+        Route::post('/', [PeriodeAnggaranController::class, 'store'])->name('anggaran.store');
+        Route::delete('/{periode}', [PeriodeAnggaranController::class, 'destroy'])->name('anggaran.destroy');
+
+        // Detail Periode (kelola kategori anggaran per-periode)
+        Route::get('/{periode}/detail', [AnggaranController::class, 'periodeIndex'])->name('anggaran.detail');
+        Route::post('/{periode}/detail', [AnggaranController::class, 'periodeStore'])->name('anggaran.detail.store');
+        Route::get('/{periode}/detail/{id}/edit', [AnggaranController::class, 'periodeEdit'])->name('anggaran.detail.edit');
+        Route::put('/{periode}/detail/{id}', [AnggaranController::class, 'periodeUpdate'])->name('anggaran.detail.update');
+        Route::delete('/{periode}/detail/{id}', [AnggaranController::class, 'periodeDestroy'])->name('anggaran.detail.destroy');
+        Route::delete('/{periode}/detail/bulk-delete', [AnggaranController::class, 'periodeBulkDelete'])->name('anggaran.detail.bulkDelete');
+    });
 
     // Dompet (Wallet)
     Route::get('/dompet/reports', [DompetController::class, 'reports'])->name('dompet.reports');

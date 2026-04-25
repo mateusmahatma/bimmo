@@ -7,13 +7,28 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Anggaran;
 use App\Models\Pengeluaran;
+use App\Models\PeriodeAnggaran;
 
 class AnggaranController extends Controller
 {
-    public function index(Request $request)
+    private function scopedQuery(int $userId, ?int $periodeId)
+    {
+        $query = Anggaran::where('id_user', $userId);
+
+        if ($periodeId === null) {
+            $query->whereNull('id_periode_anggaran');
+        } else {
+            $query->where('id_periode_anggaran', $periodeId);
+        }
+
+        return $query;
+    }
+
+    private function renderIndex(Request $request, PeriodeAnggaran $periode)
     {
         $userId = Auth::id();
-        $query = Anggaran::where('id_user', $userId);
+        $periodeId = $periode->id_periode_anggaran;
+        $query = $this->scopedQuery($userId, $periodeId);
 
         // Search
         if ($request->filled('search')) {
@@ -62,10 +77,12 @@ class AnggaranController extends Controller
 
         $anggaran = new Anggaran();
 
-        return view('anggaran.index', compact('anggarans', 'anggaran', 'pengeluarans', 'totalPersentase', 'exceedMessage', 'sort', 'direction'));
+        $baseUrl = route('anggaran.detail', $periode->id_periode_anggaran);
+
+        return view('anggaran.detail', compact('anggarans', 'anggaran', 'pengeluarans', 'totalPersentase', 'exceedMessage', 'sort', 'direction', 'periode', 'baseUrl'));
     }
 
-    public function store(Request $request)
+    private function storeScoped(Request $request, PeriodeAnggaran $periode)
     {
         $validatedData = $request->validate([
             'nama_anggaran' => ['required', 'string', 'min:3', 'max:255'],
@@ -82,7 +99,8 @@ class AnggaranController extends Controller
         ]);
 
         $userId = Auth::id();
-        $currentTotal = Anggaran::where('id_user', $userId)->sum('persentase_anggaran');
+        $periodeId = $periode?->id_periode_anggaran;
+        $currentTotal = $this->scopedQuery($userId, $periodeId)->sum('persentase_anggaran');
         $newTotal = $currentTotal + $request->persentase_anggaran;
 
         // Validasi total melebihi 100%
@@ -98,49 +116,23 @@ class AnggaranController extends Controller
         }
 
         $validatedData['id_user'] = $userId;
+        $validatedData['id_periode_anggaran'] = $periodeId;
         Anggaran::create($validatedData);
 
         if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json(['success' => true, 'message' => 'Data berhasil disimpan!']);
         }
 
-        return redirect()->route('anggaran.index')
-            ->with('success', 'Data berhasil disimpan!');
+        return redirect()->route('anggaran.detail', $periode->id_periode_anggaran)->with('success', 'Data berhasil disimpan!');
     }
 
-    // ... create, edit methods remain same (view based) ...
-    public function create()
+    private function editScoped(Request $request, int $id, PeriodeAnggaran $periode)
     {
         $userId = Auth::id();
+        $periodeId = $periode->id_periode_anggaran;
 
-        $usedIds = Anggaran::where('id_user', $userId)
-            ->pluck('id_pengeluaran')
-            ->flatMap(function ($item) {
-            if (is_array($item))
-                return $item;
-            if (is_string($item))
-                return json_decode($item, true) ?: [];
-            return [];
-        })
-            ->unique()
-            ->toArray();
-
-        $pengeluarans = Pengeluaran::where('id_user', $userId)
-            ->when(!empty($usedIds), fn($q) => $q->whereNotIn('id', $usedIds))
-            ->get();
-
-        return view('anggaran.create', [
-            'anggaran' => new Anggaran(),
-            'pengeluarans' => $pengeluarans
-        ]);
-    }
-
-    public function edit($id)
-    {
-        $userId = Auth::id();
-
-        $anggaran = Anggaran::where('id_anggaran', $id)
-            ->where('id_user', $userId)
+        $anggaran = $this->scopedQuery($userId, $periodeId)
+            ->where('id_anggaran', $id)
             ->firstOrFail();
 
         // Decode id_pengeluaran agar menjadi array
@@ -151,14 +143,14 @@ class AnggaranController extends Controller
         // Tampilkan semua pengeluaran user agar bisa diubah
         $pengeluarans = Pengeluaran::where('id_user', $userId)->get();
 
-        if (request()->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json(['result' => $anggaran]);
         }
 
         return view('anggaran.edit', compact('anggaran', 'pengeluarans', 'selectedIds'));
     }
 
-    public function update(Request $request, $id)
+    private function updateScoped(Request $request, int $id, PeriodeAnggaran $periode)
     {
         $userId = Auth::id();
 
@@ -176,11 +168,13 @@ class AnggaranController extends Controller
             'id_pengeluaran.min' => 'Pilih minimal satu jenis pengeluaran.',
         ]);
 
-        $anggaran = Anggaran::where('id_anggaran', $id)
-            ->where('id_user', $userId)
+        $periodeId = $periode->id_periode_anggaran;
+
+        $anggaran = $this->scopedQuery($userId, $periodeId)
+            ->where('id_anggaran', $id)
             ->firstOrFail();
 
-        $totalPersenTerpakai = Anggaran::where('id_user', $userId)
+        $totalPersenTerpakai = $this->scopedQuery($userId, $periodeId)
             ->where('id_anggaran', '!=', $id)
             ->sum('persentase_anggaran');
 
@@ -208,17 +202,19 @@ class AnggaranController extends Controller
             return response()->json(['success' => true, 'message' => 'Berhasil update anggaran!']);
         }
 
-        return redirect()->route('anggaran.index')
-            ->with('success', 'Berhasil update anggaran!');
+        return redirect()->route('anggaran.detail', $periode->id_periode_anggaran)->with('success', 'Berhasil update anggaran!');
     }
 
-    public function destroy($id)
+    private function destroyScoped(Request $request, int $id, PeriodeAnggaran $periode)
     {
-        $deleted = Anggaran::where('id_anggaran', $id)
-            ->where('id_user', Auth::id())
+        $userId = Auth::id();
+        $periodeId = $periode->id_periode_anggaran;
+
+        $deleted = $this->scopedQuery($userId, $periodeId)
+            ->where('id_anggaran', $id)
             ->delete();
 
-        if (request()->ajax()) {
+        if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             if ($deleted) {
                 return response()->json(['success' => true, 'message' => 'Data deleted successfully']);
             }
@@ -227,7 +223,7 @@ class AnggaranController extends Controller
         return redirect()->back();
     }
 
-    public function bulkDelete(Request $request)
+    private function bulkDeleteScoped(Request $request, PeriodeAnggaran $periode)
     {
         $validated = $request->validate([
             'ids' => 'required|array',
@@ -237,8 +233,11 @@ class AnggaranController extends Controller
         $ids = $validated['ids'];
 
         // Ensure user owns these records
-        $deleted = Anggaran::whereIn('id_anggaran', $ids)
-            ->where('id_user', Auth::id())
+        $userId = Auth::id();
+        $periodeId = $periode->id_periode_anggaran;
+
+        $deleted = $this->scopedQuery($userId, $periodeId)
+            ->whereIn('id_anggaran', $ids)
             ->delete();
 
         if ($deleted) {
@@ -246,5 +245,42 @@ class AnggaranController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'No budgets found or authorized to delete.'], 404);
+    }
+
+    // ----- Routes: Periode -----
+    public function periodeIndex(Request $request, PeriodeAnggaran $periode)
+    {
+        if ($periode->id_user !== Auth::id()) abort(403);
+        return $this->renderIndex($request, $periode);
+    }
+
+    public function periodeStore(Request $request, PeriodeAnggaran $periode)
+    {
+        if ($periode->id_user !== Auth::id()) abort(403);
+        return $this->storeScoped($request, $periode);
+    }
+
+    public function periodeEdit(Request $request, PeriodeAnggaran $periode, $id)
+    {
+        if ($periode->id_user !== Auth::id()) abort(403);
+        return $this->editScoped($request, (int) $id, $periode);
+    }
+
+    public function periodeUpdate(Request $request, PeriodeAnggaran $periode, $id)
+    {
+        if ($periode->id_user !== Auth::id()) abort(403);
+        return $this->updateScoped($request, (int) $id, $periode);
+    }
+
+    public function periodeDestroy(Request $request, PeriodeAnggaran $periode, $id)
+    {
+        if ($periode->id_user !== Auth::id()) abort(403);
+        return $this->destroyScoped($request, (int) $id, $periode);
+    }
+
+    public function periodeBulkDelete(Request $request, PeriodeAnggaran $periode)
+    {
+        if ($periode->id_user !== Auth::id()) abort(403);
+        return $this->bulkDeleteScoped($request, $periode);
     }
 }

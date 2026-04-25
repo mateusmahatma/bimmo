@@ -18,10 +18,10 @@
                 <li class="nav-item"><a class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}" href="/dashboard">Dasbor</a></li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {{ Request::is('anggaran', 'kalkulator') ? 'active' : '' }}"
+                    <a class="nav-link dropdown-toggle {{ Request::is('anggaran*', 'kalkulator*') ? 'active' : '' }}"
                         href="#" data-bs-toggle="dropdown">Anggaran</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/anggaran">Kategori Anggaran</a></li>
+                        <li><a class="dropdown-item" href="/anggaran">Periode Anggaran</a></li>
                         <li><a class="dropdown-item" href="/kalkulator">Monitoring Anggaran</a></li>
                     </ul>
                 </li>
