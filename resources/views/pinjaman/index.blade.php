@@ -10,28 +10,35 @@
         border-bottom: 1px solid #e9ecef;
         padding-bottom: 0.75rem;
     }
+
     .pagetitle h1 {
         font-size: 1.75rem;
         letter-spacing: -0.03em;
         color: #2d3436;
     }
+
     .breadcrumb {
         font-size: 0.85rem;
     }
+
     .breadcrumb-item a {
         color: #636e72;
         text-decoration: none;
         transition: color 0.2s;
     }
+
     .breadcrumb-item a:hover {
         color: #0984e3;
     }
+
     .breadcrumb-item.active {
         color: #0984e3;
         font-weight: 600;
     }
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "\F285"; /* bi-chevron-right */
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        content: "\F285";
+        /* bi-chevron-right */
         font-family: "bootstrap-icons";
         font-size: 0.65rem;
         color: #b2bec3;
@@ -42,12 +49,15 @@
     [data-bs-theme="dark"] .pagetitle {
         border-bottom: 1px solid #2d2d2d;
     }
+
     [data-bs-theme="dark"] .pagetitle h1 {
         color: #e0e0e0;
     }
+
     [data-bs-theme="dark"] .breadcrumb-item a {
         color: #a0a0a0;
     }
+
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
@@ -55,13 +65,13 @@
     /* PWA & Premium Enhancements (White Theme) */
     .card-dashboard {
         border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
         background: #ffffff;
         color: #2d3436;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         transition: none !important;
     }
-    
+
     .card-icon {
         transition: none !important;
     }
@@ -74,7 +84,8 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        display: none; /* Desktop hidden */
+        display: none;
+        /* Desktop hidden */
         align-items: center;
         justify-content: center;
         box-shadow: 0 8px 16px rgba(13, 110, 253, 0.4);
@@ -85,40 +96,42 @@
         .fab-add {
             display: flex;
         }
+
         .btn-add-desktop {
             display: none;
         }
-        
-        #pinjamanTable, 
-        #pinjamanTable thead, 
-        #pinjamanTable tbody, 
-        #pinjamanTable th, 
-        #pinjamanTable td, 
-        #pinjamanTable tr { 
-            display: block; 
+
+        #pinjamanTable,
+        #pinjamanTable thead,
+        #pinjamanTable tbody,
+        #pinjamanTable th,
+        #pinjamanTable td,
+        #pinjamanTable tr {
+            display: block;
         }
 
         /* Hide table headers */
-        #pinjamanTable thead tr { 
+        #pinjamanTable thead tr {
             position: absolute;
-            top: -9999px; left: -9999px;
+            top: -9999px;
+            left: -9999px;
         }
 
         #pinjamanTable tr {
             border: 0;
             margin-bottom: 1.5rem;
             border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             background-color: #fff;
             padding: 15px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         #pinjamanTable td {
             border: none;
             border-bottom: 1px solid #f8f9fa;
             position: relative;
-            padding-left: 45%; 
+            padding-left: 45%;
             padding-top: 1rem;
             padding-bottom: 1rem;
             text-align: right;
@@ -129,7 +142,7 @@
             align-items: flex-end;
             justify-content: center;
         }
-        
+
         #pinjamanTable td .badge {
             white-space: normal !important;
             text-align: right;
@@ -137,23 +150,23 @@
         }
 
         #pinjamanTable td:last-child {
-             padding-left: 10px;
-             text-align: center;
-             display: flex !important;
-             justify-content: center !important;
-             align-items: center !important;
-             gap: 10px;
-             border-bottom: 0;
-             margin-top: 5px;
+            padding-left: 10px;
+            text-align: center;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 10px;
+            border-bottom: 0;
+            margin-top: 5px;
         }
 
-        #pinjamanTable td:before { 
+        #pinjamanTable td:before {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
             left: 15px;
-            width: 40%; 
-            padding-right: 10px; 
+            width: 40%;
+            padding-right: 10px;
             white-space: nowrap;
             text-align: left;
             font-weight: bold;
@@ -162,11 +175,11 @@
             text-transform: uppercase;
             content: attr(data-label);
         }
-        
-        #pinjamanTable td:last-child:before { 
+
+        #pinjamanTable td:last-child:before {
             display: none;
         }
-        
+
         #pinjamanTable td[data-label="No"] {
             display: none;
         }
@@ -174,18 +187,21 @@
 
     [data-bs-theme="dark"] .card-dashboard {
         background-color: #1a1a1a;
-        border-color: rgba(255,255,255,0.05);
+        border-color: rgba(255, 255, 255, 0.05);
         color: #e0e0e0;
     }
+
     [data-bs-theme="dark"] #pinjamanTable tr {
         background-color: #1a1a1a;
-        border-color: rgba(255,255,255,0.05);
+        border-color: rgba(255, 255, 255, 0.05);
     }
-    
+
     .rich-text-index p {
         margin-bottom: 0.25rem;
     }
-    .rich-text-index ul, .rich-text-index ol {
+
+    .rich-text-index ul,
+    .rich-text-index ol {
         margin-bottom: 0.25rem;
         padding-left: 1.25rem;
     }
@@ -280,14 +296,14 @@
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage and track your Loan records.') }}</p>
                     </div>
                     <div class="d-flex gap-2 align-items-center">
-                        <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
+                        <button class="btn btn-light btn-sm  px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
                             <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
                         </button>
                         <div class="vr mx-1 d-none d-lg-block"></div>
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill" style="padding: 2px 10px; font-size: 0.75rem;">
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none " style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm rounded-pill shadow-sm btn-add-desktop" style="padding: 2px 10px; font-size: 0.75rem;">
+                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm shadow-sm btn-add-desktop" style="padding: 2px 10px; font-size: 0.75rem;">
                             <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Loan') }}
                         </a>
                     </div>
@@ -323,11 +339,11 @@
                 </div>
 
                 <div class="card-body">
-                    
+
                     <!-- Toolbar -->
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 pt-4">
                         <div class="d-flex gap-2 align-items-center flex-grow-1">
-                             <div class="search-bar" style="min-width: 250px;">
+                            <div class="search-bar" style="min-width: 250px;">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
                                     <input type="text" id="searchPinjaman" class="form-control bg-light border-start-0 border-end-0 ps-1 shadow-none" placeholder="{{ __('Search by name...') }}" style="font-size: 0.8rem;">
@@ -341,13 +357,13 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                             <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm rounded-pill d-flex align-items-center gap-2 no-loader" style="padding: 2px 10px; font-size: 0.75rem;">
+                            <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm  d-flex align-items-center gap-2 no-loader" style="padding: 2px 10px; font-size: 0.75rem;">
                                 <i class="bi bi-file-earmark-excel"></i> {{ __('Export Excel') }}
                             </a>
                         </div>
                     </div>
 
-{{-- Standarized with Toast --}}
+                    {{-- Standarized with Toast --}}
 
 
                     <div id="pinjaman-table-container">
