@@ -64,7 +64,6 @@
 
     /* PWA & Premium Enhancements (White Theme) */
     .card-dashboard {
-        border-radius: 20px;
         border: 1px solid rgba(0, 0, 0, 0.05);
         background: #ffffff;
         color: #2d3436;
@@ -83,7 +82,6 @@
         z-index: 1040;
         width: 60px;
         height: 60px;
-        border-radius: 50%;
         display: none;
         /* Desktop hidden */
         align-items: center;
@@ -120,7 +118,6 @@
         #pinjamanTable tr {
             border: 0;
             margin-bottom: 1.5rem;
-            border-radius: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             background-color: #fff;
             padding: 15px;
@@ -289,7 +286,7 @@
 
         <!-- Main Card -->
         <div class="col-12">
-            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Loan List') }}</h5>
