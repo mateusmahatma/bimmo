@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Vinkla\Hashids\Facades\Hashids;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PinjamanExport;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PinjamanController extends Controller
 {
@@ -48,17 +49,65 @@ class PinjamanController extends Controller
         // Sort
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
+        $direction = $direction === 'asc' ? 'asc' : 'desc';
 
         // Allowed sort columns
-        $allowedSort = ['nama_pinjaman', 'jumlah_pinjaman', 'created_at', 'status'];
-        if (in_array($sort, $allowedSort)) {
-            $query->orderBy($sort, $direction);
-        }
-        else {
-            $query->orderBy('created_at', 'desc');
-        }
+        $dbSortable = ['nama_pinjaman', 'jumlah_pinjaman', 'created_at', 'status'];
+        $computedSortable = ['next_due_date', 'total_loan', 'paid_amount'];
 
-        $pinjaman = $query->paginate(10)->withQueryString();
+        if (in_array($sort, $dbSortable, true)) {
+            $query->orderBy($sort, $direction);
+            $pinjaman = $query->paginate(10)->withQueryString();
+        } else {
+            // For computed sorts, fetch filtered rows then sort in-memory.
+            if (!in_array($sort, $computedSortable, true)) {
+                $sort = 'created_at';
+            }
+
+            $items = $query->get();
+
+            $computePaidAmount = function ($p) {
+                return (float) $p->bayar_pinjaman->sum('jumlah_bayar');
+            };
+            $computeTotalLoan = function ($p) use ($computePaidAmount) {
+                return (float) $p->jumlah_pinjaman + $computePaidAmount($p);
+            };
+            $computeNextDueDateKey = function ($p) use ($computePaidAmount) {
+                $totalPaid = $computePaidAmount($p);
+                $cumulativeExpected = 0.0;
+                foreach (($p->simulasi_cicilan ?? []) as $simulasi) {
+                    $cumulativeExpected += (float) ($simulasi['nominal'] ?? 0);
+                    $isPaid = $totalPaid >= ($cumulativeExpected - 0.01);
+                    if (!$isPaid) {
+                        $date = $simulasi['tanggal'] ?? null;
+                        return $date ? strtotime($date) : PHP_INT_MAX;
+                    }
+                }
+                return PHP_INT_MAX;
+            };
+
+            $items = $items->sortBy(function ($p) use ($sort, $computePaidAmount, $computeTotalLoan, $computeNextDueDateKey) {
+                return match ($sort) {
+                    'paid_amount' => $computePaidAmount($p),
+                    'total_loan' => $computeTotalLoan($p),
+                    'next_due_date' => $computeNextDueDateKey($p),
+                    default => $p->created_at?->timestamp ?? 0,
+                };
+            }, SORT_REGULAR, $direction === 'desc')->values();
+
+            $perPage = 10;
+            $page = (int) $request->get('page', 1);
+            $page = $page > 0 ? $page : 1;
+            $pageItems = $items->forPage($page, $perPage)->values();
+
+            $pinjaman = new LengthAwarePaginator(
+                $pageItems,
+                $items->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        }
 
         if ($request->ajax() && !$request->hasHeader('X-SPA-Navigation')) {
             return response()->json([
