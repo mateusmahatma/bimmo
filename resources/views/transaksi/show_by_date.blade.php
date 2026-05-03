@@ -133,7 +133,7 @@
             </nav>
         </div>
         <a href="{{ route('transaksi.create', ['date' => $date]) }}"
-            class="btn btn-primary px-4 shadow-sm btn-add-desktop">
+            class="btn btn-primary small px-4 shadow-sm btn-add-desktop">
             <i class="bi bi-plus-lg me-1"></i> {{ __('Add Transaction') }}
         </a>
     </div>
