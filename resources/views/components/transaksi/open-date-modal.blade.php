@@ -12,10 +12,10 @@
                 </div>
             </div>
             <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-light rounded-pill px-4"
+                <button type="button" class="btn btn-light px-4"
                     data-bs-dismiss="modal">{{ __('Batal') }}</button>
                 <button type="button" id="btnGoToDate"
-                    class="btn btn-primary rounded-pill px-4">
+                    class="btn btn-primary px-4">
                     {{ __('Buka') }}
                 </button>
             </div>
