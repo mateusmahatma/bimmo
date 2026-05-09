@@ -105,7 +105,20 @@
                     }
                     @endphp
                     @if($nextDueDate)
-                    {{ \Carbon\Carbon::parse($nextDueDate)->translatedFormat('d M Y') }}
+                    @php
+                    $nextDueCarbon = \Carbon\Carbon::parse($nextDueDate)->startOfDay();
+                    $daysLeft = now()->startOfDay()->diffInDays($nextDueCarbon, false);
+                    @endphp
+                    {{ $nextDueCarbon->translatedFormat('d M Y') }}
+                    <div class="text-danger small fw-normal">
+                        @if($daysLeft > 0)
+                        {{ $daysLeft }} {{ __('hari lagi') }}
+                        @elseif($daysLeft === 0)
+                        {{ __('hari ini') }}
+                        @else
+                        {{ __('terlambat') }} {{ abs($daysLeft) }} {{ __('hari') }}
+                        @endif
+                    </div>
                     @else
                     -
                     @endif
