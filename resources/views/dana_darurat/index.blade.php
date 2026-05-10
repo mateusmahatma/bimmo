@@ -9,7 +9,6 @@
 
 @section('container')
 
-
 <div class="pagetitle mb-4">
     <h1 class="fw-bold mb-1">{{ __('Emergency Fund') }}</h1>
     <nav>
@@ -23,8 +22,8 @@
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
-            
-             <div class="card card-summary mb-4">
+
+            <div class="card card-summary mb-4">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                         <div>
@@ -41,8 +40,8 @@
                             <span class="text-muted small fw-medium">{{ __('Target achievement progress') }}</span>
                             <span class="text-dark small fw-bold"><span id="targetPercentage">{{ $percentage }}</span>%</span>
                         </div>
-                        <div class="progress rounded-pill bg-light" style="height: 10px;">
-                            <div class="progress-bar bg-danger rounded-pill" id="progressBar" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress bg-light" style="height: 10px;">
+                            <div class="progress-bar bg-danger" id="progressBar" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <small class="text-muted">{{ __('Target') }}: <span class="text-dark fw-semibold" id="targetDanaDaruratAmount">Rp {{ number_format($targetDanaDarurat, 0, ',', '.') }}</span></small>
@@ -52,23 +51,23 @@
                 </div>
             </div>
 
-            <div class="card card-dashboard border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card card-dashboard border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Emergency Fund Transaction List') }}</h5>
                         <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage history of emergency fund additions or reductions.') }}</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAturTarget">
+                        <button type="button" class="btn btn-outline-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalAturTarget">
                             <i class="bi bi-gear me-1"></i> {{ __('Set Target') }}
                         </button>
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill px-3">
+                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none px-3">
                             <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
                         </button>
-                        <a href="{{ route('dana-darurat.create', ['type' => 1]) }}" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm">
+                        <a href="{{ route('dana-darurat.create', ['type' => 1]) }}" class="btn btn-success btn-sm px-3 shadow-sm">
                             <i class="bi bi-arrow-down-circle me-1"></i> {{ __('Deposit') }}
                         </a>
-                        <a href="{{ route('dana-darurat.create', ['type' => 2]) }}" class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm text-dark">
+                        <a href="{{ route('dana-darurat.create', ['type' => 2]) }}" class="btn btn-warning btn-sm px-3 shadow-sm text-dark">
                             <i class="bi bi-arrow-up-circle me-1"></i> {{ __('Withdrawal') }}
                         </a>
                     </div>
