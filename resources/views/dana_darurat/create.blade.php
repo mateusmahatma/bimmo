@@ -9,28 +9,35 @@
         border-bottom: 1px solid #e9ecef;
         padding-bottom: 0.75rem;
     }
+
     .pagetitle h1 {
         font-size: 1.75rem;
         letter-spacing: -0.03em;
         color: #2d3436;
     }
+
     .breadcrumb {
         font-size: 0.85rem;
     }
+
     .breadcrumb-item a {
         color: #636e72;
         text-decoration: none;
         transition: color 0.2s;
     }
+
     .breadcrumb-item a:hover {
         color: #0984e3;
     }
+
     .breadcrumb-item.active {
         color: #0984e3;
         font-weight: 600;
     }
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: "\F285"; /* bi-chevron-right */
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        content: "\F285";
+        /* bi-chevron-right */
         font-family: "bootstrap-icons";
         font-size: 0.65rem;
         color: #b2bec3;
@@ -41,29 +48,35 @@
     [data-bs-theme="dark"] .pagetitle {
         border-bottom: 1px solid #2d2d2d;
     }
+
     [data-bs-theme="dark"] .pagetitle h1 {
         color: #e0e0e0;
     }
+
     [data-bs-theme="dark"] .breadcrumb-item a {
         color: #a0a0a0;
     }
+
     [data-bs-theme="dark"] .breadcrumb-item.active {
         color: #60a5fa;
     }
 
     /* CKEditor Dark Mode Styles */
-    [data-bs-theme="dark"] .ck.ck-editor__main > .ck-editor__editable {
+    [data-bs-theme="dark"] .ck.ck-editor__main>.ck-editor__editable {
         background-color: #212529 !important;
         border-color: #3b4248 !important;
         color: #dee2e6 !important;
     }
+
     [data-bs-theme="dark"] .ck.ck-toolbar {
         background-color: #343a40 !important;
         border-color: #3b4248 !important;
     }
+
     [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button {
         color: #dee2e6 !important;
     }
+
     [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button:hover,
     [data-bs-theme="dark"] .ck.ck-toolbar__items .ck.ck-button.ck-on {
         background-color: #495057 !important;
@@ -109,7 +122,7 @@
 
                         <div class="mb-4">
                             <label for="tgl_transaksi_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Date') }} <span class="text-danger">*</span></label>
-                            <input name="tgl_transaksi_dana_darurat" type="date" class="form-control form-control-lg" id="tgl_transaksi_dana_darurat" 
+                            <input name="tgl_transaksi_dana_darurat" type="date" class="form-control form-control-lg" id="tgl_transaksi_dana_darurat"
                                 value="{{ old('tgl_transaksi_dana_darurat', date('Y-m-d')) }}" required>
                         </div>
 
@@ -117,13 +130,13 @@
                             <div class="col-md-6">
                                 <label for="jenis_transaksi_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Transaction Type') }} <span class="text-danger">*</span></label>
                                 <select name="jenis_transaksi_dana_darurat" id="jenis_transaksi_dana_darurat" class="form-select form-select-lg" required>
-                                     <option value="">-- {{ __('Select Status') }} --</option>
-                                     <option value="1" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
-                                     <option value="2" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
-                                 </select>
-                                 <div id="infoSaldo" class="mt-2 p-2 bg-light rounded border-start border-4 border-warning small {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? '' : 'd-none' }}">
+                                    <option value="">-- {{ __('Select Status') }} --</option>
+                                    <option value="1" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '1' ? 'selected' : '' }}>{{ __('Deposit') }}</option>
+                                    <option value="2" {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? 'selected' : '' }}>{{ __('Withdrawal') }}</option>
+                                </select>
+                                <div id="infoSaldo" class="mt-2 p-2 bg-light rounded border-start border-4 border-warning small {{ old('jenis_transaksi_dana_darurat', isset($type) ? $type : '') == '2' ? '' : 'd-none' }}">
                                     <i class="bi bi-info-circle me-1 text-warning"></i> {{ __('Current balance') }}: <span class="fw-bold text-dark">Rp {{ number_format($totalDanaDarurat, 0, ',', '.') }}</span>
-                                 </div>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="nominal_dana_darurat" class="form-label fw-bold small text-uppercase text-muted">{{ __('Amount (Rp)') }} <span class="text-danger">*</span></label>
@@ -149,8 +162,8 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{{ route('dana-darurat.index') }}" class="btn btn-light px-4 rounded-pill">{{ __('Cancel') }}</a>
-                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
+                            <a href="{{ route('dana-darurat.index') }}" class="btn btn-light px-4">{{ __('Cancel') }}</a>
+                            <button type="submit" class="btn btn-primary px-5 shadow-sm">
                                 <i class="bi bi-check-lg me-2"></i> {{ __('Save Data') }}
                             </button>
                         </div>
@@ -168,7 +181,7 @@
         if (typeof ClassicEditor !== 'undefined') {
             ClassicEditor
                 .create(document.querySelector('#keterangan'), {
-                    toolbar: [ 'heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote' ]
+                    toolbar: ['heading', '|', 'bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote']
                 })
                 .catch(error => {
                     console.error('Error initializing CKEditor:', error);
@@ -180,7 +193,11 @@
         const tarikSemuaCheckbox = document.getElementById('tarikSemuaSaldo');
         const infoSaldo = document.getElementById('infoSaldo');
         const containerTarikSemua = document.getElementById('containerTarikSemua');
-        const currentBalance = {{ $totalDanaDarurat }};
+        const currentBalance = {
+            {
+                $totalDanaDarurat
+            }
+        };
 
         // Format Rupiah Function
         function formatRupiah(angka, prefix) {
