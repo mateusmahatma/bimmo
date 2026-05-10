@@ -79,7 +79,8 @@ class DashboardDataService
     {
         $totalAset = (float) Aset::where('id_user', $this->userId)
             ->where('is_disposed', false)
-            ->sum('harga_beli');
+            ->get()
+            ->sum(fn($aset) => (float) $aset->nilai_buku);
 
         $totalHutang = (float) Pinjaman::where('id_user', $this->userId)
             ->sum('jumlah_pinjaman');

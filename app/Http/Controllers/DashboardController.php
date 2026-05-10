@@ -517,7 +517,7 @@ class DashboardController extends Controller
                 })
                 ->map(fn($aset) => [
                     'name' => $aset->nama_aset,
-                    'value' => (float) $aset->harga_beli,
+                    'value' => (float) $aset->calculateNilaiBukuAt($monthEnd),
                     'date' => Carbon::parse($aset->tanggal_pembelian)->translatedFormat('d M Y'),
                 ])
                 ->values();

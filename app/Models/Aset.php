@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use App\Services\GoldPriceService;
+use Illuminate\Support\Facades\Auth;
 
 class Aset extends Model
 {
@@ -89,49 +90,44 @@ class Aset extends Model
      */
     public function getNilaiBukuAttribute()
     {
+        return $this->calculateNilaiBukuAt(Carbon::now());
+    }
+
+    public function calculateNilaiBukuAt(Carbon $asOf): float
+    {
         if ($this->is_disposed) {
-            return 0;
+            return 0.0;
         }
 
         if ($this->kategori === 'Investasi / Emas') {
-            if ($this->berat > 0) {
+            if ((float) $this->berat > 0) {
                 $livePrice = GoldPriceService::getPricePerGram();
                 if ($livePrice) {
-                    return $this->berat * $livePrice;
+                    return (float) $this->berat * (float) $livePrice;
                 }
             }
-            // Fallback to purchase price if weight is 0 or API fails completely
-            return $this->harga_beli;
+
+            return (float) $this->harga_beli;
         }
 
         $tanggalPembelian = Carbon::parse($this->tanggal_pembelian);
-        $sekarang = Carbon::now();
 
-        // Total bulan masa pakai
-        $totalBulan = $this->masa_pakai * 12;
+        $totalBulan = (int) $this->masa_pakai * 12;
+        $bulanTerpakai = $tanggalPembelian->diffInMonths($asOf);
 
-        // Sudah dipakai berapa bulan
-        $bulanTerpakai = $tanggalPembelian->diffInMonths($sekarang);
-
-        if ($bulanTerpakai <= 0) {
-            return $this->harga_beli;
-        }
-
-        if ($totalBulan <= 0) {
-            return $this->harga_beli;
+        if ($bulanTerpakai <= 0 || $totalBulan <= 0) {
+            return (float) $this->harga_beli;
         }
 
         if ($bulanTerpakai >= $totalBulan) {
-            return $this->nilai_sisa;
+            return (float) $this->nilai_sisa;
         }
 
-        // Penyusutan per bulan
-        $totalPenyusutan = $this->harga_beli - $this->nilai_sisa;
+        $totalPenyusutan = (float) $this->harga_beli - (float) $this->nilai_sisa;
         $penyusutanPerBulan = $totalPenyusutan / $totalBulan;
-
         $akumulasiPenyusutan = $penyusutanPerBulan * $bulanTerpakai;
 
-        return max($this->nilai_sisa, $this->harga_beli - $akumulasiPenyusutan);
+        return (float) max((float) $this->nilai_sisa, (float) $this->harga_beli - $akumulasiPenyusutan);
     }
 
     /**
