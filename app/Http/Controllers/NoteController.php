@@ -15,7 +15,10 @@ class NoteController extends Controller
             ->orderBy('is_pinned', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
-        if ($request->wantsJson()) {
+        // Only return JSON for XHR/fetch calls; a normal browser navigation to `/notes`
+        // should always render the Blade view (some clients send Accept headers that can
+        // make wantsJson() return true unexpectedly).
+        if ($request->ajax()) {
             return response()->json($notes);
         }
         return view('notes.index');

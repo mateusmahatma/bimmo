@@ -541,6 +541,7 @@
             try {
                 const response = await fetch('/notes', {
                     headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
                     }
                 });
