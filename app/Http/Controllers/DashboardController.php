@@ -17,6 +17,7 @@ use App\ViewModels\DashboardViewModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
@@ -521,14 +522,7 @@ class DashboardController extends Controller
                 ])
                 ->values();
 
-            $emergencyFunds = $allDanaDarurat
-                ->filter(fn($item) => Carbon::parse($item->tgl_transaksi_dana_darurat) <= $monthEnd)
-                ->map(fn($item) => [
-                    'name' => $item->keterangan ?? ($item->jenis_transaksi_dana_darurat == 1 ? 'Top Up' : 'Withdrawal'),
-                    'value' => (float) $item->nominal_dana_darurat * ($item->jenis_transaksi_dana_darurat == 1 ? 1 : -1),
-                    'date' => Carbon::parse($item->tgl_transaksi_dana_darurat)->translatedFormat('d M Y'),
-                ])
-                ->values();
+            $emergencyFunds = $this->aggregateEmergencyFundDetails($allDanaDarurat, $monthEnd);
 
             $wallets = $allWallets
                 ->filter(fn($wallet) => $wallet->created_at <= $monthEnd)
@@ -583,5 +577,25 @@ class DashboardController extends Controller
         }
 
         return $history;
+    }
+
+    /**
+     * Aggregate emergency fund into a single end-balance row for the given month.
+     */
+    private function aggregateEmergencyFundDetails(Collection $allDanaDarurat, Carbon $monthEnd): Collection
+    {
+        $emergencyFunds = $allDanaDarurat
+            ->filter(fn($item) => Carbon::parse($item->tgl_transaksi_dana_darurat) <= $monthEnd);
+
+        $emergencyFundTotal = (float) $emergencyFunds
+            ->sum(fn($item) => (float) $item->nominal_dana_darurat * ($item->jenis_transaksi_dana_darurat == 1 ? 1 : -1));
+
+        return collect([
+            [
+                'name' => 'Total Emergency Fund',
+                'value' => $emergencyFundTotal,
+                'date' => $monthEnd->translatedFormat('d M Y'),
+            ],
+        ])->filter(fn($row) => $row['value'] != 0)->values();
     }
 }
