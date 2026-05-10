@@ -10,6 +10,16 @@
     min-height: 380px;
 }
 
+.net-worth-chart .apexcharts-datalabel,
+.net-worth-chart .apexcharts-data-labels text {
+    fill: #0f172a !important;
+}
+
+[data-bs-theme="dark"] .net-worth-chart .apexcharts-datalabel,
+[data-bs-theme="dark"] .net-worth-chart .apexcharts-data-labels text {
+    fill: #ffffff !important;
+}
+
 .net-worth-page-spinner {
     width: 3rem;
     height: 3rem;

@@ -27,6 +27,7 @@
                         <p class="text-muted small mb-0">{{ __('Historical trend of your assets and liabilities') }}</p>
                     </div>
                     <div class="d-flex align-items-center gap-2">
+                        <span id="netWorthGrowthPercent" class="badge rounded-0 bg-body-secondary text-dark border fw-semibold d-none"></span>
                         <button class="btn btn-sm rounded-0 net-worth-sync-btn" type="button" id="btnSyncNetWorth" title="{{ __('Sync Data') }}">
                             <i class="bi bi-arrow-repeat me-1"></i> {{ __('Sync') }}
                         </button>

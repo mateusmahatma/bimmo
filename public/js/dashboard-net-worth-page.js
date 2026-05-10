@@ -56,6 +56,7 @@
                     contentElement?.classList.remove('d-none');
 
                     renderChart(data);
+                    renderGrowthPercent(data);
                     renderTable(data);
                 })
                 .catch(error => {
@@ -75,13 +76,69 @@
                 return;
             }
 
+            const netWorthSeries = data.map(item => Number(item.net_worth ?? 0));
+            const netWorthPercents = netWorthSeries.map((value, index) => {
+                if (index === 0) {
+                    return null;
+                }
+
+                const prev = Number(netWorthSeries[index - 1] ?? 0);
+                if (prev === 0) {
+                    return value === 0 ? 0 : 100;
+                }
+
+                return ((value - prev) / Math.abs(prev)) * 100;
+            });
+
             const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
             const labelColor = isDark ? '#94a3b8' : '#64748b';
             const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f1f1f1';
+            const positiveColor = '#16a34a';
+            const negativeColor = '#dc2626';
+            const neutralColor = labelColor;
+            const annotationTextColor = isDark ? '#0b1220' : '#ffffff';
+
+            const percentAnnotations = netWorthPercents
+                .map((pct, index) => {
+                    if (pct === null || typeof pct === 'undefined') {
+                        return null;
+                    }
+
+                    const rounded = Math.round(pct * 10) / 10;
+                    const sign = rounded > 0 ? '+' : '';
+                    const color = rounded > 0 ? positiveColor : (rounded < 0 ? negativeColor : neutralColor);
+
+                    return {
+                        x: data[index]?.bulan,
+                        y: netWorthSeries[index],
+                        seriesIndex: 0,
+                        marker: {
+                            size: 0,
+                        },
+                        label: {
+                            text: `${sign}${rounded}%`,
+                            offsetY: -12,
+                            borderColor: color,
+                            style: {
+                                background: color,
+                                color: annotationTextColor,
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                padding: {
+                                    left: 6,
+                                    right: 6,
+                                    top: 3,
+                                    bottom: 3,
+                                },
+                            },
+                        },
+                    };
+                })
+                .filter(Boolean);
 
             const options = {
                 series: [
-                    { name: pageConfig.labels.netWorth, type: 'line', data: data.map(item => item.net_worth) },
+                    { name: pageConfig.labels.netWorth, type: 'line', data: netWorthSeries },
                     { name: pageConfig.labels.wealth, type: 'column', data: data.map(item => item.total_aset) },
                     { name: pageConfig.labels.debt, type: 'column', data: data.map(item => item.total_hutang) },
                 ],
@@ -91,6 +148,10 @@
                     stacked: false,
                     toolbar: { show: false },
                     fontFamily: 'Inter, sans-serif',
+                },
+                dataLabels: { enabled: false },
+                annotations: {
+                    points: percentAnnotations,
                 },
                 stroke: {
                     width: [4, 0, 0],
@@ -155,6 +216,36 @@
             chartInstance?.destroy();
             chartInstance = new ApexCharts(chartElement, options);
             chartInstance.render();
+        }
+
+        function renderGrowthPercent(data) {
+            const badge = document.getElementById('netWorthGrowthPercent');
+
+            if (!badge || !Array.isArray(data) || data.length < 2) {
+                badge?.classList.add('d-none');
+                return;
+            }
+
+            const last = Number(data[data.length - 1]?.net_worth ?? 0);
+            const prev = Number(data[data.length - 2]?.net_worth ?? 0);
+
+            const percent = prev === 0
+                ? (last === 0 ? 0 : 100)
+                : ((last - prev) / Math.abs(prev)) * 100;
+
+            const rounded = Math.round(percent * 10) / 10;
+            const sign = rounded > 0 ? '+' : '';
+
+            badge.textContent = `${sign}${rounded}%`;
+            badge.classList.remove('d-none', 'bg-success', 'bg-danger', 'bg-body-secondary', 'text-white', 'text-dark');
+
+            if (rounded > 0) {
+                badge.classList.add('bg-success', 'text-white');
+            } else if (rounded < 0) {
+                badge.classList.add('bg-danger', 'text-white');
+            } else {
+                badge.classList.add('bg-body-secondary', 'text-dark');
+            }
         }
 
         function renderTable(data) {
