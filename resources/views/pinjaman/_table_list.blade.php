@@ -24,7 +24,7 @@
                 <th class="text-secondary small fw-bold">{{ __('Notes') }}</th>
                 <th class="text-center text-secondary small fw-bold">
                     <a href="{{ $sortLink('next_due_date') }}" class="text-decoration-none text-secondary d-flex align-items-center justify-content-center gap-1 sort-link" data-sort="next_due_date" data-direction="{{ $currentSort === 'next_due_date' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
-                        {{ __('Jatuh Tempo Cicilan') }}
+                        {{ __('Due Date') }}
                         @if($currentSort === 'next_due_date')
                         <i class="bi bi-arrow-{{ $currentDir === 'asc' ? 'up' : 'down' }}"></i>
                         @else
@@ -95,12 +95,20 @@
                     $totalPaidForDue = $row->bayar_pinjaman->sum('jumlah_bayar');
                     $cumulativeExpected = 0;
                     $nextDueDate = null;
-                    foreach (($row->simulasi_cicilan ?? []) as $simulasi) {
+                    $isEndDateFallback = false;
+                    $simulasiList = $row->simulasi_cicilan ?? [];
+
+                    if (empty($simulasiList)) {
+                    $nextDueDate = $row->end_date ?? null;
+                    $isEndDateFallback = (bool) $nextDueDate;
+                    } else {
+                    foreach ($simulasiList as $simulasi) {
                     $cumulativeExpected += (float) ($simulasi['nominal'] ?? 0);
                     $isPaid = $totalPaidForDue >= ($cumulativeExpected - 0.01);
                     if (!$isPaid) {
                     $nextDueDate = $simulasi['tanggal'] ?? null;
                     break;
+                    }
                     }
                     }
                     @endphp
@@ -110,6 +118,9 @@
                     $daysLeft = now()->startOfDay()->diffInDays($nextDueCarbon, false);
                     @endphp
                     {{ $nextDueCarbon->translatedFormat('d M Y') }}
+                    @if($isEndDateFallback)
+                    <div class="text-muted small fw-normal">{{ __('End Date') }}</div>
+                    @endif
                     <div class="text-danger small fw-normal">
                         @if($daysLeft > 0)
                         {{ $daysLeft }} {{ __('hari lagi') }}

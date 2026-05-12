@@ -74,8 +74,12 @@ class PinjamanController extends Controller
             };
             $computeNextDueDateKey = function ($p) use ($computePaidAmount) {
                 $totalPaid = $computePaidAmount($p);
+                $simulasiList = $p->simulasi_cicilan ?? [];
+                if (empty($simulasiList)) {
+                    return $p->end_date ? strtotime($p->end_date) : PHP_INT_MAX;
+                }
                 $cumulativeExpected = 0.0;
-                foreach (($p->simulasi_cicilan ?? []) as $simulasi) {
+                foreach ($simulasiList as $simulasi) {
                     $cumulativeExpected += (float) ($simulasi['nominal'] ?? 0);
                     $isPaid = $totalPaid >= ($cumulativeExpected - 0.01);
                     if (!$isPaid) {
