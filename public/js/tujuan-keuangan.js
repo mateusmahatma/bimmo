@@ -1,5 +1,6 @@
 let isTujuanKeuanganInitialized = false;
 window.__tujuanKeuanganSelectedGoalIds = window.__tujuanKeuanganSelectedGoalIds || new Set();
+const TUJUAN_KEUANGAN_FREEZE_STORAGE_KEY = 'tujuanKeuanganFreezeCols';
 
 window.initTujuanKeuangan = function () {
     if (!$('#goalsTable').length) return;
@@ -23,8 +24,20 @@ window.initTujuanKeuangan = function () {
 
     // Initialize DataTable
     var table = $('#goalsTable').DataTable({
+        paging: true,
+        responsive: true,
+        lengthChange: true,
         processing: true,
         serverSide: true,
+        dom: '<"dt-top-bar"lf>t<"dt-bottom-bar"ip>',
+        order: [],
+        columnDefs: [
+            {
+                targets: 0, // bulk checkbox column
+                orderable: false,
+                searchable: false,
+            },
+        ],
         ajax: {
             url: '/tujuan-keuangan',
             data: function (d) {
@@ -125,6 +138,225 @@ window.initTujuanKeuangan = function () {
 
     const selectedIds = window.__tujuanKeuanganSelectedGoalIds;
 
+    function getFreezeableColumns() {
+        // DataTables column indexes (0-based)
+        return [
+            { index: 0, label: 'Checklist' },
+            { index: 1, label: 'No' },
+            { index: 2, label: 'Goal Name' },
+            { index: 3, label: 'Category' },
+            { index: 4, label: 'Target' },
+            { index: 5, label: 'Collected' },
+            { index: 6, label: 'Progress' },
+            { index: 7, label: 'Remaining Time' },
+            { index: 8, label: 'Rec. Savings/Mo' },
+            { index: 9, label: 'Priority' },
+        ];
+    }
+
+    function readFrozenColumns() {
+        try {
+            const raw = localStorage.getItem(TUJUAN_KEUANGAN_FREEZE_STORAGE_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(parsed)) return [];
+            return parsed.map(Number).filter((n) => Number.isFinite(n));
+        } catch {
+            return [];
+        }
+    }
+
+    function writeFrozenColumns(indices) {
+        const uniqueSorted = Array.from(new Set(indices.map(Number).filter((n) => Number.isFinite(n)))).sort((a, b) => a - b);
+        localStorage.setItem(TUJUAN_KEUANGAN_FREEZE_STORAGE_KEY, JSON.stringify(uniqueSorted));
+    }
+
+    function injectFreezeUi() {
+        const wrapper = document.getElementById('goalsTable_wrapper');
+        if (!wrapper) return false;
+
+        // Preferred placement is already rendered in Blade.
+        // If the Blade dropdown exists, just wire it up.
+        const preferredMount = document.getElementById('freezeColumnsContainer');
+        const existingToggle = document.getElementById('tkFreezeDropdown');
+        const existingMenu = preferredMount?.querySelector('.dropdown-menu');
+        const existingList = preferredMount?.querySelector('.tk-freeze-list');
+        if (preferredMount && existingToggle && existingMenu && existingList) {
+            wireFreezeUi(preferredMount, existingToggle, existingMenu, existingList);
+            return true;
+        }
+
+        if (wrapper.querySelector('[data-tk-freeze-ui="1"]')) return true;
+
+        let topBar = wrapper.querySelector('.dt-top-bar');
+        if (!topBar) {
+            // Fallback: create a top bar and move length + filter into it
+            const length = wrapper.querySelector('.dataTables_length');
+            const filter = wrapper.querySelector('.dataTables_filter');
+            if (!length && !filter) return false;
+
+            topBar = document.createElement('div');
+            topBar.className = 'dt-top-bar';
+
+            const insertBeforeNode =
+                wrapper.querySelector('.dataTables_scroll') ||
+                wrapper.querySelector('table') ||
+                wrapper.firstChild;
+
+            wrapper.insertBefore(topBar, insertBeforeNode);
+
+            if (length) topBar.appendChild(length);
+            if (filter) topBar.appendChild(filter);
+        }
+
+        const container = document.createElement('div');
+        container.setAttribute('data-tk-freeze-ui', '1');
+        container.className = 'ms-2 d-flex align-items-center';
+
+        const dropdownId = `tkFreezeDropdown-${Date.now()}`;
+        container.innerHTML = `
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="${dropdownId}" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    Freeze Columns
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="${dropdownId}" style="min-width: 240px;">
+                    <div class="small text-muted mb-2">Pilih kolom yang mau di-freeze</div>
+                    <div class="tk-freeze-list" style="max-height: 220px; overflow:auto;"></div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="button" class="btn btn-light btn-sm w-50" data-tk-freeze-clear="1">Clear</button>
+                        <button type="button" class="btn btn-primary btn-sm w-50" data-tk-freeze-apply="1">Apply</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const filterInTopBar = topBar.querySelector('.dataTables_filter');
+        if (filterInTopBar && filterInTopBar.parentElement === topBar) topBar.insertBefore(container, filterInTopBar.nextSibling);
+        else topBar.appendChild(container);
+
+        const toggleEl = document.getElementById(dropdownId);
+        const menuEl = container.querySelector('.dropdown-menu');
+        const listEl = container.querySelector('.tk-freeze-list');
+        wireFreezeUi(container, toggleEl, menuEl, listEl);
+
+        return true;
+    }
+
+    function wireFreezeUi(rootEl, toggleEl, menuEl, listEl) {
+        if (!rootEl || !toggleEl || !menuEl || !listEl) return;
+        if (rootEl.getAttribute('data-tk-freeze-wired') === '1') return;
+        rootEl.setAttribute('data-tk-freeze-wired', '1');
+
+        const columns = getFreezeableColumns();
+        const current = new Set(readFrozenColumns());
+        listEl.innerHTML = columns.map((c) => {
+            const checked = current.has(c.index) ? 'checked' : '';
+            return `
+                <label class="dropdown-item d-flex align-items-center gap-2 py-1 px-1 m-0" style="cursor:pointer;">
+                    <input class="form-check-input m-0" type="checkbox" value="${c.index}" ${checked}>
+                    <span class="small">${c.label}</span>
+                </label>
+            `;
+        }).join('');
+
+        // Prevent dropdown from closing while interacting inside
+        menuEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        rootEl.querySelector('[data-tk-freeze-clear="1"]')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            rootEl.querySelectorAll('.tk-freeze-list input[type="checkbox"]').forEach((el) => { el.checked = false; });
+        });
+
+        rootEl.querySelector('[data-tk-freeze-apply="1"]')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const selected = Array.from(rootEl.querySelectorAll('.tk-freeze-list input[type="checkbox"]:checked'))
+                .map((el) => Number(el.value))
+                .filter((n) => Number.isFinite(n));
+            writeFrozenColumns(selected);
+            applyFrozenColumnsFromStorage(true);
+
+            const dropdownInstance = bootstrap.Dropdown.getOrCreateInstance(toggleEl);
+            dropdownInstance.hide();
+        });
+    }
+
+    function applyFrozenColumnsFromStorage(forceRecalc = false) {
+        const indices = readFrozenColumns();
+        applyFrozenColumns(indices, forceRecalc);
+    }
+
+    function applyFrozenColumns(frozenIndices, forceRecalc) {
+        const wrapper = document.getElementById('goalsTable_wrapper');
+        if (!wrapper) return;
+
+        const headTable = wrapper.querySelector('.dataTables_scrollHead table');
+        const bodyTable = wrapper.querySelector('.dataTables_scrollBody table');
+        if (!headTable || !bodyTable) return;
+
+        const headRow = headTable.tHead?.rows?.[0];
+        if (!headRow) return;
+
+        const headCells = Array.from(headRow.cells);
+
+        // Clear old sticky classes/styles
+        [headTable, bodyTable].forEach((tbl) => {
+            tbl.querySelectorAll('.tk-sticky, .tk-sticky-last').forEach((cell) => {
+                cell.classList.remove('tk-sticky', 'tk-sticky-last');
+                cell.style.removeProperty('--tk-left');
+            });
+        });
+
+        const frozen = Array.from(new Set(frozenIndices.map(Number).filter((n) => Number.isFinite(n)))).sort((a, b) => a - b);
+        if (frozen.length === 0) return;
+
+        const widths = headCells.map((cell) => cell.getBoundingClientRect().width);
+
+        const apply = () => {
+            let left = 0;
+            frozen.forEach((colIndex, i) => {
+                const isLast = i === frozen.length - 1;
+                const headCell = headCells[colIndex];
+                if (headCell) {
+                    headCell.classList.add('tk-sticky');
+                    if (isLast) headCell.classList.add('tk-sticky-last');
+                    headCell.style.setProperty('--tk-left', `${left}px`);
+                }
+
+                bodyTable.querySelectorAll('tbody tr').forEach((tr) => {
+                    const cell = tr.children[colIndex];
+                    if (!cell) return;
+                    cell.classList.add('tk-sticky');
+                    if (isLast) cell.classList.add('tk-sticky-last');
+                    cell.style.setProperty('--tk-left', `${left}px`);
+                });
+
+                left += widths[colIndex] || 0;
+            });
+        };
+
+        if (forceRecalc) requestAnimationFrame(() => requestAnimationFrame(apply));
+        else requestAnimationFrame(apply);
+    }
+
+    // Build freeze UI + apply saved state once wrapper exists (retry a few times for slow renders)
+    (function scheduleFreezeUiInit() {
+        let attempts = 0;
+        const maxAttempts = 20; // ~2s
+        const tick = () => {
+            attempts += 1;
+            const injected = injectFreezeUi();
+            if (injected) {
+                applyFrozenColumnsFromStorage(true);
+                return;
+            }
+            if (attempts < maxAttempts) setTimeout(tick, 100);
+        };
+        setTimeout(tick, 0);
+    })();
+
     function updateBulkUI() {
         const count = selectedIds.size;
         const $count = $('#bulkSelectedCount');
@@ -170,6 +402,7 @@ window.initTujuanKeuangan = function () {
         });
         syncSelectAllState();
         updateBulkUI();
+        applyFrozenColumnsFromStorage();
     });
 
     // Bulk selection handlers (delegated)
