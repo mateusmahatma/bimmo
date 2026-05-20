@@ -30,7 +30,7 @@
     </nav>
 </div>
 
-<section class="section dashboard">
+<section class="section dashboard transaksi-page">
     <div class="row">
 
         {{-- ================================================
@@ -101,13 +101,14 @@
 
         {{-- Net Balance --}}
         <div class="col-md-4 mb-4">
-            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
+            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center {{ $netIncome < 0 ? 'transaksi-net-negative' : '' }}"
+                {{ $netIncome < 0 ? 'role=alert aria-live=polite' : '' }}>
                 <div class="card-body py-4">
                     <div class="d-flex align-items-center">
-                        <div class="card-icon transaksi-card-icon transaksi-card-icon--primary
+                        <div class="card-icon transaksi-card-icon {{ $netIncome >= 0 ? 'transaksi-card-icon--primary bg-primary-light text-primary' : 'transaksi-card-icon--warning bg-danger-light text-danger' }}
                                         rounded-circle d-flex align-items-center justify-content-center
-                                        bg-primary-light text-primary me-3">
-                            <i class="bi bi-wallet2 fs-3"></i>
+                                        me-3">
+                            <i class="bi {{ $netIncome >= 0 ? 'bi-wallet2' : 'bi-exclamation-triangle-fill' }} fs-3"></i>
                         </div>
                         <div>
                             <h6 class="text-muted small text-uppercase mb-1 fw-bold">
@@ -116,6 +117,13 @@
                             <h4 class="mb-0 fw-bold {{ $netIncome >= 0 ? 'text-success' : 'text-danger' }}">
                                 Rp {{ number_format($netIncome, 0, ',', '.') }}
                             </h4>
+                            @if ($netIncome < 0)
+                            <div class="mt-1">
+                                <span class="badge transaksi-negative-badge">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ __('Negative Balance') }}
+                                </span>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -219,26 +227,33 @@
                             {{-- Desktop Action Buttons --}}
                             <div class="toolbar-actions d-none d-lg-flex align-items-center gap-2">
 
-                                {{-- Filter --}}
-                                <button class="btn btn-outline-secondary btn-sm  px-3
-                                                   d-flex align-items-center gap-1"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#filterCollapse">
-                                    <i class="bi bi-sliders"></i>
-                                    <span>{{ __('Filter') }}</span>
-                                </button>
-
-                                {{-- Export --}}
+                                {{-- Actions (Filter, Export, Import) --}}
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-success btn-sm dropdown-toggle  px-3
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle px-3
                                                        d-flex align-items-center gap-1"
                                         type="button"
-                                        data-bs-toggle="dropdown">
-                                        <i class="bi bi-download"></i>
-                                        <span>{{ __('Export') }}</span>
+                                        data-bs-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                        title="{{ __('Actions') }}">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                        <span>{{ __('Actions') }}</span>
                                     </button>
                                     <ul class="dropdown-menu shadow border-0 rounded-3">
+                                        <li>
+                                            <button class="dropdown-item" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#filterCollapse"
+                                                aria-controls="filterCollapse">
+                                                <i class="bi bi-sliders me-2"></i>{{ __('Filter') }}
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <h6 class="dropdown-header">{{ __('Export') }}</h6>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item no-loader"
                                                 id="btnExportExcel"
@@ -254,9 +269,6 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li>
                                             <a class="dropdown-item"
                                                 id="btnExportEmail"
                                                 href="#"
@@ -266,18 +278,18 @@
                                                 {{ __('Export to Email') }}
                                             </a>
                                         </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#importExcelModal">
+                                                <i class="bi bi-upload me-2 text-success"></i>{{ __('Import') }}
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
-
-                                {{-- Import --}}
-                                <button type="button"
-                                    class="btn btn-success btn-sm  px-3
-                                                   d-flex align-items-center gap-1"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#importExcelModal">
-                                    <i class="bi bi-upload"></i>
-                                    <span>{{ __('Import') }}</span>
-                                </button>
 
                                 {{-- Download Template --}}
                                 <a href="{{ route('transaksi.download.template') }}"
@@ -339,26 +351,32 @@
                             {{-- Mobile Action Buttons --}}
                             <div class="toolbar-mobile-actions d-flex d-lg-none align-items-center gap-2 ms-auto">
 
-                                {{-- Filter --}}
-                                <button class="btn btn-outline-secondary btn-xs
-                                                   d-flex align-items-center gap-1"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#filterCollapse">
-                                    <i class="bi bi-sliders"></i>
-                                    <span class="d-none d-sm-inline">{{ __('Filter') }}</span>
-                                </button>
-
-                                {{-- Export --}}
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-success btn-xs  dropdown-toggle
+                                    <button class="btn btn-outline-secondary btn-xs dropdown-toggle
                                                        d-flex align-items-center gap-1"
                                         type="button"
-                                        data-bs-toggle="dropdown">
-                                        <i class="bi bi-download"></i>
-                                        <span class="d-none d-sm-inline">{{ __('Export') }}</span>
+                                        data-bs-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                        title="{{ __('Actions') }}">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                        <span class="d-none d-sm-inline">{{ __('Actions') }}</span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                                        <li>
+                                            <button class="dropdown-item" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#filterCollapse"
+                                                aria-controls="filterCollapse">
+                                                <i class="bi bi-sliders me-2"></i>{{ __('Filter') }}
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <h6 class="dropdown-header">{{ __('Export') }}</h6>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item no-loader"
                                                 id="btnExportExcelMobile"
@@ -385,17 +403,18 @@
                                                 {{ __('Export to Email') }}
                                             </a>
                                         </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#importExcelModal">
+                                                <i class="bi bi-upload me-2 text-success"></i>{{ __('Import') }}
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
-
-                                {{-- Import --}}
-                                <button type="button"
-                                    class="btn btn-success btn-xs  d-flex align-items-center gap-1"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#importExcelModal">
-                                    <i class="bi bi-upload"></i>
-                                    <span class="d-none d-sm-inline">{{ __('Import') }}</span>
-                                </button>
 
                                 {{-- Pick Date --}}
                                 <button type="button"

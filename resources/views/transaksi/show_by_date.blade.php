@@ -139,7 +139,7 @@
     </div>
 </div>
 
-<section class="section">
+<section class="section transaksi-page">
     <div class="row">
 
         {{-- Summary Cards --}}

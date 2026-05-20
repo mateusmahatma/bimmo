@@ -125,7 +125,7 @@
         white-space: nowrap;
         text-align: left;
         font-weight: bold;
-        color: #6c757d;
+        color: #495057;
         font-size: 0.8rem;
         text-transform: uppercase;
         content: attr(data-label);
@@ -244,6 +244,10 @@
     border-color: rgba(255, 255, 255, 0.05);
 }
 
+[data-bs-theme="dark"] #transaksiTable td:before {
+    color: rgba(255, 255, 255, 0.75);
+}
+
 /* Page layout (moved from inline) */
 .transaksi-card-icon {
     width: 48px;
@@ -260,6 +264,33 @@
 
 .transaksi-card-icon--primary {
     background: rgba(13, 110, 253, 0.1);
+}
+
+.transaksi-card-icon--warning {
+    background: rgba(220, 53, 69, 0.12);
+}
+
+.transaksi-net-negative {
+    border-color: rgba(220, 53, 69, 0.35) !important;
+    background: linear-gradient(180deg, rgba(220, 53, 69, 0.08), #ffffff 70%) !important;
+}
+
+[data-bs-theme="dark"] .transaksi-net-negative {
+    border-color: rgba(255, 99, 132, 0.35) !important;
+    background: linear-gradient(180deg, rgba(220, 53, 69, 0.18), #1e1e1e 70%) !important;
+}
+
+.transaksi-negative-badge {
+    background: rgba(220, 53, 69, 0.12);
+    border: 1px solid rgba(220, 53, 69, 0.35);
+    color: #b02a37;
+    font-weight: 600;
+}
+
+[data-bs-theme="dark"] .transaksi-negative-badge {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.35);
+    color: #ffb3bc;
 }
 
 .transaksi-period-heading {
@@ -287,6 +318,35 @@
 
 .transaksi-section-desc {
     font-size: 0.85rem;
+}
+
+.transaksi-section-desc,
+.transaksi-daterange-label,
+.transaksi-daily-avg-label {
+    color: #495057;
+}
+
+[data-bs-theme="dark"] .transaksi-section-desc,
+[data-bs-theme="dark"] .transaksi-daterange-label,
+[data-bs-theme="dark"] .transaksi-daily-avg-label {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Higher contrast for muted text on transaction pages */
+.transaksi-page .text-muted {
+    color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .transaksi-page .text-muted {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.transaksi-page .breadcrumb-item a {
+    color: #495057;
+}
+
+[data-bs-theme="dark"] .transaksi-page .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .transaksi-search-bar {
