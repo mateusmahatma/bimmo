@@ -197,6 +197,25 @@
         margin-bottom: 0.25rem;
     }
 
+    .loan-progress-wrap {
+        width: 92px;
+        max-width: 120px;
+    }
+
+    .loan-progress {
+        height: 6px;
+        border-radius: 999px;
+        background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .loan-progress .progress-bar {
+        border-radius: 999px;
+    }
+
+    [data-bs-theme="dark"] .loan-progress {
+        background-color: rgba(255, 255, 255, 0.12);
+    }
+
     .rich-text-index ul,
     .rich-text-index ol {
         margin-bottom: 0.25rem;

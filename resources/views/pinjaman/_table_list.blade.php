@@ -52,6 +52,7 @@
                         @endif
                     </a>
                 </th>
+                <th class="text-secondary small fw-bold text-center">{{ __('Progress') }}</th>
                 <th class="text-end text-secondary small fw-bold">
                     <a href="{{ $sortLink('jumlah_pinjaman') }}" class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link" data-sort="jumlah_pinjaman" data-direction="{{ $currentSort === 'jumlah_pinjaman' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
                         {{ __('Remaining Balance') }}
@@ -82,6 +83,9 @@
             $row->hash = $hash;
             $paid = $row->bayar_pinjaman->sum('jumlah_bayar');
             $total_loan = $row->jumlah_pinjaman + $paid;
+            $progressPercent = $total_loan > 0 ? (int) round(($paid / $total_loan) * 100) : 0;
+            $progressPercent = max(0, min(100, $progressPercent));
+            $progressClass = $progressPercent >= 100 ? 'bg-success' : ($progressPercent >= 75 ? 'bg-info' : ($progressPercent >= 50 ? 'bg-primary' : 'bg-warning'));
             @endphp
             <tr>
                 <td class="text-center">
@@ -136,6 +140,18 @@
                 </td>
                 <td class="text-end fw-bold text-primary">Rp {{ number_format($total_loan, 0, ',', '.') }}</td>
                 <td class="text-end fw-bold text-success">Rp {{ number_format($paid, 0, ',', '.') }}</td>
+                <td class="text-center">
+                    @if($total_loan > 0)
+                    <div class="loan-progress-wrap mx-auto">
+                        <div class="progress loan-progress" role="progressbar" aria-label="{{ __('Loan payoff progress') }}" aria-valuenow="{{ $progressPercent }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar {{ $progressClass }}" style="width: {{ $progressPercent }}%"></div>
+                        </div>
+                        <div class="loan-progress-text small text-muted mt-1">{{ $progressPercent }}%</div>
+                    </div>
+                    @else
+                    -
+                    @endif
+                </td>
                 <td class="text-end fw-bold text-danger">Rp {{ number_format($row->jumlah_pinjaman, 0, ',', '.') }}</td>
                 <td class="text-center">
                     @if ($row->status === 'lunas')
@@ -150,7 +166,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="10" class="text-center py-5">
+                <td colspan="11" class="text-center py-5">
                     <div class="py-4">
                         <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
                         <p class="text-muted mt-2">{{ __('No Loan records found') }}</p>
