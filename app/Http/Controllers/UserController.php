@@ -13,6 +13,33 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function updateAlerts(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'alert_cashflow_deficit_enabled' => 'required|boolean',
+            'alert_debt_service_ratio_enabled' => 'required|boolean',
+        ]);
+
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $user->alert_cashflow_deficit_enabled = (bool) $validated['alert_cashflow_deficit_enabled'];
+        $user->alert_debt_service_ratio_enabled = (bool) $validated['alert_debt_service_ratio_enabled'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengaturan alert berhasil disimpan!',
+        ]);
+    }
+
     public function updateLanguage(Request $request): JsonResponse
     {
         $validated = $request->validate([

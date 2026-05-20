@@ -155,6 +155,34 @@
             </div>
         </div>
 
+        <!-- Pengaturan Alert Finansial -->
+        <div class="card mb-4">
+            <div class="card-header">
+                {{ __('Financial Alert Settings') }}
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Aktifkan/nonaktifkan alert berbahaya yang tampil di aplikasi.</p>
+
+                <div id="alertSettingsFeedback"></div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="alert_cashflow_deficit_enabled"
+                        @checked((bool) (auth()->user()->alert_cashflow_deficit_enabled ?? true))>
+                    <label class="form-check-label" for="alert_cashflow_deficit_enabled">
+                        Cashflow Defisit
+                    </label>
+                </div>
+
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="alert_debt_service_ratio_enabled"
+                        @checked((bool) (auth()->user()->alert_debt_service_ratio_enabled ?? true))>
+                    <label class="form-check-label" for="alert_debt_service_ratio_enabled">
+                        Debt Service Ratio
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <!-- Pengaturan Gaya Visual -->
         {{-- <div class="card mb-4 shadow-sm border-0" style="border-radius: 15px;">
             <div class="card-header bg-transparent border-0 pt-4 px-4">
@@ -513,6 +541,68 @@
                     alert('Gagal menyelaraskan gaya visual.');
                 });
             });
+        });
+
+        // 5. Financial Alert Settings Logic
+        const cashflowToggle = document.getElementById('alert_cashflow_deficit_enabled');
+        const dsrToggle = document.getElementById('alert_debt_service_ratio_enabled');
+        const alertFeedback = document.getElementById('alertSettingsFeedback');
+
+        const renderAlertFeedback = (type, message) => {
+            if (!alertFeedback) return;
+            const klass = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
+            alertFeedback.innerHTML = `
+                <div class="alert ${klass} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        };
+
+        const syncAlertSettings = async () => {
+            if (!cashflowToggle || !dsrToggle) return;
+
+            const prevCashflow = cashflowToggle.checked;
+            const prevDsr = dsrToggle.checked;
+
+            cashflowToggle.disabled = true;
+            dsrToggle.disabled = true;
+
+            try {
+                const res = await fetch("{{ route('profil.updateAlerts') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        alert_cashflow_deficit_enabled: cashflowToggle.checked,
+                        alert_debt_service_ratio_enabled: dsrToggle.checked
+                    })
+                });
+
+                const data = await res.json().catch(() => null);
+                if (!res.ok || !data || !data.success) {
+                    throw new Error(data?.message || `HTTP ${res.status}`);
+                }
+
+                renderAlertFeedback('success', data.message || 'Pengaturan alert berhasil disimpan.');
+            } catch (err) {
+                console.error('Failed to sync alert settings:', err);
+                cashflowToggle.checked = prevCashflow;
+                dsrToggle.checked = prevDsr;
+                renderAlertFeedback('danger', 'Gagal menyimpan pengaturan alert. Silakan coba lagi.');
+            } finally {
+                cashflowToggle.disabled = false;
+                dsrToggle.disabled = false;
+            }
+        };
+
+        [cashflowToggle, dsrToggle].forEach((el) => {
+            if (!el || el.dataset.listenerAttached) return;
+            el.dataset.listenerAttached = 'true';
+            el.addEventListener('change', syncAlertSettings);
         });
     };
 

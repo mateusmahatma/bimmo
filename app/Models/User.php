@@ -84,6 +84,8 @@ class User extends Authenticatable
         'subscription_ends_at' => 'datetime',
         'subscription_auto_renew' => 'boolean',
         'ui_style' => 'string',
+        'alert_cashflow_deficit_enabled' => 'boolean',
+        'alert_debt_service_ratio_enabled' => 'boolean',
     ];
 
     public function isOnTrial()

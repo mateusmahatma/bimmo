@@ -23,6 +23,7 @@ class InjectGlobalDangerAlerts
             return $next($request);
         }
 
+        $user = Auth::user();
         $userId = (int) Auth::id();
         $now = Carbon::now('Asia/Jakarta');
 
@@ -48,7 +49,8 @@ class InjectGlobalDangerAlerts
 
         $alerts = [];
 
-        if (config('health.alerts.cashflow_deficit', true) && $saldoThisMonth < 0) {
+        $cashflowAlertEnabled = (bool) ($user?->alert_cashflow_deficit_enabled ?? true);
+        if (config('health.alerts.cashflow_deficit', true) && $cashflowAlertEnabled && $saldoThisMonth < 0) {
             $alerts[] = [
                 'id' => 'cashflow-deficit',
                 'version' => $periodVersion,
@@ -59,7 +61,8 @@ class InjectGlobalDangerAlerts
         }
 
         $debtThreshold = (float) config('health.alerts.debt_service_ratio_danger', 35);
-        if (config('health.alerts.debt_service_ratio', true) && $debtServiceRatio > $debtThreshold) {
+        $dsrAlertEnabled = (bool) ($user?->alert_debt_service_ratio_enabled ?? true);
+        if (config('health.alerts.debt_service_ratio', true) && $dsrAlertEnabled && $debtServiceRatio > $debtThreshold) {
             $alerts[] = [
                 'id' => 'debt-service-ratio-high',
                 'version' => $periodVersion,

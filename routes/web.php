@@ -222,6 +222,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/phone', [UserController::class, 'updatePhoneNumber'])->name('profil.updatePhoneNumber');
     Route::put('/profil/photo', [UserController::class, 'updatePhoto'])->name('profil.updatePhoto');
     Route::delete('/profil/photo', [UserController::class, 'deletePhoto'])->name('profil.deletePhoto');
+    Route::post('/profil/alerts', [UserController::class, 'updateAlerts'])->name('profil.updateAlerts');
     Route::get('/storage/profile-photo/{filename}', [UserController::class, 'showPhoto'])->name('storage.profile_photo');
     Route::post('/user/language', [UserController::class, 'updateLanguage'])->name('user.update.language');
     Route::post('/user/skin', [UserController::class, 'updateSkin'])->name('user.update.skin');
