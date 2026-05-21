@@ -216,6 +216,35 @@
         background-color: rgba(255, 255, 255, 0.12);
     }
 
+    /* Readability / Contrast tweaks (scoped) */
+    .pinjaman-page {
+        color: #1f2937; /* slate-800 */
+    }
+
+    .pinjaman-page .text-muted {
+        color: #4b5563 !important; /* slate-600 */
+    }
+
+    .pinjaman-page .text-secondary {
+        color: #374151 !important; /* slate-700 */
+    }
+
+    .pinjaman-page #pinjamanTable td:before {
+        color: #374151; /* slate-700 */
+    }
+
+    [data-bs-theme="dark"] .pinjaman-page {
+        color: rgba(255, 255, 255, 0.88);
+    }
+
+    [data-bs-theme="dark"] .pinjaman-page .text-muted {
+        color: rgba(255, 255, 255, 0.72) !important;
+    }
+
+    [data-bs-theme="dark"] .pinjaman-page .text-secondary {
+        color: rgba(255, 255, 255, 0.78) !important;
+    }
+
     .rich-text-index ul,
     .rich-text-index ol {
         margin-bottom: 0.25rem;
@@ -236,7 +265,7 @@
     </nav>
 </div>
 
-<section class="section dashboard">
+<section class="section dashboard pinjaman-page">
     <div class="row">
         <!-- Summary Cards -->
         <div class="col-xl-3 col-md-6 mb-4">
