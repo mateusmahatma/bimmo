@@ -5,7 +5,9 @@
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <span class="text-muted" style="font-size: 0.88rem;">
-                {{ __('Hai') }}, <strong class="{{ $uiStyle === 'milenial' ? 'text-primary' : 'text-dark' }}">{{ auth()->user()->name }}</strong> 👋
+                {{ __('Hai') }}, <strong
+                    class="{{ $uiStyle === 'milenial' ? 'text-primary' : 'text-dark' }}">{{ auth()->user()->name }}</strong>
+                👋
             </span>
             <span class="dashboard-date-badge">
                 <i class="bi bi-calendar3"></i>
@@ -14,13 +16,11 @@
         </div>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('notes.index') }}"
-            class="btn btn-warning btn-sm rounded-0 px-3 d-flex align-items-center gap-2">
+        <a href="{{ route('notes.index') }}" class="btn btn-warning btn-sm">
             <i class="bi bi-sticky fs-6"></i>
             <span class="fw-semibold">{{ __('Notes') }}</span>
         </a>
-        <a href="{{ route('transaksi.create') }}"
-            class="btn btn-primary btn-sm rounded-0 px-3 d-flex align-items-center gap-2">
+        <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-circle-fill fs-6"></i>
             <span class="fw-semibold">{{ __('Record Now') }}</span>
         </a>
