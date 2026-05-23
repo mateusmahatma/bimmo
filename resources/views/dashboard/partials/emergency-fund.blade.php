@@ -21,7 +21,7 @@
         <div class="row g-3 text-center mb-4">
             {{-- Kolom Actual --}}
             <div class="col-6">
-                <div class="p-3 border rounded shadow-sm bg-white">
+                <div class="card p-3">
                     <p class="text-muted small text-uppercase fw-semibold mb-1">{{ __('Actual') }}</p>
                     <h6 class="fw-bold mb-0 text-primary">Rp
                         {{ number_format($totalDanaDarurat, 0, ',', '.') }}</h6>
@@ -29,7 +29,7 @@
             </div>
             {{-- Kolom Target --}}
             <div class="col-6">
-                <div class="p-3 border rounded shadow-sm bg-white">
+                <div class="card p-3">
                     <p class="text-muted small text-uppercase fw-semibold mb-1">{{ __('Target') }}</p>
                     <h6 class="fw-bold mb-0 text-dark">Rp
                         {{ number_format($targetDanaDarurat, 0, ',', '.') }}</h6>
