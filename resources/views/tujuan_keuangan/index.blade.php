@@ -91,9 +91,9 @@
         }
 
         /* ============================================================
-           DataTables Controls — custom dom (dt-top-bar / dt-bottom-bar)
-           Keep spacing consistent with Dana Darurat index
-           ============================================================ */
+                                                                               DataTables Controls — custom dom (dt-top-bar / dt-bottom-bar)
+                                                                               Keep spacing consistent with Dana Darurat index
+                                                                               ============================================================ */
         #goalsTable_wrapper .dt-top-bar {
             display: flex;
             justify-content: space-between;
@@ -183,6 +183,7 @@
 
         /* Mobile: stack length + search */
         @media (max-width: 575.98px) {
+
             #goalsTable_wrapper .dt-top-bar,
             #goalsTable_wrapper .dt-bottom-bar {
                 flex-direction: column;
@@ -255,7 +256,7 @@
             <div class="col-md-8">
                 <div class="d-flex flex-wrap gap-2">
                     <div class="filter-group">
-                        <select id="filter_kategori" class="form-select border-0 shadow-sm">
+                        <select id="filter_kategori" class="form-select">
                             <option value="">{{ __('All Categories') }}</option>
                             <option value="Savings">{{ __('Savings') }}</option>
                             <option value="Investment">{{ __('Investment') }}</option>
@@ -265,7 +266,7 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <select id="filter_prioritas" class="form-select border-0 shadow-sm">
+                        <select id="filter_prioritas" class="form-select">
                             <option value="">{{ __('All Priorities') }}</option>
                             <option value="High">{{ __('High') }}</option>
                             <option value="Medium">{{ __('Medium') }}</option>
@@ -275,8 +276,7 @@
                 </div>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <button type="button" class="btn btn-primary px-4 shadow-sm" data-bs-toggle="modal"
-                    data-bs-target="#modalAddGoal">
+                <button type="button" class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#modalAddGoal">
                     <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Goal') }}
                 </button>
             </div>
@@ -286,9 +286,9 @@
             <!-- Goals will be loaded here or we can use a table -->
         </div>
 
-        <div class="card card-dashboard border-0 shadow-sm">
+        <div class="card">
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <div>
+                <div class="card-body">
                     <h5 class="card-title mb-0 fw-bold text-dark">{{ __('Track Your Goals') }}</h5>
                     <p class="text-muted small mb-0 mt-1">{{ __('Monitor progress and reach your financial targets.') }}
                     </p>
@@ -300,8 +300,7 @@
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
                                 id="tkFreezeDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                                data-bs-display="static"
-                                aria-expanded="false">
+                                data-bs-display="static" aria-expanded="false">
                                 Freeze Columns
                             </button>
                             <div class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="tkFreezeDropdown"

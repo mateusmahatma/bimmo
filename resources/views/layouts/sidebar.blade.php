@@ -1,34 +1,32 @@
-@php
-$uiStyle = auth()->user()->ui_style ?? 'corporate';
-@endphp
-<aside class="sidebar d-flex flex-column {{ $uiStyle === 'milenial' ? 'm-glass-sidebar' : '' }}">
+<aside class="sidebar d-flex flex-column">
     <div class="sidebar-header p-4 d-flex align-items-center justify-content-between border-bottom mb-2">
         <a href="/dashboard">
-            <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo me-2" style="height: 22px; width: auto;" alt="BIMMO">
+            <img src="{{ asset('img/bimmo_light.png') }}" class="sidebar-logo me-2" style="height: 22px; width: auto;"
+                alt="BIMMO">
         </a>
         <div class="d-flex align-items-center gap-1">
-            <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}"
-                style="font-size: 0.65rem; border-radius: 0;"
-                onclick="updateLanguage('id')">ID</button>
-            <button class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'en' ? 'btn-primary' : 'btn-outline-secondary' }}"
-                style="font-size: 0.65rem; border-radius: 0;"
-                onclick="updateLanguage('en')">EN</button>
+            <button
+                class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'id' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                style="font-size: 0.65rem;" onclick="updateLanguage('id')">ID</button>
+            <button
+                class="btn btn-sm p-1 px-2 {{ (auth()->user()->language ?? 'en') == 'en' ? 'btn-primary' : 'btn-outline-secondary' }}"
+                style="font-size: 0.65rem;" onclick="updateLanguage('en')">EN</button>
         </div>
     </div>
 
     <div class="sidebar-menu-items flex-grow-1 py-2">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
-                    href="{{ url('dashboard') }}" wire:navigate>
+                <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}" href="{{ url('dashboard') }}"
+                    wire:navigate>
                     <i class="bi bi-speedometer me-3"></i>
                     <span>{{ __('Dashboard') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('dompet*') ? 'active' : '' }}"
-                    href="{{ route('dompet.index') }}" wire:navigate>
+                <a class="nav-link {{ request()->is('dompet*') ? 'active' : '' }}" href="{{ route('dompet.index') }}"
+                    wire:navigate>
                     <i class="bi bi-wallet2 me-3"></i>
                     <span>{{ __('Wallet') }}</span>
                 </a>
@@ -36,24 +34,25 @@ $uiStyle = auth()->user()->ui_style ?? 'corporate';
 
             <!-- Anggaran -->
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request()->is('anggaran*','kalkulator*') ? 'active' : '' }}"
+                <a class="nav-link d-flex align-items-center {{ Request()->is('anggaran*', 'kalkulator*') ? 'active' : '' }}"
                     data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAnggaran" role="button">
                     <i class="bi bi-calculator-fill me-3"></i>
                     <span>{{ __('Budget') }}</span>
                     <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
 
-                <div class="collapse {{ Request()->is('anggaran*','kalkulator*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAnggaran">
+                <div class="collapse {{ Request()->is('anggaran*', 'kalkulator*') ? 'show' : '' }}"
+                    id="{{ $prefix ?? '' }}menuAnggaran">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request()->is('anggaran*') ? 'active' : '' }}" href="{{ route('anggaran.index') }}"
-                                wire:navigate>
+                            <a class="nav-link sub-link {{ Request()->is('anggaran*') ? 'active' : '' }}"
+                                href="{{ route('anggaran.index') }}" wire:navigate>
                                 {{ __('Budget Period') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request()->is('kalkulator*') ? 'active' : '' }}" href="{{ route('kalkulator.index') }}"
-                                wire:navigate>
+                            <a class="nav-link sub-link {{ Request()->is('kalkulator*') ? 'active' : '' }}"
+                                href="{{ route('kalkulator.index') }}" wire:navigate>
                                 {{ __('Budget Monitoring') }}
                             </a>
                         </li>
@@ -73,12 +72,14 @@ $uiStyle = auth()->user()->ui_style ?? 'corporate';
                 <div class="collapse {{ Request::is('aset*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuAset">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('aset') ? 'active' : '' }}" href="{{ route('aset.index') }}" wire:navigate>
+                            <a class="nav-link sub-link {{ Request::is('aset') ? 'active' : '' }}"
+                                href="{{ route('aset.index') }}" wire:navigate>
                                 {{ __('Inventory') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('aset/report') ? 'active' : '' }}" href="{{ route('aset.report') }}" wire:navigate>
+                            <a class="nav-link sub-link {{ Request::is('aset/report') ? 'active' : '' }}"
+                                href="{{ route('aset.report') }}" wire:navigate>
                                 {{ __('Analysis & Report') }}
                             </a>
                         </li>
@@ -87,21 +88,24 @@ $uiStyle = auth()->user()->ui_style ?? 'corporate';
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}" href="{{ route('dana-darurat.index') }}" role="button" wire:navigate>
+                <a class="nav-link d-flex align-items-center {{ Request::is('dana-darurat*') ? 'active' : '' }}"
+                    href="{{ route('dana-darurat.index') }}" role="button" wire:navigate>
                     <i class="bi bi-exclamation-triangle-fill me-3"></i>
                     <span>{{ __('Emergency Fund') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('tujuan-keuangan*') ? 'active' : '' }}" href="/tujuan-keuangan" role="button" wire:navigate>
+                <a class="nav-link d-flex align-items-center {{ Request::is('tujuan-keuangan*') ? 'active' : '' }}"
+                    href="/tujuan-keuangan" role="button" wire:navigate>
                     <i class="bi bi-bullseye me-3"></i>
                     <span>{{ __('Financial Goals') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('threads*') ? 'active' : '' }}" href="{{ route('threads.index') }}" role="button" wire:navigate>
+                <a class="nav-link d-flex align-items-center {{ Request::is('threads*') ? 'active' : '' }}"
+                    href="{{ route('threads.index') }}" role="button" wire:navigate>
                     <i class="bi bi-chat-left-text me-3"></i>
                     <span>{{ __('Threads') }}</span>
                 </a>
@@ -109,32 +113,37 @@ $uiStyle = auth()->user()->ui_style ?? 'corporate';
 
             <!-- Money Movement -->
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'active' : '' }}"
+                <a class="nav-link d-flex align-items-center {{ Request::is('pemasukan*', 'pengeluaran*', 'transaksi*', 'pinjaman*') ? 'active' : '' }}"
                     data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuMoneyMovement" role="button">
                     <i class="bi bi-arrow-down-up me-3"></i>
                     <span>{{ __('Money Movement') }}</span>
                     <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
 
-                <div class="collapse {{ Request::is('pemasukan*','pengeluaran*','transaksi*', 'pinjaman*') ? 'show' : '' }}" id="{{ $prefix ?? '' }}menuMoneyMovement">
+                <div class="collapse {{ Request::is('pemasukan*', 'pengeluaran*', 'transaksi*', 'pinjaman*') ? 'show' : '' }}"
+                    id="{{ $prefix ?? '' }}menuMoneyMovement">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}" href="/pemasukan" wire:navigate>
+                            <a class="nav-link sub-link {{ Request::is('pemasukan') ? 'active' : '' }}"
+                                href="/pemasukan" wire:navigate>
                                 {{ __('Income') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}" href="/pengeluaran" wire:navigate>
+                            <a class="nav-link sub-link {{ Request::is('pengeluaran') ? 'active' : '' }}"
+                                href="/pengeluaran" wire:navigate>
                                 {{ __('Expense') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('transaksi') ? 'active' : '' }}" href="/transaksi" wire:navigate>
+                            <a class="nav-link sub-link {{ Request::is('transaksi') ? 'active' : '' }}"
+                                href="/transaksi" wire:navigate>
                                 {{ __('Cash Flow') }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman" wire:navigate>
+                            <a class="nav-link sub-link {{ Request::is('pinjaman') ? 'active' : '' }}" href="/pinjaman"
+                                wire:navigate>
                                 {{ __('Loan') }}
                             </a>
                         </li>
@@ -153,15 +162,13 @@ $uiStyle = auth()->user()->ui_style ?? 'corporate';
                 <i class="bi bi-book"></i>
                 <span>{{ __('Guide') }}</span>
             </a>
-            <a href="#" class="sidebar-compact-btn"
-                data-bs-toggle="modal" data-bs-target="#feedbackModal"
+            <a href="#" class="sidebar-compact-btn" data-bs-toggle="modal" data-bs-target="#feedbackModal"
                 title="{{ __('Send Feedback') }}">
                 <i class="bi bi-bug"></i>
                 <span>{{ __('Feedback') }}</span>
             </a>
-            <a href="#" class="sidebar-compact-btn text-success"
-                data-bs-toggle="modal" data-bs-target="#donateModal"
-                title="{{ __('Coffee') }}">
+            <a href="#" class="sidebar-compact-btn text-success" data-bs-toggle="modal"
+                data-bs-target="#donateModal" title="{{ __('Coffee') }}">
                 <i class="bi bi-cup-hot"></i>
                 <span>{{ __('Coffee') }}</span>
             </a>
@@ -170,11 +177,14 @@ $uiStyle = auth()->user()->ui_style ?? 'corporate';
         {{-- Profile & Logout --}}
         <ul class="nav flex-column border-top pt-1">
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}" href="{{ route('profil.index') }}" wire:navigate>
-                    @if(Auth::user()->profile_photo)
-                    <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}" class="rounded-0 me-3" style="width: 24px; height: 24px; object-fit: cover;" alt="Profile">
+                <a class="nav-link {{ request()->is('profil*') ? 'active' : '' }}"
+                    href="{{ route('profil.index') }}" wire:navigate>
+                    @if (Auth::user()->profile_photo)
+                        <img src="{{ route('storage.profile_photo', ['filename' => basename(Auth::user()->profile_photo)]) }}"
+                            class="rounded-0 me-3" style="width: 24px; height: 24px; object-fit: cover;"
+                            alt="Profile">
                     @else
-                    <i class="bi bi-person-circle me-3"></i>
+                        <i class="bi bi-person-circle me-3"></i>
                     @endif
                     <span class="text-truncate" style="max-width: 140px;">{{ Auth::user()->name }}</span>
                 </a>

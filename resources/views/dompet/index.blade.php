@@ -3,352 +3,403 @@
 @section('title', __('Wallet'))
 
 @push('css')
-<link href="{{ asset('vendors/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
-<link href="{{ asset('css/dompet.css') }}?v={{ filemtime(public_path('css/dompet.css')) }}" rel="stylesheet">
+    <link href="{{ asset('vendors/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dompet.css') }}?v={{ filemtime(public_path('css/dompet.css')) }}" rel="stylesheet">
 @endpush
 
 @section('container')
-<div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">{{ __('Wallet') }}</h1>
-    <nav>
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-            <li class="breadcrumb-item active">{{ __('Wallet') }}</li>
-        </ol>
-    </nav>
-</div>
+    <div class="pagetitle mb-4">
+        <h1 class="fw-bold mb-1">{{ __('Wallet') }}</h1>
+        <nav>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item active">{{ __('Wallet') }}</li>
+            </ol>
+        </nav>
+    </div>
 
 
-<section class="section">
-    <div class="row">
+    <section class="section">
+        <div class="row">
 
-        <div class="col-lg-12 mb-4">
-            <div class="card card-summary mb-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h5 class="card-title mb-1 fw-bold">{{ __('Total Balance') }}</h5>
-                            <p class="text-muted small mb-0">{{ __('Combined balance from all your active wallets.') }}</p>
-                        </div>
-                        <div class="text-end">
-                            <p class="small mb-0 text-muted d-md-none text-start">{{ __('Current Total') }}</p>
-                            <h2 class="balance-amount text-dark mb-0 fw-bold">Rp {{ number_format($totalBalance, 0, ',', '.') }}</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Wallets Grid -->
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-                <div>
-                    <h5 class="fw-bold mb-0 text-dark">{{ __('Wallet Portfolio') }}</h5>
-                    <p class="text-muted small mb-0">{{ __('Manage your various funding sources here') }}</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm border" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
-                        <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
-                    </button>
-                    @if(count($wallets) > 1)
-                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#transferWalletModal">
-                        <i class="bi bi-arrow-left-right me-1"></i> {{ __('Transfer') }}
-                    </button>
-                    @endif
-                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm btn-add-desktop" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                        <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet') }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Instructions Section -->
-            <div class="collapse mb-4" id="instructionsCollapse">
-                <div class="card-body bg-light border-bottom mb-4">
-                    <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-lightbulb me-2"></i>{{ __('How to Use the Wallet Page') }}:</h6>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <ul class="mb-0 ps-3 small text-muted list-unstyled">
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">1</span> {!! __('Click **Add Wallet** to create a new account.') !!}</li>
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">2</span> {{ __('Enter the wallet name, icon, and initial balance, if any.') }}</li>
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">3</span> {!! __('Activate **"Input as income"** if you want the opening balance to be recorded in the cash flow.') !!}</li>
-                                </ul>
+            <div class="col-lg-12 mb-4">
+                <div class="card mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <h5 class="card-title mb-1 fw-bold">{{ __('Total Balance') }}</h5>
+                                <p class="text-muted small mb-0">{{ __('Combined balance from all your active wallets.') }}
+                                </p>
                             </div>
-                            <div class="col-md-6">
-                                <ul class="mb-0 ps-3 small text-muted list-unstyled">
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">4</span> {!! __('Click on the wallet card to view **Transaction History**.') !!}</li>
-                                    <li class="mb-2"><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">5</span> {!! __('Use the **Add Balance** button in the history to manually top up.') !!}</li>
-                                    <li><span class="badge bg-primary rounded-circle me-2" style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">6</span> {{ __('Balance is automatically updated when recording income/expense transactions.') }}</li>
-                                </ul>
+                            <div class="text-end">
+                                <p class="small mb-0 text-muted d-md-none text-start">{{ __('Current Total') }}</p>
+                                <h2 class="balance-amount text-dark mb-0 fw-bold">Rp
+                                    {{ number_format($totalBalance, 0, ',', '.') }}</h2>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-body {{ count($wallets) > 0 ? 'p-4' : 'p-0' }}">
-                    @if(count($wallets) > 0)
-                    <div class="table-responsive">
-                        <table id="dompetTable" class="table table-hover align-middle mb-0" style="width: 100%;">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col" class="ps-4">{{ __('Wallet') }}</th>
-                                    <th scope="col">{{ __('Balance') }}</th>
-                                    <th scope="col" class="text-end pe-4">{{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($wallets as $wallet)
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 40px; height: 40px; border: 1px solid rgba(65, 84, 241, 0.1);">
-                                                @if($wallet->ikon)
-                                                @if(str_starts_with($wallet->ikon, 'uploads/'))
-                                                <img src="{{ asset('img/icons/' . $wallet->ikon) }}" alt="{{ $wallet->nama }}" style="width: 24px; height: 24px; object-fit: contain;">
-                                                @else
-                                                <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}" alt="{{ $wallet->ikon }}" style="width: 24px; height: 24px; object-fit: contain;">
-                                                @endif
-                                                @else
-                                                <i class="bi bi-wallet2 fs-5"></i>
-                                                @endif
-                                            </div>
-                                            <div>
-                                                <a href="{{ route('dompet.show', $wallet->id) }}" class="text-decoration-none fw-bold text-dark">{{ $wallet->nama }}</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td data-order="{{ $wallet->saldo }}">
-                                        <span class="fw-semibold text-dark">Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }}</span>
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="dropdown">
-                                            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative; z-index: 10;">
-                                                <i class="bi bi-three-dots-vertical fs-5"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="z-index: 1050;">
-                                                <li>
-                                                    <a class="dropdown-item py-2 px-3 text-primary d-flex align-items-center" href="{{ route('dompet.show', $wallet->id) }}">
-                                                        <i class="bi bi-eye me-2"></i> {{ __('View Details') }}
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        class="dropdown-item py-2 px-3 text-warning d-flex align-items-center"
-                                                        href="#"
-                                                        onclick="openEditBalanceModal('{{ $wallet->id }}', @js($wallet->nama), '{{ (float) $wallet->saldo }}')"
-                                                    >
-                                                        <i class="bi bi-pencil-square me-2"></i> {{ __('Edit Balance') }}
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center" href="#" onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
-                                                        <i class="bi bi-trash me-2"></i> {{ __('Delete Wallet') }}
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+            <!-- Wallets Grid -->
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">{{ __('Wallet Portfolio') }}</h5>
+                        <p class="text-muted small mb-0">{{ __('Manage your various funding sources here') }}</p>
                     </div>
-                    @else
-                    <div class="text-center py-5">
-                        <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
-                            <i class="bi bi-wallet2 text-muted display-4"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark">{{ __('No wallets yet') }}</h5>
-                        <p class="text-muted">{{ __('Start managing your finances by adding your first wallet.') }}</p>
-                        <button type="button" class="btn btn-primary btn-sm rounded-pill mt-2 px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet Now') }}
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light btn-sm px-3 border" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#instructionsCollapse" aria-expanded="false"
+                            aria-controls="instructionsCollapse">
+                            <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
+                        </button>
+                        @if (count($wallets) > 1)
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm"
+                                data-bs-toggle="modal" data-bs-target="#transferWalletModal">
+                                <i class="bi bi-arrow-left-right me-1"></i> {{ __('Transfer') }}
+                            </button>
+                        @endif
+                        <button type="button" class="btn btn-primary btn-sm px-3 btn-add-desktop" data-bs-toggle="modal"
+                            data-bs-target="#addWalletModal">
+                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet') }}
                         </button>
                     </div>
-                    @endif
                 </div>
+
+                <!-- Instructions Section -->
+                <div class="collapse mb-4" id="instructionsCollapse">
+                    <div class="card-body bg-light border-bottom mb-4">
+                        <div class="alert alert-info bg-white mb-0 text-dark">
+                            <h6 class="fw-bold mb-3 text-primary"><i
+                                    class="bi bi-lightbulb me-2"></i>{{ __('How to Use the Wallet Page') }}:</h6>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <ul class="mb-0 ps-3 small text-muted list-unstyled">
+                                        <li class="mb-2"><span class="badge bg-primary rounded-circle me-2"
+                                                style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">1</span>
+                                            {!! __('Click **Add Wallet** to create a new account.') !!}</li>
+                                        <li class="mb-2"><span class="badge bg-primary rounded-circle me-2"
+                                                style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">2</span>
+                                            {{ __('Enter the wallet name, icon, and initial balance, if any.') }}</li>
+                                        <li class="mb-2"><span class="badge bg-primary rounded-circle me-2"
+                                                style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">3</span>
+                                            {!! __('Activate **"Input as income"** if you want the opening balance to be recorded in the cash flow.') !!}</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="mb-0 ps-3 small text-muted list-unstyled">
+                                        <li class="mb-2"><span class="badge bg-primary rounded-circle me-2"
+                                                style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">4</span>
+                                            {!! __('Click on the wallet card to view **Transaction History**.') !!}</li>
+                                        <li class="mb-2"><span class="badge bg-primary rounded-circle me-2"
+                                                style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">5</span>
+                                            {!! __('Use the **Add Balance** button in the history to manually top up.') !!}</li>
+                                        <li><span class="badge bg-primary rounded-circle me-2"
+                                                style="width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;">6</span>
+                                            {{ __('Balance is automatically updated when recording income/expense transactions.') }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body {{ count($wallets) > 0 ? 'p-4' : 'p-0' }}">
+                        @if (count($wallets) > 0)
+                            <div class="table-responsive">
+                                <table id="dompetTable" class="table table-hover align-middle mb-0" style="width: 100%;">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4">{{ __('Wallet') }}</th>
+                                            <th scope="col">{{ __('Balance') }}</th>
+                                            <th scope="col" class="text-end pe-4">{{ __('Actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($wallets as $wallet)
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="wallet-icon-wrapper rounded-4 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center shadow-sm me-3"
+                                                            style="width: 40px; height: 40px; border: 1px solid rgba(65, 84, 241, 0.1);">
+                                                            @if ($wallet->ikon)
+                                                                @if (str_starts_with($wallet->ikon, 'uploads/'))
+                                                                    <img src="{{ asset('img/icons/' . $wallet->ikon) }}"
+                                                                        alt="{{ $wallet->nama }}"
+                                                                        style="width: 24px; height: 24px; object-fit: contain;">
+                                                                @else
+                                                                    <img src="{{ asset('img/icons/' . $wallet->ikon . '.png') }}"
+                                                                        alt="{{ $wallet->ikon }}"
+                                                                        style="width: 24px; height: 24px; object-fit: contain;">
+                                                                @endif
+                                                            @else
+                                                                <i class="bi bi-wallet2 fs-5"></i>
+                                                            @endif
+                                                        </div>
+                                                        <div>
+                                                            <a href="{{ route('dompet.show', $wallet->id) }}"
+                                                                class="text-decoration-none fw-bold text-dark">{{ $wallet->nama }}</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td data-order="{{ $wallet->saldo }}">
+                                                    <span class="fw-semibold text-dark">Rp
+                                                        {{ number_format((float) $wallet->saldo, 0, ',', '.') }}</span>
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-link text-muted p-0" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false"
+                                                            style="position: relative; z-index: 10;">
+                                                            <i class="bi bi-three-dots-vertical fs-5"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0"
+                                                            style="z-index: 1050;">
+                                                            <li>
+                                                                <a class="dropdown-item py-2 px-3 text-primary d-flex align-items-center"
+                                                                    href="{{ route('dompet.show', $wallet->id) }}">
+                                                                    <i class="bi bi-eye me-2"></i>
+                                                                    {{ __('View Details') }}
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item py-2 px-3 text-warning d-flex align-items-center"
+                                                                    href="#"
+                                                                    onclick="openEditBalanceModal('{{ $wallet->id }}', @js($wallet->nama), '{{ (float) $wallet->saldo }}')">
+                                                                    <i class="bi bi-pencil-square me-2"></i>
+                                                                    {{ __('Edit Balance') }}
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item py-2 px-3 text-danger d-flex align-items-center"
+                                                                    href="#"
+                                                                    onclick="confirmDelete('{{ $wallet->id }}', '{{ $wallet->nama }}')">
+                                                                    <i class="bi bi-trash me-2"></i>
+                                                                    {{ __('Delete Wallet') }}
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <div class="bg-light d-inline-flex p-4 mb-3">
+                                    <i class="bi bi-wallet2 text-muted display-4"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark">{{ __('No wallets yet') }}</h5>
+                                <p class="text-muted">
+                                    {{ __('Start managing your finances by adding your first wallet.') }}</p>
+                                <button type="button" class="btn btn-primary btn-sm mt-2 px-3" data-bs-toggle="modal"
+                                    data-bs-target="#addWalletModal">
+                                    <i class="bi bi-plus-lg me-1"></i> {{ __('Add Wallet Now') }}
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button for Mobile -->
+        <button type="button" class="btn btn-primary fab-add" data-bs-toggle="modal" data-bs-target="#addWalletModal"
+            title="{{ __('Add Wallet') }}">
+            <i class="bi bi-plus-lg fs-2"></i>
+        </button>
+    </section>
+
+    <!-- Add Wallet Modal -->
+    <div class="modal fade" id="addWalletModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">{{ __('Add New Wallet') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('dompet.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('Wallet Name') }}</label>
+                            <input type="text" name="nama" class="form-control rounded-3"
+                                placeholder="{{ __('e.g. Bank Account, PayPal, Cash') }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('Initial Balance') }}</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
+                                <input type="number" name="saldo" class="form-control rounded-end-3 border-start-0"
+                                    placeholder="0" required>
+                            </div>
+                            <div class="form-check form-switch small">
+                                <input class="form-check-input" type="checkbox" name="record_income" id="recordIncome"
+                                    value="1" checked>
+                                <label class="form-check-label text-muted" for="recordIncome">
+                                    {{ __('Record as income in cash flow?') }}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <input type="hidden" name="ikon" value="wallet">
+                            <label
+                                class="form-label small fw-bold text-muted">{{ __('Or Attach Custom Image/Icon') }}</label>
+                            <input type="file" name="custom_ikon" class="form-control rounded-3" accept="image/*">
+                            <div class="form-text small">{{ __('Maximum 2MB (Jpeg, Png, Svg, Gif)') }}</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Save') }}</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Floating Action Button for Mobile -->
-    <button type="button" class="btn btn-primary fab-add" data-bs-toggle="modal" data-bs-target="#addWalletModal" title="{{ __('Add Wallet') }}">
-        <i class="bi bi-plus-lg fs-2"></i>
-    </button>
-</section>
-
-<!-- Add Wallet Modal -->
-<div class="modal fade" id="addWalletModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">{{ __('Add New Wallet') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Edit Balance Modal -->
+    <div class="modal fade" id="editBalanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h5 class="modal-title fw-bold">{{ __('Edit Wallet Balance') }}</h5>
+                        <p class="text-muted small mb-0" id="editBalanceWalletName"></p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editBalanceForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <div class="alert alert-light border small text-muted mb-3">
+                            {{ __('Use this for manual balance correction only. This change does not create a cash flow transaction.') }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('Current Balance') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
+                                <input type="number" name="saldo" id="editBalanceInput"
+                                    class="form-control rounded-end-3 border-start-0" min="0" step="0.01"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit"
+                            class="btn btn-primary rounded-pill px-4">{{ __('Save Changes') }}</button>
+                    </div>
+                </form>
             </div>
-            <form action="{{ route('dompet.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('Wallet Name') }}</label>
-                        <input type="text" name="nama" class="form-control rounded-3" placeholder="{{ __('e.g. Bank Account, PayPal, Cash') }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('Initial Balance') }}</label>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
-                            <input type="number" name="saldo" class="form-control rounded-end-3 border-start-0" placeholder="0" required>
-                        </div>
-                        <div class="form-check form-switch small">
-                            <input class="form-check-input" type="checkbox" name="record_income" id="recordIncome" value="1" checked>
-                            <label class="form-check-label text-muted" for="recordIncome">
-                                {{ __('Record as income in cash flow?') }}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <input type="hidden" name="ikon" value="wallet">
-                        <label class="form-label small fw-bold text-muted">{{ __('Or Attach Custom Image/Icon') }}</label>
-                        <input type="file" name="custom_ikon" class="form-control rounded-3" accept="image/*">
-                        <div class="form-text small">{{ __('Maximum 2MB (Jpeg, Png, Svg, Gif)') }}</div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Save') }}</button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
 
-<!-- Edit Balance Modal -->
-<div class="modal fade" id="editBalanceModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header border-0 pb-0">
-                <div>
-                    <h5 class="modal-title fw-bold">{{ __('Edit Wallet Balance') }}</h5>
-                    <p class="text-muted small mb-0" id="editBalanceWalletName"></p>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editBalanceForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="alert alert-light border small text-muted mb-3">
-                        {{ __('Use this for manual balance correction only. This change does not create a cash flow transaction.') }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('Current Balance') }}</label>
-                        <div class="input-group">
-                            <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
-                            <input type="number" name="saldo" id="editBalanceInput" class="form-control rounded-end-3 border-start-0" min="0" step="0.01" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Save Changes') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    function confirmDelete(id, name) {
-        window.confirmAction({
-            title: 'Delete Wallet?',
-            text: `Are you sure you want to delete "${name}"? Deleted data cannot be recovered!`,
-            onConfirm: () => {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/dompet/${id}`;
-                form.innerHTML = `
+    <script>
+        function confirmDelete(id, name) {
+            window.confirmAction({
+                title: 'Delete Wallet?',
+                text: `Are you sure you want to delete "${name}"? Deleted data cannot be recovered!`,
+                onConfirm: () => {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/dompet/${id}`;
+                    form.innerHTML = `
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
                 `;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
 
-    function openEditBalanceModal(id, name, saldo) {
-        document.getElementById('editBalanceWalletName').textContent = name;
-        document.getElementById('editBalanceInput').value = saldo;
-        document.getElementById('editBalanceForm').action = `/dompet/${id}/balance`;
+        function openEditBalanceModal(id, name, saldo) {
+            document.getElementById('editBalanceWalletName').textContent = name;
+            document.getElementById('editBalanceInput').value = saldo;
+            document.getElementById('editBalanceForm').action = `/dompet/${id}/balance`;
 
-        const modalElement = document.getElementById('editBalanceModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.show();
-    }
-</script>
+            const modalElement = document.getElementById('editBalanceModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        }
+    </script>
 
-<!-- Transfer Wallet Modal -->
-<div class="modal fade" id="transferWalletModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">{{ __('Transfer Between Wallets') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('dompet.transfer') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('From Wallet') }}</label>
-                        <select name="dari_dompet_id" class="form-select rounded-3" required>
-                            <option value="" disabled selected>{{ __('Select Source Wallet') }}</option>
-                            @foreach($wallets as $wallet)
-                            <option value="{{ $wallet->id }}">{{ $wallet->nama }} (Rp {{ number_format((float)$wallet->saldo, 0, ',', '.') }})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="text-center mb-3">
-                        <i class="bi bi-arrow-down fs-4 text-primary"></i>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('To Wallet') }}</label>
-                        <select name="ke_dompet_id" class="form-select rounded-3" required>
-                            <option value="" disabled selected>{{ __('Select Destination Wallet') }}</option>
-                            @foreach($wallets as $wallet)
-                            <option value="{{ $wallet->id }}">{{ $wallet->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <hr class="my-4 opacity-10">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('Amount') }}</label>
-                        <div class="input-group">
-                            <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
-                            <input type="number" name="nominal" class="form-control rounded-end-3 border-start-0" placeholder="0" min="1" required>
+    <!-- Transfer Wallet Modal -->
+    <div class="modal fade" id="transferWalletModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">{{ __('Transfer Between Wallets') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('dompet.transfer') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('From Wallet') }}</label>
+                            <select name="dari_dompet_id" class="form-select rounded-3" required>
+                                <option value="" disabled selected>{{ __('Select Source Wallet') }}</option>
+                                @foreach ($wallets as $wallet)
+                                    <option value="{{ $wallet->id }}">{{ $wallet->nama }} (Rp
+                                        {{ number_format((float) $wallet->saldo, 0, ',', '.') }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="text-center mb-3">
+                            <i class="bi bi-arrow-down fs-4 text-primary"></i>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('To Wallet') }}</label>
+                            <select name="ke_dompet_id" class="form-select rounded-3" required>
+                                <option value="" disabled selected>{{ __('Select Destination Wallet') }}</option>
+                                @foreach ($wallets as $wallet)
+                                    <option value="{{ $wallet->id }}">{{ $wallet->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <hr class="my-4 opacity-10">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('Amount') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text rounded-start-3 bg-light border-end-0">Rp</span>
+                                <input type="number" name="nominal" class="form-control rounded-end-3 border-start-0"
+                                    placeholder="0" min="1" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">{{ __('Note (Optional)') }}</label>
+                            <input type="text" name="keterangan" class="form-control rounded-3"
+                                placeholder="{{ __('e.g. Monthly transfer, rebalancing') }}">
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">{{ __('Note (Optional)') }}</label>
-                        <input type="text" name="keterangan" class="form-control rounded-3" placeholder="{{ __('e.g. Monthly transfer, rebalancing') }}">
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit"
+                            class="btn btn-primary rounded-pill px-4">{{ __('Transfer Now') }}</button>
                     </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ __('Transfer Now') }}</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-@push('scripts')
-<script src="{{ asset('vendors/jquery/jquery-3.6.0.min.js') }}"></script>
-<script src="{{ asset('vendors/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendors/datatables/dataTables.bootstrap5.min.js') }}"></script>
-<script src="{{ asset('js/dompet.js') }}?v={{ filemtime(public_path('js/dompet.js')) }}"></script>
-@endpush
+    @push('scripts')
+        <script src="{{ asset('vendors/jquery/jquery-3.6.0.min.js') }}"></script>
+        <script src="{{ asset('vendors/datatables/jquery.dataTables.min.js') }}"></script>
+        <script src="{{ asset('vendors/datatables/dataTables.bootstrap5.min.js') }}"></script>
+        <script src="{{ asset('js/dompet.js') }}?v={{ filemtime(public_path('js/dompet.js')) }}"></script>
+    @endpush
 
 @endsection
