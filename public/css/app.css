@@ -148,8 +148,17 @@ input[type="image"],
 
 /* Dark Mode Overrides */
 [data-bs-theme="dark"] body {
-    background-color: #121212;
+    background: var(--body-bg, #272727) !important;
+    background-color: var(--body-bg, #272727) !important;
+    background-image: none !important;
     color: #e0e0e0;
+}
+
+/* Ensure main content area is solid black in dark mode (no vignette/gradient) */
+[data-bs-theme="dark"] main {
+    background: var(--body-bg, #272727) !important;
+    background-color: var(--body-bg, #272727) !important;
+    background-image: none !important;
 }
 
 [data-bs-theme="dark"] .bg-white {
@@ -243,7 +252,6 @@ input[type="image"],
 /* Sidebar Dark Mode */
 [data-bs-theme="dark"] .sidebar {
     background-color: #1e1e1e;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
     border-right: 1px solid #333 !important;
 }
 
@@ -283,7 +291,7 @@ input[type="image"],
 /* Header Dark Mode */
 [data-bs-theme="dark"] .header {
     background-color: #1e1e1e;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
 }
 
 [data-bs-theme="dark"] .list-group-item {

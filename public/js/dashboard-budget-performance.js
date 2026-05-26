@@ -74,7 +74,7 @@
 
                 container.insertAdjacentHTML('beforeend', `
                     <div class="col">
-                        <div class="card h-100 border-0 shadow-sm" style="background: ${cardInnerBg}; border: 1px solid ${borderColor} !important; border-radius: 16px; transition: all 0.3s ease; overflow: hidden;">
+                        <div class="card h-100 border-0 shadow-sm" style="background: ${cardInnerBg}; border: 1px solid ${borderColor} !important; transition: all 0.3s ease; overflow: hidden;">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <h6 class="card-title mb-0 fw-bold text-truncate" style="font-size: 0.95rem; max-width: 150px; color: ${textColor};" title="${item.nama_anggaran}">${item.nama_anggaran}</h6>
@@ -118,7 +118,7 @@
                                 </div>
                                 ${breakdownHtml}
                                 <div class="mt-3 pt-3 text-end" style="border-top: 1px solid ${borderColor};">
-                                    <a href="/kalkulator/${item.hash}" class="btn btn-sm btn-primary rounded-pill px-3 py-1 shadow-sm" style="font-size: 0.75rem; font-weight: 600;">
+                                    <a href="/kalkulator/${item.hash}" class="btn btn-sm btn-primary px-3 py-1" style="font-size: 0.75rem; font-weight: 600;">
                                         ${config.labels.detail} <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </div>

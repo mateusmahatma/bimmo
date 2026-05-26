@@ -27,7 +27,7 @@
 
 /* DARK MODE SUPPORT */
 [data-bs-theme="dark"] .sidebar {
-    background-color: #1a1d20 !important;
+    background-color: #272727 !important;
     border-right-color: rgba(255, 255, 255, 0.05);
 }
 
@@ -72,7 +72,7 @@
 }
 
 [data-bs-theme="dark"] .sidebar-bottom {
-    background-color: #1a1d20;
+    background-color: #272727;
 }
 
 /* Offcanvas Sidebar Adjustments */
@@ -110,7 +110,6 @@
     /* slate-600 */
     padding: 10px 16px;
     margin: 4px 12px;
-    border-radius: 0;
     font-weight: 500;
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, padding 0.2s ease;
     display: flex;
