@@ -261,20 +261,20 @@
                 const row = document.createElement('tr');
                 row.className = 'net-worth-row';
                 row.innerHTML = `
-                    <td class="ps-4"><span class="fw-bold text-dark">${item.bulan}</span></td>
+                    <td class="ps-4"><span class="fw-bold text-body">${item.bulan}</span></td>
                     <td class="text-end">
-                        <button onclick="showNetWorthDetail(${index}, 'wealth')" class="btn btn-link text-success text-decoration-none fw-semibold p-0" style="font-size: 0.85rem;">
-                            Rp ${currencyFormatter.format(item.total_aset)}
+                        <button onclick="showNetWorthDetail(${index}, 'wealth')" class="btn btn-link text-success text-decoration-none fw-semibold p-0 net-worth-link" type="button">
+                            <span class="net-worth-amount">Rp ${currencyFormatter.format(item.total_aset)}</span>
                             <i class="bi bi-search ms-1 small opacity-50"></i>
                         </button>
                     </td>
                     <td class="text-end">
-                        <button onclick="showNetWorthDetail(${index}, 'debt')" class="btn btn-link text-danger text-decoration-none fw-semibold p-0" style="font-size: 0.85rem;">
-                            Rp ${currencyFormatter.format(item.total_hutang)}
+                        <button onclick="showNetWorthDetail(${index}, 'debt')" class="btn btn-link text-danger text-decoration-none fw-semibold p-0 net-worth-link" type="button">
+                            <span class="net-worth-amount">Rp ${currencyFormatter.format(item.total_hutang)}</span>
                             <i class="bi bi-search ms-1 small opacity-50"></i>
                         </button>
                     </td>
-                    <td class="text-end pe-4 fw-bold ${item.net_worth >= 0 ? 'text-primary' : 'text-danger'}" style="font-size: 0.85rem;">
+                    <td class="text-end pe-4 fw-bold ${item.net_worth >= 0 ? 'text-primary' : 'text-danger'}">
                         Rp ${currencyFormatter.format(item.net_worth)}
                     </td>
                 `;
@@ -336,7 +336,7 @@
                             <div class="${isDark ? 'bg-dark' : 'bg-light'} p-2 rounded-0 me-3 text-center ${item.className}" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi ${item.icon} fs-5"></i>
                             </div>
-                            <div class="fw-bold text-dark">${item.name}</div>
+                            <div class="fw-bold text-body">${item.name}</div>
                         </div>
                     </td>
                     <td><span class="badge ${isDark ? 'bg-dark text-light' : 'bg-light text-dark'} fw-normal border rounded-0">${item.type}</span></td>

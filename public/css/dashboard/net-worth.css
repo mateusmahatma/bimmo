@@ -10,6 +10,16 @@
     min-height: 380px;
 }
 
+.net-worth-table {
+    margin-top: 0;
+}
+
+@media (min-width: 1200px) {
+    .net-worth-chart {
+        min-height: 420px;
+    }
+}
+
 .net-worth-chart .apexcharts-datalabel,
 .net-worth-chart .apexcharts-data-labels text {
     fill: #0f172a !important;
@@ -61,7 +71,8 @@
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-.table > :not(caption) > * > * {
+.net-worth-table > :not(caption) > * > *,
+.net-worth-detail-list .table > :not(caption) > * > * {
     padding: 0.75rem 0.4rem;
 }
 
@@ -88,11 +99,84 @@
 
 .net-worth-table {
     font-size: 0.85rem;
+    table-layout: fixed;
 }
 
 .net-worth-table th {
     font-size: 0.75rem;
     letter-spacing: 0.5px;
+}
+
+.net-worth-table th,
+.net-worth-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.net-worth-table th:first-child,
+.net-worth-table td:first-child {
+    width: 28%;
+}
+
+.net-worth-table th:nth-child(2),
+.net-worth-table td:nth-child(2),
+.net-worth-table th:nth-child(3),
+.net-worth-table td:nth-child(3),
+.net-worth-table th:nth-child(4),
+.net-worth-table td:nth-child(4) {
+    width: 24%;
+}
+
+.net-worth-table .net-worth-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    line-height: 1.1;
+    max-width: 100%;
+    min-width: 0;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.net-worth-table .net-worth-amount {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.net-worth-table .net-worth-link:focus-visible {
+    outline: 2px solid rgba(13, 110, 253, 0.35);
+    outline-offset: 2px;
+}
+
+@media (max-width: 576px) {
+    .net-worth-table {
+        font-size: 0.8rem;
+    }
+
+    .net-worth-table th,
+    .net-worth-table td {
+        padding: 0.6rem 0.35rem;
+    }
+
+    .net-worth-table th:first-child,
+    .net-worth-table td:first-child {
+        width: 34%;
+    }
+
+    .net-worth-table th:nth-child(2),
+    .net-worth-table td:nth-child(2),
+    .net-worth-table th:nth-child(3),
+    .net-worth-table td:nth-child(3),
+    .net-worth-table th:nth-child(4),
+    .net-worth-table td:nth-child(4) {
+        width: 22%;
+    }
+
+    .net-worth-table .net-worth-link i {
+        display: none;
+    }
 }
 
 .modal-lg {
