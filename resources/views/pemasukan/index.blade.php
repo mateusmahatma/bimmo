@@ -143,7 +143,7 @@
                                 {{ __('Manage your income classification and sources efficiently.') }}</p>
                         </div>
                         <div class="d-flex gap-2">
-                            <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none rounded-pill"
+                            <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none"
                                 style="padding: 2px 10px; font-size: 0.75rem;">
                                 <i class="bi bi-trash me-1"></i> {{ __('Delete Selected') }} (<span
                                     id="countSelected">0</span>)
@@ -160,10 +160,9 @@
                         <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
                             <div class="search-bar" style="min-width: 200px;">
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i
+                                    <span class="input-group-text bg-light ps-3"><i
                                             class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="searchPemasukan"
-                                        class="form-control bg-light border-start-0 rounded-end-pill"
+                                    <input type="text" id="searchPemasukan" class="form-control bg-light border-start-0"
                                         placeholder="{{ __('Search categories...') }}"
                                         style="box-shadow: none; font-size: 0.8rem;">
                                 </div>
