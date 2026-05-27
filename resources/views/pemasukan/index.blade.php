@@ -135,7 +135,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                        <div>
+                        <div class="card-body">
                             <h5 class="card-title mb-0 fw-bold text-dark"
                                 style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('List of Income Categories') }}
                             </h5>
