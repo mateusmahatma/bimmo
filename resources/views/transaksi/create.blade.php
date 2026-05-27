@@ -87,7 +87,7 @@
                                     <button type="button" class="btn btn-outline-danger" id="modeExpense">
                                         <i class="bi bi-arrow-up-circle me-2"></i>{{ __('Expense') }}
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary" id="modeBoth">
+                                    <button type="button" class="btn btn-outline-warning" id="modeBoth">
                                         <i class="bi bi-arrows-collapse me-2"></i>{{ __('Both') }}
                                     </button>
                                 </div>
