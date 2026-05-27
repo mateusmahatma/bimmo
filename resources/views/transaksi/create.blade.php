@@ -81,10 +81,10 @@
                                     class="form-label fw-bold small text-uppercase text-muted m-0">{{ __('Transaction Type') }}</label>
                                 <div class="btn-group transaksi-type-toggle__group" role="group"
                                     aria-label="{{ __('Transaction Type') }}">
-                                    <button type="button" class="btn btn-outline-secondary" id="modeIncome">
+                                    <button type="button" class="btn btn-outline-success" id="modeIncome">
                                         <i class="bi bi-arrow-down-circle me-2"></i>{{ __('Income') }}
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" id="modeExpense">
+                                    <button type="button" class="btn btn-outline-danger" id="modeExpense">
                                         <i class="bi bi-arrow-up-circle me-2"></i>{{ __('Expense') }}
                                     </button>
                                     <button type="button" class="btn btn-outline-secondary" id="modeBoth">
