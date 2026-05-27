@@ -5,8 +5,6 @@
 @section('container')
     @push('css')
         <link href="{{ asset('css/tom-select.bootstrap5.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/transaksi-create.css') }}?v={{ filemtime(public_path('css/transaksi-create.css')) }}"
-            rel="stylesheet">
     @endpush
 
     <div class="pagetitle mb-4">
@@ -239,7 +237,7 @@
                         </div> --}}
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary shadow-sm">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-2"></i> {{ __('Save Transaction') }}
                             </button>
                         </div>

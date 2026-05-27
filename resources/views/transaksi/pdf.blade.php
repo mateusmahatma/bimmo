@@ -103,9 +103,9 @@
         </p>
 
         <div style="margin-bottom: 20px; font-size: 12px;">
-            <strong>Total Pemasukan:</strong> Rp {{ number_format((float)($totalPemasukan ?? 0), 0, ',', '.') }} |
-            <strong>Total Pengeluaran:</strong> Rp {{ number_format((float)($totalPengeluaran ?? 0), 0, ',', '.') }} |
-            <strong>Saldo Bersih:</strong> Rp {{ number_format((float)($netIncome ?? 0), 0, ',', '.') }}
+            <strong>Total Pemasukan:</strong> Rp {{ number_format((float) ($totalPemasukan ?? 0), 0, ',', '.') }} |
+            <strong>Total Pengeluaran:</strong> Rp {{ number_format((float) ($totalPengeluaran ?? 0), 0, ',', '.') }} |
+            <strong>Saldo Bersih:</strong> Rp {{ number_format((float) ($netIncome ?? 0), 0, ',', '.') }}
         </div>
     </center>
 
@@ -124,41 +124,45 @@
         <tbody>
             @php $no = 1 @endphp
             @foreach ($transaksi as $trans)
-            <tr>
-                <td>{{ $no++ }}</td>
-                <td>{{ \Carbon\Carbon::parse($trans->tgl_transaksi)->locale('id')->isoFormat('dddd, D MMMM Y') }}</td>
-                <td>{{ $trans->pemasukanRelation->nama ?? '-' }}</td>
-                <td>{{ number_format((float)$trans->nominal_pemasukan, 0, ',', '.') }}</td>
-                <td>{{ $trans->pengeluaranRelation->nama ?? '-' }}</td>
-                <td>{{ number_format((float)$trans->nominal, 0, ',', '.') }}</td>
-                <td>
-                    @if($trans->keterangan)
-                        @php
-                            $lines = array_filter(preg_split('/\r\n|\r|\n/', $trans->keterangan), function ($l) {
-                                return trim($l) !== '';
-                            });
-                        @endphp
-                        @if(count($lines) > 1)
-                            <table style="width: 100%; border: none; border-collapse: collapse; margin: 0; padding: 0;">
-                                @foreach($lines as $line)
-                                    <tr>
-                                        <td style="width: 15px; border: none; padding: 0 4px 2px 0; vertical-align: top; font-weight: bold; color: #666; font-size: 9px;">
-                                            {{ $loop->iteration }}.
-                                        </td>
-                                        <td style="border: none; padding: 0 0 2px 0; vertical-align: top; font-size: 10px;">
-                                            {{ trim($line) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </table>
+                <tr>
+                    <td>{{ $no++ }}</td>
+                    <td>{{ \Carbon\Carbon::parse($trans->tgl_transaksi)->locale('id')->isoFormat('dddd, D MMMM Y') }}
+                    </td>
+                    <td>{{ $trans->pemasukanRelation->nama ?? '-' }}</td>
+                    <td>{{ number_format((float) $trans->nominal_pemasukan, 0, ',', '.') }}</td>
+                    <td>{{ $trans->pengeluaranRelation->nama ?? '-' }}</td>
+                    <td>{{ number_format((float) $trans->nominal, 0, ',', '.') }}</td>
+                    <td>
+                        @if ($trans->keterangan)
+                            @php
+                                $lines = array_filter(preg_split('/\r\n|\r|\n/', $trans->keterangan), function ($l) {
+                                    return trim($l) !== '';
+                                });
+                            @endphp
+                            @if (count($lines) > 1)
+                                <table
+                                    style="width: 100%; border: none; border-collapse: collapse; margin: 0; padding: 0;">
+                                    @foreach ($lines as $line)
+                                        <tr>
+                                            <td
+                                                style="width: 15px; border: none; padding: 0 4px 2px 0; vertical-align: top; font-weight: bold; color: #666; font-size: 9px;">
+                                                {{ $loop->iteration }}.
+                                            </td>
+                                            <td
+                                                style="border: none; padding: 0 0 2px 0; vertical-align: top; font-size: 10px;">
+                                                {{ trim($line) }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            @else
+                                {{ $trans->keterangan }}
+                            @endif
                         @else
-                            {{ $trans->keterangan }}
+                            -
                         @endif
-                    @else
-                        -
-                    @endif
-                </td>
-            </tr>
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
