@@ -125,7 +125,7 @@
             {{-- Periode Expense --}}
             <div class="col-12 mb-3">
                 <div class="card">
-                    <div class="card-body py-3">
+                    <div class="card-body">
                         <div class="d-flex flex-column align-items-start text-start">
                             <h6 class="fw-bold text-dark text-uppercase mb-1 transaksi-period-heading">
                                 {{ __('Period Expense') }}
