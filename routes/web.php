@@ -171,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
         // Periode Anggaran (halaman utama /anggaran)
         Route::get('/', [PeriodeAnggaranController::class, 'index'])->name('anggaran.index');
         Route::post('/', [PeriodeAnggaranController::class, 'store'])->name('anggaran.store');
+        Route::post('/copy', [PeriodeAnggaranController::class, 'copy'])->name('anggaran.copy');
         Route::delete('/{periode}', [PeriodeAnggaranController::class, 'destroy'])->name('anggaran.destroy');
 
         // Detail Periode (kelola kategori anggaran per-periode)
