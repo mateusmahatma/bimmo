@@ -142,7 +142,7 @@
                             <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">
                                 {{ __('Manage your expense classification and types efficiently.') }}</p>
                         </div>
-                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <div class="d-flex gap-2">
                             <div class="search-container position-relative">
                                 <i
                                     class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
