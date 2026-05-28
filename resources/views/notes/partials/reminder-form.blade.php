@@ -11,7 +11,7 @@
             <button class="btn btn-secondary btn-sm px-3 d-none" id="cancelEditBtn" type="button">
                 <i class="bi bi-x-circle me-1"></i>{{ __('Cancel') }}
             </button>
-            <button class="btn btn-success btn-sm px-4 d-flex align-items-center gap-2" id="addNewNoteBtn"
+            <button class="btn btn-primary btn-sm px-4 d-flex align-items-center gap-2" id="addNewNoteBtn"
                 type="button">
                 <i class="bi bi-plus-lg"></i>
                 <span class="fw-bold" id="btnNoteText">{{ __('Add Data') }}</span>
