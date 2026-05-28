@@ -3,435 +3,463 @@
 @section('title', __('Loan List'))
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<style>
-    /* Header Enhancements */
-    .pagetitle {
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 0.75rem;
-    }
-
-    .pagetitle h1 {
-        font-size: 1.75rem;
-        letter-spacing: -0.03em;
-        color: #2d3436;
-    }
-
-    .breadcrumb {
-        font-size: 0.85rem;
-    }
-
-    .breadcrumb-item a {
-        color: #636e72;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-
-    .breadcrumb-item a:hover {
-        color: #0984e3;
-    }
-
-    .breadcrumb-item.active {
-        color: #0984e3;
-        font-weight: 600;
-    }
-
-    .breadcrumb-item+.breadcrumb-item::before {
-        content: "\F285";
-        /* bi-chevron-right */
-        font-family: "bootstrap-icons";
-        font-size: 0.65rem;
-        color: #b2bec3;
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-    }
-
-    [data-bs-theme="dark"] .pagetitle {
-        border-bottom: 1px solid #2d2d2d;
-    }
-
-    [data-bs-theme="dark"] .pagetitle h1 {
-        color: #e0e0e0;
-    }
-
-    [data-bs-theme="dark"] .breadcrumb-item a {
-        color: #a0a0a0;
-    }
-
-    [data-bs-theme="dark"] .breadcrumb-item.active {
-        color: #60a5fa;
-    }
-
-    /* PWA & Premium Enhancements (White Theme) */
-    .card-dashboard {
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        background: #ffffff;
-        color: #2d3436;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: none !important;
-    }
-
-    .card-icon {
-        transition: none !important;
-    }
-
-    .fab-add {
-        position: fixed;
-        bottom: 2rem;
-        right: 1.5rem;
-        z-index: 1040;
-        width: 60px;
-        height: 60px;
-        display: none;
-        /* Desktop hidden */
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 16px rgba(13, 110, 253, 0.4);
-        transition: none !important;
-    }
-
-    @media (max-width: 767.98px) {
-        .fab-add {
-            display: flex;
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <style>
+        /* Header Enhancements */
+        .pagetitle {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 0.75rem;
         }
 
-        .btn-add-desktop {
-            display: none;
+        .pagetitle h1 {
+            font-size: 1.75rem;
+            letter-spacing: -0.03em;
+            color: #2d3436;
         }
 
-        #pinjamanTable,
-        #pinjamanTable thead,
-        #pinjamanTable tbody,
-        #pinjamanTable th,
-        #pinjamanTable td,
-        #pinjamanTable tr {
-            display: block;
+        .breadcrumb {
+            font-size: 0.85rem;
         }
 
-        /* Hide table headers */
-        #pinjamanTable thead tr {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
+        .breadcrumb-item a {
+            color: #636e72;
+            text-decoration: none;
+            transition: color 0.2s;
         }
 
-        #pinjamanTable tr {
-            border: 0;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            background-color: #fff;
-            padding: 15px;
+        .breadcrumb-item a:hover {
+            color: #0984e3;
+        }
+
+        .breadcrumb-item.active {
+            color: #0984e3;
+            font-weight: 600;
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            content: "\F285";
+            /* bi-chevron-right */
+            font-family: "bootstrap-icons";
+            font-size: 0.65rem;
+            color: #b2bec3;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        [data-bs-theme="dark"] .pagetitle {
+            border-bottom: 1px solid #2d2d2d;
+        }
+
+        [data-bs-theme="dark"] .pagetitle h1 {
+            color: #e0e0e0;
+        }
+
+        [data-bs-theme="dark"] .breadcrumb-item a {
+            color: #a0a0a0;
+        }
+
+        [data-bs-theme="dark"] .breadcrumb-item.active {
+            color: #60a5fa;
+        }
+
+        /* PWA & Premium Enhancements (White Theme) */
+        .card-dashboard {
             border: 1px solid rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            color: #2d3436;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: none !important;
         }
 
-        #pinjamanTable td {
-            border: none;
-            border-bottom: 1px solid #f8f9fa;
-            position: relative;
-            padding-left: 45%;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            text-align: right;
-            white-space: normal;
-            min-height: 3.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+        .card-icon {
+            transition: none !important;
+        }
+
+        .fab-add {
+            position: fixed;
+            bottom: 2rem;
+            right: 1.5rem;
+            z-index: 1040;
+            width: 60px;
+            height: 60px;
+            display: none;
+            /* Desktop hidden */
+            align-items: center;
             justify-content: center;
+            box-shadow: 0 8px 16px rgba(13, 110, 253, 0.4);
+            transition: none !important;
         }
 
-        #pinjamanTable td .badge {
-            white-space: normal !important;
-            text-align: right;
-            max-width: 100%;
+        @media (max-width: 767.98px) {
+            .fab-add {
+                display: flex;
+            }
+
+            .btn-add-desktop {
+                display: none;
+            }
+
+            #pinjamanTable,
+            #pinjamanTable thead,
+            #pinjamanTable tbody,
+            #pinjamanTable th,
+            #pinjamanTable td,
+            #pinjamanTable tr {
+                display: block;
+            }
+
+            /* Hide table headers */
+            #pinjamanTable thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            #pinjamanTable tr {
+                border: 0;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                background-color: #fff;
+                padding: 15px;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            #pinjamanTable td {
+                border: none;
+                border-bottom: 1px solid #f8f9fa;
+                position: relative;
+                padding-left: 45%;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                text-align: right;
+                white-space: normal;
+                min-height: 3.5rem;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: center;
+            }
+
+            #pinjamanTable td .badge {
+                white-space: normal !important;
+                text-align: right;
+                max-width: 100%;
+            }
+
+            #pinjamanTable td:last-child {
+                padding-left: 10px;
+                text-align: center;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                gap: 10px;
+                border-bottom: 0;
+                margin-top: 5px;
+            }
+
+            #pinjamanTable td:before {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 15px;
+                width: 40%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #6c757d;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                content: attr(data-label);
+            }
+
+            #pinjamanTable td:last-child:before {
+                display: none;
+            }
+
+            #pinjamanTable td[data-label="No"] {
+                display: none;
+            }
         }
 
-        #pinjamanTable td:last-child {
-            padding-left: 10px;
-            text-align: center;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            gap: 10px;
-            border-bottom: 0;
-            margin-top: 5px;
+        [data-bs-theme="dark"] .card-dashboard {
+            background-color: #1a1a1a;
+            border-color: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
         }
 
-        #pinjamanTable td:before {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 15px;
-            width: 40%;
-            padding-right: 10px;
-            white-space: nowrap;
-            text-align: left;
-            font-weight: bold;
-            color: #6c757d;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            content: attr(data-label);
+        [data-bs-theme="dark"] #pinjamanTable tr {
+            background-color: #1a1a1a;
+            border-color: rgba(255, 255, 255, 0.05);
         }
 
-        #pinjamanTable td:last-child:before {
-            display: none;
+        .rich-text-index p {
+            margin-bottom: 0.25rem;
         }
 
-        #pinjamanTable td[data-label="No"] {
-            display: none;
+        .loan-progress-wrap {
+            width: 92px;
+            max-width: 120px;
         }
-    }
 
-    [data-bs-theme="dark"] .card-dashboard {
-        background-color: #1a1a1a;
-        border-color: rgba(255, 255, 255, 0.05);
-        color: #e0e0e0;
-    }
+        .loan-progress {
+            height: 6px;
+            border-radius: 999px;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
 
-    [data-bs-theme="dark"] #pinjamanTable tr {
-        background-color: #1a1a1a;
-        border-color: rgba(255, 255, 255, 0.05);
-    }
+        .loan-progress .progress-bar {
+            border-radius: 999px;
+        }
 
-    .rich-text-index p {
-        margin-bottom: 0.25rem;
-    }
+        [data-bs-theme="dark"] .loan-progress {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
 
-    .loan-progress-wrap {
-        width: 92px;
-        max-width: 120px;
-    }
+        /* Readability / Contrast tweaks (scoped) */
+        .pinjaman-page {
+            color: #1f2937;
+            /* slate-800 */
+        }
 
-    .loan-progress {
-        height: 6px;
-        border-radius: 999px;
-        background-color: rgba(0, 0, 0, 0.08);
-    }
+        .pinjaman-page .text-muted {
+            color: #4b5563 !important;
+            /* slate-600 */
+        }
 
-    .loan-progress .progress-bar {
-        border-radius: 999px;
-    }
+        .pinjaman-page .text-secondary {
+            color: #374151 !important;
+            /* slate-700 */
+        }
 
-    [data-bs-theme="dark"] .loan-progress {
-        background-color: rgba(255, 255, 255, 0.12);
-    }
+        .pinjaman-page #pinjamanTable td:before {
+            color: #374151;
+            /* slate-700 */
+        }
 
-    /* Readability / Contrast tweaks (scoped) */
-    .pinjaman-page {
-        color: #1f2937; /* slate-800 */
-    }
+        [data-bs-theme="dark"] .pinjaman-page {
+            color: rgba(255, 255, 255, 0.88);
+        }
 
-    .pinjaman-page .text-muted {
-        color: #4b5563 !important; /* slate-600 */
-    }
+        [data-bs-theme="dark"] .pinjaman-page .text-muted {
+            color: rgba(255, 255, 255, 0.72) !important;
+        }
 
-    .pinjaman-page .text-secondary {
-        color: #374151 !important; /* slate-700 */
-    }
+        [data-bs-theme="dark"] .pinjaman-page .text-secondary {
+            color: rgba(255, 255, 255, 0.78) !important;
+        }
 
-    .pinjaman-page #pinjamanTable td:before {
-        color: #374151; /* slate-700 */
-    }
-
-    [data-bs-theme="dark"] .pinjaman-page {
-        color: rgba(255, 255, 255, 0.88);
-    }
-
-    [data-bs-theme="dark"] .pinjaman-page .text-muted {
-        color: rgba(255, 255, 255, 0.72) !important;
-    }
-
-    [data-bs-theme="dark"] .pinjaman-page .text-secondary {
-        color: rgba(255, 255, 255, 0.78) !important;
-    }
-
-    .rich-text-index ul,
-    .rich-text-index ol {
-        margin-bottom: 0.25rem;
-        padding-left: 1.25rem;
-    }
-</style>
+        .rich-text-index ul,
+        .rich-text-index ol {
+            margin-bottom: 0.25rem;
+            padding-left: 1.25rem;
+        }
+    </style>
 @endpush
 
 @section('container')
 
-<div class="pagetitle mb-4">
-    <h1 class="fw-bold mb-1">{{ __('Loan List') }}</h1>
-    <nav>
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-            <li class="breadcrumb-item active">{{ __('Loans') }}</li>
-        </ol>
-    </nav>
-</div>
+    <div class="pagetitle mb-4">
+        <h1 class="fw-bold mb-1">{{ __('Loan List') }}</h1>
+        <nav>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item active">{{ __('Loans') }}</li>
+            </ol>
+        </nav>
+    </div>
 
-<section class="section dashboard pinjaman-page">
-    <div class="row">
-        <!-- Summary Cards -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
-                <div class="card-body py-4">
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light text-primary me-3" style="width: 48px; height: 48px; background: rgba(13, 110, 253, 0.1);">
-                            <i class="bi bi-bank fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Loan') }}</h6>
-                            <h4 class="mb-0 fw-bold text-primary" id="statTotalOriginal">Rp {{ number_format($totalOriginal, 0, ',', '.') }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
-                <div class="card-body py-4">
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light text-success me-3" style="width: 48px; height: 48px; background: rgba(25, 135, 84, 0.1);">
-                            <i class="bi bi-check-circle fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Paid') }}</h6>
-                            <h4 class="mb-0 fw-bold text-success" id="statTotalPaid">Rp {{ number_format($totalPaid, 0, ',', '.') }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
-                <div class="card-body py-4">
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light text-danger me-3" style="width: 48px; height: 48px; background: rgba(220, 53, 69, 0.1);">
-                            <i class="bi bi-exclamation-circle fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Remaining Balance') }}</h6>
-                            <h4 class="mb-0 fw-bold text-danger" id="totalPinjaman">Rp {{ number_format($totalRemaining, 0, ',', '.') }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-dashboard h-100 d-flex flex-column justify-content-center">
-                <div class="card-body py-4">
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning-light text-warning me-3" style="width: 48px; height: 48px; background: rgba(255, 193, 7, 0.1);">
-                            <i class="bi bi-calendar-event fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Next Installment') }}</h6>
-                            <h4 class="mb-0 fw-bold text-warning" id="statNextInstallment">Rp {{ number_format($totalNextMonthInstallment, 0, ',', '.') }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Card -->
-        <div class="col-12">
-            <div class="card card-dashboard border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title mb-0 fw-bold text-dark" style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Loan List') }}</h5>
-                        <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">{{ __('Manage and track your Loan records.') }}</p>
-                    </div>
-                    <div class="d-flex gap-2 align-items-center">
-                        <button class="btn btn-light btn-sm  px-3 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
-                            <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
-                        </button>
-                        <div class="vr mx-1 d-none d-lg-block"></div>
-                        <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none " style="padding: 2px 10px; font-size: 0.75rem;">
-                            <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
-                        </button>
-                        <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm shadow-sm btn-add-desktop" style="padding: 2px 10px; font-size: 0.75rem;">
-                            <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Loan') }}
-                        </a>
-                    </div>
-                </div>
-
-                <div class="collapse" id="instructionsCollapse">
-                    <div class="card-body bg-light border-bottom">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
-                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-wallet2 me-2"></i>{{ __('How to Pay Loan:') }}</h6>
-                                    <ol class="mb-0 ps-3 small">
-                                        <li>{{ __('Find the Loan you want to pay in the list below.') }}</li>
-                                        <li>{{ __('Click the Blue Eye Icon') }} (<strong><i class="bi bi-eye"></i></strong>) {{ __('to view details.') }}</li>
-                                        <li>{{ __('Click the Pay Loan button at the top right of the history section.') }}</li>
-                                        <li>{{ __('Enter the amount, date, and optionally upload proof.') }}</li>
-                                    </ol>
-                                </div>
+    <section class="section dashboard pinjaman-page">
+        <div class="row">
+            {{-- Total Loan --}}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 d-flex flex-column justify-content-center">
+                    <div class="card-body py-4">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light text-primary me-3"
+                                style="width: 48px; height: 48px; background: rgba(13, 110, 253, 0.1);">
+                                <i class="bi bi-bank fs-3"></i>
                             </div>
-                            <div class="col-md-6">
-                                <div class="alert alert-success border-0 bg-white shadow-sm mb-0 text-dark">
-                                    <h6 class="fw-bold mb-2 small text-uppercase"><i class="bi bi-upload me-2"></i>{{ __('How to Upload Proof:') }}</h6>
-                                    <ol class="mb-0 ps-3 small">
-                                        <li>{{ __('You can upload proof while making a payment.') }}</li>
-                                        <li>{{ __('To add/update proof later, go to Details view.') }}</li>
-                                        <li>{{ __('In the History table, click the Pencil Icon') }} (<strong><i class="bi bi-pencil"></i></strong>) {{ __('on a payment row.') }}</li>
-                                        <li>{{ __('Choose your file (JPG, PNG, PDF) and save.') }}</li>
-                                    </ol>
-                                </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Loan') }}</h6>
+                                <h4 class="mb-0 fw-bold text-primary" id="statTotalOriginal">Rp
+                                    {{ number_format($totalOriginal, 0, ',', '.') }}</h4>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card-body">
-
-                    <!-- Toolbar -->
-                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 pt-4">
-                        <div class="d-flex gap-2 align-items-center flex-grow-1">
-                            <div class="search-bar" style="min-width: 250px;">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" id="searchPinjaman" class="form-control bg-light border-start-0 border-end-0 ps-1 shadow-none" placeholder="{{ __('Search by name...') }}" style="font-size: 0.8rem;">
-                                    <select class="form-select bg-light border-start-1 rounded-end-pill shadow-none" id="filter_status" style="max-width: 100px; font-size: 0.8rem;">
-                                        <option value="">{{ __('All Status') }}</option>
-                                        <option value="belum_lunas">{{ __('Unpaid') }}</option>
-                                        <option value="lunas">{{ __('Paid') }}</option>
-                                    </select>
-                                </div>
+            {{-- Total Paid --}}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 d-flex flex-column justify-content-center">
+                    <div class="card-body py-4">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light text-success me-3"
+                                style="width: 48px; height: 48px; background: rgba(25, 135, 84, 0.1);">
+                                <i class="bi bi-check-circle fs-3"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Total Paid') }}</h6>
+                                <h4 class="mb-0 fw-bold text-success" id="statTotalPaid">Rp
+                                    {{ number_format($totalPaid, 0, ',', '.') }}</h4>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel" class="btn btn-outline-success btn-sm  d-flex align-items-center gap-2 no-loader" style="padding: 2px 10px; font-size: 0.75rem;">
-                                <i class="bi bi-file-earmark-excel"></i> {{ __('Export Excel') }}
+            {{-- Remaining Balance --}}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 d-flex flex-column justify-content-center">
+                    <div class="card-body py-4">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light text-danger me-3"
+                                style="width: 48px; height: 48px; background: rgba(220, 53, 69, 0.1);">
+                                <i class="bi bi-exclamation-circle fs-3"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Remaining Balance') }}</h6>
+                                <h4 class="mb-0 fw-bold medium text-danger" id="totalPinjaman">Rp
+                                    {{ number_format($totalRemaining, 0, ',', '.') }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Next Installment --}}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card h-100 d-flex flex-column justify-content-center">
+                    <div class="card-body py-4">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning-light text-warning me-3"
+                                style="width: 48px; height: 48px; background: rgba(255, 193, 7, 0.1);">
+                                <i class="bi bi-calendar-event fs-3"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted small text-uppercase mb-1 fw-bold">{{ __('Next Installment') }}</h6>
+                                <h4 class="mb-0 fw-bold medium text-warning" id="statNextInstallment">Rp
+                                    {{ number_format($totalNextMonthInstallment, 0, ',', '.') }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Table --}}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0 fw-bold text-dark"
+                                style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Loan List') }}</h5>
+                            <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">
+                                {{ __('Manage and track your Loan records.') }}</p>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <button class="btn btn-info btn-sm  px-3" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#instructionsCollapse" aria-expanded="false"
+                                aria-controls="instructionsCollapse">
+                                <i class="bi bi-info-circle me-1"></i> {{ __('Instructions') }}
+                            </button>
+                            <div class="vr mx-1 d-none d-lg-block"></div>
+                            <button id="btnBulkDelete" class="btn btn-outline-danger btn-sm d-none ">
+                                <i class="bi bi-trash me-1"></i> {{ __('Delete') }} (<span id="countSelected">0</span>)
+                            </button>
+                            <a href="{{ route('pinjaman.create') }}" class="btn btn-primary btn-sm btn-add-desktop">
+                                <i class="bi bi-plus-lg me-1"></i> {{ __('Add New Loan') }}
                             </a>
                         </div>
                     </div>
 
-                    {{-- Standarized with Toast --}}
-
-
-                    <div id="pinjaman-table-container">
-                        @include('pinjaman._table_list')
+                    <div class="collapse" id="instructionsCollapse">
+                        <div class="card-body bg-light border-bottom">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="alert alert-info border-0 bg-white shadow-sm mb-0 text-dark">
+                                        <h6 class="fw-bold mb-2 small text-uppercase"><i
+                                                class="bi bi-wallet2 me-2"></i>{{ __('How to Pay Loan:') }}</h6>
+                                        <ol class="mb-0 ps-3 small">
+                                            <li>{{ __('Find the Loan you want to pay in the list below.') }}</li>
+                                            <li>{{ __('Click the Blue Eye Icon') }} (<strong><i
+                                                        class="bi bi-eye"></i></strong>) {{ __('to view details.') }}</li>
+                                            <li>{{ __('Click the Pay Loan button at the top right of the history section.') }}
+                                            </li>
+                                            <li>{{ __('Enter the amount, date, and optionally upload proof.') }}</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-success border-0 bg-white shadow-sm mb-0 text-dark">
+                                        <h6 class="fw-bold mb-2 small text-uppercase"><i
+                                                class="bi bi-upload me-2"></i>{{ __('How to Upload Proof:') }}</h6>
+                                        <ol class="mb-0 ps-3 small">
+                                            <li>{{ __('You can upload proof while making a payment.') }}</li>
+                                            <li>{{ __('To add/update proof later, go to Details view.') }}</li>
+                                            <li>{{ __('In the History table, click the Pencil Icon') }} (<strong><i
+                                                        class="bi bi-pencil"></i></strong>) {{ __('on a payment row.') }}
+                                            </li>
+                                            <li>{{ __('Choose your file (JPG, PNG, PDF) and save.') }}</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
+                    <div class="card-body">
+
+                        <!-- Toolbar -->
+                        <div
+                            class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 pt-4">
+                            <div class="d-flex gap-2 align-items-center flex-grow-1">
+                                <div class="search-bar" style="min-width: 250px;">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3"><i
+                                                class="bi bi-search text-muted"></i></span>
+                                        <input type="text" id="searchPinjaman"
+                                            class="form-control bg-light border-start-0 border-end-0 ps-1 shadow-none"
+                                            placeholder="{{ __('Search by name...') }}" style="font-size: 0.8rem;">
+                                        <select class="form-select bg-light border-start-1 rounded-end-pill shadow-none"
+                                            id="filter_status" style="max-width: 100px; font-size: 0.8rem;">
+                                            <option value="">{{ __('All Status') }}</option>
+                                            <option value="belum_lunas">{{ __('Unpaid') }}</option>
+                                            <option value="lunas">{{ __('Paid') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('pinjaman.export.excel') }}" id="btnExportExcel"
+                                    class="btn btn-outline-success btn-sm  d-flex align-items-center gap-2 no-loader">
+                                    <i class="bi bi-file-earmark-excel"></i> {{ __('Export Excel') }}
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="pinjaman-table-container">
+                            @include('pinjaman._table_list')
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Include Modals -->
-@include('modal.pinjaman.index')
+    <!-- Include Modals -->
+    @include('modal.pinjaman.index')
 
-<!-- Floating Action Button for Mobile -->
-<a href="{{ route('pinjaman.create') }}" class="btn btn-primary fab-add" title="{{ __('Add New Loan') }}">
-    <i class="bi bi-plus-lg fs-2"></i>
-</a>
+    <!-- Floating Action Button for Mobile -->
+    <a href="{{ route('pinjaman.create') }}" class="btn btn-primary fab-add" title="{{ __('Add New Loan') }}">
+        <i class="bi bi-plus-lg fs-2"></i>
+    </a>
 
-@push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
-@endpush
+    @push('scripts')
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ asset('js/pinjaman.js') }}?v={{ filemtime(public_path('js/pinjaman.js')) }}"></script>
+    @endpush
 @endsection
