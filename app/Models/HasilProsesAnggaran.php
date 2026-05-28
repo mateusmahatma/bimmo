@@ -74,18 +74,19 @@ class HasilProsesAnggaran extends Model
 
     public function calculateBurnRate()
     {
-        $startDate  = \Carbon\Carbon::parse($this->tanggal_mulai)->startOfDay();
-        $endDate    = \Carbon\Carbon::parse($this->tanggal_selesai)->endOfDay();
-        $today      = \Carbon\Carbon::now()->startOfDay();
+        $startDate = \Carbon\Carbon::parse($this->tanggal_mulai)->startOfDay();
+        $endDate = \Carbon\Carbon::parse($this->tanggal_selesai)->endOfDay();
+        $today = \Carbon\Carbon::now()->startOfDay();
 
         // Only compute when the period has started
         if ($today->lt($startDate)) {
             return null;
         }
 
-        $totalDays     = (int) $startDate->diffInDays($endDate) + 1;
-        $daysElapsed   = (int) $startDate->diffInDays($today->min($endDate)) + 1;
-        $daysRemaining = max(0, (int) $today->diffInDays($endDate));
+        $effectiveToday = $today->copy()->min($endDate);
+        $totalDays = (int) $startDate->diffInDays($endDate) + 1;
+        $daysElapsed = (int) $startDate->diffInDays($effectiveToday) + 1;
+        $daysRemaining = max(0, (int) $today->diffInDays($endDate, false));
 
         $totalSpent    = (float) $this->anggaran_yang_digunakan;
         $totalBudget   = (float) $this->nominal_anggaran;

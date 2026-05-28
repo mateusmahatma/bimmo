@@ -253,9 +253,13 @@ class DashboardController extends Controller
     {
         $query = HasilProsesAnggaran::where('id_user', Auth::id());
 
-        if ($request->filter) {
-            [$mulai, $selesai] = explode('_', $request->filter);
-            $query->where('tanggal_mulai', $mulai)->where('tanggal_selesai', $selesai);
+        if ($request->filled('filter')) {
+            [$mulai, $selesai] = array_pad(explode('_', (string) $request->query('filter'), 2), 2, null);
+
+            if ($mulai && $selesai) {
+                $query->whereDate('tanggal_mulai', Carbon::parse($mulai)->toDateString())
+                    ->whereDate('tanggal_selesai', Carbon::parse($selesai)->toDateString());
+            }
         }
 
         $anggarans = $query->get()->map(function ($a) {
@@ -269,8 +273,10 @@ class DashboardController extends Controller
 
             if (is_array($jenisPengeluaran) && !empty($jenisPengeluaran)) {
                 $totalNominal = (float) $a->nominal_anggaran;
+                $rangeStart = Carbon::parse($a->tanggal_mulai)->startOfDay();
+                $rangeEnd = Carbon::parse($a->tanggal_selesai)->endOfDay();
                 $allTrxInRange = Transaksi::where('id_user', Auth::id())
-                    ->whereBetween('tgl_transaksi', [$a->tanggal_mulai, $a->tanggal_selesai])
+                    ->whereBetween('tgl_transaksi', [$rangeStart, $rangeEnd])
                     ->get();
                 $categoryNames = \App\Models\Pengeluaran::whereIn('id', $jenisPengeluaran)->pluck('nama', 'id');
 
@@ -340,8 +346,10 @@ class DashboardController extends Controller
                     $idPemasukans = json_decode((string) $idPemasukans, true) ?? [$idPemasukans];
                 }
 
+                $rangeStart = Carbon::parse($prosesAnggaran->tanggal_mulai)->startOfDay();
+                $rangeEnd = Carbon::parse($prosesAnggaran->tanggal_selesai)->endOfDay();
                 $allIncomesInRange = Transaksi::where('id_user', $userId)
-                    ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                    ->whereBetween('tgl_transaksi', [$rangeStart, $rangeEnd])
                     ->get();
 
                 $totalIncome = $allIncomesInRange
@@ -368,7 +376,10 @@ class DashboardController extends Controller
             }
 
             $allTrxInRange = Transaksi::where('id_user', $userId)
-                ->whereBetween('tgl_transaksi', [$prosesAnggaran->tanggal_mulai, $prosesAnggaran->tanggal_selesai])
+                ->whereBetween('tgl_transaksi', [
+                    Carbon::parse($prosesAnggaran->tanggal_mulai)->startOfDay(),
+                    Carbon::parse($prosesAnggaran->tanggal_selesai)->endOfDay(),
+                ])
                 ->get();
 
             $totalTransaksi = $allTrxInRange

@@ -18,8 +18,11 @@
             <select id="filterTanggal" class="form-select form-select-sm rounded-0" style="width: 180px;">
                 <option value="">{{ __('All Data') }}</option>
                 @foreach ($filterOptions as $row)
-                    <option value="{{ $row->tanggal_mulai }}_{{ $row->tanggal_selesai }}">
-                        {{ $row->tanggal_mulai }} s/d {{ $row->tanggal_selesai }}
+                    @php
+                        $filterValue = \Carbon\Carbon::parse($row->tanggal_mulai)->format('Y-m-d') . '_' . \Carbon\Carbon::parse($row->tanggal_selesai)->format('Y-m-d');
+                    @endphp
+                    <option value="{{ $filterValue }}">
+                        {{ \Carbon\Carbon::parse($row->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($row->tanggal_selesai)->format('d M Y') }}
                     </option>
                 @endforeach
             </select>

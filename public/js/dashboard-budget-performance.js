@@ -1,4 +1,7 @@
 (function () {
+    let budgetChartInstance = null;
+    let activeChartRequest = null;
+
     function initDashboardBudgetPerformance() {
         const config = window.dashboardBudgetConfig;
         const chartElement = document.querySelector('#chartAnggaran');
@@ -230,14 +233,46 @@
                 },
             };
 
+            if (budgetChartInstance) {
+                budgetChartInstance.destroy();
+            }
+
             chartElement.innerHTML = '';
-            new ApexCharts(chartElement, options).render();
+            budgetChartInstance = new ApexCharts(chartElement, options);
+            budgetChartInstance.render();
         };
 
         const loadChart = (filter = '') => {
-            fetch(`${config.chartUrl}?filter=${filter}`)
-                .then(response => response.json())
-                .then(renderChart);
+            if (activeChartRequest) {
+                activeChartRequest.abort();
+            }
+
+            activeChartRequest = new AbortController();
+
+            const params = new URLSearchParams();
+            if (filter) {
+                params.set('filter', filter);
+            }
+
+            fetch(`${config.chartUrl}${params.toString() ? `?${params.toString()}` : ''}`, {
+                signal: activeChartRequest.signal,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    return response.json();
+                })
+                .then(renderChart)
+                .catch(error => {
+                    if (error.name === 'AbortError') {
+                        return;
+                    }
+
+                    console.error('Budget chart load error:', error);
+                    chartElement.innerHTML = `<div class='d-flex align-items-center justify-content-center' style='height: 200px;'><p class='text-muted'>${config.labels.noData}</p></div>`;
+                });
         };
 
         document.getElementById('filterTanggal')?.addEventListener('change', function () {
