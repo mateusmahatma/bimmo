@@ -38,8 +38,8 @@
                             </div>
                             <div class="d-flex justify-content-end align-items-center mt-2">
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-secondary btn-sm px-3 d-none"
-                                        id="cancelEditBtn">{{ __('Cancel') }}</button>
+                                    <button class="btn btn-secondary btn-sm px-3 d-none" id="cancelEditBtn"><i
+                                            class="bi bi-x-circle me-1"></i>{{ __('Cancel') }}</button>
                                     <button class="btn btn-primary btn-sm px-4 d-flex align-items-center gap-2"
                                         id="addNewNoteBtn" type="button">
                                         <i class="bi bi-plus-lg"></i>
