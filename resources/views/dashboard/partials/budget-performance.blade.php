@@ -11,18 +11,21 @@
             <p class="text-muted mb-0 mt-1" style="font-size: 0.82rem;">{{ __('Track your budget usage.') }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button id="btnSyncAnggaran" class="btn btn-sm btn-outline-primary border-0 rounded-0"
-                title="{{ __('Sync Data') }}">
-                <i class="bi bi-arrow-repeat"></i>
+            <button id="btnSyncAnggaran" class="btn btn-sm btn-outline-primary" title="{{ __('Sync Data') }}">
+                <i class="bi bi-arrow-repeat"></i> Synchronized
             </button>
             <select id="filterTanggal" class="form-select form-select-sm rounded-0" style="width: 180px;">
                 <option value="">{{ __('All Data') }}</option>
                 @foreach ($filterOptions as $row)
                     @php
-                        $filterValue = \Carbon\Carbon::parse($row->tanggal_mulai)->format('Y-m-d') . '_' . \Carbon\Carbon::parse($row->tanggal_selesai)->format('Y-m-d');
+                        $filterValue =
+                            \Carbon\Carbon::parse($row->tanggal_mulai)->format('Y-m-d') .
+                            '_' .
+                            \Carbon\Carbon::parse($row->tanggal_selesai)->format('Y-m-d');
                     @endphp
                     <option value="{{ $filterValue }}">
-                        {{ \Carbon\Carbon::parse($row->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($row->tanggal_selesai)->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($row->tanggal_mulai)->format('d M Y') }} s/d
+                        {{ \Carbon\Carbon::parse($row->tanggal_selesai)->format('d M Y') }}
                     </option>
                 @endforeach
             </select>
