@@ -1,6 +1,15 @@
 {
     "Dashboard": "Dasbor",
+    "Emergency Fund Progress": "Kemajuan Dana Darurat",
+    "Achieved": "Telah tercapai",
+    "Actual": "Saat ini",
+    "Keep up the good work! Just": "Teruslah bekerja dengan baik! Hanya",
+    "left to reach your target.": "sisa waktu untuk mencapai target Anda.",
+    "Debt Service Ratio": "",
+    "Track your safety net status.": "Pantau status jaring pengaman Anda.",
     "Wallet": "Dompet",
+    "Combined balance from all your active wallets.": "Saldo gabungan dari semua dompet aktif Anda.",
+    "Total Balance": "Saldo Total",
     "Budget": "Anggaran",
     "Budget Categories": "Kategori Anggaran",
     "Budget Monitoring": "Monitoring Anggaran",
@@ -582,5 +591,6 @@
     "last through the end of the period": "masih mencukupi hingga akhir periode",
     "Keep it up!": "Pertahankan!",
     "Notes": "Catatan",
-    "Record Now": "Catat Sekarang"
+    "Record Now": "Catat Sekarang",
+    "Copy Budget Period": "Salin Periode Anggaran"
 }
