@@ -201,9 +201,9 @@
 
             {{-- Transaction List --}}
             <div class="col-12">
-                <div class="card shadow-sm">
+                <div class="card">
                     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                        <div>
+                        <div class="card-body">
                             <h5 class="card-title mb-0 fw-bold text-dark" style="font-size:1.1rem;">
                                 {{ __('Transactions') }}
                             </h5>
