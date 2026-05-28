@@ -14,7 +14,7 @@
             <button class="btn btn-primary btn-sm px-4 d-flex align-items-center gap-2" id="addNewNoteBtn"
                 type="button">
                 <i class="bi bi-plus-lg"></i>
-                <span class="fw-bold" id="btnNoteText">{{ __('Add Data') }}</span>
+                <span class="fw-bold" id="btnNoteText">{{ __('Add Notes') }}</span>
             </button>
         </div>
     </div>

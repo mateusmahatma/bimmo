@@ -521,7 +521,7 @@
             function resetForm() {
                 quill.setContents([]);
                 editingNoteId = null;
-                btnNoteText.textContent = 'Add Reminder';
+                btnNoteText.textContent = 'Add Notes';
                 cancelEditBtn.classList.add('d-none');
                 addNoteBtn.querySelector('i').classList.replace('bi-check-lg', 'bi-plus-lg');
                 if (noteEditorWrapper) noteEditorWrapper.classList.add('d-none');
