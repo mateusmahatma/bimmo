@@ -30,11 +30,17 @@
                                 {{ __('Create a period to be used during the budget monitoring process.') }}</p>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal"
-                                data-bs-target="#periodeAnggaranModal" style="padding: 2px 10px;">
+                            <button type="button" class="btn btn-outline-primary btn-sm shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#copyPeriodeAnggaranModal" style="padding: 2px 10px;"
+                                {{ isset($allPeriods) && $allPeriods->count() > 0 ? '' : 'disabled' }}>
+                                <i class="bi bi-clipboard-plus me-1"></i>
+                                {{ __('Copy Budget Period') }}
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm px-3 btn-add-desktop"
+                                data-bs-toggle="modal" data-bs-target="#periodeAnggaranModal">
                                 <i class="bi bi-plus-lg
                                 me-1"></i>
-                                {{ __('Add Budget Period Data') }}
+                                {{ __('Add Budget Period') }}
                             </button>
                         </div>
                     </div>
@@ -117,6 +123,69 @@
         </div>
     </section>
 
+    <!-- Modal: Copy Periode Anggaran -->
+    <div class="modal fade" id="copyPeriodeAnggaranModal" tabindex="-1" aria-labelledby="copyPeriodeAnggaranModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content border-0 shadow">
+                <form method="POST" action="{{ route('anggaran.copy') }}" autocomplete="off">
+                    @csrf
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold" id="copyPeriodeAnggaranModalLabel">
+                            {{ __('Copy Periode Anggaran') }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium small  text-muted required"
+                                for="copy_nama_periode">{{ __('Nama Periode') }}</label>
+                            <input type="text" id="copy_nama_periode" class="form-control" name="nama_periode_copy"
+                                placeholder="{{ __('Contoh: April 2026') }}" value="{{ old('nama_periode_copy') }}"
+                                required>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium small  text-muted required"
+                                    for="copy_tanggal_mulai">{{ __('Tanggal Mulai') }}</label>
+                                <input type="date" id="copy_tanggal_mulai" class="form-control" name="tanggal_mulai_copy"
+                                    value="{{ old('tanggal_mulai_copy') }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium small  text-muted required"
+                                    for="copy_tanggal_selesai">{{ __('Tanggal Selesai') }}</label>
+                                <input type="date" id="copy_tanggal_selesai" class="form-control"
+                                    name="tanggal_selesai_copy" value="{{ old('tanggal_selesai_copy') }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-medium small  text-muted required"
+                                for="source_periode_id">{{ __('Pilih Periode yang Dicopy') }}</label>
+                            <select id="source_periode_id" class="form-select" name="source_periode_id" required>
+                                <option value="" selected disabled>{{ __('Pilih Periode') }}</option>
+                                @foreach ($allPeriods ?? collect() as $p)
+                                    <option value="{{ $p->id_periode_anggaran }}"
+                                        {{ (string) old('source_periode_id') === (string) $p->id_periode_anggaran ? 'selected' : '' }}>
+                                        {{ $p->nama_periode }} ({{ optional($p->tanggal_mulai)->format('Y-m-d') }} -
+                                        {{ optional($p->tanggal_selesai)->format('Y-m-d') }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="text-muted small mt-2">
+                            {{ __('Detail anggaran akan disalin dari periode yang dipilih.') }}
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0 pb-4">
+                        <button type="button" class="btn btn-light"
+                            data-bs-dismiss="modal">{{ __('Batal') }}</button>
+                        <button type="submit" class="btn btn-primary px-4">{{ __('Simpan') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Tambah Periode Anggaran -->
     <div class="modal fade" id="periodeAnggaranModal" tabindex="-1" aria-labelledby="periodeAnggaranModalLabel"
         aria-hidden="true">
@@ -125,7 +194,8 @@
                 <form method="POST" action="{{ route('anggaran.store') }}" autocomplete="off">
                     @csrf
                     <div class="modal-header border-bottom-0 pb-0">
-                        <h5 class="modal-title fw-bold" id="periodeAnggaranModalLabel">{{ __('Tambah Periode Anggaran') }}
+                        <h5 class="modal-title fw-bold" id="periodeAnggaranModalLabel">
+                            {{ __('Tambah Periode Anggaran') }}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -134,24 +204,26 @@
                             <label class="form-label fw-medium small  text-muted required"
                                 for="nama_periode">{{ __('Nama Periode') }}</label>
                             <input type="text" id="nama_periode" class="form-control" name="nama_periode"
-                                placeholder="{{ __('Contoh: April 2026') }}" required>
+                                placeholder="{{ __('Contoh: April 2026') }}" value="{{ old('nama_periode') }}" required>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-medium small  text-muted required"
                                     for="tanggal_mulai">{{ __('Tanggal Mulai') }}</label>
-                                <input type="date" id="tanggal_mulai" class="form-control" name="tanggal_mulai" required>
+                                <input type="date" id="tanggal_mulai" class="form-control" name="tanggal_mulai"
+                                    value="{{ old('tanggal_mulai') }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium small  text-muted required"
                                     for="tanggal_selesai">{{ __('Tanggal Selesai') }}</label>
                                 <input type="date" id="tanggal_selesai" class="form-control" name="tanggal_selesai"
-                                    required>
+                                    value="{{ old('tanggal_selesai') }}" required>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer border-top-0 pt-0 pb-4">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('Batal') }}</button>
+                        <button type="button" class="btn btn-light"
+                            data-bs-dismiss="modal">{{ __('Batal') }}</button>
                         <button type="submit" class="btn btn-primary px-4">{{ __('Simpan') }}</button>
                     </div>
                 </form>
@@ -160,3 +232,15 @@
     </div>
 
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (old('source_periode_id') || old('nama_periode_copy') || old('tanggal_mulai_copy') || old('tanggal_selesai_copy'))
+                (new bootstrap.Modal(document.getElementById('copyPeriodeAnggaranModal'))).show();
+            @elseif (old('tanggal_mulai') || old('tanggal_selesai') || old('nama_periode'))
+                (new bootstrap.Modal(document.getElementById('periodeAnggaranModal'))).show();
+            @endif
+        });
+    </script>
+@endpush
