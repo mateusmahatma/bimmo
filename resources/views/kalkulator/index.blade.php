@@ -25,14 +25,14 @@
                     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                         <div class="card-body">
                             <h5 class="card-title mb-0 fw-bold text-dark"
-                                style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Proses Budget') }}</h5>
+                                style="font-size: 1.1rem; letter-spacing: -0.01em;">{{ __('Process Budget') }}</h5>
                             <p class="text-muted small mb-0 mt-1">
-                                {{ __('Pilih periode anggaran yang sudah dibuat, lalu proses budget.') }}</p>
+                                {{ __('Select the budget period you have created, then process the budget.') }}</p>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal"
-                                data-bs-target="#prosesPeriodeModal" style="padding: 2px 10px; font-size: 0.75rem;">
-                                <i class="bi bi-gear me-1"></i> {{ __('Proses Budget') }}
+                            <button type="button" class="btn btn-primary btn-sm px-3 btn-add-desktop"
+                                data-bs-toggle="modal" data-bs-target="#prosesPeriodeModal">
+                                <i class="bi bi-arrow-repeat"></i> {{ __('Process Budget') }}
                             </button>
                         </div>
                     </div>
@@ -115,15 +115,15 @@
         <div class="modal-dialog modal-dialog-centered modal-md">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="prosesPeriodeModalLabel">{{ __('Proses Budget') }}</h5>
+                    <h5 class="modal-title fw-bold" id="prosesPeriodeModalLabel">{{ __('Process Budget') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pt-4">
                     <div class="mb-3">
                         <label for="id_periode_anggaran"
-                            class="form-label fw-medium small text-uppercase text-muted required">{{ __('Pilih Periode Anggaran') }}</label>
+                            class="form-label fw-medium small text-uppercase text-muted required">{{ __('Select Budget Period') }}</label>
                         <select id="id_periode_anggaran" class="form-select">
-                            <option value="">{{ __('Pilih...') }}</option>
+                            <option value="">{{ __('Select...') }}</option>
                             @foreach ($periods ?? [] as $p)
                                 <option value="{{ $p->id_periode_anggaran }}">
                                     {{ $p->nama_periode }} ({{ optional($p->tanggal_mulai)->format('Y-m-d') }} —
@@ -131,14 +131,13 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="form-text small">
-                            {{ __('Periode ini akan digunakan sebagai rentang tanggal proses budget.') }}</div>
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pt-0 pb-4">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('Batal') }}</button>
-                    <button type="button" class="btn btn-primary px-4" id="btnProsesPeriode">
-                        <span class="me-1"><i class="bi bi-gear"></i></span> {{ __('Proses') }}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> {{ __('Batal') }}</button>
+                    <button type="button" class="btn btn-primary" id="btnProsesPeriode">
+                        <span class="me-1"><i class="bi bi-arrow-repeat"></i></span> {{ __('Proses') }}
                         <span id="btnProsesPeriodeSpinner" class="spinner-border spinner-border-sm ms-2 d-none"
                             role="status" aria-hidden="true"></span>
                     </button>
