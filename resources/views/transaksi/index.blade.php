@@ -151,16 +151,15 @@
                 </div>
             </div>
 
-
             {{-- Transaction Dates --}}
             <div class="col-12">
-                <div class="card shadow-sm transaksi-main-card">
+                <div class="card transaksi-main-card">
 
                     {{-- Card Header --}}
                     <div
                         class="card-header bg-white border-bottom py-3
                                 d-flex justify-content-between align-items-center">
-                        <div>
+                        <div class="card-body">
                             <h5 class="card-title mb-0 fw-bold text-dark transaksi-section-title">
                                 {{ __('Transaction Dates') }}
                             </h5>
