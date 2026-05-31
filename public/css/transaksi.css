@@ -189,15 +189,12 @@
 
 /* Date cards */
 .date-card-link:hover .date-card {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: rgba(13, 110, 253, 0.2);
+    border-color: green;
 }
 
 .date-card {
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 [data-bs-theme="dark"] .date-card {
@@ -207,27 +204,6 @@
 
 [data-bs-theme="dark"] .date-card-link:hover .date-card {
     border-color: rgba(96, 165, 250, 0.3);
-}
-
-.date-badge {
-    width: 52px;
-    min-width: 52px;
-    background: linear-gradient(135deg, #0d6efd, #0984e3);
-    color: #fff;
-    padding: 6px 4px;
-}
-
-.date-badge-month {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.85;
-}
-
-.date-badge-day {
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1.1;
 }
 
 .date-badge-dow {

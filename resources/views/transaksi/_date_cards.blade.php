@@ -17,10 +17,10 @@
                 <div class="date-card p-3 d-flex align-items-center gap-3">
 
                     {{-- Calendar Badge --}}
-                    <div class="date-badge flex-shrink-0 text-center">
-                        <div class="date-badge-month">{{ \Carbon\Carbon::parse($group->date)->format('M') }}</div>
-                        <div class="date-badge-day">{{ \Carbon\Carbon::parse($group->date)->format('d') }}</div>
-                        <div class="date-badge-dow">{{ \Carbon\Carbon::parse($group->date)->translatedFormat('D') }}
+                    <div class="badge text-bg-primary">
+                        <div class="fs-6 fw-normal">{{ \Carbon\Carbon::parse($group->date)->format('M') }}</div>
+                        <div class="fs-6 fw-normal">{{ \Carbon\Carbon::parse($group->date)->format('d') }}</div>
+                        <div class="fs-6 fw-normal">{{ \Carbon\Carbon::parse($group->date)->translatedFormat('D') }}
                         </div>
                     </div>
 
@@ -28,8 +28,7 @@
                     <div class="flex-grow-1 min-w-0">
                         <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
                             <span class="fw-semibold text-dark date-card-title">{{ $group->dateFormatted }}</span>
-                            <span class="badge bg-light text-secondary border fw-normal rounded-pill px-2 py-1"
-                                style="font-size: 0.72rem;">
+                            <span class="badge bg-light text-secondary border fw-normal px-2 py-1">
                                 {{ $group->count }} {{ __('transactions') }}
                             </span>
                         </div>

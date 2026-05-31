@@ -463,8 +463,7 @@
 
                                 </form>
                             </div>
-                        </div>{{-- /filterCollapse --}}
-
+                        </div>
 
                         <div id="transaction-table-container">
                             @include('transaksi._date_cards', ['groupedByDate' => $groupedByDate])
