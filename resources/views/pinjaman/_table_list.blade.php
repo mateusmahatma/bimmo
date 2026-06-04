@@ -189,10 +189,10 @@
                     <td class="text-center">
                         @if ($row->status === 'lunas')
                             <span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i>
-                                {{ __('Lunas') }}</span>
+                                {{ __('Paid in full') }}</span>
                         @else
                             <span class="badge bg-danger-light text-danger"><i class="bi bi-x-circle me-1"></i>
-                                {{ __('Belum Lunas') }}</span>
+                                {{ __('Not Yet Paid in Full') }}</span>
                         @endif
                     </td>
                     <td class="text-center">
