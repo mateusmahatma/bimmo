@@ -53,7 +53,7 @@
                         <li class="nav-item">
                             <a class="nav-link sub-link {{ Request()->is('kalkulator*') ? 'active' : '' }}"
                                 href="{{ route('kalkulator.index') }}" wire:navigate>
-                                {{ __('Proses & Monitoring') }}
+                                {{ __('Process & Monitoring') }}
                             </a>
                         </li>
                     </ul>
