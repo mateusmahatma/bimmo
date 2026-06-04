@@ -41,6 +41,19 @@
                     </a>
                 </th>
                 <th class="text-end text-secondary small fw-bold">
+                    <a href="{{ $sortLink('jumlah_angsuran') }}"
+                        class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
+                        data-sort="jumlah_angsuran"
+                        data-direction="{{ $currentSort === 'jumlah_angsuran' && $currentDir === 'asc' ? 'desc' : 'asc' }}">
+                        {{ __('MONTHLY PAYMENTS') }}
+                        @if ($currentSort === 'jumlah_angsuran')
+                            <i class="bi bi-arrow-{{ $currentDir === 'asc' ? 'up' : 'down' }}"></i>
+                        @else
+                            <i class="bi bi-arrow-down-up opacity-50"></i>
+                        @endif
+                    </a>
+                </th>
+                <th class="text-end text-secondary small fw-bold">
                     <a href="{{ $sortLink('total_loan') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
                         data-sort="total_loan"
@@ -167,6 +180,9 @@
                             -
                         @endif
                     </td>
+                    <td class="text-end fw-bold text-warning">Rp
+                        {{ number_format($row->nominal_angsuran, 0, ',', '.') }}
+                    </td>
                     <td class="text-end fw-bold text-primary">Rp {{ number_format($total_loan, 0, ',', '.') }}</td>
                     <td class="text-end fw-bold text-success">Rp {{ number_format($paid, 0, ',', '.') }}</td>
                     <td class="text-center">
@@ -201,7 +217,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11" class="text-center py-5">
+                    <td colspan="12" class="text-center py-5">
                         <div class="py-4">
                             <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
                             <p class="text-muted mt-2">{{ __('No Loan records found') }}</p>
