@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', __('Budget Monitoring'))
+@section('title', __('Process & Monitoring'))
 
 @push('css')
     <link href="{{ asset('css/kalkulator.css') }}?v={{ filemtime(public_path('css/kalkulator.css')) }}" rel="stylesheet">
@@ -8,11 +8,11 @@
 
 @section('container')
     <div class="pagetitle mb-4">
-        <h1 class="fw-bold mb-1">{{ __('Budget Monitoring') }}</h1>
+        <h1 class="fw-bold mb-1">{{ __('Process & Monitoring') }}</h1>
         <nav>
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-                <li class="breadcrumb-item active">{{ __('Budget Monitoring') }}</li>
+                <li class="breadcrumb-item active">{{ __('Process & Monitoring') }}</li>
             </ol>
         </nav>
     </div>
