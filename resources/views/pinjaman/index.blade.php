@@ -260,7 +260,7 @@
 @section('container')
 
     <div class="pagetitle mb-4">
-        <h1 class="fw-bold mb-1">{{ __('Loan List') }}</h1>
+        <h1 class="fw-bold mb-1">{{ __('Loan') }}</h1>
         <nav>
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
