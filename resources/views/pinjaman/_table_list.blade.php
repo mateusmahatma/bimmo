@@ -1,4 +1,4 @@
-<div class="table-responsive">
+<div class="table-responsive loan-table-scroll">
     @php
         $currentSort = request('sort', 'created_at');
         $currentDir = request('direction', 'desc');
@@ -26,7 +26,7 @@
                         @endif
                     </a>
                 </th>
-                <th class="text-secondary small fw-bold">{{ __('NOTES') }}</th>
+                <th class="text-secondary small fw-bold loan-notes-heading">{{ __('NOTES') }}</th>
                 <th class="text-center text-secondary small fw-bold">
                     <a href="{{ $sortLink('next_due_date') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-center gap-1 sort-link"
@@ -135,7 +135,7 @@
                     <td class="text-secondary fw-medium">
                         {{ $loop->iteration + ($pinjaman->currentPage() - 1) * $pinjaman->perPage() }}</td>
                     <td class="fw-semibold text-dark">{{ $row->nama_pinjaman }}</td>
-                    <td class="text-muted small rich-text-index">{!! $row->keterangan ?: '-' !!}</td>
+                    <td class="text-muted small rich-text-index loan-notes-cell">{!! $row->keterangan ?: '-' !!}</td>
                     <td class="text-center fw-semibold text-dark">
                         @php
                             $totalPaidForDue = $row->bayar_pinjaman->sum('jumlah_bayar');

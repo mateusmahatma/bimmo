@@ -108,11 +108,47 @@
                 display: block;
             }
 
+            #pinjamanTable {
+                min-width: 1320px;
+            }
+
+            .loan-table-scroll #pinjamanTable {
+                display: table;
+            }
+
+            .loan-table-scroll #pinjamanTable thead {
+                display: table-header-group;
+            }
+
+            .loan-table-scroll #pinjamanTable tbody {
+                display: table-row-group;
+            }
+
+            .loan-table-scroll #pinjamanTable tr {
+                display: table-row;
+                margin-bottom: 0;
+                padding: 0;
+                box-shadow: none;
+                border: 0;
+            }
+
+            .loan-table-scroll #pinjamanTable th,
+            .loan-table-scroll #pinjamanTable td {
+                display: table-cell;
+                padding: 0.75rem;
+                min-height: 0;
+                text-align: inherit;
+            }
+
             /* Hide table headers */
             #pinjamanTable thead tr {
                 position: absolute;
                 top: -9999px;
                 left: -9999px;
+            }
+
+            .loan-table-scroll #pinjamanTable thead tr {
+                position: static;
             }
 
             #pinjamanTable tr {
@@ -146,6 +182,10 @@
                 max-width: 100%;
             }
 
+            #pinjamanTable .loan-notes-cell {
+                max-width: none;
+            }
+
             #pinjamanTable td:last-child {
                 padding-left: 10px;
                 text-align: center;
@@ -155,6 +195,13 @@
                 gap: 10px;
                 border-bottom: 0;
                 margin-top: 5px;
+            }
+
+            .loan-table-scroll #pinjamanTable td:last-child {
+                display: table-cell !important;
+                padding: 0.75rem;
+                margin-top: 0;
+                border-bottom: inherit;
             }
 
             #pinjamanTable td:before {
@@ -173,12 +220,20 @@
                 content: attr(data-label);
             }
 
+            .loan-table-scroll #pinjamanTable td:before {
+                display: none;
+            }
+
             #pinjamanTable td:last-child:before {
                 display: none;
             }
 
             #pinjamanTable td[data-label="No"] {
                 display: none;
+            }
+
+            .loan-table-scroll #pinjamanTable td[data-label="No"] {
+                display: table-cell;
             }
         }
 
@@ -193,8 +248,48 @@
             border-color: rgba(255, 255, 255, 0.05);
         }
 
+        .table-responsive.loan-table-scroll {
+            display: block;
+            max-width: 100%;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive.loan-table-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive.loan-table-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 999px;
+        }
+
+        .table-responsive.loan-table-scroll::-webkit-scrollbar-thumb {
+            background: rgba(55, 65, 81, 0.35);
+            border-radius: 999px;
+        }
+
+        #pinjamanTable {
+            min-width: 1320px;
+        }
+
         .rich-text-index p {
             margin-bottom: 0.25rem;
+        }
+
+        .loan-notes-heading {
+            width: 18%;
+        }
+
+        .loan-notes-cell {
+            max-width: 220px;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .loan-notes-cell > *:last-child {
+            margin-bottom: 0;
         }
 
         .loan-progress-wrap {
