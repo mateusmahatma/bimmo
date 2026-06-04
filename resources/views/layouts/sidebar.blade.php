@@ -37,7 +37,7 @@
                 <a class="nav-link d-flex align-items-center {{ Request()->is('anggaran*', 'kalkulator*') ? 'active' : '' }}"
                     data-bs-toggle="collapse" href="#{{ $prefix ?? '' }}menuAnggaran" role="button">
                     <i class="bi bi-calculator-fill me-3"></i>
-                    <span>{{ __('Budget') }}</span>
+                    <span>{{ __('Budget Management') }}</span>
                     <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
 
@@ -47,13 +47,13 @@
                         <li class="nav-item">
                             <a class="nav-link sub-link {{ Request()->is('anggaran*') ? 'active' : '' }}"
                                 href="{{ route('anggaran.index') }}" wire:navigate>
-                                {{ __('Budget Period') }}
+                                {{ __('Period') }}
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link sub-link {{ Request()->is('kalkulator*') ? 'active' : '' }}"
                                 href="{{ route('kalkulator.index') }}" wire:navigate>
-                                {{ __('Budget Monitoring') }}
+                                {{ __('Proses & Monitoring') }}
                             </a>
                         </li>
                     </ul>
