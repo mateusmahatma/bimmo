@@ -26,8 +26,8 @@
                         @endif
                     </a>
                 </th>
-                <th class="text-secondary small fw-bold loan-notes-heading">{{ __('NOTES') }}</th>
-                <th class="text-center text-secondary small fw-bold">
+                <th style="width: 20%;" class="text-secondary small fw-bold loan-notes-heading">{{ __('NOTES') }}</th>
+                <th style="width: 20%;" class="text-center text-secondary small fw-bold">
                     <a href="{{ $sortLink('next_due_date') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-center gap-1 sort-link"
                         data-sort="next_due_date"
@@ -40,7 +40,7 @@
                         @endif
                     </a>
                 </th>
-                <th class="text-end text-secondary small fw-bold">
+                <th style="width: 20%;" class="text-end text-secondary small fw-bold">
                     <a href="{{ $sortLink('jumlah_angsuran') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
                         data-sort="jumlah_angsuran"
@@ -53,7 +53,7 @@
                         @endif
                     </a>
                 </th>
-                <th class="text-end text-secondary small fw-bold">
+                <th style="width: 20%;" class="text-end text-secondary small fw-bold">
                     <a href="{{ $sortLink('total_loan') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
                         data-sort="total_loan"
@@ -66,7 +66,7 @@
                         @endif
                     </a>
                 </th>
-                <th class="text-end text-secondary small fw-bold">
+                <th style="width: 20%;" class="text-end text-secondary small fw-bold">
                     <a href="{{ $sortLink('paid_amount') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
                         data-sort="paid_amount"
@@ -80,7 +80,7 @@
                     </a>
                 </th>
                 <th class="text-secondary small fw-bold text-center">{{ __('PROGRESS') }}</th>
-                <th class="text-end text-secondary small fw-bold">
+                <th style="width: 20%;" class="text-end text-secondary small fw-bold">
                     <a href="{{ $sortLink('jumlah_pinjaman') }}"
                         class="text-decoration-none text-secondary d-flex align-items-center justify-content-end gap-1 sort-link"
                         data-sort="jumlah_pinjaman"
